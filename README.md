@@ -1,24 +1,35 @@
-# KSolr Mandala Asset Search Tool 
+# Search UI Mandala Search Tool 
 This tool is implelemented in Javascript as a module to search for resources using 
 the Solr index. 
 
 ### Dependencies 
 
-It needs jQuery and jQueryi to be loaded. If you want to support touch based devices, 
-load the jquery.ui.touch-punch.min.js jQuery plugin.
+It needs jQuery, 
 
 ### Implementations
 
-It can be run as a standalone modulesee index.html for implementation) or as a 
-plug-in for v4.x of the CKEditor rich text editor (see demo.htm, and the ksolr folder in
-ckeditor/plugins for implementation).
+	When allocated, attaches a <div> framework containing a search button in the top white bar of the Mandala app.
+	When clicked, it will expand to cover the entire screen. 
+	An sui=open message is sent to host.
+	When a SOLR query is needed, a JSON formatted version of the search object is sent to host uoing a sui=query message.
+	The host responds with a SOLR query.
+	When an item has been selected, a sui=page message is sent to host and the host navigates there.
+	The UI retreats to only the search button.
+	A sui=close message is sent to host.
 
-As a plugin, it calls a url of the standlone imlementattion online somewhere
-(as set in ckeditor/plugins/ksolr/dialogs/ksolr.js line 10) and communicates 
-back to the plugin using HTML5 messaging.
-
-The main code returns a solr JSON object of the resource to add. The kSolrHandler()
-handler takes that JSON and adds  HTML code to ther rich text to represent it
+	Requires: 	jQuery 												// Almost any version should work
+	CSS:		searchui.css										// All styles are prefixed with 'sui-'
+	JS:			ECMA-6												// Uses lambda (arrow) functions
+	Images:		loading.gif, gradient.jpg, treebuts.png
+	Globals:	sui													// Needs to be declared globally!
+	Usage: 		var sui=new SearchUI();								// Allocs SearchUI class (fully encapsulated)							
+	Messages: 	sui=page|url ->										// Hides search and send url to direct Drupal to display
+				sui=open|searchState ->								// Tells Drupal search page is open w/ current search state (ss object)
+				sui=query|searchState ->							// Asks Drupul to turn search state (JSON) into SOLR query string
+				sui=close ->										// Tells Drupal search page is closed
+				-> sui=open|[searchState] 							// Open search page is to search state
+				-> sui=close										// Close search page 
+			
 
 License
 =====
