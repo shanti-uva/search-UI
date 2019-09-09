@@ -4,9 +4,9 @@ the Solr index.
 
 ### Dependencies 
 
-It needs jQuery, 
+It needs jQuery. 
 
-### Implementations
+### Implementation
 
 	When allocated, attaches a <div> framework containing a search button in the top white bar of the Mandala app.
 	When clicked, it will expand to cover the entire screen. 
