@@ -276,7 +276,7 @@ class SearchUI  {
 			$("#sui-left").slideDown();																// Slide down
 			}
 		else if (this.ss.mode == "advanced") {														// Advanced search
-			$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width()-35+"px",display:"inline-block"});	// Size and show results area
+			$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width()-19+"px",display:"inline-block"});	// Size and show results area
 			$("#sui-adv").css({ display:"inline-block" });										// Show search ui
 			}
 		$("#sui-headLeft").css({ display:"inline-block" });											// Show left header

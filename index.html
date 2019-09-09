@@ -3,20 +3,21 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-	<link rel="stylesheet" href="css/kmapsearch.css"></link>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<script src="searchui.js"></script>
-	<link rel="stylesheet"  type="text/css" href="css/searchui.css">
-	<link REL="SHORTCUT ICON" HREF="img/favicon.ico">
+	<link rel="stylesheet"  type="text/css" href="searchui.css">
+	<link REL="SHORTCUT ICON" HREF="img/shanti.ico">
 	<title>Mandala Search UI</title>
 </head>
 
 <body>
-	<div style='white-space:nowrap'>
-		<img src="img/mandalaleft.jpg">
-		<img src="img/mandalaright.jpg" style='float:right'>
-	<div>
-	<img src="img/mandalaback.jpg" style='width:100%; height:calc(100vh - 48px)'>
+	<div style='margin:-8px;padding:0'>
+		<div style='white-space:nowrap'>
+			<img src="img/mandalaleft.jpg">
+			<img src="img/mandalaright.jpg" style='float:right'>
+		<div>
+		<img src="img/mandalaback.jpg" style='width:100%;margin-top:-5px;height:calc(100vh - 55px)'>
+	</div>
 <script>
 
 var sui=new SearchUI();														// Alloc new search object
@@ -35,15 +36,6 @@ var sui=new SearchUI();														// Alloc new search object
 		else
 			console.log(msg);
 	}
-
-/*	OLD CKEDIT TESTBED
-	var solr=new ksSolr();													// Alloc ksSolr object
-	solr.ImportSolrDialog(300,done);										// Run dialog
-	<!script src="ksolr.js"></!script>
-	<!script src="zoomer.js"><!script>
-*/
-	
-
 </script>
 </body>
 </html>

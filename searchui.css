@@ -1,8 +1,7 @@
-
 .sui-main {			position: absolute; left:0; top:0; font-family:Verdana,Geneva,sans-serif,shanticon;
 					font-size:14px; box-sizing:border-box; padding:0; margin:0; width:100vw; height:100vh;
 					}
-.sui-top {			padding-left:calc(100% - 495px); height:36px; width:480px; user-select:none; padding-top:6px;  
+.sui-top {			padding-left:calc(100% - 493px); height:36px; width:480px; user-select:none; padding-top:6px;  
 					}
 .sui-search1 {		float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:230px; padding: 6px 8px 0 8px;
 					border-radius:16px 0 0 16px; border-left: 1px solid #999; border-top:1px solid #999; border-bottom:1px solid #999;
@@ -158,7 +157,7 @@
 .sui-tree li a { 	line-height: 19px; cursor: pointer; }
 .sui-tree > ul > li > a { color: #3B4C56; display: block;  font-weight: normal; position: relative; text-decoration: none; }
 .sui-tree li.parent > a { padding: 0 0 2px 20px;  }
-.sui-tree li.parent > a:before { background-image: url("../treebuts.png"); content: ""; display: block;
+.sui-tree li.parent > a:before { background-image: url("treebuts.png"); content: ""; display: block;
 								height: 15px; left:0; position: absolute; top:2px; width: 15px;  background-position:0;
 					}
 .sui-tree ul li.active > a:before { background-position: 30px; }
