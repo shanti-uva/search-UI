@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link REL="SHORTCUT ICON" HREF="img/shanti.ico">
+	<title>Book Adder</title>
+</head>
+<style>
+
+	body { 			font-family: Verdana,Geneva,sans-serif; font-size:13px; box-sizing: border-box;
+					}
+	.sui-search {	background-color:#fafafa; font-size:16px; height:22px; width:200px; padding: 4px 8px 0 8px;
+					border-radius:16px; border: 1px solid #999; text-align:center
+					}
+	.sui-gridPopup {position:absolute; width:200px; padding:16px; left:calc(50% - 100px); top:25%; color:#990000;
+					border-radius:8px; background-color:#eee; border:1px solid #ccc; display:none; font-size:14px; text-align:center
+					}	
+	.sui-but {		background-color:#a4baec; font-size:16px; height:27px; padding: 4px 12px 0 13px; cursor:pointer;
+					border-radius:16px; border: 1px solid #999; text-align:center; color:#fff;
+					
+
+	::-webkit-input-placeholder { color: #bbb }	::placeholder { color: #bbb }									
+</style>
+
+<body>
+	<br><br>
+	<div style='text-align:center'>
+		<input type='text' id='sui-search' class='sui-search' placeholder='Enter ISBN number'>
+		<br><br>Books added so far:<br><br>
+		<table id='bookList' align="center" style='text-align:left;border-spacing: 12px 2px;'>
+		<tr><td><b>Author</b></td><td><b>Title</b></td><td><b>Publisher</b></td><td><b>Date</b></td><td><b>ISBN</b></td><td><b>Picture</b></td><td></td></td></tr>
+		</table>
+		<br><br><br>
+		<button class= 'sui-but' id='downloadBooks'>Save books to tab file</button>
+	</div>
+<script>
+
+//	GetBook("0385472579");
+
+	var books=[];
+	$("#sui-search").on("change", function()   {	GetBook($(this).val());	})
+	$("#sui-down").on("change", function() 	   {	Download(); });	
+	$("#downloadBooks").on("click", function() {	Download(); });	
+
+	 function GetBook(isbn)
+	{
+		var url="https://openlibrary.org/api/books?bibkeys=ISBN:"+isbn+"&jscmd=data&format=jsonp";
+		$.ajax( { url: url, dataType:'jsonp' } ).done(function(res) {
+			var o=res["ISBN:"+isbn];
+			if (!o) {	
+				Popup("<b>Book not found!</b>")		
+				return;
+			
+			}
+			var b={ isbn:isbn };
+			b.author=""; b.title=""; b.publisher=""; b.date=""; b.pic="";
+			if (o.authors && o.authors.length) {
+				for (i=0;i<o.authors.length;++i) 	b.author+=o.authors[i].name+", ";
+				b.author=b.author.substr(0,b.author.length-2);
+				}
+			if (o.publishers && o.publishers.length) {
+				for (i=0;i<o.publishers.length;++i) 	b.publisher+=o.publishers[i].name+", ";
+				b.publisher=b.publisher.substr(0,b.publisher.length-2);
+				}
+			if (o.title)						b.title=o.title;
+			if (o.publish_date)					b.date=o.publish_date;
+			if (o.cover && o.cover.medium)		b.pic=o.cover.medium;
+			else if (o.cover && o.cover.small)	b.pic=o.cover.small;
+
+			books.push(b)
+			var str="<tr id='bookLine-"+(books.length-1)+"'>";
+			str+="<td>"+b.author+"</td>";				str+="<td>"+b.title+"</td>"; 
+			str+="<td>"+b.publisher+"</td>"; 			str+="<td>"+b.date+"</td>"; 
+			str+="<td>"+b.isbn+"</td>"; 				str+="<td>"+b.pic+"</td>";
+			str+="<td id='xout-"+(books.length-1)+"'>&otimes; </td></tr>"; 
+			$("#bookList").append(str);
+			$("#sui-search").val("");	
+			
+			$("[id^=xout-]").off("click") 
+			$("[id^=xout-]").on("click", function(e) {	
+				var v=e.target.id.split("-")
+				books.splice(v[1],1);
+				$("#bookLine-"+v[1]).remove();
+				});	
+		});
+	}			
+
+	function Download() 
+	{
+		var b, text=""	
+		for (var i=0;i<books.length;++i) {
+			b=books[i];
+			text+="\t"+b.title+"\t\t\t\t\t"+b.isbn+"\t\t\t\t\t\t\t\t\t"+b.date+"\t"+b.pic+"\t\t\t\t\t\t\t\t"+b.publisher+"\t"+b.author+"\n"
+			}
+			var element = document.createElement('a');
+  		element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+  		element.setAttribute('download', "books.txt");
+  		element.style.display = 'none';
+  		document.body.appendChild(element);
+  		element.click();
+  		document.body.removeChild(element);
+	}
+
+	function Popup(msg, time)																		
+	{
+		var str="";
+		$("#sui-popupDiv").remove();															
+		str+="<div id='sui-popupDiv' class='sui-gridPopup'>"; 		
+		str+=msg+"</div>"; 																		
+		$("body").append(str);																	
+		$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);						
+	}
+
+	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
+	{
+		if (p4 != undefined)
+			console.log(msg,p1,p2,p3,p4);
+		else if (p3 != undefined)
+			console.log(msg,p1,p2,p3);
+		else if (p2 != undefined)
+			console.log(msg,p1,p2);
+		else if (p1 != undefined)
+			console.log(msg,p1);
+		else
+			console.log(msg);
+	}
+</script>
+</body>
+</html>
