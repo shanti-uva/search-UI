@@ -118,21 +118,19 @@
 /* ADVANCED SEARCH */
 
 .sui-adv { 			position:absolute; left:100%; top:0; height:calc(100% - 32px); width:314px; background-color:#eee; display:none;
-					border-left:1px solid #aaa; border-right:2px solid #aaa; padding:16px;color:#333;
+					border-left:1px solid #aaa; border-right:2px solid #aaa; padding:16px;color:#333; font-size:15px;
 					}
 .sui-advTop { 		text-align:center; color:#fff; background-color:#a4baec; padding: 8px; margin:-16px 0 0 -16px; width:calc(100% + 16px);
 					}
-
-
 .sui-advHeader { 	border-bottom:1px solid #a4baec; padding-bottom:4px; cursor:pointer; width:calc(100% - 32px);
 					} .sui-advHeader:hover { color:#668eec;	
 					}
 .sui-advTermRem { 	display:inline-block; cursor:pointer; margin-right: 4px; } .sui-advValueRem:hover { color: #668eec;
 					}
-.sui-advTerm { 		padding:6px 0 6px 6px; font-size:10px; line-height:15px;
+.sui-advTerm { 		padding:6px 0 6px 6px; font-size:11px; line-height:15px;
 					}						
 .sui-advEdit {		border:1px solid #ccc; margin-bottom:8px; width:calc(100% - 48px); background-color:#fff;
-					border-radius:5px; display:none; padding:8px; font-size:11px; color:#666;
+					border-radius:5px; display:none; padding:8px; font-size:12px; color:#666;
 					}
 .sui-advEditBut { 	display:inline-block; cursor:pointer; margin-left: 12px; vertical-align:-2px; }
 					.sui-advEditBut:hover { color:#a4baec;	

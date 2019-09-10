@@ -29,29 +29,38 @@ class SearchUI  {
 	constructor()   																			// CONSTRUCTOR
 	{
 		sui=this;																					// Save ref to class as global
-		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
-		this.facets=["place","collection","language","feature","subject","term","relationship"];
 		this.curResults="";																			// Returns results
 		this.numItems=0;																			// Number of items																						
+		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
 		this.ss={};																					// Holds search state
-		this.assets={};
-		this.assets.All=	 { c:"#5b66cb", g:"&#xe60b", n:1421 };									// All assets
-		this.assets.Places=	 { c:"#6faaf1", g:"&#xe62b", n:1200};									// Places
-		this.assets["Audio-Video"]=	{ c:"#58aab4", g:"&#xe648", n:6 };								// AV
-		this.assets.Images=	 { c:"#b49c59", g:"&#xe62a", n:32 };									// Images
-		this.assets.Sources= { c:"#7773ab", g:"&#xe631", n:86 };									// Sources
-		this.assets.Texts=	 { c:"#8b5aa1", g:"&#xe636", n:93 };									// Texts
-		this.assets.Visuals= { c:"#6e9456", g:"&#xe63b", n:39 };									// Visuals
-		this.assets.Subjects={ c:"#cc4c39", g:"&#xe634", n:39 };									// Subjects
-		this.assets.Terms=   { c:"#a2733f", g:"&#xe635", n:39 };									// Terms
+
+		this.facets={};																				
+		this.facets.place=			{ type:"tree", icon:"&#xe63b", data:[] };						// Places 
+		this.facets.collection=		{ type:"list", icon:"&#xe633", data:[] };						// Collections 
+		this.facets.language=		{ type:"list", icon:"&#xe670", data:[] };						// Languages 
+		this.facets.feature=		{ type:"tree", icon:"&#xe600", data:[] };						// Places 
+		this.facets.subject=		{ type:"tree", icon:"&#xe634", data:[] };						// Subjects 
+		this.facets.term=			{ type:"tree", icon:"&#xe635", data:[] };						// Terms 
+		this.facets.relationship=	{ type:"list", icon:"&#xe638", data:[] };						// Relationships
 	
-		this.GetFacetData();																		// Get data about SOLR categories
+		this.assets={};
+		this.assets.All=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
+		this.assets.Places=	 		{ c:"#6faaf1", g:"&#xe62b" };									// Places
+		this.assets["Audio-Video"]=	{ c:"#58aab4", g:"&#xe648" };									// AV
+		this.assets.Images=	 		{ c:"#b49c59", g:"&#xe62a" };									// Images
+		this.assets.Sources= 		{ c:"#7773ab", g:"&#xe631" };									// Sources
+		this.assets.Texts=	 		{ c:"#8b5aa1", g:"&#xe636" };									// Texts
+		this.assets.Visuals= 		{ c:"#6e9456", g:"&#xe63b" };									// Visuals
+		this.assets.Subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
+		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
+	
+		for (var key in this.facets) this.GetFacetData(key);										// Get data about SOLR categories for each facet
 		this.SetSearchState(null);																	// Init search state to default
 		this.AddFrame();																			// Add div framework
 		this.Query();																				// Get intial data
 		this.Draw();																				// Draw
 		
-		window.onresize=()=> {	this.Draw(); };														// On windo resize,
+		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw
 		}
 
 	SetSearchState(state)																		// SET OR INIT SEARCH STATE
@@ -65,7 +74,6 @@ class SearchUI  {
 			this.ss.type="All";																		// Current item types
 			this.ss.page=0;																			// Current page being shown
 			this.ss.pageSize=100;																	// Results per page	
-			this.collection=[];																		// Hold all possible collections
 			this.ss.query={ 																		// Current query
 				text:"",																			// Search word 
 				place:[],																			// Places
@@ -82,25 +90,24 @@ class SearchUI  {
 			}
 		}
 
-		GetFacetData()
-		{
-			var type="collection";
-			var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=asset_type%3A(images%20audio-video)&wt=json&rows=0&json.facet=%7Bcollection:%7Blimit:300,type:%22terms%22,field:%22collection_title%22,facet:%7Bcollection_nid:%7Bfield:%22collection_nid%22,type:%22terms%22%7D%7D%7D%7D";
-			$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {				// Get facets
-				var i,val;
-				if (!data || !data.facets || !data.facets[type] || !data.facets[type].buckets)		// If no buckets
-					return;																			// Quit
-					var buckets=data.facets[type].buckets;											// Point at buckets
-				for (i=0;i<buckets.length;++i)  													// For each bucket
-					this[type].push({ title: buckets[i].val, count:buckets[i].count, id:'', url:"some mandala URL" });		// Add to list								
-				this[type].sort((a,b) => (a.count > b.count) ? -1 : 1);								// Sort by counts
-				});
-		}
+	GetFacetData(type)																			// GET FACET DATA
+	{
+		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=asset_type%3A(images%20audio-video)&wt=json&rows=0&json.facet=%7Bcollection:%7Blimit:300,type:%22terms%22,field:%22collection_title%22,facet:%7Bcollection_nid:%7Bfield:%22collection_nid%22,type:%22terms%22%7D%7D%7D%7D";
+		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
+			var i;
+			if (!data || !data.facets || !data.facets[type] || !data.facets[type].buckets)			// If no buckets
+				return;																				// Quit
+			this.facets[type].data=[];																// New array
+			var buckets=data.facets[type].buckets;													// Point at buckets
+			for (i=0;i<buckets.length;++i)  														// For each bucket
+				this.facets[type].data.push({ title: buckets[i].val, count:buckets[i].count, id:'', url:"" });		// Add to list								
+			this.facets[type].data.sort((a,b) => (a.count > b.count) ? -1 : 1);						// Sort by counts
+			});
+	}
 
 	AddFrame()																					// ADD DIV FRAMEWORK
 	{
-		var i;
-		var icons=["&#xe62b","&#xe633","&#xe670","&#xe600","&#xe634","&#xe634","&#xe635","&#xe638"];
+		var key;
 		var str=`<div id='sui-main' class='sui-main'>
 			<div id='sui-top' class='sui-top'>
 				<div class='sui-search1'>
@@ -118,22 +125,23 @@ class SearchUI  {
 				<div id='sui-results' class='sui-results scrollbar'></div>
 				<div id='sui-footer' class='sui-footer'></div>
 				<div id='sui-adv' class='sui-adv'>
-					<div class='sui-advTop'>Advanced search<div id='sui-advClose'style='float:right;font-size:12px;cursor:pointer' 
-					title='Hide' onclick='$("#sui-mode").trigger("click")'>
-					&#xe684&nbsp;&nbsp;&nbsp;</div></div><br>
+					<div class='sui-advTop'>Advanced search
+					<div id='sui-advClose' style='float:right;font-size:12px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
+					</div><br>
 					<div class='sui-search1'>
 						<input type='text' id='sui-search2' class='sui-search2' placeholder='Enter Search'>
 						<div id='sui-clear' class='sui-search3'>&#xe610</div>
 					</div>
 					<div id='sui-searchgo2' class='sui-search4'>&#xe623</div><br><br>`
-					for (i=0;i<this.facets.length;++i)
-						str+=`<div class='sui-advHeader' id='sui-advHeader-${this.facets[i]}'>
-						${icons[i]}&nbsp;&nbsp;
-						${this.facets[i].toUpperCase()}S
-						<span id='sui-advPlus-${this.facets[i]}' style='float:right'>&#xe669</span>
+					for (key in this.facets) { 
+						str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
+						${this.facets[key].icon}&nbsp;&nbsp;
+						${key.toUpperCase()}S
+						<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
 						</div>
-					<div class='sui-advTerm' id='sui-advTerm-${this.facets[i]}'></div>
-					<div class='sui-advEdit' id='sui-advEdit-${this.facets[i]}'></div>`;
+						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
+						<div class='sui-advEdit' id='sui-advEdit-${key}'></div>`;
+						}
 					str+=`</div>
 					<div class='sui-advHeader' id='sui-advOptions-text'>&#xe623&nbsp;&nbsp;SEARCH WORD OPTIONS</div>
 				<div class='sui-advTerm' id='sui-advTerm-text'></div>
@@ -148,6 +156,7 @@ class SearchUI  {
 			$("#sui-search, #sui-search2" ).val("");	this.ss.query.text=""; 						// Clear input and query												
 			this.Query(); 																			// Load and redraw
 			});					
+		
 		$("#sui-search, #sui-search2, #sui-searchgo, #sui-searchgo2").on("change", (e)=> { 			// ON SEARCH CHANGE
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
@@ -156,11 +165,13 @@ class SearchUI  {
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
+		
 		$("#sui-mode").on("click",()=> { 															// ON CHANGE MODE
 			if (this.ss.mode == "advanced") this.ss.mode="simple";									// Go to simple mode
 			else							this.ss.mode="advanced";								// Go to advanced mode
 			this.Draw(); 																			// Redraw
 			});	
+			
 		$("[id^=sui-advHeader-]").on("click",(e)=> {												// ON FACET HEADER CLICK
 			var id=e.currentTarget.id.substring(14);												// Get facet name		
 			$(".sui-advEdit").slideUp(400, ()=> {													// Close any open tree or lists
@@ -169,8 +180,13 @@ class SearchUI  {
 					$("#sui-advPlus-"+id).html("&#xe66a");											// Show open
 				});
 			$("#sui-advPlus-"+id).html("&#xe66a");													// Show open
-			if (id.match(/place|subject|term/))		this.DrawFacetTree(id);							// Open tree tree				
-			else									this.DrawFacetList(id);							// Open list view
+
+			for (var key in this.facets)															// For each facet
+				if (this.facets[key] == "list")														// If a list
+					$("#sui-advEdit-"+key).html("");												// Erase contents
+
+			if (this.facets[id].type == "tree")		this.DrawFacetTree(id);							// Open tree tree				
+			else									this.DrawFacetList(id);							// Draw list view
 			});
 		}
 
@@ -576,14 +592,14 @@ class SearchUI  {
 	DrawAdvanced()																				// DRAW SEARCH UI SECTION
 	{
 		var i,j,str;
-		for (i=0;i<2;++i) {																			// For each facet
-			$("#sui-advTerm-"+this.facets[i]).empty();												// Clear list
-			for (j=0;j<this.ss.query[this.facets[i]].length;++j) {									// For each term in facet	
-				var o=sui.ss.query[this.facets[i]][j];												// Point at facet to add to div
-				str=`<div><div class='sui-advTermRem' id='sui-advKill-${this.facets[i]}-${j}'>&#xe60f</div>
-					<div class='sui-advEditBool' id='sui-advBool-${this.facets[i]}-${j}' title='Change boolean method'>${this[o.bool]}</div>
+		for (var key in this.facets) {																// For each facet
+			$("#sui-advTerm-"+key).empty();															// Clear list
+			for (j=0;j<this.ss.query[key].length;++j) {												// For each term in facet	
+				var o=sui.ss.query[key][j];															// Point at facet to add to div
+				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${j}'>&#xe60f</div>
+					<div class='sui-advEditBool' id='sui-advBool-${key}-${j}' title='Change boolean method'>${this[o.bool]}</div>
 					<i> ${o.title}</i></div>`;
-					$("#sui-advTerm-"+this.facets[i]).append(str);
+				$("#sui-advTerm-"+key).append(str);
 				}
 			}
 	
@@ -615,11 +631,7 @@ class SearchUI  {
 			$("#sui-advEdit-"+id).slideUp();														// Close it 
 			return;																			
 			}
-		for (i=0;i<this.facets.length;++i)															// For each facet
-			if (!this.facets[i].match(/place|feature|subject|term/))								// If a list
-				$("#sui-advEdit-"+this.facets[i]).html("");											// Erase contents
-
-		var items=this["collection"];																// Point at items
+		var items=this.facets[id].data;																// Point at items
 		var tot=items.length;																		// Number of items
 		var n=Math.min(300,items.length);															// Cap at 300
 		if (tot > 300) tot="300+";																	// Too many, cap to 300
@@ -699,23 +711,25 @@ class SearchUI  {
 		this.Query();																				// Run query and show results
 	}
 
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TREE 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawFacetTree(id, open, searchItem)  																			// DRAW FACET TREE
+
+	DrawFacetTree(facet, open, searchItem)  													// DRAW FACET TREE
 	{
-		if (!open && ($("#sui-advEdit-"+id).css("display") != "none")) {							// If open
-			$("#sui-advEdit-"+id).slideUp();														// Close it 
+		if (!open && ($("#sui-advEdit-"+facet).css("display") != "none")) {							// If open
+			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
 			}
-		var div="#sui-tree"+id;																		// Tree div
+		var div="#sui-tree"+facet;																	// Tree div
 		if (!$(div).length) {																		// If doesn't exist
 			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 			style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>
 			<div class='sui-advEditBut' id='sui-advTreeMap' title='List view'>&#xe61f</div>
-			<div id='sui-tree${id}' class='sui-tree'><ul>`;		
-			if (id == "place") {
+			<div id='sui-tree${facet}' class='sui-tree'><ul>`;		
+			if (facet == "place") {
 				str+="<li class='parent'><a id='places-13738' data-path='13735/13738'>Africa";
 				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/13738' title='View page'>&#xe67c</div></a>";					
 				str+="<li class='parent'><a id='places-13742' data-path='13735/13742'>Antarctica";
@@ -741,7 +755,7 @@ class SearchUI  {
 				str+="<li class='parent'><a id='subjects-6844' data-path='6844'>Teaching Resources</a>";
 				str+="<li class='parent'><a id='subjects-6403' data-path='6403'>Tibet and Himalayas</a>";
 				}
-			$("#sui-advEdit-"+id).html(str+"</ul></div>".replace(/\t|\n|\r/g,""));						// Add to div
+			$("#sui-advEdit-"+facet).html(str+"</ul></div>".replace(/\t|\n|\r/g,""));					// Add to div
 
 			$('.sui-tree li').each( function() {                                						// For each element
 				if ($(this).children('ul').length > 0)                       							// If has children 
@@ -757,15 +771,15 @@ class SearchUI  {
 				handleClick($(this),e);  																// Handle
 				});      
 			$("#sui-advTreeMap").on("click", ()=> {														// ON CLICK LIST BUTTON
-				this.DrawFacetList(id,1,$("#sui-advTreeFilter").val());									// Close it and open as list
+				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());								// Close it and open as list
 				});      
 			$("#sui-advTreeFilter").on("keydown", (e)=> {												// ON TYPING IN TEXT BOX
-				this.DrawFacetList(id,1,$("#sui-advTreeFilter").val());									// Close it and open as list
-				$("#sui-advEditFilter-"+id).focus();														// Focus on input in list
+				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());								// Close it and open as list
+				$("#sui-advEditFilter-"+facet).focus();													// Focus on input in list
 				});      
 			}
 	
-		$("#sui-advEdit-"+id).slideDown();																// Show it
+		$("#sui-advEdit-"+facet).slideDown();															// Show it
 			
 		function handleClick(row, e)																// HANDLE NODE CLICK
 		{
@@ -780,7 +794,7 @@ class SearchUI  {
 			else{
 				var s=$("#"+e.target.id).text();														// Get term
 				s=s.substr(0,s.length-1);																// Remove viewer icon
-				sui.AddNewTerm(id,s,e.target.id,"AND");													// Add term to search state and refresh
+				sui.AddNewTerm(facet,s,e.target.id,"AND");												// Add term to search state and refresh
 				}
 		}
 
@@ -873,7 +887,12 @@ class SearchUI  {
 		}
 	}
 
-	LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON		
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPERS
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON		
 	{
 		if (!mode) {																				// If hiding
 			$("#sui-loadingIcon").remove();															// Remove it
@@ -888,6 +907,7 @@ class SearchUI  {
 	{
 		var str="";
 		$("#sui-popupDiv").remove();																// Kill old one, if any
+		if (!msg)	return;
 		str+="<div id='sui-popupDiv' class='sui-gridPopup' style='width:auto'>"; 					// Add div
 		str+="<b>Navigate to this page:</b><br>";
 		str+=msg+"</div>"; 																			// Add div
