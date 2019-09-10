@@ -35,13 +35,14 @@ class SearchUI  {
 		this.ss={};																					// Holds search state
 
 		this.facets={};																				
-		this.facets.place=			{ type:"tree", icon:"&#xe63b", data:[] };						// Places 
-		this.facets.collection=		{ type:"list", icon:"&#xe633", data:[] };						// Collections 
-		this.facets.language=		{ type:"list", icon:"&#xe670", data:[] };						// Languages 
-		this.facets.feature=		{ type:"tree", icon:"&#xe600", data:[] };						// Places 
-		this.facets.subject=		{ type:"tree", icon:"&#xe634", data:[] };						// Subjects 
-		this.facets.term=			{ type:"tree", icon:"&#xe635", data:[] };						// Terms 
-		this.facets.relationship=	{ type:"list", icon:"&#xe638", data:[] };						// Relationships
+		this.facets.place=			{ type:"tree",  icon:"&#xe63b", data:[] };						// Places 
+		this.facets.collection=		{ type:"list",  icon:"&#xe633", data:[] };						// Collections 
+		this.facets.language=		{ type:"list",  icon:"&#xe670", data:[] };						// Languages 
+		this.facets.feature=		{ type:"tree",  icon:"&#xe638", data:[] };						// Features 
+		this.facets.subject=		{ type:"tree",  icon:"&#xe634", data:[] };						// Subjects 
+		this.facets.term=			{ type:"tree",  icon:"&#xe635", data:[] };						// Terms 
+		this.facets.user=			{ type:"input", icon:"&#xe600", data:[] };						// Terms 
+		this.facets.relationship=	{ type:"list",  icon:"&#xe638", data:[] };						// Relationships
 	
 		this.assets={};
 		this.assets.All=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
@@ -185,8 +186,9 @@ class SearchUI  {
 				if (this.facets[key] == "list")														// If a list
 					$("#sui-advEdit-"+key).html("");												// Erase contents
 
-			if (this.facets[id].type == "tree")		this.DrawFacetTree(id);							// Open tree tree				
-			else									this.DrawFacetList(id);							// Draw list view
+			if (this.facets[id].type == "input")		this.DrawInput(id);							// Draw input editor			
+			else if (this.facets[id].type == "tree")	this.DrawFacetTree(id);						// Open tree editor				
+			else										this.DrawFacetList(id);						// Draw list editor
 			});
 		}
 
@@ -621,8 +623,28 @@ class SearchUI  {
 			this.Query();																			// Run query and show results
 			});
 		}
+
 		
-	DrawFacetList(id, open, searchItem)
+	DrawInput(facet)																			// DRAW INPUT FACET PIVKER
+	{
+		if ($("#sui-advEdit-"+facet).css("display") != "none") {									// If open
+			$("#sui-advEdit-"+facet).slideUp();														// Close it 
+			return;																			
+			}
+		var tot=934;
+		var str=`<input id='sui-advInput-${facet}' placeholder='Type here'  
+		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>
+		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${facet}s</div>`;
+		$("#sui-advEdit-"+facet).html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
+		$("#sui-advEdit-"+facet).slideDown();														// Show it
+
+		$("#sui-advInput-"+facet).on("change",(e)=> {												// ON CHANGE
+			var v=e.target.id.split("-");															// Get ids		
+			this.AddNewTerm(facet,$("#sui-advInput-"+facet).val(),"","AND");						// Add term to search state
+			});
+	}
+
+	DrawFacetList(id, open, searchItem)															// DRAW LIST FACET PICKER
 	{
 		var i;
 		var sorted=0;
