@@ -6,7 +6,7 @@
 .sui-search1 {		float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:230px; padding: 6px 8px 0 8px;
 					border-radius:16px 0 0 16px; border-left: 1px solid #999; border-top:1px solid #999; border-bottom:1px solid #999;
 					}
-.sui-search2 {		float:left; background-color:#fafafa; color:#888; height:17px; width:200px; margin-top:-2px; margin-left:2px; font-size:14px;
+.sui-search2 {		float:left; background-color:#fafafa; color:#888; height:17px; width:195px; margin-top:-2px; margin-left:2px; font-size:14px;
 					outline:none; border-radius:0; border:0; appearance: none; -webkit-appearance: none; box-shadow: none !important;
 					}
 .sui-search3 {		float:right; font-size:16px; color: #ccc; cursor:pointer;
@@ -86,7 +86,7 @@
 .sui-grid { 		display:inline-block;
 					}
 .sui-gridPic { 		height:100px; width:150px; margin-bottom:2px; cursor:pointer; border: 2px solid #ddd; text-align:center }
-					 .sui-gridPic:hover { border-color:#a4baec;
+					0385472579 .sui-gridPic:hover { border-color:#a4baec;
 					}
 .sui-gridInfo { 	display:inline-block; cursor:pointer; color:#fff; border-radius:16px; margin-left:-24px; vertical-align:10px;
 					padding-top:1px; text-align:center; margin-right:17px; text-shadow:1px 1px 2px #666;
@@ -94,8 +94,8 @@
 .sui-gridGlyph{ 	position:absolute; font-size:36px; pointer-events:none; width:138px; height:72px; margin-top:-100px; 
 					text-align:center;  padding:16px 12px 0 12px; overflow:hidden;
 					}					
-.sui-gridPopup {	position:absolute; width:300px; padding:16px; left:calc(50% - 250px); top:calc(50% - 50px);
-					border-radius:8px; background-color:#fff; border:1px solid #ccc; display:none; font-size:12px;
+.sui-gridPopup {	position:absolute; width:300px; left:calc(50% - 250px); top:calc(50% - 50px); font-family:Verdana,Geneva,sans-serif,shanticon;
+					padding:16px; border-radius:8px; background-color:#fff; border:1px solid #ccc; display:none; font-size:12px;
 					}
 
 /* CARD RESULTS */

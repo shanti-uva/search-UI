@@ -158,10 +158,16 @@ class SearchUI  {
 			this.Query(); 																			// Load and redraw
 			});					
 		
-		$("#sui-search, #sui-search2, #sui-searchgo, #sui-searchgo2").on("change", (e)=> { 			// ON SEARCH CHANGE
+		$("#sui-search, #sui-search2").on("change", (e)=> { 										// ON SEARCH CHANGE
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			$("#sui-search2").val(this.ss.query.text);												// Set adv search
+			if (this.ss.mode == "input") this.ss.mode="simple";										// Toggle simple mode
+			this.ss.page=0;																			// Start at beginning
+			this.Query(); 																			// Load and redraw
+			});	
+
+		$("#sui-searchgo, #sui-searchgo2").on("click", (e)=> { 										// ON SEARCH BUTTON CLCK
 			if (this.ss.mode == "input") this.ss.mode="simple";										// Toggle simple mode
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
@@ -426,10 +432,10 @@ class SearchUI  {
 			var o=this.curResults[num];																// Point at item
 			var str="";
 			if (o.title) str+="<b>"+o.title+"</b><br><br>";											// Add title
-			str+=this.Glyph(this.assets[o.asset_type].g)+"&nbsp;&nbsp;"+o.asset_type.toUpperCase();	// Add type
+			str+=this.assets[o.asset_type].g+"&nbsp;&nbsp;"+o.asset_type.toUpperCase();				// Add type
 			if (o.asset_subtype) str+=" / "+o.asset_subtype;										// Add subtype
 			str+="<br>";
-			if (o.creator) str+="<p>"+this.Glyph("&#xe600")+"&nbsp;&nbsp;"+o.creator.join(", ")+"</p>";	// Add creator
+			if (o.creator) str+="<p>&#xe600&nbsp;&nbsp;"+o.creator.join(", ")+"</p>";				// Add creator
 			if (o.summary || o.caption) {															// If a summary or caption
 				var s1=o.summary || o.caption;														// Use either summary or caption
 				if (s1.length > 80)	s1=s1.substr(0,80)+"...";										// Limit size
@@ -945,11 +951,6 @@ LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON
 		str+=msg+"</div>"; 																			// Add content
 		$("body").append(str);																		// Add popup to div or body
 		$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);					// Animate in and out		
-	}
-
-	Glyph(str)																					// SHOW GLYPH
-	{
-		return `<span style='font-family:shanticon'>${str}</span>`;									// Force glyph
 	}
 
 } // SearchUI class closure
