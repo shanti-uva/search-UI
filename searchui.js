@@ -669,6 +669,7 @@ class SearchUI  {
 				str+="<div class='sui-advEditBut' id='sui-advListMap' title='Tree view'>&#xe638</div>";
 				str+=`<div class='sui-advEditBut' id='sui-advEditSort-${id}' title='Sort'>&#xe652</div>
 				<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${id}s</div>
+				<hr style='border: .5px solid #a4baec'>
 				<div class='sui-advEditList'>`;
 		for (i=0;i<n;++i)																			// For each one
 			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>
@@ -756,6 +757,7 @@ class SearchUI  {
 			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 			style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>
 			<div class='sui-advEditBut' id='sui-advTreeMap' title='List view'>&#xe61f</div>
+			<hr style='border: .5px solid #a4baec'>
 			<div id='sui-tree${facet}' class='sui-tree'><ul>`;		
 			if (facet == "place") {
 				str+="<li class='parent'><a id='places-13738' data-path='13735/13738'>Africa";
