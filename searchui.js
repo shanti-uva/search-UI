@@ -26,13 +26,14 @@
 
 class SearchUI  {																					
 
-	constructor()   																			// CONSTRUCTOR
+	constructor(mode)   																		// CONSTRUCTOR
 	{
 		sui=this;																					// Save ref to class as global
 		this.curResults="";																			// Returns results
 		this.numItems=0;																			// Number of items																						
 		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
 		this.ss={};																					// Holds search state
+		this.testMode=mode;																			// Current mode
 
 		this.facets={};																				
 		this.facets.place=			{ type:"tree",  icon:"&#xe63b", data:[] };						// Places 
@@ -90,21 +91,6 @@ class SearchUI  {
 				};																
 			}
 		}
-
-	GetFacetData(type)																			// GET FACET DATA
-	{
-		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=asset_type%3A(images%20audio-video)&wt=json&rows=0&json.facet=%7Bcollection:%7Blimit:300,type:%22terms%22,field:%22collection_title%22,facet:%7Bcollection_nid:%7Bfield:%22collection_nid%22,type:%22terms%22%7D%7D%7D%7D";
-		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
-			var i;
-			if (!data || !data.facets || !data.facets[type] || !data.facets[type].buckets)			// If no buckets
-				return;																				// Quit
-			this.facets[type].data=[];																// New array
-			var buckets=data.facets[type].buckets;													// Point at buckets
-			for (i=0;i<buckets.length;++i)  														// For each bucket
-				this.facets[type].data.push({ title: buckets[i].val, count:buckets[i].count, id:'', url:"" });		// Add to list								
-			this.facets[type].data.sort((a,b) => (a.count > b.count) ? -1 : 1);						// Sort by counts
-			});
-	}
 
 	AddFrame()																					// ADD DIV FRAMEWORK
 	{
@@ -209,6 +195,21 @@ class SearchUI  {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  QUERY
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	GetFacetData(type)																			// GET FACET DATA
+	{
+		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=asset_type%3A(images%20audio-video)&wt=json&rows=0&json.facet=%7Bcollection:%7Blimit:300,type:%22terms%22,field:%22collection_title%22,facet:%7Bcollection_nid:%7Bfield:%22collection_nid%22,type:%22terms%22%7D%7D%7D%7D";
+		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
+			var i;
+			if (!data || !data.facets || !data.facets[type] || !data.facets[type].buckets)			// If no buckets
+				return;																				// Quit
+			this.facets[type].data=[];																// New array
+			var buckets=data.facets[type].buckets;													// Point at buckets
+			for (i=0;i<buckets.length;++i)  														// For each bucket
+				this.facets[type].data.push({ title: buckets[i].val, count:buckets[i].count, id:'', url:"" });		// Add to list								
+			this.facets[type].data.sort((a,b) => (a.count > b.count) ? -1 : 1);						// Sort by counts
+			});
+	}
 
 	Query()																						// QUERY AND UPDATE RESULTS
 	{
@@ -427,11 +428,11 @@ class SearchUI  {
 
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
-			this.SendMessage(this.curResults[num].url_html);										// Send message
-			});
+			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
+			})
 		$("[id^=sui-itemPic-]").on("click",(e)=> { 													// ON ITEM CLICK
 			var num=e.currentTarget.id.substring(12);												// Get index of result	
-			this.SendMessage(this.curResults[num].url_html);										// Send message
+			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
 			});
 		$(".sui-gridInfo").on("mouseover",(e)=> { 													// ON INFO BUTTON HOVER
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
@@ -454,7 +455,7 @@ class SearchUI  {
 		$(".sui-gridInfo").on("mouseout",(e)=> { $("#sui-popupDiv").remove(); });					// ON INFO BUTTON OUT
 		$("[id^=sui-itemTitle-]").on("click",(e)=> { 												// ON TITLE CLICK
 			var num=e.currentTarget.id.substring(14);												// Get index of result	
-			this.SendMessage(this.curResults[num].url_html);										// Send message
+			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
 			});
 		$(".sui-itemPlus").on("click",(e)=> { 														// ON MORE BUTTON CLICK
 			this.ShowItemMore(e.currentTarget.id.substring(13));									// Shoe more info below
@@ -481,7 +482,7 @@ class SearchUI  {
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {										// If has an ancestors trail
 			str+="<div class='sui-itemTrail'>";														// Holds trail
 			for (i=0;i<o.ancestors_txt.length;++i) {												// For each trail member
-				str+="<span class='sui-itemAncestor' onclick='sui.SendMessage(\"";					// Add ancestor
+				str+="<span class='sui-itemAncestor' onclick='sui.SendMessage(\"page=";				// Add ancestor
 				str+="https://mandala.shanti.virginia.edu/"+o.asset_type.toLowerCase()+"/";			// URL stem
 				str+=o.ancestor_ids_is[i+1]+"/overview/nojs#search\")'>";							// URL end
 				str+=o.ancestors_txt[i]+"</span>";													// Finish ancestor link
@@ -551,7 +552,7 @@ class SearchUI  {
 		$("#sui-itemMore-"+num).slideDown();														// Slide it down
 		$("[id^=sui-itemPic]").on("click",(e)=> { 													// ON PIC CLICK
 			var num=e.currentTarget.id.substring(12);												// Get index of result	
-			this.SendMessage(this.curResults[num].url_html);										// Send message
+			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
 			});
 		}
 
@@ -685,7 +686,7 @@ class SearchUI  {
 		
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			var v=e.target.id.split("-");															// Get ids		
-			if (v[0].match(/ViewListPage/))	this.SendMessage(items[v[1]].url);						// If viewing, ask for that page
+			if (v[0].match(/ViewListPage/))	this.SendMessage("page="+items[v[1]].url);				// If viewing, ask for that page
 			else	this.AddNewTerm(id,items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
 			});
 	
@@ -775,7 +776,7 @@ class SearchUI  {
 
 			$('.sui-advViewTreePage').on("click", (e)=> {												// ON CLICK VIEW BUTTON
 				var v=e.target.id.split("-");															// Get id
-				this.SendMessage("https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs");			// Goto page
+				this.SendMessage("page=https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs");	// Goto page
 				e.stopPropagation();																	// Stop propagation
 				});      
 			$('.sui-tree li > a').on("click", function(e) {												// ON CLICK OF NODE TEXT
@@ -870,7 +871,7 @@ class SearchUI  {
 	
 					$('.sui-advViewTreePage').on("click", (e)=> {									// ON CLICK VIEW BUTTON
 						var v=e.target.id.split("-");												// Get id
-						sui.SendMessage("https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs"); // Goto page
+						sui.SendMessage("page=https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs"); // Goto page
 						e.stopPropagation();														// Stop propagation
 						});      
 			
@@ -944,14 +945,17 @@ LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON
 	SendMessage(msg, time)																		// SEND MESSAGE TO HOST
 	{
 		var str="";
-		$("#sui-popupDiv").remove();																// Kill old one, if any
 		if (!msg)	return;
-		str+="<div id='sui-popupDiv' class='sui-gridPopup' style='width:auto'>"; 					// Add div
-		str+="<b>Navigate to this page:</b><br>";
-		str+=msg+"</div>"; 																			// Add div
-		$("body").append(str);																		// Add popup to div or body
-		$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);					// Animate in and out		
-	}
+		window.parent.postMessage("sui="+msg,"*");													// Send message to parent wind		
+		if (this.testMode == "test") {																// Test mode
+			$("#sui-popupDiv").remove();															// Kill old one, if any
+			str+="<div id='sui-popupDiv' class='sui-gridPopup' style='width:auto'>"; 				// Add div
+			str+="<b>Navigate to this page:</b><br>";
+			str+=msg+"</div>"; 																		// Add div
+			$("body").append(str);																	// Add popup to div or body
+			$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);				// Animate in and out		
+			}
+		}
 
 	Popup(msg, time, x, y)																		// POPUP 
 	{
