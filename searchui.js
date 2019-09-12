@@ -240,7 +240,7 @@ class SearchUI  {
 
 	FormQuery()																					// FORM SOLR QUERY FROM SEARCH OBJECT
 	{
-		var i,str,search="*";																		// Assume not filtering of words
+		var i,o,str,search="*";																		// Assume not filtering of words
 		if (this.ss.query.text) {																	// If a filter spec'd
 			str="*"+this.ss.query.text.toLowerCase()+"*";											// Search term
 			search=" (title%3A"+str;																// Look at title
@@ -251,12 +251,18 @@ class SearchUI  {
 		if (o.length) 																				// If spec'd
 			for (i=0;i<o.length;++i) 																// For each term
 				search+=" "+o[i].bool+" kmapid%3A"+o[i].id.toLowerCase();							// Place search term 
-		var o=this.ss.query.collection;																// Point at collection
+		o=this.ss.query.collection;																	// Point at collection
 		if (o.length) 																				// If spec'd
 			for (i=0;i<o.length;++i) {																// For each term
 				str="*"+o[i].title.toLowerCase()+"*";												// Search term
 				search+=" "+o[i].bool+" collection_title%3A"+str;									// Boolean and title
 				}
+		o=this.ss.query.user;                                                                   	// Point at user            
+		if (o.length)                                                                               // If spec'd
+			for (i=0;i<o.length;++i) {                                                              // For each term
+				str="*"+o[i].title.toLowerCase()+"*";                                               // Search term
+				search+=" "+o[i].bool+" node_user%3A"+str;                                          // Boolean and title
+				}		
 		return search;																				// Return formatted query
 	}
 
@@ -630,7 +636,6 @@ class SearchUI  {
 			});
 		}
 
-		
 	DrawInput(facet)																			// DRAW INPUT FACET PIVKER
 	{
 		if ($("#sui-advEdit-"+facet).css("display") != "none") {									// If open
@@ -758,35 +763,11 @@ class SearchUI  {
 			style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>
 			<div class='sui-advEditBut' id='sui-advTreeMap' title='List view'>&#xe61f</div>
 			<hr style='border: .5px solid #a4baec'>
-			<div id='sui-tree${facet}' class='sui-tree'><ul>`;		
-			if (facet == "place") {
-				str+="<li class='parent'><a id='places-13738' data-path='13735/13738'>Africa";
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/13738' title='View page'>&#xe67c</div></a>";					
-				str+="<li class='parent'><a id='places-13742' data-path='13735/13742'>Antarctica";
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/1742' title='View page'>&#xe67c</div></a>";					
-				str+="<li class='parent'><a id='places-13740' data-path='13735/13740'>Asia";
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/13740' title='View page'>&#xe67c</div></a>";					
-				str+="<li class='parent'><a id='places-13739' data-path='13735/13739'>Europe";
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/13739' title='View page'>&#xe67c</div></a>";					
-				str+="<li class='parent'><a id='places-13736' data-path='13735/13736'>North America";
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/13736' title='View page'>&#xe67c</div></a>";					
-				str+="<li class='parent'><a id='places-13741' data-path='13735/13741'>Oceania";
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/13741' title='View page'>&#xe67c</div></a>";					
-				str+="<li class='parent'><a id='places-13737' data-path='13735/13737'>South America";
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-places/13747' title='View page'>&#xe67c</div></a>";					
-				}
-			else{
-				str+="<li class='parent'><a id='subjects-8868' data-path='8868'>Cultural Landscapes</a>";
-				str+="<li class='parent'><a id='subjects-6793' data-path='6793'>General</a>";
-				str+="<li class='parent'><a id='subjects-20'   data-path='20'  >Geographic Features</a>";
-				str+="<li class='parent'><a id='subjects-6404' data-path='6404'>Higher Education Digital Tools</a>";
-				str+="<li class='parent'><a id='subjects-6664' data-path='6664'>Mesoamerican Studies</a>";
-				str+="<li class='parent'><a id='subjects-7174' data-path='7174'>Politics</a>";
-				str+="<li class='parent'><a id='subjects-6844' data-path='6844'>Teaching Resources</a>";
-				str+="<li class='parent'><a id='subjects-6403' data-path='6403'>Tibet and Himalayas</a>";
-				}
-			$("#sui-advEdit-"+facet).html(str+"</ul></div>".replace(/\t|\n|\r/g,""));					// Add to div
-
+			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
+			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));								// Add tree frame to div
+			if (facet == "place") 	LazyLoad(null,facet,13735);
+			else 					GetTopRow(facet);
+	
 			$('.sui-tree li').each( function() {                                						// For each element
 				if ($(this).children('ul').length > 0)                       							// If has children 
 					$(this).addClass('parent');                              							// Make parent class
@@ -815,7 +796,7 @@ class SearchUI  {
 		{
 			if (e.offsetX < 20) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
-					LazyLoad(row);																		// Lazy load from SOLR
+					LazyLoad(row,facet);																// Lazy load from SOLR
 				else{																					// Open or close
 					row.parent().toggleClass('active');                         						// Toggle active class on or off
 					row.parent().children('ul').slideToggle('fast');            						// Slide into place
@@ -828,42 +809,69 @@ class SearchUI  {
 				}
 		}
 
-		function LazyLoad(row) 															// ADD NEW NODES TO TREE
+		function GetTopRow(facet, sort)																// GET TOP-MOST TREE LEVEL
 		{
-			if (row.parent().children().length == 1) {										// If no children, lazy load 
-				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";	// Base url
-				var path=""+row.data().path;												// Get path	as string										
-					var lvla=path.split("/").length+1;										// Get level
-				var type=row.prop("id").split('-')[0];										// Get type
-				var url=buildQuery(base,type,path,lvla,lvla);								// Build query
-				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {				// Run query
+			var i,o,str="<ul>";
+			var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";				// Base url
+			var url=buildQuery(base,facet+"s","/",1,1);													// Build query
+			trace(url)
+			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {								// Run query
+				trace(res)
+				for (i=0;i<res.response.docs.length;++i) {												// For each child
+					o=res.response.docs[i];																// Point at child
+					str+="<li class='parent'><a id='"+o.id+"'";											// Start row
+					str+="' data-path='"+o.ancestor_id_path+"'>"+o.header;								// Add path/header
+					str+="<div class='sui-advViewTreePage' id='advViewTreePage"+o.id+"' title='View page'>&#xe67c</div>";					
+					str+="</a></li>";																	// Add label
+					}
+				$("#sui-tree"+facet).html(str+"</ul>");													// If initing 1st level
+				$('.sui-tree li > a').off();															// Clear handlers
+				$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 				// Restore handler
+				});
+		}
+
+		function LazyLoad(row, facet, init) 													// ADD NEW NODES TO TREE
+		{
+			var path;
+			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
+				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
+				if (init) 	path=""+init;															// Force path as string
+				else 		path=""+row.data().path;												// Get path	as string										
+				var lvla=path.split("/").length+1;													// Set level
+				var type=facet+"s";																	// Set type
+				var url=buildQuery(base,type,path,lvla,lvla);										// Build query
+				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
 					var o,i,re;
-					var str="<ul style='display:none'>";									// Wrapper
-					var f=res.facet_counts.facet_fields.ancestor_id_path.join();			// List of facets
+					var str="<ul>";																	// Wrapper, show if not initting
+					var f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
 					res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); // Sort
-					for (i=0;i<res.response.docs.length;++i) {								// For each child
-						o=res.response.docs[i];												// Point at child
-						re=new RegExp("\/"+o.id.split("-")[1]);								// Id
-						str+="<li";															// Start row
-						if (f && f.match(re))	str+=" class='parent'"						// If has children, add parent class
-						str+="><a id='"+o.id;												// Add id
-						str+="' data-path='"+o.ancestor_id_path+"'>";						// Add path
-						str+=o.header;														// Add label
+					
+					for (i=0;i<res.response.docs.length;++i) {										// For each child
+						o=res.response.docs[i];														// Point at child
+						re=new RegExp("\/"+o.id.split("-")[1]);										// Id
+						str+="<li";																	// Start row
+						if ((f && f.match(re)) || init)	str+=" class='parent'"						// If has children or is top, add parent class
+						str+="><a id='"+o.id;														// Add id
+						str+="' data-path='"+o.ancestor_id_path+"'>";								// Add path
+						str+=o.header;																// Add label
 						str+="<div class='sui-advViewTreePage' id='advViewTreePage"+o.id+"' title='View page'>&#xe67c</div>";					
-						str+="</a></li>";													// Add label
+						str+="</a></li>";															// Add label
 						}
 					if (res.response.docs.length) {
-						row.after(str+"</ul>");												// Add to tree
-						row.parent().toggleClass('active');                         		// Toggle active class on or off
-						row.parent().children('ul').slideToggle('fast');            		// Slide into place
-						$('.sui-tree li > a').off();										// Clear handlers
+						if (init)	$("#sui-tree"+facet).html(str+"</ul>");							// If initing 1st level
+						else{																		// Adding a level to a branch
+							row.after(str+"</ul>");													// Add children to tree
+							row.parent().toggleClass('active');                         			// Toggle active class on or off
+							row.parent().children('ul').slideToggle('fast');            			// Slide into place
+							}
+						$('.sui-tree li > a').off();												// Clear handlers
 						$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 	// Restore handler
 						}
 	
-					$('.sui-advViewTreePage').on("click", (e)=> {							// ON CLICK VIEW BUTTON
-						var v=e.target.id.split("-");										// Get id
+					$('.sui-advViewTreePage').on("click", (e)=> {									// ON CLICK VIEW BUTTON
+						var v=e.target.id.split("-");												// Get id
 						sui.SendMessage("https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs"); // Goto page
-						e.stopPropagation();												// Stop propagation
+						e.stopPropagation();														// Stop propagation
 						});      
 			
 					});
