@@ -163,6 +163,11 @@
 .sui-tree ul li ul 	{ border-left: 1px solid #a4baec;  display: none; margin: 0 0 0 7px; padding: 0 0 0 12px; }
 .sui-tree ul li ul li { position: relative; }
 
+/* PLACES */
+
+#plc-infoDiv { position: absolute; top: 250px;  left: 15px; }
+#plc-infoDiv input { border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
+
 /* PSUEDO ELEMENTS */
 
 .sui-main ::-webkit-scrollbar { width: 10px } 

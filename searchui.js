@@ -10,6 +10,7 @@
 	A sui=close message is sent to host.
 
 	Requires: 	jQuery 												// Almost any version should work
+	Needs:		places.js											// Other JS modules
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		loading.gif, gradient.jpg, treebuts.png
@@ -20,8 +21,8 @@
 				sui=query|searchState ->							// Asks Drupul to turn search state (JSON) into SOLR query string
 				sui=close ->										// Tells Drupal search page is closed
 				-> sui=open|[searchState] 							// Open search page is to search state
-				-> sui=close										// Close search page 
-			
+				-> sui=close										// Close search page 	
+	
 */
 
 class SearchUI  {																					
@@ -57,6 +58,7 @@ class SearchUI  {
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
 		for (var key in this.facets) this.GetFacetData(key);										// Get data about SOLR categories for each facet
+		this.places=new Places();																	// Alloc places class
 		this.SetSearchState(null);																	// Init search state to default
 		this.AddFrame();																			// Add div framework
 		this.Query();																				// Get intial data
@@ -70,7 +72,7 @@ class SearchUI  {
 		if (!state) {
 			this.ss={};																				// Clear search state
 			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR production url
-			this.ss.mode="simple";																	// Current mode - can be input, simple, or advanced
+			this.ss.mode="input";																	// Current mode - can be input, simple, or advanced
 			this.ss.view="Card";																	// Dispay mode - can be List, Grid, or Card
 			this.ss.sort="Alpha";																	// Sort mode - can be Alpha, Date, or Author
 			this.ss.type="All";																		// Current item types
@@ -326,6 +328,8 @@ class SearchUI  {
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
 		if (n >= 1000)	n=Math.floor(n/1000)+"K";													// Shorten if need be
+		$("#sui-header").css("background-color","#888");											// Set b/g color
+	
 		var str=`
 			<span id='sui-resClose' class='sui-resClose'>&#xe60f</span>
 			Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}
@@ -362,7 +366,8 @@ class SearchUI  {
 
 	DrawFooter()																				// DRAW RESULTS FOOTER
 	{
-		var lastPage=Math.floor(this.numItems/this.ss.pageSize);										// Calc last page
+		var lastPage=Math.floor(this.numItems/this.ss.pageSize);									// Calc last page
+		$("#sui-footer").css("background-color","#888");											// Set b/g color
 		var str=`
 		<div style='float:left;font-size:18px'>
 			<div id='sui-viewModeList' class='sui-resDisplay' title='List view'>&#xe61f</div>
@@ -947,7 +952,10 @@ LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON
 	SendMessage(msg, time)																		// SEND MESSAGE TO HOST
 	{
 		var str="";
+		if (msg.match(/\/places\//i)) 																// If a place
+			this.places.Draw("317"),msg="";															// Show map
 		if (!msg)	return;
+			
 		window.parent.postMessage("sui="+msg,"*");													// Send message to parent wind		
 		if (this.testMode == "test") {																// Test mode
 			$("#sui-popupDiv").remove();															// Kill old one, if any
