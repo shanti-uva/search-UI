@@ -83,13 +83,14 @@
 
 /* GRID RESULTS */
 
-.sui-grid { 		display:inline-block;
+.sui-grid { 		display:inline-block; height:100px; width:150px; margin-bottom:2px; cursor:pointer; overflow:hidden; 
+					border: 2px solid #ddd; text-align:center; background-color:#aaa }
+					.sui-grid:hover { border-color:#a4baec;
 					}
-.sui-gridPic { 		height:100px; width:150px; margin-bottom:2px; cursor:pointer; border: 2px solid #ddd; text-align:center }
-					0385472579 .sui-gridPic:hover { border-color:#a4baec;
+.sui-gridPic { 		height:100%;
 					}
-.sui-gridInfo { 	display:inline-block; cursor:pointer; color:#fff; border-radius:16px; margin-left:-24px; vertical-align:10px;
-					padding-top:1px; text-align:center; margin-right:17px; text-shadow:1px 1px 2px #666;
+.sui-gridInfo { 	position:absolute; ; cursor:pointer; color:#fff; margin-left:128px; margin-top:-24px;
+					padding-top:1px; text-align:center; text-shadow:1px 1px 2px #666;
 					}
 .sui-gridGlyph{ 	position:absolute; font-size:36px; pointer-events:none; width:138px; height:72px; margin-top:-100px; 
 					text-align:center;  padding:16px 12px 0 12px; overflow:hidden;
@@ -101,14 +102,14 @@
 /* CARD RESULTS */
 
 .sui-card { 		display:inline-block; border-top:3px solid #9e894d;  margin:6px; background-color:#fff; width:180px; height:232px; 
-					vertical-align:top; overflow: hidden; border-radius: 0 0 5px 8px;  
+					vertical-align:top; overflow: hidden; border-radius: 0 0 5px 8px; 
 					} .sui-card:hover { border-top: 3px solid #a4baec
 					}
-.sui-cardPic { 		width:100%; height:100px; cursor:pointer; 
+.sui-cardPic { 		width:180px; cursor:pointer; 
 					}
 .sui-cardInfo { 	padding:10px; color:#666; font-size:11px; line-height:17px; margin-top:-6px; height:92px; overflow: hidden; 
 					}
-.sui-cardGlyph{ 	display:inline-block; font-size:36px; margin-left:-100px; vertical-align:37px; pointer-events:none;
+.sui-cardGlyph{ 	position:absolute; width:180px; font-size:36px; text-align:center; pointer-events:none; margin-top:-68px;
 					}	
 .sui-cardType { 	display:inline-block; margin-left:-23px; vertical-align:top; padding-top:5px; color:#fff; text-shadow:1px 1px 2px #666;
 					}					

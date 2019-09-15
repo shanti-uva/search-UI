@@ -70,7 +70,7 @@ class SearchUI  {
 		if (!state) {
 			this.ss={};																				// Clear search state
 			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR production url
-			this.ss.mode="input";																	// Current mode - can be input, simple, or advanced
+			this.ss.mode="simple";																	// Current mode - can be input, simple, or advanced
 			this.ss.view="Card";																	// Dispay mode - can be List, Grid, or Card
 			this.ss.sort="Alpha";																	// Sort mode - can be Alpha, Date, or Author
 			this.ss.type="All";																		// Current item types
@@ -283,7 +283,7 @@ class SearchUI  {
 				this.assets[val].n=buckets[i].count;												// Set count
 				}
 			this.assets.All.n=data.response.numFound;												// All count																	
-			});
+		});
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -354,6 +354,7 @@ class SearchUI  {
 			$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 				this.ss.type=e.currentTarget.id.substring(7);										// Get asset name		
 				$("#sui-typeList").remove();														// Remove type list
+				this.ss.page=0;																		// Start at beginning
 				this.Query(); 																		// Get new results
 				});							
 			});
@@ -561,13 +562,13 @@ class SearchUI  {
 		var str="<div class='sui-grid'>";
 		var o=this.curResults[num];																	// Point at item
 		str+="<img src='"+o.url_thumb+"' class='sui-gridPic' id='sui-itemPic-"+num+"'>";			// Add pic
-		str+="<div id='sui-gridInfo-"+num+"' class='sui-gridInfo'>&#xe67f</div>";					// Add info button
 		if (o.url_thumb.match(/gradient.jpg/))	{													// If a generic
 			 str+=`<div class='sui-gridGlyph' style='color:${this.assets[o.asset_type].c}'>
 			 ${this.assets[o.asset_type].g}
 			 <p style='font-size:12px;margin-top:0'>${o.title}</p>
 			 </div>`;
 			  }
+		str+="<div id='sui-gridInfo-"+num+"' class='sui-gridInfo'>&#xe67f</div>";					// Add info button
 		return str+"</div>";																		// Return grid markup
 	}
 
@@ -578,7 +579,8 @@ class SearchUI  {
 		var c="#9e894d";																			// Color
 		var label=o.collection_title;																// Set label
 		var str="<div class='sui-card'>";															// Overall container
-		str+="<img src='"+o.url_thumb+"' class='sui-cardPic' id='sui-itemPic-"+num+"'>";			// Add pic
+		str+="<div style='width:100%;height:100px;overflow:hidden;display:inline-block;margin:0;padding:0'>";			// Div container
+		str+="<img src='"+o.url_thumb+"' class='sui-cardPic' id='sui-itemPic-"+num+"'></div>";		// Add pic
 		var gg=this.assets[o.asset_type].g;															// Assume generic icon
 		if (o.asset_subtype == "Audio")			gg="&#xe60a";										// Audio
 		else if (o.asset_subtype == "Video")	gg="&#xe62d";										// Video
