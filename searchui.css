@@ -50,7 +50,7 @@
 .sui-footer { 		position:absolute; left:0; top:calc(100% - 30px); width:100%; height:24px; background-color: #888;	
 					color:#fff; text-align:center; padding-top:6px; user-select:none; overflow:hidden;
 					}
-.sui-infoBottom { 	position:absolute; left:12px; height:33%; width:33%; top:calc(67% - 26px); display:none; min-width:500px;
+.sui-infoBottom { 	position:absolute; left:12px; height:33%; width:33%; top:calc(67% - 26px); display:none; min-width:500px; color:#555;
 					background-color: #f8f8f8; padding:0 16px 16px 16px; border: 1px solid #999; border-radius: 8px 8px 0 0; overflow-y:auto;	
 					}
 
@@ -133,7 +133,7 @@
 					}
 .sui-advTerm { 		padding:6px 0 6px 20px; font-size:11px; line-height:15px;
 					}						
-.sui-advEdit {		border:1px solid #ccc; margin-bottom:8px; width:calc(100% - 44px); background-color:#fff;
+.sui-advEdit {		border:1px solid #ccc; margin-bottom:8px; width:calc(100% - 44px); background-color:#fff; text-align:left;
 					border-radius:5px; display:none; padding:8px; font-size:12px; color:#666;  margin-left:12px;
 					}
 .sui-advEditBut { 	display:inline-block; cursor:pointer; margin-left: 12px; vertical-align:-2px; }
@@ -143,9 +143,9 @@
 					}
 .sui-advEditBool { 	display:inline-block; cursor:pointer; color:#668eec;}   .sui-advEditBool:hover	{ color:#ccc
 					}
-.sui-advEditList {	overflow-x:hidden; max-height:110px;  
+.sui-advEditList {	overflow-x:hidden; max-height:110px;   
 					}
-.sui-advEditLine { 	cursor:pointer; padding:2px; border-radius:5px;}	.sui-advEditLine:hover { background-color: #dee7f1
+.sui-advEditLine { 	cursor:pointer; padding:2px; border-radius:5px; }	.sui-advEditLine:hover { background-color: #dee7f1
 					}
 .sui-advViewListPage { 	display:inline-block; } .sui-advViewListPage:hover { color:#668eec;	
 					}	
@@ -168,8 +168,11 @@
 
 /* PLACES */
 
-#plc-infoDiv { position: absolute; top: 250px;  left: 15px; }
-#plc-infoDiv input { border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
+#plc-infoDiv { 		position: absolute; top: 250px;  left: 200px; }
+#plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
+.plc-typeList {		background-color:#fff; font-size:12px;  text-align:left;
+					color:#666; border-radius:8px; width:139px; cursor: pointer; border: 1px solid #999; padding:12px; 
+					}
 
 /* PSUEDO ELEMENTS */
 

@@ -36,6 +36,17 @@ class Places  {
 			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/KMLLayer", "esri/core/watchUtils"]
 	   		};
 	
+/*		app.kml=`http://www.thlib.org:8080/thdl-geoserver/wms
+			?LAYERS=thl:roman_popular_poly,thl:roman_popular_pt,thl:roman_popular_line
+			&TRANSPARENT=TRUE&SPHERICALMERCATOR=true&PROJECTION=EPSG:900913&UNITS=m
+			&GEOSERVERURL=http://www.thlib.org:8080/thdl-geoserver
+			&STYLES=thl_noscale,thl_noscale,thl_noscale
+			&CQL_FILTER=fid=${id};fid=${id};fid==${id}
+			&SERVICE=WMS&SRS=EPSG:900913&FORMAT=kml&VERSION=1.1.1
+			&BBOX=3159514.209965,-1447629.9642176,20066161.87184,9001617.5490246
+			&WIDTH=864&HEIGHT=53
+			&REQUEST=GetMap`.replace(/\t|\n|\r|/g,"")
+*/		
 		this.app=app;	   
 		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");									// Scalebar if spec'd
 		if (app.opt&2)	 app.reqs.push("esri/widgets/Search");										// Search
@@ -78,7 +89,29 @@ class Places  {
 				</div>`;
 			$("#sui-main").append(str);
 			}
-		$("#sui-results").html("<div style='width:calc(100% + 24px);height:calc(100%  + 24px);margin:-12px' id='plc-main'></div>");
+	
+		var str="<div style='position:absolute;text-align:center'>";											
+		str+="<div style='margin-bottom:8px'>RELATED ASSETS</div>";									// Title
+		str+="<div id='plc-typeList' class='plc-typeList'>";										// Enclosing div for list
+		for (var k in sui.assets) {																	// For each asset type														
+			var n=sui.assets[k].n;																	// Get number of items
+			if (n > 1000)	n=Math.floor(n/1000)+"K";												// Shorten
+			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:24px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
+			}
+		str+="</div><div style='margin:8px'>PLACES</div>";									// Title
+		str+="<div class='sui-advEdit' id='sui-advEdit-map' style='margin:0;width:146px'></div>";
+		str+="</div><div style='width:calc(100% - 177px);height:75%;margin-left:177px' id='plc-main'></div>";
+		str+=`<br><img src='https://staging-mms.thlib.org/images/0050/8753/63691_essay.jpg' style='float:left;height:100px;margin:0 12px 0 177px'>
+		<b>FEATURE TYPE:</b> <i>City &#xe613 ADM3 &#xe613 Capital of a 1st order administrative division</i>
+		<p style='font-family:serif;max-width:900px'>Lhasa is the most important city in modern and historical Tibet, both religiously and politically; located in the geographical center of central Tibet, it is home to the sacred center of Tibet in the Jokhang Temple and the famed Potala Palace, from which the Dalai Lamas ruled over Tibet.</p>`;
+		$("#sui-results").html(str.replace(/\t|\n|\r|/g,""));
+		sui.DrawFacetTree("map",1);	
+		$("[id^=sui-tl-]").on("click", (e)=> {														// ON CLICK ON ASSET 
+			sui.ss.type=e.currentTarget.id.substring(7);											// Get asset name		
+			$("#sui-typeList").remove();															// Remove type list
+			sui.ss.page=0;																			// Start at beginning
+			sui.Query(); 																			// Get new results
+			});	
 
 		app.ShowOptions=function() {																// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
@@ -117,6 +150,7 @@ class Places  {
 					var kmlFullExtent=polygons.concat(lines).concat(points).concat(images)
 					.map(graphic => (graphic.extent ? graphic.extent : graphic.geometry.extent))
 					.reduce((previous, current) => previous.union(current));
+					trace(kmlFullExtent)
 					app.mapView.goTo({ extent: kmlFullExtent });
 					});
 				});
@@ -157,7 +191,6 @@ class Places  {
 		});
 		app.sceneView.when(function() { app.sceneView.goTo({ tilt:80 }); });						// When 3D loads, tilt
 
-
 		app.DrawHeader=function()																	// DRAW MAP HEADER
 		{
 			var n=123;
@@ -165,43 +198,21 @@ class Places  {
 				<span id='sui-resClose' class='sui-resClose'>&#xe60f</span>
 				LHASA&nbsp;&nbsp;<span style='font-size:12px'> Asia > China > Tibet Autonomous Region</span>
 				`;
+			
 			$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
+			$("#sui-headRight").html("");
 			$("#sui-header").css("background-color","#6faaf1");										// Color header
 			$("#sui-footer").css("background-color","#6faaf1");										// Color header
-			str=`ASSETS&nbsp; 
-				<div id='sui-type' class='sui-type' title='Choose asset type'>
-				<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:#5b66cb'>
-				&#xe60b</div>All (${n})
-				<div id='sui-typeSet' class='sui-typeSet'>&#xe609</div>
-				</div>`;
-			$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-			$("#sui-resClose").on("click", ()=> { sui.Draw("input"); });								// ON QUIT
-			$("#sui-typeSet").on("click", ()=> {														// ON CHANGE ASSET BUTTON
-				$("#sui-typeList").remove();															// Remove type list
-				str="<div id='sui-typeList' class='sui-typeList'>";										// Enclosing div for list
-				for (var k in sui.assets) {																// For each asset type														
-					n=sui.assets[k].n;																	// Get number of items
-					if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
-					str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px; line-height: 24px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
-					}
-				$("#sui-main").append(str);																// Add to main div
-				
-				$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-					sui.ss.type=e.currentTarget.id.substring(7);										// Get asset name		
-					$("#sui-typeList").remove();														// Remove type list
-					sui.ss.page=0;																		// Start at beginning
-					sui.Query(); 																		// Get new results
-					});							
-				});
-		
+			$("#sui-main").append(str);																// Add to main div
+									
 			str=`<div style='float:left;font-size:18px'>
 				<div id='plc-viewInfoBut' class='sui-resDisplay' title='See names'>&#xe67f</div>
-				<div id='sui-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div>
+				<div id='plc-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div>
 				</div>				
-				<div style='float:right;font-size:12px'>Place id: F317 | Geocode Name: THL Extended GB Code | Code: gb.ext&nbsp;&nbsp;</div>`;
+				<div style='float:right;font-size:12px'>Place id: F317 | Geocode Name: THL Extended GB Code | Code: gb.ext&nbsp;&nbsp;&nbsp;&nbsp;</div>`;
 			$("#sui-footer").html(str);
 			
-			$("#sui-customMap").on("click", ()=> {
+			$("#plc-customMap").on("click", ()=> {
 				if ($("#plc-infoDiv").length) {
 					$("#plc-infoDiv").remove();
 					var h=$("#sui-results").height()-4;
@@ -214,7 +225,7 @@ class Places  {
 			$("#plc-viewInfoBut").on("click", ()=> {
 				$("#plc-viewInfo").remove();
 				str=`<div id='plc-viewInfo' class='sui-infoBottom'>
-				<p style='color:#668eec'><b>FEATURE TYPE</b></p><i>ADM2 &#xe638 Municipality, provincial capitol &#xe638</i><br>
+				<div id='plc-viewInfoCancel' style='float:right;cursor:pointer;margin-top:12px'>&#xe60f</div>
 				<p style='color:#668eec'><b>NAMES</p></b><span style=font-size:12px> ལྷ་ས། (Tibetan, Tibetan script, Original)<br>
 				Lhasa (Tibetan, Latin script, THL Simplified Tibetan Transcription)<br>
 				lha sa (Tibetan, Latin script, THL Extended Wylie Transliteration)<br>
@@ -233,6 +244,7 @@ class Places  {
 				</div>`;
 				$("#sui-results").append(str);
 				$("#plc-viewInfo").slideDown();
+				$("#plc-viewInfoCancel").on("click", ()=> { $("#plc-viewInfo").slideUp(); });
 			});
 
 		}

@@ -58,7 +58,8 @@ class SearchUI  {
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
 		for (var key in this.facets) this.GetFacetData(key);										// Get data about SOLR categories for each facet
-		this.places=new Places();																	// Alloc places class
+		if (mode == "test")
+			this.places=new Places();																// Alloc places class
 		this.SetSearchState(null);																	// Init search state to default
 		this.AddFrame();																			// Add div framework
 		this.Query();																				// Get intial data
@@ -294,6 +295,7 @@ class SearchUI  {
 	DrawResults()																				// DRAW RESULTS SECTION
 	{
 		$("#sui-results").scrollTop(0);																// Scroll to top
+		$("#plc-infoDiv").remove();																	// Remove map buttons
 		this.numItems=this.assets[this.ss.type].n;													// Set number of items
 		if (this.ss.mode == "input") {																// Just the search box
 			$("#sui-header").css({ display:"none"});												// Show header
@@ -671,13 +673,14 @@ class SearchUI  {
 			$("#sui-advEdit-"+id).slideUp();														// Close it 
 			return;																			
 			}
-		var items=this.facets[id].data;																// Point at items
+		
+		var items=this.facets[(id == "map") ? "place" : id].data;									// Point at items (use places for map)
 		var tot=items.length;																		// Number of items
 		var n=Math.min(300,items.length);															// Cap at 300
 		if (tot > 300) tot="300+";																	// Too many, cap to 300
 		var str=`<input id='sui-advEditFilter-${id}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>`;
-			if (id.match(/place|feature|subject|term/))
+			if (id.match(/place|feature|subject|term|map/))
 				str+="<div class='sui-advEditBut' id='sui-advListMap' title='Tree view'>&#xe638</div>";
 				str+=`<div class='sui-advEditBut' id='sui-advEditSort-${id}' title='Sort'>&#xe652</div>
 				<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${id}s</div>
@@ -742,6 +745,10 @@ class SearchUI  {
 
 	AddNewTerm(facet, title, id, bool)															// ADD NEW TERM TO SEARCH STATE
 	{
+		if (facet == "map")	{																		// If a map
+			this.ss.query.place=[{ id:id, title:title, bool:bool }];								// Sole query term
+			return;																
+			}
 		var num=this.ss.query[facet].length;														// Number to add to												
 		this.ss.query[facet].push({});																// Add obj
 		this.ss.query[facet][num].title=title;														// Get title
@@ -773,6 +780,7 @@ class SearchUI  {
 			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
 			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add tree frame to div
 			if (facet == "place") 		 LazyLoad(null,facet,13735);
+			else if (facet == "map") 	 LazyLoad(null,facet,13735);
 			else if (facet == "feature") LazyLoad(null,facet,20);
 			else 						 GetTopRow(facet);
 	
@@ -822,7 +830,6 @@ class SearchUI  {
 			var i,o,str="<ul>";
 			var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";				// Base url
 			var url=buildQuery(base,facet+"s","/",1,1);													// Build query
-			trace(url)
 			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {								// Run query
 				trace(res)
 				for (i=0;i<res.response.docs.length;++i) {												// For each child
@@ -847,8 +854,10 @@ class SearchUI  {
 				else 		path=""+row.data().path;												// Get path	as string										
 				var lvla=path.split("/").length+1;													// Set level
 				var type=facet+"s";																	// Set type
+				if (type == "features") type="subjects";											// Feature types are in subjects
+				else if (type == "maps") type="places";												// Maps are places
 				var url=buildQuery(base,type,path,lvla,lvla);										// Build query
-				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
+					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
 					var o,i,re;
 					var str="<ul>";																	// Wrapper, show if not initting
 					var f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
@@ -952,12 +961,11 @@ LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON
 	SendMessage(msg, time)																		// SEND MESSAGE TO HOST
 	{
 		var str="";
-		if (msg.match(/\/places\//i)) 																// If a place
+		if ((this.places) && msg.match(/\/places\//i)) 												// If a place
 			this.places.Draw("317"),msg="";															// Show map
 		if (!msg)	return;
-			
 		window.parent.postMessage("sui="+msg,"*");													// Send message to parent wind		
-		if (this.testMode == "test") {																// Test mode
+		if (this.testMode != "drupal") {															// Test mode
 			$("#sui-popupDiv").remove();															// Kill old one, if any
 			str+="<div id='sui-popupDiv' class='sui-gridPopup' style='width:auto'>"; 				// Add div
 			str+="<b>Navigate to this page:</b><br>";
