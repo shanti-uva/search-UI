@@ -195,8 +195,7 @@ class Places  {
 				});
 		
 			str=`<div style='float:left;font-size:18px'>
-				<div id='plc-viewNames' class='sui-resDisplay' title='See names'>&#xe67f</div>
-				<div id='plc-viewEtym' class='sui-resDisplay' title='See etymology'>&#xe638</div>
+				<div id='plc-viewInfoBut' class='sui-resDisplay' title='See names'>&#xe67f</div>
 				<div id='sui-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div>
 				</div>				
 				<div style='float:right;font-size:12px'>Place id: F317 | Geocode Name: THL Extended GB Code | Code: gb.ext&nbsp;&nbsp;</div>`;
@@ -212,6 +211,30 @@ class Places  {
 				else sui.places.Draw(sui.places.id);
 				});
 	
+			$("#plc-viewInfoBut").on("click", ()=> {
+				$("#plc-viewInfo").remove();
+				str=`<div id='plc-viewInfo' class='sui-infoBottom'>
+				<p style='color:#668eec'><b>FEATURE TYPE</b></p><i>ADM2 &#xe638 Municipality, provincial capitol &#xe638</i><br>
+				<p style='color:#668eec'><b>NAMES</p></b><span style=font-size:12px> ལྷ་ས། (Tibetan, Tibetan script, Original)<br>
+				Lhasa (Tibetan, Latin script, THL Simplified Tibetan Transcription)<br>
+				lha sa (Tibetan, Latin script, THL Extended Wylie Transliteration)<br>
+				拉薩 (Tibetan, Traditional Chinese Characters, Tibetan-to-Chinese Transcription)<br>
+				Lasa (Tibetan, Latin script, Pinyin Transcription)<br>
+				拉萨 (Tibetan, Simplified Chinese Characters, Traditional-to-Simplified Chinese Transliteration)<br>
+				Lhasa (Tibetan, Latin script, Ethnic Pinyin Tibetan Transcription)<br>
+				ར་ས། (Tibetan, Tibetan script, Original)<br>
+				Rasa (Tibetan, Latin script, THL Simplified Tibetan Transcription)<br>
+				ra sa (Tibetan, Latin script, THL Extended Wylie Transliteration)</span><br>
+				<p style='color:#668eec'><b>ETYMOLOGY</p></b> <span style=font-size:12px>
+				Etymology for ལྷ་ས།:<br>
+				Lit. "god-place," referring especially to the presence of the two famous Buddha statues traditionally housed in the Jokhang and Ramoché temples respectively, but also more generally to the location of important shrines, temples, and monasteries within the city of Lhasa.
+				</span><br>
+				<p style='color:#668eec'><b>LOCATION</b></p><span style=font-size:12px>103.5964, 34.0343</span>
+				</div>`;
+				$("#sui-results").append(str);
+				$("#plc-viewInfo").slideDown();
+			});
+
 		}
 
 	app.DrawHeader();

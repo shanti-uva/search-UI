@@ -198,7 +198,7 @@ class SearchUI  {
 //  QUERY
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	GetFacetData(type)																			// GET FACET DATA
+	GetFacetData(type, search)																	// GET FACET DATA
 	{
 		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=asset_type%3A(images%20audio-video)&wt=json&rows=0&json.facet=%7Bcollection:%7Blimit:300,type:%22terms%22,field:%22collection_title%22,facet:%7Bcollection_nid:%7Bfield:%22collection_nid%22,type:%22terms%22%7D%7D%7D%7D";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
@@ -209,7 +209,6 @@ class SearchUI  {
 			var buckets=data.facets[type].buckets;													// Point at buckets
 			for (i=0;i<buckets.length;++i)  														// For each bucket
 				this.facets[type].data.push({ title: buckets[i].val, count:buckets[i].count, id:'', url:"" });		// Add to list								
-			this.facets[type].data.sort((a,b) => (a.count > b.count) ? -1 : 1);						// Sort by counts
 			});
 	}
 
@@ -772,9 +771,10 @@ class SearchUI  {
 			<div class='sui-advEditBut' id='sui-advTreeMap' title='List view'>&#xe61f</div>
 			<hr style='border: .5px solid #a4baec'>
 			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
-			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));								// Add tree frame to div
-			if (facet == "place") 	LazyLoad(null,facet,13735);
-			else 					GetTopRow(facet);
+			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add tree frame to div
+			if (facet == "place") 		 LazyLoad(null,facet,13735);
+			else if (facet == "feature") LazyLoad(null,facet,20);
+			else 						 GetTopRow(facet);
 	
 			$('.sui-tree li').each( function() {                                						// For each element
 				if ($(this).children('ul').length > 0)                       							// If has children 
