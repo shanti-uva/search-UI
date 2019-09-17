@@ -10,7 +10,7 @@
 	A sui=close message is sent to host.
 
 	Requires: 	jQuery 												// Almost any version should work
-	Needs:		places.js											// Other JS modules
+	Calls:		places.js											// Other JS modules that are dynmically loaded
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		loading.gif, gradient.jpg, treebuts.png
@@ -231,6 +231,7 @@ class SearchUI  {
 				if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
 				if (o.ancestors_txt && o.ancestors_txt.length)	o.ancestors_txt.splice(0,1);		// Remove 1st ancestor from trail
 				if (o.asset_type == "Audio-video") 	o.asset_type="Audio-Video";						// Handle AV
+				if (o.asset_type == "Texts")		o.url_thumb="gradient.jpg";								// Use gradient for texts
 				else if (!o.url_thumb)				o.url_thumb="gradient.jpg";						// Use gradient for generic
 				if (o.display_label) o.title=o.display_label;										// Get title form display
 				}
@@ -941,7 +942,6 @@ class SearchUI  {
 			return result;
 		}
 	}
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS
