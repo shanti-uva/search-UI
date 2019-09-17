@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Query</title>
+</head>
+<body>
+
+<input id='search' type="text">
+<a class="hotlink" href=""> LINK </a>
+
+
+
+<div><pre id="output"></pre></div>
+
+<script language="JavaScript" src="kmapsSolrUtil.js"></script>
+<script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+</script>
+<script>
+    $(function() {
+        var util = new KmapsSolrUtil();
+        $(".hotlink").on('click', function() {
+            var searchstring = $('input#search').val();
+            var state = {
+                "query": { "text": searchstring }
+            };
+            var url = util.createBasicQuery(state);
+            $.ajax({
+                    url: url, dataType: 'jsonp', jsonp: 'json.wrf',
+                    success: function (data) {
+                        $('#output').text(
+                            JSON.stringify(data, undefined, 2)
+                        );
+                    }
+                }
+            )
+            return false;
+        });
+
+
+    });
+</script>
+</body>
+</html>
