@@ -16,7 +16,7 @@
 
 class Places  {																					
 
-	constructor()   																			// CONSTRUCTOR
+	constructor()   																		// CONSTRUCTOR
 	{
 		this.app=null;
 		this.id=null;
@@ -26,6 +26,7 @@ class Places  {
 
 	Draw(id)
 	{
+trace(id)
 		this.id=id;
 		sui.LoadingIcon(true,64);																	// Show loading icon
 		var app={ container:"plc-main",																// Holds startup parameters													
@@ -194,13 +195,9 @@ class Places  {
 		app.DrawHeader=function()																	// DRAW MAP HEADER
 		{
 			var n=123;
-			var str=`
-				<span id='sui-resClose' class='sui-resClose'>&#xe60f</span>
-				LHASA&nbsp;&nbsp;<span style='font-size:12px'> Asia > China > Tibet Autonomous Region</span>
-				`;
-			
+			var str=`&#xe62b&nbsp;&nbsp;LHASA&nbsp;&nbsp;<span style='font-size:12px'> Asia > China > Tibet Autonomous Region</span>`;
 			$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
-			$("#sui-headRight").html("");
+			$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
 			$("#sui-header").css("background-color","#6faaf1");										// Color header
 			$("#sui-footer").css("background-color","#6faaf1");										// Color header
 			$("#sui-main").append(str);																// Add to main div
@@ -211,7 +208,9 @@ class Places  {
 				</div>				
 				<div style='float:right;font-size:12px'>Place id: F317 | Geocode Name: THL Extended GB Code | Code: gb.ext&nbsp;&nbsp;&nbsp;&nbsp;</div>`;
 			$("#sui-footer").html(str);
-			
+
+			$("#plc-closeBut").on("click", ()=> { sui.Draw() });
+
 			$("#plc-customMap").on("click", ()=> {
 				if ($("#plc-infoDiv").length) {
 					$("#plc-infoDiv").remove();

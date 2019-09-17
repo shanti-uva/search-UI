@@ -37,7 +37,7 @@ class SearchUI  {
 		this.runMode=mode;																			// Current mode
 
 		this.facets={};																				
-		this.facets.place=			{ type:"tree",  icon:"&#xe63b", data:[] };						// Places 
+		this.facets.place=			{ type:"tree",  icon:"&#xe62b", data:[] };						// Places 
 		this.facets.collection=		{ type:"list",  icon:"&#xe633", data:[] };						// Collections 
 		this.facets.language=		{ type:"list",  icon:"&#xe670", data:[] };						// Languages 
 		this.facets.feature=		{ type:"tree",  icon:"&#xe638", data:[] };						// Features 
@@ -964,23 +964,13 @@ class SearchUI  {
 
 	SendMessage(msg, time)																		// SEND MESSAGE TO HOST
 	{
-		if (this.runMode == "standalone") {															// If a standalone													
-		if (msg.match(/\/places\//i)) 																// If a place
-			this.places.Draw("317"),msg="";															// Show map
+		if (this.pages && (this.runMode == "standalone")) {											// If a standalone													
+			this.pages.Draw(msg);																	// Route to page
+			return;
 			}
-		if (!msg)	return;
 		trace("sui="+msg);																			// Show message sent on console
 		window.postMessage("sui="+msg,"*");															// Send message to drupal app
-		if (this.runMode != "drupal") {																// Test mode
-			var str="";
-			$("#sui-popupDiv").remove();															// Kill old one, if any
-			str+="<div id='sui-popupDiv' class='sui-gridPopup' style='width:auto'>"; 				// Add div
-			str+="<b>Navigate to this page:</b><br>";
-			str+=msg+"</div>"; 																		// Add div
-			$("body").append(str);																	// Add popup to div or body
-			$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);				// Animate in and out		
-			}
-		else this.Draw("input");																		// Return to hidden mode
+		this.Draw("input");																			// Return to hidden mode
 		}
 
 	Popup(msg, time, x, y)																		// POPUP 
