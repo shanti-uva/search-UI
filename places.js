@@ -16,7 +16,7 @@
 
 class Places  {																					
 
-	constructor(mode)   																		// CONSTRUCTOR
+	constructor()   																			// CONSTRUCTOR
 	{
 		this.app=null;
 		this.id=null;

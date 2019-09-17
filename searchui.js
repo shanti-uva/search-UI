@@ -34,7 +34,7 @@ class SearchUI  {
 		this.numItems=0;																			// Number of items																						
 		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
 		this.ss={};																					// Holds search state
-		this.testMode=mode;																			// Current mode
+		this.runMode=mode;																			// Current mode
 
 		this.facets={};																				
 		this.facets.place=			{ type:"tree",  icon:"&#xe63b", data:[] };						// Places 
@@ -58,8 +58,12 @@ class SearchUI  {
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
 		for (var key in this.facets) this.GetFacetData(key);										// Get data about SOLR categories for each facet
-		if (mode == "test")
-			this.places=new Places();																// Alloc places class
+	
+		$("<link/>", { rel:"stylesheet", type:"text/css", href:"searchui.css" }).appendTo("head"); 	// Load CSS
+		if (mode == "standalone") {																	// If in standalone
+			$.ajax(	{ url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); 	// Dynamically load and alloc places class
+			$.ajax(	{ url:"pages.js",  dataType:"script" }).done(()=> { this.pages=new Pages(); }); 	// Dynamically load and alloc pages class
+			}
 		this.SetSearchState(null);																	// Init search state to default
 		this.AddFrame();																			// Add div framework
 		this.Query();																				// Get intial data
@@ -947,7 +951,7 @@ class SearchUI  {
 // HELPERS
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON		
+	LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON		
 	{
 		if (!mode) {																				// If hiding
 			$("#sui-loadingIcon").remove();															// Remove it
@@ -960,12 +964,15 @@ LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON
 
 	SendMessage(msg, time)																		// SEND MESSAGE TO HOST
 	{
-		var str="";
-		if ((this.places) && msg.match(/\/places\//i)) 												// If a place
+		if (this.runMode == "standalone") {															// If a standalone													
+		if (msg.match(/\/places\//i)) 																// If a place
 			this.places.Draw("317"),msg="";															// Show map
+			}
 		if (!msg)	return;
-		window.parent.postMessage("sui="+msg,"*");													// Send message to parent wind		
-		if (this.testMode != "drupal") {															// Test mode
+		trace("sui="+msg);																			// Show message sent on console
+		window.postMessage("sui="+msg,"*");															// Send message to drupal app
+		if (this.runMode != "drupal") {																// Test mode
+			var str="";
 			$("#sui-popupDiv").remove();															// Kill old one, if any
 			str+="<div id='sui-popupDiv' class='sui-gridPopup' style='width:auto'>"; 				// Add div
 			str+="<b>Navigate to this page:</b><br>";
@@ -973,6 +980,7 @@ LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON
 			$("body").append(str);																	// Add popup to div or body
 			$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);				// Animate in and out		
 			}
+		else this.Draw("input");																		// Return to hidden mode
 		}
 
 	Popup(msg, time, x, y)																		// POPUP 
