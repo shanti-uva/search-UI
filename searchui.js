@@ -64,12 +64,10 @@ class SearchUI  {
 	
 		for (var key in this.facets) this.GetFacetData(key);										// Get data about SOLR categories for each facet
 	
+		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : "";
+		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
 		
-	//	if (this.runMode == "drupal")	pre="Drupal.settings.shanti_sarvaka.theme_path + "/js/inc/shanti_search_ui/"
-
-
-		$("<link/>", { rel:"stylesheet", type:"text/css", href:"searchui.css" }).appendTo("head"); 	// Load CSS
-		if (mode == "standalone") {																	// If in standalone
+		if (mode == "standalone") {																		// If in standalone
 			$.ajax(	{ url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); 	// Dynamically load and alloc places class
 			$.ajax(	{ url:"pages.js",  dataType:"script" }).done(()=> { this.pages=new Pages(); }); 	// Dynamically load and alloc pages class
 			}
