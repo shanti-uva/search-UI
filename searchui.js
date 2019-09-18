@@ -25,10 +25,7 @@
 	
 */
 
-$=jQuery;
-
-//$("<link/>", { rel:"stylesheet", type:"text/css", href: Drupal.settings.shanti_sarvaka.theme_path + "/js/inc/shanti_search_ui/searchui.css" }).appendTo("head"); 	// Load CSS
-
+$=jQuery;																							// For Drupal only
 
 class SearchUI  {																					
 
