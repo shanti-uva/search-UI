@@ -51,7 +51,7 @@ class SearchUI  {
 		this.assets.Places=	 		{ c:"#6faaf1", g:"&#xe62b" };									// Places
 		this.assets["Audio-Video"]=	{ c:"#58aab4", g:"&#xe648" };									// AV
 		this.assets.Images=	 		{ c:"#b49c59", g:"&#xe62a" };									// Images
-		this.assets.Sources= 		{ c:"#7773ab", g:"&#xe631" };									// Sources
+		this.assets.Sources= 		{ c:"#5a57ad", g:"&#xe631" };									// Sources
 		this.assets.Texts=	 		{ c:"#8b5aa1", g:"&#xe636" };									// Texts
 		this.assets.Visuals= 		{ c:"#6e9456", g:"&#xe63b" };									// Visuals
 		this.assets.Subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
@@ -202,6 +202,32 @@ class SearchUI  {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  QUERY
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
+	{
+		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=uid:"+id+"&wt=json";
+		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
+			data=this.MassageKmapData(data);
+			callback(data.response.docs[0]);														// Return kmap
+			});
+		}
+
+	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
+	{
+		var i,o;
+		for (i=0;i<data.response.docs.length;++i) {													// For each result, massage data
+			o=data.response.docs[i];																// Point at item
+			o.asset_type=o.asset_type.charAt(0).toUpperCase()+o.asset_type.slice(1);				// UC 1st char
+			if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
+			if (o.ancestors_txt && o.ancestors_txt.length)	o.ancestors_txt.splice(0,1);			// Remove 1st ancestor from trail
+			if (o.asset_type == "Audio-video") 				o.asset_type="Audio-Video";				// Handle AV
+			if (o.asset_type == "Texts")					o.url_thumb="gradient.jpg";				// Use gradient for texts
+			else if (!o.url_thumb)							o.url_thumb="gradient.jpg";				// Use gradient for generic
+			if (o.display_label) 							o.title=o.display_label;				// Get title form display
+			}
+		return data;
+	}
 
 	GetFacetData(type, search)																	// GET FACET DATA
 	{
@@ -440,11 +466,11 @@ class SearchUI  {
 
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
-			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
+			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
 			})
 		$("[id^=sui-itemPic-]").on("click",(e)=> { 													// ON ITEM CLICK
 			var num=e.currentTarget.id.substring(12);												// Get index of result	
-			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
+			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
 			});
 		$(".sui-gridInfo").on("mouseover",(e)=> { 													// ON INFO BUTTON HOVER
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
@@ -467,7 +493,7 @@ class SearchUI  {
 		$(".sui-gridInfo").on("mouseout",(e)=> { $("#sui-popupDiv").remove(); });					// ON INFO BUTTON OUT
 		$("[id^=sui-itemTitle-]").on("click",(e)=> { 												// ON TITLE CLICK
 			var num=e.currentTarget.id.substring(14);												// Get index of result	
-			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
+			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
 			});
 		$(".sui-itemPlus").on("click",(e)=> { 														// ON MORE BUTTON CLICK
 			this.ShowItemMore(e.currentTarget.id.substring(13));									// Shoe more info below
@@ -496,7 +522,7 @@ class SearchUI  {
 			for (i=0;i<o.ancestors_txt.length;++i) {												// For each trail member
 				str+="<span class='sui-itemAncestor' onclick='sui.SendMessage(\"page=";				// Add ancestor
 				str+="https://mandala.shanti.virginia.edu/"+o.asset_type.toLowerCase()+"/";			// URL stem
-				str+=o.ancestor_ids_is[i+1]+"/overview/nojs#search\")'>";							// URL end
+				str+=o.ancestor_ids_is[i+1]+"/overview/nojs#search\,"+this.curResults[num]+")'>";	// URL end
 				str+=o.ancestors_txt[i]+"</span>";													// Finish ancestor link
 				if (i < o.ancestors_txt.length-1)	str+=" > ";										// Add separator
 				}
@@ -564,7 +590,7 @@ class SearchUI  {
 		$("#sui-itemMore-"+num).slideDown();														// Slide it down
 		$("[id^=sui-itemPic]").on("click",(e)=> { 													// ON PIC CLICK
 			var num=e.currentTarget.id.substring(12);												// Get index of result	
-			this.SendMessage("page="+this.curResults[num].url_html);								// Send message
+			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
 			});
 		}
 
@@ -700,7 +726,7 @@ class SearchUI  {
 		
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			var v=e.target.id.split("-");															// Get ids		
-			if (v[0].match(/ViewListPage/))	this.SendMessage("page="+items[v[1]].url);				// If viewing, ask for that page
+			if (v[0].match(/ViewListPage/))	this.SendMessage("page="+items[v[1]].url,this.curResults[v[1]]);			// If viewing, ask for that page
 			else	this.AddNewTerm(id,items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
 			});
 	
@@ -796,7 +822,7 @@ class SearchUI  {
 
 			$('.sui-advViewTreePage').on("click", (e)=> {												// ON CLICK VIEW BUTTON
 				var v=e.target.id.split("-");															// Get id
-				this.SendMessage("page=https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs");	// Goto page
+				this.SendMessage("page=https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs",this.curResults[v[1]]);	// Goto page
 				e.stopPropagation();																	// Stop propagation
 				});      
 			$('.sui-tree li > a').on("click", function(e) {												// ON CLICK OF NODE TEXT
@@ -892,7 +918,7 @@ class SearchUI  {
 	
 					$('.sui-advViewTreePage').on("click", (e)=> {									// ON CLICK VIEW BUTTON
 						var v=e.target.id.split("-");												// Get id
-						sui.SendMessage("page=https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs"); // Goto page
+						sui.GetKmapFromID(type+"-"+v[1],(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
 						e.stopPropagation();														// Stop propagation
 						});      
 			
@@ -962,10 +988,10 @@ class SearchUI  {
 		$("#sui-results").append(str);																// Add icon to results
 	}
 
-	SendMessage(msg, time)																		// SEND MESSAGE TO HOST
+	SendMessage(msg, kmap)																// SEND MESSAGE TO HOST
 	{
 		if (this.pages && (this.runMode == "standalone")) {											// If a standalone													
-			this.pages.Draw(msg);																	// Route to page
+			this.pages.Draw(kmap);																	// Route to page
 			return;
 			}
 		trace("sui="+msg);																			// Show message sent on console

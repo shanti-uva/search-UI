@@ -19,15 +19,13 @@ class Places  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.app=null;
-		this.id=null;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		$.ajax(		 { url:"https://js.arcgis.com/4.12", dataType: "script"  }); 
 	}
 
-	Draw(id)
+	Draw(kmap)
 	{
-trace(id)
-		this.id=id;
+		this.kmap=kmap;
 		sui.LoadingIcon(true,64);																	// Show loading icon
 		var app={ container:"plc-main",																// Holds startup parameters													
 			map:null, baseMap:"topo-vector", kml:null, 								
@@ -99,14 +97,15 @@ trace(id)
 			if (n > 1000)	n=Math.floor(n/1000)+"K";												// Shorten
 			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:24px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
 			}
-		str+="</div><div style='margin:8px'>PLACES</div>";									// Title
-		str+="<div class='sui-advEdit' id='sui-advEdit-map' style='margin:0;width:146px'></div>";
+		str+=`<br><img src='https://staging-mms.thlib.org/images/0050/8753/63691_essay.jpg' style='width:100%'></div>`;
 		str+="</div><div style='width:calc(100% - 177px);height:75%;margin-left:177px' id='plc-main'></div>";
-		str+=`<br><img src='https://staging-mms.thlib.org/images/0050/8753/63691_essay.jpg' style='float:left;height:100px;margin:0 12px 0 177px'>
-		<b>FEATURE TYPE:</b> <i>City &#xe613 ADM3 &#xe613 Capital of a 1st order administrative division</i>
-		<p style='font-family:serif;max-width:900px'>Lhasa is the most important city in modern and historical Tibet, both religiously and politically; located in the geographical center of central Tibet, it is home to the sacred center of Tibet in the Jokhang Temple and the famed Potala Palace, from which the Dalai Lamas ruled over Tibet.</p>`;
+		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
+			str+="<p style='margin-left:177px'<b>FEATURE TYPE:</b>";															// Add header
+			for (i=0;i<kmap.feature_types_ss.length;++i) str+=" <i>"+kmap.feature_types_ss[i]+" &#xe613</i>";  // Feature types
+			str+="</p>";
+			}
+		if (kmap.caption)	str+=`<p class='sui-sourceText' style='margin-left:177px;max-width:900px'>${kmap.caption}</p>`;
 		$("#sui-results").html(str.replace(/\t|\n|\r|/g,""));
-		sui.DrawFacetTree("map",1);	
 		$("[id^=sui-tl-]").on("click", (e)=> {														// ON CLICK ON ASSET 
 			sui.ss.type=e.currentTarget.id.substring(7);											// Get asset name		
 			$("#sui-typeList").remove();															// Remove type list
@@ -151,7 +150,6 @@ trace(id)
 					var kmlFullExtent=polygons.concat(lines).concat(points).concat(images)
 					.map(graphic => (graphic.extent ? graphic.extent : graphic.geometry.extent))
 					.reduce((previous, current) => previous.union(current));
-					trace(kmlFullExtent)
 					app.mapView.goTo({ extent: kmlFullExtent });
 					});
 				});
@@ -192,25 +190,14 @@ trace(id)
 		});
 		app.sceneView.when(function() { app.sceneView.goTo({ tilt:80 }); });						// When 3D loads, tilt
 
-		app.DrawHeader=function()																	// DRAW MAP HEADER
+		app.DrawFooter=function()																	// DRAW MAP FOOTER
 		{
-			var n=123;
-			var str=`&#xe62b&nbsp;&nbsp;LHASA&nbsp;&nbsp;<span style='font-size:12px'> Asia > China > Tibet Autonomous Region</span>`;
-			$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
-			$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
-			$("#sui-header").css("background-color","#6faaf1");										// Color header
-			$("#sui-footer").css("background-color","#6faaf1");										// Color header
-			$("#sui-main").append(str);																// Add to main div
-									
+			var i;
 			str=`<div style='float:left;font-size:18px'>
-				<div id='plc-viewInfoBut' class='sui-resDisplay' title='See names'>&#xe67f</div>
-				<div id='plc-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div>
-				</div>				
-				<div style='float:right;font-size:12px'>Place id: F317 | Geocode Name: THL Extended GB Code | Code: gb.ext&nbsp;&nbsp;&nbsp;&nbsp;</div>`;
+				<div id='plc-viewInfoBut' class='sui-resDisplay' title='See more information'>&#xe67f</div>
+				<div id='plc-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div></div>;				
+				<div style='float:right;font-size:14px;margin-right:16px'>PLACE ID: ${kmap.id}</div>`;
 			$("#sui-footer").html(str);
-
-			$("#plc-closeBut").on("click", ()=> { sui.Draw() });
-
 			$("#plc-customMap").on("click", ()=> {
 				if ($("#plc-infoDiv").length) {
 					$("#plc-infoDiv").remove();
@@ -225,22 +212,11 @@ trace(id)
 				$("#plc-viewInfo").remove();
 				str=`<div id='plc-viewInfo' class='sui-infoBottom'>
 				<div id='plc-viewInfoCancel' style='float:right;cursor:pointer;margin-top:12px'>&#xe60f</div>
-				<p style='color:#668eec'><b>NAMES</p></b><span style=font-size:12px> ལྷ་ས། (Tibetan, Tibetan script, Original)<br>
-				Lhasa (Tibetan, Latin script, THL Simplified Tibetan Transcription)<br>
-				lha sa (Tibetan, Latin script, THL Extended Wylie Transliteration)<br>
-				拉薩 (Tibetan, Traditional Chinese Characters, Tibetan-to-Chinese Transcription)<br>
-				Lasa (Tibetan, Latin script, Pinyin Transcription)<br>
-				拉萨 (Tibetan, Simplified Chinese Characters, Traditional-to-Simplified Chinese Transliteration)<br>
-				Lhasa (Tibetan, Latin script, Ethnic Pinyin Tibetan Transcription)<br>
-				ར་ས། (Tibetan, Tibetan script, Original)<br>
-				Rasa (Tibetan, Latin script, THL Simplified Tibetan Transcription)<br>
-				ra sa (Tibetan, Latin script, THL Extended Wylie Transliteration)</span><br>
-				<p style='color:#668eec'><b>ETYMOLOGY</p></b> <span style=font-size:12px>
-				Etymology for ལྷ་ས།:<br>
-				Lit. "god-place," referring especially to the presence of the two famous Buddha statues traditionally housed in the Jokhang and Ramoché temples respectively, but also more generally to the location of important shrines, temples, and monasteries within the city of Lhasa.
-				</span><br>
-				<p style='color:#668eec'><b>LOCATION</b></p><span style=font-size:12px>103.5964, 34.0343</span>
-				</div>`;
+				<p style='color:#668eec'><b>IDS</b></p>
+				Place id: ${kmap.id}<br>Geocode Name: THL Extended GB Code<br>Code: gb.ext
+				<p style='color:#668eec'><b>NAMES</b></p><span style=font-size:12px>`;
+				if (kmap.names_txt)	for (i=0;i<kmap.names_txt.length;++i) str+=kmap.names_txt[i]+"<br>";
+				str+=`</span><p style='color:#668eec'><b>LOCATION</b></p><span style=font-size:12px>103.5964, 34.0343</span></div>`;
 				$("#sui-results").append(str);
 				$("#plc-viewInfo").slideDown();
 				$("#plc-viewInfoCancel").on("click", ()=> { $("#plc-viewInfo").slideUp(); });
@@ -248,7 +224,7 @@ trace(id)
 
 		}
 
-	app.DrawHeader();
+	app.DrawFooter();
 		
 		
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
