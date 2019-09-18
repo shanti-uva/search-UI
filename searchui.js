@@ -25,6 +25,11 @@
 	
 */
 
+$=jQuery;
+
+//$("<link/>", { rel:"stylesheet", type:"text/css", href: Drupal.settings.shanti_sarvaka.theme_path + "/js/inc/shanti_search_ui/searchui.css" }).appendTo("head"); 	// Load CSS
+
+
 class SearchUI  {																					
 
 	constructor(mode)   																		// CONSTRUCTOR
@@ -59,6 +64,10 @@ class SearchUI  {
 	
 		for (var key in this.facets) this.GetFacetData(key);										// Get data about SOLR categories for each facet
 	
+		
+	//	if (this.runMode == "drupal")	pre="Drupal.settings.shanti_sarvaka.theme_path + "/js/inc/shanti_search_ui/"
+
+
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"searchui.css" }).appendTo("head"); 	// Load CSS
 		if (mode == "standalone") {																	// If in standalone
 			$.ajax(	{ url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); 	// Dynamically load and alloc places class
@@ -213,6 +222,14 @@ class SearchUI  {
 			});
 		}
 
+	GetJsonFromID(id, callback)																	// GET KMAP FROM ID
+	{
+		var url="https://sources.shanti.virginia.edu/sources-api/ajax/21048"
+			$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
+	trace(data)
+			});
+		}
+		
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
 	{
 		var i,o;

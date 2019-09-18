@@ -44,34 +44,6 @@ class Pages  {
 			});
 	}
 
-	
-	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
-	{
-		var latin=(typeof(o.name_latin) == "string" ) ? o.name_latin : o.name_latin.join(", ");
-		var str=`<div class='sui-sources'>
-		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
-		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
-		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
-		<p>TIBETAN:&nbsp;&nbsp<span class='sui-sourceText'>${o.name_tibt}&nbsp;&nbsp;(Tibetan script, original)</span></p>
-		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>
-		<p>PHONEME:&nbsp;&nbsp<span class='sui-sourceText'>${o.data_phoneme_ss.join(", ")}</span></p>
-		<p><span style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
-		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>
-		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
-		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-	}
-
-	DrawSubject(o)																			// DRAW SUBJECT PAGE FROM KMAP
-	{
-		var str=`<div class='sui-sources'>
-		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
-		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
-		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`
-		str+="</div>";
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-	}
-
 	DrawAV(o)																				// DRAW AV PAGE FROM KMAP
 	{
 		var str=`<div class='sui-sources'>
@@ -104,11 +76,36 @@ class Pages  {
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
+	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
+	{
+		var latin=(typeof(o.name_latin) == "string" ) ? o.name_latin : o.name_latin.join(", ");
+		var str=`<div class='sui-sources'>
+		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
+		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
+		<p>TIBETAN:&nbsp;&nbsp<span class='sui-sourceText'>${o.name_tibt}&nbsp;&nbsp;(Tibetan script, original)</span></p>
+		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>
+		<p>PHONEME:&nbsp;&nbsp<span class='sui-sourceText'>${o.data_phoneme_ss.join(", ")}</span></p>
+		<p><span style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
+		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>
+		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
+		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
+		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+	}
+
+	DrawSubject(o)																			// DRAW SUBJECT PAGE FROM KMAP
+	{
+		var str=`<div class='sui-sources'>
+		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
+		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
+		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`
+		str+="</div>";
+		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+	}
+
 	DrawSource(o)																			// DRAW SOURCE PAGE FROM KMAP
 	{
-
-
-		sui.GetJsonFromID(o.id)	
+sui.GetJsonFromID(o.id)	
 		var str=`<div class='sui-sources'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
@@ -125,7 +122,5 @@ class Pages  {
 		str+="</div>";
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
-
-
 
 } // Pages class closure
