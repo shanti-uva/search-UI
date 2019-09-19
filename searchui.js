@@ -81,8 +81,8 @@ class SearchUI  {
 	{
 		if (!state) {
 			this.ss={};																				// Clear search state
-//			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR production url
-			this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/";	
+//			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR dev url
+			this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/";		// Production
 			this.ss.mode="input";																	// Current mode - can be input, simple, or advanced
 			this.ss.view="Card";																	// Dispay mode - can be List, Grid, or Card
 			this.ss.sort="Alpha";																	// Sort mode - can be Alpha, Date, or Author
@@ -264,6 +264,12 @@ class SearchUI  {
 				this.facets.collections.data=[];													// Clear
 				for (i=0;i<buckets.length;++i) 														// For each item
 					this.facets.collections.data.push({title:buckets[i].val, id:"collections-0"});	// Add to list
+				}
+			if (data && data.facets && data.facets.node_lang && data.facets.node_lang.buckets) {	// If valid
+				buckets=data.facets.node_lang.buckets;												// Point at buckets
+				this.facets.languages.data=[];														// Clear
+				for (i=1;i<buckets.length;++i) 														// For each item
+					this.facets.languages.data.push({title:buckets[i].val, id:"languages-0"});		// Add to list
 				}
 			}
 		});
@@ -725,9 +731,10 @@ class SearchUI  {
 				<div class='sui-advEditList'>`;
 		
 		for (i=0;i<n;++i) {																			// For each one
-			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>
-			<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>					
-			${items[i].title}</div>`;																// Add item to list
+			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
+			if (items[i].id.split("-")[1] != 0)
+				str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>`;					
+			str+=`${items[i].title}</div>`;																// Add item to list
 			}
 		$("#sui-advEdit-"+id).html(str+"</div>".replace(/\t|\n|\r/g,""));							// Add to div
 		$("#sui-advEdit-"+id).slideDown();															// Show it
@@ -757,10 +764,11 @@ class SearchUI  {
 			str="";
 			if (!sorted) {																			// If not sorted
 				$(".sui-advEditList").empty();														// Remove items from list
-				for (i=0;i<n;++i) 																	// For each one
-					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>
-					<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>					
-					${items[i].title}</div>`;														// Add item to list
+				for (i=0;i<n;++i) {																	// For each one
+					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
+					if (items[i].id.split("-")[1] != 0) str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>`;					
+					str+=`${items[i].title}</div>`;														// Add item to list
+					}
 				$(".sui-advEditList").html(str);													// Add back
 				$("#sui-advEditSort-"+id).css("color","#666");											// Off
 				return;																				// Quit
@@ -873,11 +881,13 @@ class SearchUI  {
 				tops.pa=114065;		tops.pha=120048;	tops.ba=127869;		tops.ma=142667;	tops.tsa=154251;	tops.tsha=158451;	
 				tops.dza=164453;	tops.wa=166888;		tops.zha=167094;	tops.za=172249;	tops["'a"]=177092;	tops.ya=178454;
 				tops.ra=185531;		tops.la=193509;		tops.sha=199252;	tops.sa=204036;	tops.ha=215681;		tops.a=219022;
-			}
+				}
+			else if (facet == "subjects") {
+				}
 			for (k in tops) {																			// For each top row
 				id=facet+"-"+tops[k];																	// id
 				str+="<li class='parent'><a id='"+id+"'";												// Start row
-				str+="' data-path='"+tops[k]+"'>"+k;													// Add path/header
+				str+="' data-path=''>"+k;																// Add path/header
 				str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
 				str+="</a></li>";																		// Add label
 				}
@@ -889,24 +899,19 @@ class SearchUI  {
 		function LazyLoad(row, facet, init) 													// ADD NEW NODES TO TREE
 		{
 			var path;
-			
 			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
 					var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
 				if (init) 	path=""+init;															// Force path as string
 				else 		path=""+row.data().path;												// Get path	as string										
-				var lvla=path.split("/").length+1;													// Set level
+				var lvla=path.split("").length+1;													// Set level
 				var type=facet;																		// Set type
 				if (type == "features") type="subjects";											// Feature types are in subjects
-				path=0
-				
-				,lvla,lvla);
 				var url=buildQuery(base,type,path,lvla,lvla);										// Build query
 					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
-					var o,i,re;
+					var o,i,f,re;
 					var str="<ul>";																	// Wrapper, show if not initting
-					var f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
+	//				f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
 					res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); // Sort
-trace(type,res)					
 					for (i=0;i<res.response.docs.length;++i) {										// For each child
 						o=res.response.docs[i];														// Point at child
 						re=new RegExp("\/"+o.id.split("-")[1]);										// Id
@@ -939,52 +944,62 @@ trace(type,res)
 				}
 			}
 
-	// THIS FUNCTION IS STRAIGHT FROM YUJI 3/15/18 --  sites/all/libraries/shanti_kmaps_tree/js/jquery.kmapstree.js
-
 	function buildQuery(termIndexRoot, type, path, lvla, lvlb) 
 	{
+		var SOLR_ROW_LIMIT=2000;
 		path = path.replace(/^\//, "").replace(/\s\//, " ");  // remove root slashes
 		if (path === "") {
 			path = "*";
 		}
 
-		var fieldList = [
+		var levelField = "level_i";
+		var ancestorField = "ancestor_id_path";
+		if (type === "terms") {
+		  levelField = "level_tib.alpha_i";
+		  ancestorField = "ancestor_id_tib.alpha_path";
+		}
+
+	  var fieldList = [
 			"header",
 			"id",
 			"ancestor*",
 			"caption_eng",
-			"level_i"
+			"position*",
+			levelField
 		].join(",");
 
 		var result =
 			termIndexRoot + "/select?" +
-			"df=ancestor_id_path" +
+			"df=" + ancestorField+
 			"&q=" + path +
 			"&wt=json" +
 			"&indent=true" +
-			"&limit=" + 2000 +
+			"&limit=" + SOLR_ROW_LIMIT +
 			"&facet=true" +
 			"&fl=" + fieldList +
 			"&indent=true" +
 
 			"&fq=tree:" + type +
-			"&fq=level_i:[" + lvla + "+TO+" + (lvlb + 1) + "]" +
-			"&fq={!tag=hoot}level_i:[" + lvla + "+TO+" + lvlb + "]" +
+			"&fq=" + levelField + ":[" + lvla + "+TO+" + (lvlb + 1) + "]" +
+			"&fq={!tag=hoot}" + levelField + ":[" + lvla + "+TO+" + lvlb + "]" +
 
 			"&facet.mincount=2" +
 			"&facet.limit=-1" +
-			"&sort=level_i+ASC" +
-			"&facet.sort=ancestor_id_path" +
-			"&facet.field={!ex=hoot}ancestor_id_path" +
+		  "&sort=" + levelField + "+ASC" +
+			"&sort=position_i+asc" +
+		   "&sort=header+asc" +
+
+			"&facet.sort=" + ancestorField +"+ASC" +
+			"&facet.field={!ex=hoot}" + ancestorField +
 
 			"&wt=json" +
 			"&json.wrf=?" +
+			"&rows=" + SOLR_ROW_LIMIT;
 
-			"&rows=" + 2000;
-
-			return result;
-		}
+	trace(result)
+		return result;
 	}
+}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS

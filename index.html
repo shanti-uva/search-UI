@@ -19,13 +19,19 @@
 	<div style='margin:-8px;padding:0'>
 		<div style='white-space:nowrap'>
 			<img src="img/mandalaleft.jpg">
-			<img src="img/mandalaright.jpg" style='float:right'>
+			<img src="img/mandalaright.jpg" id='specialK' style='float:right'>
 		<div>
 		<img src="img/mandalaback.jpg" style='width:100%;margin-top:-5px;height:calc(100vh - 55px)'>
 	</div>
 <script>
 
 var sui=new SearchUI("standalone");														// Alloc new search object
+
+$("#specialK").on("click",(e)=> { if (!e.altKey) return;
+	sui.GetKmapFromID("terms-1",(d)=> {trace(d) });
+	});
+
+
 
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
