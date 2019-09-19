@@ -8,9 +8,9 @@
 
 <input id='search' type="text">
 <a class="hotlink" href=""> LINK </a>
-
-
-
+<div>
+    <a class="linkTo" id="linkTo" href="">link</a>
+</div>
 <div><pre id="output"></pre></div>
 
 <script language="JavaScript" src="kmapsSolrUtil.js"></script>
@@ -25,6 +25,8 @@
         $(".hotlink").on('click', function() {
             var searchstring = $('input#search').val();
             var state = {
+                "page": 0,																			// Current page being shown
+                "pageSize": 10,
                 "query": { "text": searchstring }
             };
             var url = util.createBasicQuery(state);
@@ -34,6 +36,7 @@
                         $('#output').text(
                             JSON.stringify(data, undefined, 2)
                         );
+                        $('#linkTo').text(url).attr('href',url);
                     }
                 }
             )
