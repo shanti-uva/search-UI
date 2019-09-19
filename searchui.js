@@ -81,8 +81,8 @@ class SearchUI  {
 	{
 		if (!state) {
 			this.ss={};																				// Clear search state
-//			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR dev url
-			this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/";		// Production
+			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR dev url
+//			this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/";		// Production
 			this.ss.mode="input";																	// Current mode - can be input, simple, or advanced
 			this.ss.view="Card";																	// Dispay mode - can be List, Grid, or Card
 			this.ss.sort="Alpha";																	// Sort mode - can be Alpha, Date, or Author
@@ -223,7 +223,6 @@ class SearchUI  {
 	{
 		var url="https://sources.shanti.virginia.edu/sources-api/ajax/21048"
 			$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
-	trace(data)
 			});
 		}
 	
@@ -259,11 +258,11 @@ class SearchUI  {
 					}
 				this.assets.All.n=data.response.numFound;											// All count
 				}	
-			if (data && data.facets && data.facets.collection_title && data.facets.collection_title.buckets) {	// If valid
-				buckets=data.facets.collection_title.buckets;										// Point at buckets
+			if (data && data.facets && data.facets.collection_nid && data.facets.collection_nid.buckets) {	// If valid
+				buckets=data.facets.collection_nid.buckets;										// Point at buckets
 				this.facets.collections.data=[];													// Clear
 				for (i=0;i<buckets.length;++i) 														// For each item
-					this.facets.collections.data.push({title:buckets[i].val, id:"collections-0"});	// Add to list
+					this.facets.collections.data.push({title:buckets[i].collection_title.buckets[0].val, id:"collections-0"});	// Add to list
 				}
 			if (data && data.facets && data.facets.node_lang && data.facets.node_lang.buckets) {	// If valid
 				buckets=data.facets.node_lang.buckets;												// Point at buckets
@@ -508,7 +507,7 @@ class SearchUI  {
 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
 			});
 		$(".sui-itemPlus").on("click",(e)=> { 														// ON MORE BUTTON CLICK
-			this.ShowItemMore(e.currentTarget.id.substring(13));									// Shoe more info below
+			this.ShowItemMore(e.currentTarget.id.substring(13));									// Show more info below
 			});
 	}	
 		
@@ -883,6 +882,15 @@ class SearchUI  {
 				tops.ra=185531;		tops.la=193509;		tops.sha=199252;	tops.sa=204036;	tops.ha=215681;		tops.a=219022;
 				}
 			else if (facet == "subjects") {
+				var xxxx=0;
+				tops["Administration"]=5550;		tops["Architecture"]=6669;			tops["Collections"]=2823;		tops["Community Services Project Types"]=5553;
+				tops["Contemplation"]=5806;			tops["Cultural Landscapes"]=8868;	tops["Cultural Regions"]=305;	tops["Event"]=2743;
+				tops["General"]=6793;				tops["Geographical Features"]=xxxx;	tops["Grammars"]=xxxx;			tops["Higher Education Digital Tools"]=xxxx;
+				tops["Historical Periods"]=xxxx;	tops["Human Relationships"]=xxxx;	tops["Language Tree"]=xxxx;		tops["Literary Genres"]=xxxx;
+				tops["Material Objects"]=xxxx;		tops["Mesoamerican Studies"]=xxxx;	tops["Oral Genres"]=xxxx;		tops["Organizations and Organizational Units"]=xxxx;
+				tops["Politics"]=xxxx;				tops["Profession"]=xxxx;			tops["Religious Sects"]=xxxx;	tops["Religious Systems"]=xxxx;
+				tops["Ritual"]=xxxx;				tops["Scripts"]=xxxx;				tops["Teaching Resources"]=xxxx;	tops["Text Typologies"]=xxxx;
+				tops["Tibet and Himalayas"]=xxxx;	tops["Zoologies (Biological and Spiritual)"]=xxxx;
 				}
 			for (k in tops) {																			// For each top row
 				id=facet+"-"+tops[k];																	// id
@@ -899,18 +907,21 @@ class SearchUI  {
 		function LazyLoad(row, facet, init) 													// ADD NEW NODES TO TREE
 		{
 			var path;
+	
 			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
-					var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
+				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
 				if (init) 	path=""+init;															// Force path as string
 				else 		path=""+row.data().path;												// Get path	as string										
 				var lvla=path.split("").length+1;													// Set level
 				var type=facet;																		// Set type
 				if (type == "features") type="subjects";											// Feature types are in subjects
 				var url=buildQuery(base,type,path,lvla,lvla);										// Build query
-					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
-					var o,i,f,re;
+				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
+					trace(res)
+					var o,i,f="",re;
 					var str="<ul>";																	// Wrapper, show if not initting
-	//				f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
+					if (res.facet_counts && res.facet_counts.facet_fields)							// If there
+						f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
 					res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); // Sort
 					for (i=0;i<res.response.docs.length;++i) {										// For each child
 						o=res.response.docs[i];														// Point at child
@@ -995,8 +1006,6 @@ class SearchUI  {
 			"&wt=json" +
 			"&json.wrf=?" +
 			"&rows=" + SOLR_ROW_LIMIT;
-
-	trace(result)
 		return result;
 	}
 }
