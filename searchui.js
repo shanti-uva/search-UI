@@ -10,7 +10,7 @@
 	A sui=close message is sent to host.
 
 	Requires: 	jQuery 												// Almost any version should work
-	Calls:		places.js											// Other JS modules that are dynmically loaded
+	Calls:		kmapsSolrUtil.js, [places.js, pages.js]				// Other JS modules that are dynamically loaded
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		loading.gif, gradient.jpg, treebuts.png
@@ -39,14 +39,14 @@ class SearchUI  {
 		this.runMode=mode;																			// Current mode
 
 		this.facets={};																				
-		this.facets.place=			{ type:"tree",  icon:"&#xe62b", data:[] };						// Places 
-		this.facets.collection=		{ type:"list",  icon:"&#xe633", data:[] };						// Collections 
-		this.facets.language=		{ type:"list",  icon:"&#xe670", data:[] };						// Languages 
-		this.facets.feature=		{ type:"tree",  icon:"&#xe638", data:[] };						// Features 
-		this.facets.subject=		{ type:"tree",  icon:"&#xe634", data:[] };						// Subjects 
-		this.facets.term=			{ type:"tree",  icon:"&#xe635", data:[] };						// Terms 
-		this.facets.user=			{ type:"input", icon:"&#xe600", data:[] };						// Terms 
-		this.facets.relationship=	{ type:"list",  icon:"&#xe638", data:[] };						// Relationships
+		this.facets.places=			{ type:"tree",  icon:"&#xe62b", data:[] };						// Places 
+		this.facets.collections=	{ type:"list",  icon:"&#xe633", data:[] };						// Collections 
+		this.facets.languages=		{ type:"list",  icon:"&#xe670", data:[] };						// Languages 
+		this.facets.features=		{ type:"tree",  icon:"&#xe638", data:[] };						// Features 
+		this.facets.subjects=		{ type:"tree",  icon:"&#xe634", data:[] };						// Subjects 
+		this.facets.terms=			{ type:"tree",  icon:"&#xe635", data:[] };						// Terms 
+		this.facets.users=			{ type:"input", icon:"&#xe600", data:[] };						// Terms 
+		this.facets.relationships=	{ type:"list",  icon:"&#xe638", data:[] };						// Relationships
 	
 		this.assets={};
 		this.assets.All=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
@@ -59,17 +59,18 @@ class SearchUI  {
 		this.assets.Subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
-		for (var key in this.facets) this.GetFacetData(key);										// Get data about SOLR categories for each facet
-	
-		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : "";
+		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
-		
-		if (mode == "standalone") {																		// If in standalone
+		$.ajax( { url:"kmapsSolrUtil.js", dataType:"script" }).done(()=> { 							// Dynamically load search class
+				this.solrUtil=new KmapsSolrUtil();													// Alloc
+				this.GetFacetData("");																// Get data about SOLR categories for each facet
+				}); 	
+		if (mode == "standalone") {																	// If in standalone
 			$.ajax(	{ url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); 	// Dynamically load and alloc places class
 			$.ajax(	{ url:"pages.js",  dataType:"script" }).done(()=> { this.pages=new Pages(); }); 	// Dynamically load and alloc pages class
 			}
 		this.SetSearchState(null);																	// Init search state to default
-		this.AddFrame();																			// Add div framework
+ 		this.AddFrame();																			// Add div framework
 		this.Query();																				// Get intial data
 		this.Draw();																				// Draw
 		
@@ -80,7 +81,8 @@ class SearchUI  {
 	{
 		if (!state) {
 			this.ss={};																				// Clear search state
-			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR production url
+//			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR production url
+			this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/";	
 			this.ss.mode="input";																	// Current mode - can be input, simple, or advanced
 			this.ss.view="Card";																	// Dispay mode - can be List, Grid, or Card
 			this.ss.sort="Alpha";																	// Sort mode - can be Alpha, Date, or Author
@@ -89,15 +91,15 @@ class SearchUI  {
 			this.ss.pageSize=100;																	// Results per page	
 			this.ss.query={ 																		// Current query
 				text:"",																			// Search word 
-				place:[],																			// Places
-				collection:[],																		// Collections
-				language:[],																		// Languages
-				feature:[],																			// Feature types
-				subject:[],																			// Subjects
-				term:[],																			// Terms
-				relationship:[],																	// Relationships
-				user:[],																			// Users
-				asset:[],																			// Assets
+				places:[],																			// Places
+				collections:[],																		// Collections
+				languages:[],																		// Languages
+				features:[],																		// Feature types
+				subjects:[],																		// Subjects
+				terms:[],																			// Terms
+				relationships:[],																	// Relationships
+				users:[],																			// Users
+				assets:[],																			// Assets
 				dateStart:"", dateEnd:""															// Beginning and ending dates
 				};																
 			}
@@ -134,7 +136,7 @@ class SearchUI  {
 					for (key in this.facets) { 
 						str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
 						${this.facets[key].icon}&nbsp;&nbsp;
-						${key.toUpperCase()}S
+						${key.toUpperCase()}
 						<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
 						</div>
 						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
@@ -212,7 +214,7 @@ class SearchUI  {
 	{
 		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=uid:"+id+"&wt=json";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
-			data=this.MassageKmapData(data);
+			data=this.MassageKmapData(data);														// Normalize kmap
 			callback(data.response.docs[0]);														// Return kmap
 			});
 		}
@@ -224,7 +226,7 @@ class SearchUI  {
 	trace(data)
 			});
 		}
-		
+	
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
 	{
 		var i,o;
@@ -243,16 +245,28 @@ class SearchUI  {
 
 	GetFacetData(type, search)																	// GET FACET DATA
 	{
-		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=asset_type%3A(images%20audio-video)&wt=json&rows=0&json.facet=%7Bcollection:%7Blimit:300,type:%22terms%22,field:%22collection_title%22,facet:%7Bcollection_nid:%7Bfield:%22collection_nid%22,type:%22terms%22%7D%7D%7D%7D";
-		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
-			var i;
-			if (!data || !data.facets || !data.facets[type] || !data.facets[type].buckets)			// If no buckets
-				return;																				// Quit
-			this.facets[type].data=[];																// New array
-			var buckets=data.facets[type].buckets;													// Point at buckets
-			for (i=0;i<buckets.length;++i)  														// For each bucket
-				this.facets[type].data.push({ title: buckets[i].val, count:buckets[i].count, id:'', url:"" });		// Add to list								
-			});
+		var i,val,buckets;
+		var url=this.solrUtil.createBasicQuery(search);												// Query SOLR
+		$.ajax({ url:url, dataType: "jsonp", jsonp:"json.wrf", success:(data)=> {
+			trace(data);
+			if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
+				buckets=data.facets.asset_counts.buckets;											// Point at buckets
+				for (i=0;i<buckets.length;++i) {													// For each bucket
+					val=buckets[i].val;																// Get name
+					val=val.charAt(0).toUpperCase()+val.slice(1);									// UC
+					if (val == "Audio-video") val="Audio-Video";									// Handle AV
+					this.assets[val].n=buckets[i].count;											// Set count
+					}
+				this.assets.All.n=data.response.numFound;											// All count
+				}	
+			if (data && data.facets && data.facets.collection_title && data.facets.collection_title.buckets) {	// If valid
+				buckets=data.facets.collection_title.buckets;										// Point at buckets
+				this.facets.collections.data=[];													// Clear
+				for (i=0;i<buckets.length;++i) 														// For each item
+					this.facets.collections.data.push({title:buckets[i].val, id:"collections-0"});	// Add to list
+				}
+			}
+		});
 	}
 
 	Query()																						// QUERY AND UPDATE RESULTS
@@ -281,7 +295,6 @@ class SearchUI  {
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			});
-		this.GetAssetCounts(search);																// Get asset counts	
 	}
 
 	FormQuery()																					// FORM SOLR QUERY FROM SEARCH OBJECT
@@ -293,42 +306,23 @@ class SearchUI  {
 			search+=" OR caption%3A"+str;															// Or caption 
 			search+=" OR summary%3A"+str+")";														// Or summary
 			}
-		o=this.ss.query.place;																		// Point at place
+		o=this.ss.query.places;																		// Point at place
 		if (o.length) 																				// If spec'd
 			for (i=0;i<o.length;++i) 																// For each term
 				search+=" "+o[i].bool+" kmapid%3A"+o[i].id.toLowerCase();							// Place search term 
-		o=this.ss.query.collection;																	// Point at collection
+		o=this.ss.query.collections;																	// Point at collection
 		if (o.length) 																				// If spec'd
 			for (i=0;i<o.length;++i) {																// For each term
 				str="*"+o[i].title.toLowerCase()+"*";												// Search term
 				search+=" "+o[i].bool+" collection_title%3A"+str;									// Boolean and title
 				}
-		o=this.ss.query.user;                                                                   	// Point at user            
+		o=this.ss.query.users;                                                                   	// Point at user            
 		if (o.length)                                                                               // If spec'd
 			for (i=0;i<o.length;++i) {                                                              // For each term
 				str="*"+o[i].title.toLowerCase()+"*";                                               // Search term
 				search+=" "+o[i].bool+" node_user%3A"+str;                                          // Boolean and title
 				}		
 		return search;																				// Return formatted query
-	}
-
-	GetAssetCounts(search) 																		// GET ASSET COUNTS
-	{
-		var i,val;
-		var url=this.ss.solrUrl+"?"+"q=*"+search+"&wt=json&rows=0&json.facet={assetType:{limit:300,type:%22terms%22,field:%22asset_type%22}}";
-		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get asset counts
-			for (i in this.assets) this.assets[i].n=0;												// Zero them out
-			if (!data || !data.facets || !data.facets.assetType || !data.facets.assetType.buckets)	// If no buckets
-				return;																				// Quit
-			var buckets=data.facets.assetType.buckets;												// Point at buckets
-			for (i=0;i<buckets.length;++i) {														// For each bucket
-				val=buckets[i].val;																	// Get name
-				val=val.charAt(0).toUpperCase()+val.slice(1);										// UC
-				if (val == "Audio-video") val="Audio-Video";										// Handle AV
-				this.assets[val].n=buckets[i].count;												// Set count
-				}
-			this.assets.All.n=data.response.numFound;												// All count																	
-		});
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -703,7 +697,7 @@ class SearchUI  {
 
 		$("#sui-advInput-"+facet).on("change",(e)=> {												// ON CHANGE
 			var v=e.target.id.split("-");															// Get ids		
-			this.AddNewTerm(facet,$("#sui-advInput-"+facet).val(),"","AND");						// Add term to search state
+			this.AddNewTerm($("#sui-advInput-"+facet).val(),"","AND");						// Add term to search state
 			});
 	}
 
@@ -716,8 +710,8 @@ class SearchUI  {
 			$("#sui-advEdit-"+id).slideUp();														// Close it 
 			return;																			
 			}
-		
-		var items=this.facets[(id == "map") ? "place" : id].data;									// Point at items (use places for map)
+		var items=this.facets[id].data;																// Point at items
+
 		var tot=items.length;																		// Number of items
 		var n=Math.min(300,items.length);															// Cap at 300
 		if (tot > 300) tot="300+";																	// Too many, cap to 300
@@ -729,17 +723,19 @@ class SearchUI  {
 				<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${id}s</div>
 				<hr style='border: .5px solid #a4baec'>
 				<div class='sui-advEditList'>`;
-		for (i=0;i<n;++i)																			// For each one
+		
+		for (i=0;i<n;++i) {																			// For each one
 			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>
 			<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>					
 			${items[i].title}</div>`;																// Add item to list
+			}
 		$("#sui-advEdit-"+id).html(str+"</div>".replace(/\t|\n|\r/g,""));							// Add to div
 		$("#sui-advEdit-"+id).slideDown();															// Show it
 		
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			var v=e.target.id.split("-");															// Get ids		
 			if (v[0].match(/ViewListPage/))	this.SendMessage("page="+items[v[1]].url,this.curResults[v[1]]);			// If viewing, ask for that page
-			else	this.AddNewTerm(id,items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
+			else	this.AddNewTerm(items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
 			});
 	
 		$("#sui-advEditFilter-"+id).on("keydown",(e)=> {											// ON FILTER CHANGE
@@ -786,12 +782,9 @@ class SearchUI  {
 			});      
 	}
 
-	AddNewTerm(facet, title, id, bool)															// ADD NEW TERM TO SEARCH STATE
+	AddNewTerm(title, id, bool)																	// ADD NEW TERM TO SEARCH STATE
 	{
-		if (facet == "map")	{																		// If a map
-			this.ss.query.place=[{ id:id, title:title, bool:bool }];								// Sole query term
-			return;																
-			}
+		var facet=id.split("-")[0];																	// Isolate facet
 		var num=this.ss.query[facet].length;														// Number to add to												
 		this.ss.query[facet].push({});																// Add obj
 		this.ss.query[facet][num].title=title;														// Get title
@@ -821,35 +814,38 @@ class SearchUI  {
 			<div class='sui-advEditBut' id='sui-advTreeMap' title='List view'>&#xe61f</div>
 			<hr style='border: .5px solid #a4baec'>
 			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
-			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add tree frame to div
-			if (facet == "place") 		 LazyLoad(null,facet,13735);
-			else if (facet == "map") 	 LazyLoad(null,facet,13735);
-			else if (facet == "feature") LazyLoad(null,facet,20);
-			else 						 GetTopRow(facet);
-	
-			$('.sui-tree li').each( function() {                                						// For each element
-				if ($(this).children('ul').length > 0)                       							// If has children 
-					$(this).addClass('parent');                              							// Make parent class
+			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));								// Add tree frame to div
+			if (facet == "places") 		 	LazyLoad(null,facet,13735);
+			else if (facet == "features") 	LazyLoad(null,facet,20);
+			else 							GetTopRow(facet);
+			
+			$('.sui-tree li').each( function() {                                					// For each element
+				if ($(this).children('ul').length > 0)                       						// If has children 
+					$(this).addClass('parent');                              						// Make parent class
 				});
 
-			$('.sui-advViewTreePage').on("click", (e)=> {												// ON CLICK VIEW BUTTON
-				var v=e.target.id.split("-");															// Get id
-				this.SendMessage("page=https://mandala.shanti.virginia.edu/"+v[1]+"/overview/nojs",this.curResults[v[1]]);	// Goto page
-				e.stopPropagation();																	// Stop propagation
+			$('.sui-tree li > a').on("click", function(e) {											// ON CLICK OF NODE TEXT
+				handleClick($(this),e);  															// Handle
 				});      
-			$('.sui-tree li > a').on("click", function(e) {												// ON CLICK OF NODE TEXT
-				handleClick($(this),e);  																// Handle
+
+			$("#sui-advTreeMap").on("click", ()=> {													// ON CLICK LIST BUTTON
+				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
 				});      
-			$("#sui-advTreeMap").on("click", ()=> {														// ON CLICK LIST BUTTON
-				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());								// Close it and open as list
+
+			$("#sui-advTreeFilter").on("keydown", (e)=> {											// ON TYPING IN TEXT BOX
+				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
+				$("#sui-advEditFilter-"+facet).focus();												// Focus on input in list
 				});      
-			$("#sui-advTreeFilter").on("keydown", (e)=> {												// ON TYPING IN TEXT BOX
-				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());								// Close it and open as list
-				$("#sui-advEditFilter-"+facet).focus();													// Focus on input in list
+
+			$('.sui-advViewTreePage').off("click");													// Kill old handlers
+			$('.sui-advViewTreePage').on("click", (e)=> {											// ON CLICK VIEW BUTTON
+				var v=e.target.id.split("-");														// Get id
+				sui.GetKmapFromID(v[1]+"-"+v[2],(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+				e.stopPropagation();																// Stop propagation
 				});      
 			}
 	
-		$("#sui-advEdit-"+facet).slideDown();															// Show it
+		$("#sui-advEdit-"+facet).slideDown();														// Show it
 			
 		function handleClick(row, e)																// HANDLE NODE CLICK
 		{
@@ -864,48 +860,53 @@ class SearchUI  {
 			else{
 				var s=$("#"+e.target.id).text();														// Get term
 				s=s.substr(0,s.length-1);																// Remove viewer icon
-				sui.AddNewTerm(facet,s,e.target.id,"AND");												// Add term to search state and refresh
+				sui.AddNewTerm(s,e.target.id,"AND");													// Add term to search state and refresh
 				}
 		}
 
-		function GetTopRow(facet, sort)																// GET TOP-MOST TREE LEVEL
+		function GetTopRow(facet)																	// GET TOP-MOST TREE LEVEL
 		{
-			var i,o,str="<ul>";
-			var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";				// Base url
-			var url=buildQuery(base,facet+"s","/",1,1);													// Build query
-			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {								// Run query
-				trace(res)
-				for (i=0;i<res.response.docs.length;++i) {												// For each child
-					o=res.response.docs[i];																// Point at child
-					str+="<li class='parent'><a id='"+o.id+"'";											// Start row
-					str+="' data-path='"+o.ancestor_id_path+"'>"+o.header;								// Add path/header
-					str+="<div class='sui-advViewTreePage' id='advViewTreePage"+o.id+"' title='View page'>&#xe67c</div>";					
-					str+="</a></li>";																	// Add label
-					}
-				$("#sui-tree"+facet).html(str+"</ul>");													// If initing 1st level
-				$('.sui-tree li > a').off();															// Clear handlers
-				$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 				// Restore handler
-				});
+			var id,k,tops=[],str="<ul>";
+			if (facet == "terms") {
+				tops.ka=1;			tops.kha=14263;		tops.ga=24465;		tops.nga=45101;	tops.ca=51638;		tops.cha=55178;		
+				tops.ja=62496;		tops.nya=66477;		tops.ta=73101;		tops.tha=80697;	tops.da=87969;		tops.na=105631;	
+				tops.pa=114065;		tops.pha=120048;	tops.ba=127869;		tops.ma=142667;	tops.tsa=154251;	tops.tsha=158451;	
+				tops.dza=164453;	tops.wa=166888;		tops.zha=167094;	tops.za=172249;	tops["'a"]=177092;	tops.ya=178454;
+				tops.ra=185531;		tops.la=193509;		tops.sha=199252;	tops.sa=204036;	tops.ha=215681;		tops.a=219022;
+			}
+			for (k in tops) {																			// For each top row
+				id=facet+"-"+tops[k];																	// id
+				str+="<li class='parent'><a id='"+id+"'";												// Start row
+				str+="' data-path='"+tops[k]+"'>"+k;													// Add path/header
+				str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
+				str+="</a></li>";																		// Add label
+				}
+			$("#sui-tree"+facet).html(str+"</ul>");														// If initing 1st level
+			$('.sui-tree li > a').off();																// Clear handlers
+			$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 					// Restore handler
 		}
 
 		function LazyLoad(row, facet, init) 													// ADD NEW NODES TO TREE
 		{
 			var path;
+			
 			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
-				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
+					var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
 				if (init) 	path=""+init;															// Force path as string
 				else 		path=""+row.data().path;												// Get path	as string										
 				var lvla=path.split("/").length+1;													// Set level
-				var type=facet+"s";																	// Set type
+				var type=facet;																		// Set type
 				if (type == "features") type="subjects";											// Feature types are in subjects
-				else if (type == "maps") type="places";												// Maps are places
+				path=0
+				
+				,lvla,lvla);
 				var url=buildQuery(base,type,path,lvla,lvla);										// Build query
-					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
+					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
 					var o,i,re;
 					var str="<ul>";																	// Wrapper, show if not initting
 					var f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
 					res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); // Sort
-					
+trace(type,res)					
 					for (i=0;i<res.response.docs.length;++i) {										// For each child
 						o=res.response.docs[i];														// Point at child
 						re=new RegExp("\/"+o.id.split("-")[1]);										// Id
@@ -914,7 +915,7 @@ class SearchUI  {
 						str+="><a id='"+o.id;														// Add id
 						str+="' data-path='"+o.ancestor_id_path+"'>";								// Add path
 						str+=o.header;																// Add label
-						str+="<div class='sui-advViewTreePage' id='advViewTreePage"+o.id+"' title='View page'>&#xe67c</div>";					
+						str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+o.id+"' title='View page'>&#xe67c</div>";					
 						str+="</a></li>";															// Add label
 						}
 					if (res.response.docs.length) {
@@ -927,10 +928,10 @@ class SearchUI  {
 						$('.sui-tree li > a').off();												// Clear handlers
 						$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 	// Restore handler
 						}
-	
+					$('.sui-advViewTreePage').off("click");											// Kill old handlers
 					$('.sui-advViewTreePage').on("click", (e)=> {									// ON CLICK VIEW BUTTON
 						var v=e.target.id.split("-");												// Get id
-						sui.GetKmapFromID(type+"-"+v[1],(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
+						sui.GetKmapFromID(v[1]+"-"+v[2],(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
 						e.stopPropagation();														// Stop propagation
 						});      
 			
