@@ -41,7 +41,7 @@ class SearchUI  {
 		this.facets={};																				
 		this.facets.places=			{ type:"tree",  icon:"&#xe62b", data:[] };						// Places 
 		this.facets.collections=	{ type:"list",  icon:"&#xe633", data:[] };						// Collections 
-		this.facets.languages=		{ type:"list",  icon:"&#xe670", data:[] };						// Languages 
+		this.facets.languages=		{ type:"tree",  icon:"&#xe670", data:[] };						// Languages 
 		this.facets.features=		{ type:"tree",  icon:"&#xe638", data:[] };						// Features 
 		this.facets.subjects=		{ type:"tree",  icon:"&#xe634", data:[] };						// Subjects 
 		this.facets.terms=			{ type:"tree",  icon:"&#xe635", data:[] };						// Terms 
@@ -263,12 +263,6 @@ class SearchUI  {
 				this.facets.collections.data=[];													// Clear
 				for (i=0;i<buckets.length;++i) 														// For each item
 					this.facets.collections.data.push({title:buckets[i].collection_title.buckets[0].val, id:"collections-0"});	// Add to list
-				}
-			if (data && data.facets && data.facets.node_lang && data.facets.node_lang.buckets) {	// If valid
-				buckets=data.facets.node_lang.buckets;												// Point at buckets
-				this.facets.languages.data=[];														// Clear
-				for (i=1;i<buckets.length;++i) 														// For each item
-					this.facets.languages.data.push({title:buckets[i].val, id:"languages-0"});		// Add to list
 				}
 			}
 		});
@@ -687,7 +681,7 @@ class SearchUI  {
 			});
 		}
 
-	DrawInput(facet)																			// DRAW INPUT FACET PIVKER
+	DrawInput(facet)																			// DRAW INPUT FACET PICKER
 	{
 		if ($("#sui-advEdit-"+facet).css("display") != "none") {									// If open
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
@@ -702,7 +696,7 @@ class SearchUI  {
 
 		$("#sui-advInput-"+facet).on("change",(e)=> {												// ON CHANGE
 			var v=e.target.id.split("-");															// Get ids		
-			this.AddNewTerm($("#sui-advInput-"+facet).val(),"","AND");						// Add term to search state
+			this.AddNewFilter($("#sui-advInput-"+facet).val(),"","AND");							// Add term to search state
 			});
 	}
 
@@ -740,8 +734,8 @@ class SearchUI  {
 		
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			var v=e.target.id.split("-");															// Get ids		
-			if (v[0].match(/ViewListPage/))	this.SendMessage("page="+items[v[1]].url,this.curResults[v[1]]);			// If viewing, ask for that page
-			else	this.AddNewTerm(items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
+			if (v[0].match(/ViewListPage/))	this.SendMessage("page="+items[v[1]].url,this.curResults[v[1]]);	// If viewing, ask for that page
+			else	this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
 			});
 	
 		$("#sui-advEditFilter-"+id).on("keydown",(e)=> {											// ON FILTER CHANGE
@@ -789,7 +783,7 @@ class SearchUI  {
 			});      
 	}
 
-	AddNewTerm(title, id, bool)																	// ADD NEW TERM TO SEARCH STATE
+	AddNewFilter(title, id, bool)																	// ADD NEW TERM TO SEARCH STATE
 	{
 		var facet=id.split("-")[0];																	// Isolate facet
 		var num=this.ss.query[facet].length;														// Number to add to												
@@ -822,18 +816,15 @@ class SearchUI  {
 			<hr style='border: .5px solid #a4baec'>
 			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
 			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));								// Add tree frame to div
-			if (facet == "places") 		 	LazyLoad(null,facet,13735);
-			else if (facet == "features") 	LazyLoad(null,facet,20);
-			else 							GetTopRow(facet);
+			if (facet == "places") 		 	LazyLoad(null,facet,13735);								// Embedded top layer for places
+			else if (facet == "features") 	LazyLoad(null,facet,20);								// Features
+			else if (facet == "languages") 	LazyLoad(null,facet,301);								// Languages
+			else 							GetTopRow(facet);										// Constructed top layers
 			
 			$('.sui-tree li').each( function() {                                					// For each element
 				if ($(this).children('ul').length > 0)                       						// If has children 
 					$(this).addClass('parent');                              						// Make parent class
 				});
-
-			$('.sui-tree li > a').on("click", function(e) {											// ON CLICK OF NODE TEXT
-				handleClick($(this),e);  															// Handle
-				});      
 
 			$("#sui-advTreeMap").on("click", ()=> {													// ON CLICK LIST BUTTON
 				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
@@ -856,6 +847,7 @@ class SearchUI  {
 			
 		function handleClick(row, e)																// HANDLE NODE CLICK
 		{
+
 			if (e.offsetX < 20) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
 					LazyLoad(row,facet);																// Lazy load from SOLR
@@ -867,7 +859,7 @@ class SearchUI  {
 			else{
 				var s=$("#"+e.target.id).text();														// Get term
 				s=s.substr(0,s.length-1);																// Remove viewer icon
-				sui.AddNewTerm(s,e.target.id,"AND");													// Add term to search state and refresh
+				sui.AddNewFilter(s, facet+"-"+e.target.id.split("-")[1], "AND");						// Add term to search state and refresh
 				}
 		}
 
@@ -885,8 +877,8 @@ class SearchUI  {
 				var xxxx=0;
 				tops["Administration"]=5550;		tops["Architecture"]=6669;			tops["Collections"]=2823;		tops["Community Services Project Types"]=5553;
 				tops["Contemplation"]=5806;			tops["Cultural Landscapes"]=8868;	tops["Cultural Regions"]=305;	tops["Event"]=2743;
-				tops["General"]=6793;				tops["Geographical Features"]=xxxx;	tops["Grammars"]=xxxx;			tops["Higher Education Digital Tools"]=xxxx;
-				tops["Historical Periods"]=xxxx;	tops["Human Relationships"]=xxxx;	tops["Language Tree"]=xxxx;		tops["Literary Genres"]=xxxx;
+				tops["General"]=6793;				tops["Geographical Features"]=20;	tops["Grammars"]=5812;			tops["Higher Education Digital Tools"]=6404;
+				tops["Historical Periods"]=5807;	tops["Human Relationships"]=306;	tops["Language Tree"]=301;		tops["Literary Genres"]=xxxx;
 				tops["Material Objects"]=xxxx;		tops["Mesoamerican Studies"]=xxxx;	tops["Oral Genres"]=xxxx;		tops["Organizations and Organizational Units"]=xxxx;
 				tops["Politics"]=xxxx;				tops["Profession"]=xxxx;			tops["Religious Sects"]=xxxx;	tops["Religious Systems"]=xxxx;
 				tops["Ritual"]=xxxx;				tops["Scripts"]=xxxx;				tops["Teaching Resources"]=xxxx;	tops["Text Typologies"]=xxxx;
@@ -903,25 +895,24 @@ class SearchUI  {
 			$('.sui-tree li > a').off();																// Clear handlers
 			$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 					// Restore handler
 		}
-
+	
 		function LazyLoad(row, facet, init) 													// ADD NEW NODES TO TREE
 		{
 			var path;
-	
+			
 			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
 				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
 				if (init) 	path=""+init;															// Force path as string
 				else 		path=""+row.data().path;												// Get path	as string										
-				var lvla=path.split("").length+1;													// Set level
+				var lvla=path.split("/").length+1;													// Set level
 				var type=facet;																		// Set type
-				if (type == "features") type="subjects";											// Feature types are in subjects
+				if ((type == "features") ||  (type == "languages")) type="subjects";				// Features and languages are in subjects
+
 				var url=buildQuery(base,type,path,lvla,lvla);										// Build query
-				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
-					trace(res)
-					var o,i,f="",re;
+					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
+					var o,i,re;
 					var str="<ul>";																	// Wrapper, show if not initting
-					if (res.facet_counts && res.facet_counts.facet_fields)							// If there
-						f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
+					var f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
 					res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); // Sort
 					for (i=0;i<res.response.docs.length;++i) {										// For each child
 						o=res.response.docs[i];														// Point at child
