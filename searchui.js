@@ -37,6 +37,7 @@ class SearchUI  {
 		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
 		this.ss={};																					// Holds search state
 		this.runMode=mode;																			// Current mode
+		this.curTree="";																			// Holds current tree open
 
 		this.facets={};																				
 		this.facets.places=			{ type:"tree",  icon:"&#xe62b", data:[] };						// Places 
@@ -696,7 +697,7 @@ class SearchUI  {
 
 		$("#sui-advInput-"+facet).on("change",(e)=> {												// ON CHANGE
 			var v=e.target.id.split("-");															// Get ids		
-			this.AddNewFilter($("#sui-advInput-"+facet).val(),"","AND");							// Add term to search state
+			this.AddNewFilter($("#sui-advInput-"+facet).val(),facet+"-0","AND");					// Add term to search state
 			});
 	}
 
@@ -808,6 +809,7 @@ class SearchUI  {
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
 			}
+		this.curTree=facet;
 		var div="#sui-tree"+facet;																	// Tree div
 		if (!$(div).length) {																		// If doesn't exist
 			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
@@ -847,7 +849,6 @@ class SearchUI  {
 			
 		function handleClick(row, e)																// HANDLE NODE CLICK
 		{
-
 			if (e.offsetX < 20) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
 					LazyLoad(row,facet);																// Lazy load from SOLR
@@ -859,7 +860,7 @@ class SearchUI  {
 			else{
 				var s=$("#"+e.target.id).text();														// Get term
 				s=s.substr(0,s.length-1);																// Remove viewer icon
-				sui.AddNewFilter(s, facet+"-"+e.target.id.split("-")[1], "AND");						// Add term to search state and refresh
+				sui.AddNewFilter(s, sui.curTree+"-"+e.target.id.split("-")[1], "AND");					// Add term to search state and refresh
 				}
 		}
 
@@ -878,11 +879,11 @@ class SearchUI  {
 				tops["Administration"]=5550;		tops["Architecture"]=6669;			tops["Collections"]=2823;		tops["Community Services Project Types"]=5553;
 				tops["Contemplation"]=5806;			tops["Cultural Landscapes"]=8868;	tops["Cultural Regions"]=305;	tops["Event"]=2743;
 				tops["General"]=6793;				tops["Geographical Features"]=20;	tops["Grammars"]=5812;			tops["Higher Education Digital Tools"]=6404;
-				tops["Historical Periods"]=5807;	tops["Human Relationships"]=306;	tops["Language Tree"]=301;		tops["Literary Genres"]=xxxx;
-				tops["Material Objects"]=xxxx;		tops["Mesoamerican Studies"]=xxxx;	tops["Oral Genres"]=xxxx;		tops["Organizations and Organizational Units"]=xxxx;
-				tops["Politics"]=xxxx;				tops["Profession"]=xxxx;			tops["Religious Sects"]=xxxx;	tops["Religious Systems"]=xxxx;
-				tops["Ritual"]=xxxx;				tops["Scripts"]=xxxx;				tops["Teaching Resources"]=xxxx;	tops["Text Typologies"]=xxxx;
-				tops["Tibet and Himalayas"]=xxxx;	tops["Zoologies (Biological and Spiritual)"]=xxxx;
+				tops["Historical Periods"]=5807;	tops["Human Relationships"]=306;	tops["Language Tree"]=301;		tops["Literary Genres"]=5809;
+				tops["Material Objects"]=2693;		tops["Mesoamerican Studies"]=6664;	tops["Oral Genres"]=5808;		tops["Organizations and Organizational Units"]=2688;
+				tops["Politics"]=7174;				tops["Profession"]=6670;			tops["Religious Sects"]=302;	tops["Religious Systems"]=5810;
+				tops["Ritual"]=5805;				tops["Scripts"]=192;				tops["Teaching Resources"]=6844; tops["Text Typologies"]=4833;
+				tops["Tibet and Himalayas"]=6403;	tops["Zoologies (Biological and Spiritual)"]=5813;
 				}
 			for (k in tops) {																			// For each top row
 				id=facet+"-"+tops[k];																	// id
@@ -899,7 +900,6 @@ class SearchUI  {
 		function LazyLoad(row, facet, init) 													// ADD NEW NODES TO TREE
 		{
 			var path;
-			
 			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
 				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
 				if (init) 	path=""+init;															// Force path as string
@@ -910,9 +910,10 @@ class SearchUI  {
 
 				var url=buildQuery(base,type,path,lvla,lvla);										// Build query
 					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
-					var o,i,re;
+					var o,i,re,f="";
 					var str="<ul>";																	// Wrapper, show if not initting
-					var f=res.facet_counts.facet_fields.ancestor_id_path.join();					// List of facets
+					if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
+						f=res.facet_counts.facet_fields.ancestor_id_path.join();					// Get list of facets
 					res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); // Sort
 					for (i=0;i<res.response.docs.length;++i) {										// For each child
 						o=res.response.docs[i];														// Point at child
