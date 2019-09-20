@@ -12,10 +12,10 @@ class Pages  {
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
-		else if (kmap.asset_type == "Images") 		this.DrawImage(kmap);						// Image
-		else if (kmap.asset_type == "Audio-Video") 	this.DrawAV(kmap);							// AV
-		else if (kmap.asset_type == "Texts") 		this.DrawText(kmap);						// Text
-		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
+		else if (kmap.asset_type == "Images") 		this.DrawIframe(kmap);						// Image
+		else if (kmap.asset_type == "Audio-Video") 	this.DrawIframe(kmap);						// AV
+		else if (kmap.asset_type == "Texts") 		this.DrawIframe(kmap);						// Text
+		else if (kmap.asset_type == "Visuals") 		this.DrawIframe(kmap);						// Visual
 	}
 
 	DrawHeader(o)																			// DRAW HEADER
@@ -44,35 +44,10 @@ class Pages  {
 			});
 	}
 
-	DrawAV(o)																				// DRAW AV PAGE FROM KMAP
+	DrawIframe(o)																				// DRAW AV PAGE FROM KMAP
 	{
-		var str=`<div class='sui-sources'>
-		<br><br>AV page will show up here<br><br>`;
-		str+="</div>";
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-	}
-
-	DrawImage(o)																			// DRAW IMAGE PAGE FROM KMAP
-	{
-		var str=`<div class='sui-sources'>
-		<br><br>IMAGES page will show up here<br><br>`;
-		str+="</div>";
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-	}
-
-	DrawText(o)																				// DRAW TEXT PAGE FROM KMAP
-	{
-		var str=`<div class='sui-sources'>
-		<br><br>TEXT page will show up here<br><br>`;
-		str+="</div>";
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-	}
-
-	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
-	{
-		var str=`<div class='sui-sources'>
-		<br><br>VISUALS page will show up here<br><br>`;
-		str+="</div>";
+		var str=`<iframe id='sui-iframe' frameborder='0' 
+		src='${o.url_html}' style='height:calc(100vh - 155px);width:100%'></iframe>`;	
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
