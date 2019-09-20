@@ -849,7 +849,8 @@ class SearchUI  {
 			
 		function handleClick(row, e)																// HANDLE NODE CLICK
 		{
-			if (e.offsetX < 20) {                                         				  				// In icon
+			var off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
+			if (e.offsetX < off) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
 					LazyLoad(row,facet);																// Lazy load from SOLR
 				else{																					// Open or close
