@@ -220,13 +220,6 @@ class SearchUI  {
 			});
 		}
 
-	GetJsonFromID(id, callback)																	// GET KMAP FROM ID
-	{
-		var url="https://sources.shanti.virginia.edu/sources-api/ajax/21048"
-			$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
-			});
-		}
-	
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
 	{
 		var i,o;
@@ -1035,7 +1028,7 @@ class SearchUI  {
 		$("#sui-popupDiv").remove();																// Kill old one, if any
 		str+="<div id='sui-popupDiv' class='sui-gridPopup' style='left:"+x+"px;top:"+y+"px'>"; 		// Add div
 		str+=msg+"</div>"; 																			// Add content
-		$("body").append(str);																		// Add popup to div or body
+		$("#sui-main").append(str);																	// Add to div 
 		$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);					// Animate in and out		
 	}
 

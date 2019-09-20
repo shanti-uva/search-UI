@@ -80,7 +80,6 @@ class Pages  {
 
 	DrawSource(o)																			// DRAW SOURCE PAGE FROM KMAP
 	{
-sui.GetJsonFromID(o.id)	
 		var str=`<div class='sui-sources'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
