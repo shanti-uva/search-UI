@@ -10,7 +10,7 @@
 	A sui=close message is sent to host.
 
 	Requires: 	jQuery 												// Almost any version should work
-	Calls:		kmapsSolrUtil.js, [places.js, pages.js]				// Other JS modules that are dynamically loaded
+	Calls:		kmapsSolrUtil.js, [places.js, pages.js]				// Other JS modules that are dynamically loaded (not uued in plain search)
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		loading.gif, gradient.jpg, treebuts.png
@@ -64,7 +64,7 @@ class SearchUI  {
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
 		$.ajax( { url:"kmapsSolrUtil.js", dataType:"script" }).done(()=> { 							// Dynamically load search class
 				this.solrUtil=new KmapsSolrUtil();													// Alloc
-				this.GetFacetData("");																// Get data about SOLR categories for each facet
+				this.GetFacetData();																// Get data about SOLR categories for each facet
 				}); 	
 		if (mode == "standalone") {																	// If in standalone
 			$.ajax(	{ url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); 	// Dynamically load and alloc places class
@@ -116,7 +116,7 @@ class SearchUI  {
 				<div id='sui-clear' class='sui-search3'>&#xe610</div>
 				</div>
 				<div id='sui-searchgo' class='sui-search4'>&#xe623</div>
-				<div id='sui-mode' class='sui-search5' title='Advanced search'>&#xe669</div>
+				<div id='sui-mode' class='sui-search5' title='Advanced search'>ADVANCED<br>SEARCH</div>
 			</div>
 			<div id='sui-header' class='sui-header'>
 				<div id='sui-headLeft' class='sui-headLeft'></div>
@@ -236,10 +236,10 @@ class SearchUI  {
 		return data;
 	}
 
-	GetFacetData(type, search)																	// GET FACET DATA
+	GetFacetData()																				// GET FACET DATA
 	{
 		var i,val,buckets;
-		var url=this.solrUtil.createBasicQuery(search);												// Query SOLR
+		var url=this.solrUtil.createBasicQuery("");												// Query SOLR
 		$.ajax({ url:url, dataType: "jsonp", jsonp:"json.wrf", success:(data)=> {
 			trace(data);
 			if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
@@ -284,6 +284,7 @@ class SearchUI  {
 				else if (!o.url_thumb)				o.url_thumb="gradient.jpg";						// Use gradient for generic
 				if (o.display_label) o.title=o.display_label;										// Get title form display
 				}
+			this.GetFacetData();																	// Get facet data counts
 			this.assets[this.ss.type].n=data.response.numFound;										// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
@@ -345,7 +346,7 @@ class SearchUI  {
 			}
 		$("#sui-headLeft").css({ display:"inline-block" });											// Show left header
 		$("#sui-mode").prop({"title": this.ss.mode == "advanced" ? "Regular search" : "Advanced search" } );	// Set tooltip
-		$("#sui-mode").html(this.ss.mode == "advanced" ? "&#xe66a" : "&#xe669" );					// Set mode icon	
+		$("#sui-mode").html(this.ss.mode == "advanced" ? "REGULAR<br>SEARCH" : "ADVANCED<br>SEARCH" );			// Set mode icon	
 		$("#sui-header").css({display:"inline-block"} );											// Show header
 		$("#sui-typeList").remove();																// Remove type list
 		this.DrawHeader();																			// Draw header
@@ -779,13 +780,14 @@ class SearchUI  {
 
 	AddNewFilter(title, id, bool)																	// ADD NEW TERM TO SEARCH STATE
 	{
-		var facet=id.split("-")[0];																	// Isolate facet
-		var num=this.ss.query[facet].length;														// Number to add to												
-		this.ss.query[facet].push({});																// Add obj
-		this.ss.query[facet][num].title=title;														// Get title
-		this.ss.query[facet][num].id=id;															// Id
-		this.ss.query[facet][num].bool=bool;														// Bool
-		$("#sui-advEdit-"+facet).slideUp();															// Close window
+		var o=this.ss.query[id.split("-")[0]];														// Point at facet
+		if (o.filter(o => (o.title == title)).length) 	return;										// Don't add if already there											
+		var num=o.length;																			// Facet index to add to												
+		o.push({});																					// Add obj
+		o[num].title=title;																			// Get title
+		o[num].id=id;																				// Id
+		o[num].bool=bool;																			// Bool
+//		$("#sui-advEdit-"+facet).slideUp();															// Close window
 		this.DrawAdvanced();																		// Redraw
 		this.Query();																				// Run query and show results
 	}
