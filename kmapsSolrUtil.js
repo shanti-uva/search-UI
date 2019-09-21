@@ -287,8 +287,60 @@ class KmapsSolrUtil {
 
 
 
+	
+	buildQuery(termIndexRoot, type, path, lvla, lvlb) 
+	{
+		var SOLR_ROW_LIMIT=2000;
+		path = path.replace(/^\//, "").replace(/\s\//, " ");  // remove root slashes
+		if (path === "") {
+			path = "*";
+		}
 
+		var levelField = "level_i";
+		var ancestorField = "ancestor_id_path";
+		if (type === "terms") {
+		  levelField = "level_tib.alpha_i";
+		  ancestorField = "ancestor_id_tib.alpha_path";
+		}
 
+	  var fieldList = [
+			"header",
+			"id",
+			"ancestor*",
+			"caption_eng",
+			"position*",
+			levelField
+		].join(",");
+
+		var result =
+			termIndexRoot + "/select?" +
+			"df=" + ancestorField+
+			"&q=" + path +
+			"&wt=json" +
+			"&indent=true" +
+			"&limit=" + SOLR_ROW_LIMIT +
+			"&facet=true" +
+			"&fl=" + fieldList +
+			"&indent=true" +
+
+			"&fq=tree:" + type +
+			"&fq=" + levelField + ":[" + lvla + "+TO+" + (lvlb + 1) + "]" +
+			"&fq={!tag=hoot}" + levelField + ":[" + lvla + "+TO+" + lvlb + "]" +
+
+			"&facet.mincount=2" +
+			"&facet.limit=-1" +
+		  "&sort=" + levelField + "+ASC" +
+			"&sort=position_i+asc" +
+		   "&sort=header+asc" +
+
+			"&facet.sort=" + ancestorField +"+ASC" +
+			"&facet.field={!ex=hoot}" + ancestorField +
+
+			"&wt=json" +
+			"&json.wrf=?" +
+			"&rows=" + SOLR_ROW_LIMIT;
+		return result;
+	}
 
 
 }
