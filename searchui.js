@@ -129,7 +129,7 @@ class SearchUI  {
 					<div class='sui-advTop'>Advanced search
 					<div id='sui-advClose' style='float:right;font-size:12px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
 					</div><br>
-					<div class='sui-search1'>
+					<div class='sui-search1' style='margin-left:20px'>
 						<input type='text' id='sui-search2' class='sui-search2' placeholder='Enter Search'>
 						<div id='sui-clear' class='sui-search3'>&#xe610</div>
 					</div>
