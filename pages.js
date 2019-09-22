@@ -12,7 +12,7 @@ class Pages  {
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
-		else if (kmap.asset_type == "Images") 		this.DrawIframe(kmap);						// Image
+		else if (kmap.asset_type == "Images") 		this.DrawImage(kmap);						// Image
 		else if (kmap.asset_type == "Audio-Video") 	this.DrawIframe(kmap);						// AV
 		else if (kmap.asset_type == "Texts") 		this.DrawIframe(kmap);						// Text
 		else if (kmap.asset_type == "Visuals") 		this.DrawIframe(kmap);						// Visual
@@ -96,5 +96,53 @@ class Pages  {
 		str+="</div>";
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
+
+	DrawImage(o)																			// DRAW IMAGE PAGE FROM KMAP
+	{
+		var str=`<div class='sui-imagesBox'>
+		<img src='${o.url_thumb.replace(/200\/200/,"1200/1200")}' width="50%"><br>
+		<p>${sui.assets[o.asset_type].g}&nbsp;&nbsp;${o.title[0]}<br>
+		${"Yeshi Wangchuk"} | ${"Photograph"} | ${"4000 x 3000"} px</p></div><br>
+		<div class='sui-sources'>
+		<div style='text-align:center'><b>&#xe633&nbsp;&nbsp;MANDALA COLLECTION</b>:&nbsp;&nbsp;${o.collection_title}</div>
+		<hr style='border-top: 1px solid #b49c59;margin-top:12px'>
+		<div style='width:calc(49% - 24px);border-right:1px solid #eee;display:inline-block;margin-right:24px;vertical-align:top;height:100%'>
+		<p><b>${sui.assets[o.asset_type].g}&nbsp;&nbsp;TITLE</b>:&nbsp;&nbsp;${o.title[0]}</p>
+		<p><b>&#xe600&nbsp;&nbsp;CREATOR</b>:&nbsp;&nbsp;${"Yeshi Wangchuk"}</p>
+		<p><b>&#xe659&nbsp;&nbsp;TYPE</b>:&nbsp;&nbsp;${"Photograph"}</p>
+		<p><b>&#xe663&nbsp;&nbsp;SIZE</b>:&nbsp;&nbsp;${"4000 x 3000 px"}</p>
+		<p><b>PHOTOGRAPHER</b>:&nbsp;&nbsp;${"Yeshi Wangchuk (03/29/2015)"}</p>
+		<p><b>ONLY DIGITAL</b>:&nbsp;&nbsp;${"Yes"}&nbsp;&nbsp;<b>COLOR</b>:&nbsp;&nbsp;${"Yes"}</p>
+		<p><b>QUALITY</b>:&nbsp;&nbsp;${"Average"}&nbsp;&nbsp;<b>ROTATION</b>:&nbsp;&nbsp;${"0"}</p>
+
+		</div>
+		<div style='width:49%;display:inline-block;vertical-align:top'>
+		<p><b>&#xe62B&nbsp;&nbsp;LOCATION</b>:&nbsp;&nbsp;${"Ugyenchhoeling"}</p>
+		<p><b>&#xe634&nbsp;&nbsp;SUBJECT</b>:&nbsp;&nbsp;${"Bell"}</p>
+		<p><b>&copy;&nbsp;&nbsp;COPYRIGHT HOLDER</b>:&nbsp;&nbsp;${"Copyright owned by Shejun and any other concerned organisation and individuals as per agreement with Shejun."}</p>
+		<p><b>&copy;&nbsp;&nbsp;RIGHTS NOTES</b>:&nbsp;&nbsp;${""}</p>
+		<p><b>ORIGINAL FILE</b>:&nbsp;&nbsp;${"BU_TANG_2017_08_26_OGYEN_CHOLING_MUSEUM_T_R3_070.jp2"}</p>
+		<p><b>UPLOADED BY</b>:&nbsp;&nbsp;${"Sam Chrisinger"}</p>
+		<p><b>LICENSE</b>:&nbsp;&nbsp;${"Creative Commons — Attribution-NonCommercial 4.0 International — CC BY-NC 4.0"}</p>
+		
+		</div>`;
+
+	
+	
+	
+/*	
+		if (o.creator && o.creator.length) {
+			str+=`<span style='color:${sui.assets[o.asset_type].c}'>&#xe600</span>
+			&nbsp;&nbsp;${o.creator.join(", ")}<br><br>`;
+			}
+		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</p>";
+		if (!o.puYear)	o.pubYear="n/a";
+		str+="<p>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText'>"+o.pubYear+"</span>";
+		str+="<p>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
+		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
+*/		str+="</div>";
+		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+	}
+
 
 } // Pages class closure

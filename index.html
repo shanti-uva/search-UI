@@ -27,6 +27,7 @@
 
 var sui=new SearchUI("standalone");														// Alloc new search object
 
+
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
 	sui.GetKmapFromID("terms-1",(d)=> {trace(d) });
 	});
