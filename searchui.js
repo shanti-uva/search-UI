@@ -22,7 +22,6 @@
 				sui=close ->										// Tells Drupal search page is closed
 				-> sui=open|[searchState] 							// Open search page is to search state
 				-> sui=close										// Close search page 	
-	
 */
 
 $=jQuery;																							// For Drupal only
@@ -220,6 +219,21 @@ class SearchUI  {
 			});
 		}
 
+	GetFacetTerms(facet)																	// GET TERMS FROM FACET
+	{
+
+			var i,o;
+			var url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select?wt=json&q=asset_type:terms&fl=uid,name*&rows=2000";
+			$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {				// Get facets
+				sui.facets[facet].data=[];															// Clear array			
+				for (i=0;i<data.response.docs.length;++i) {											// For each result
+					o=data.response.docs[i];														// Point at item
+					sui.facets[facet].data.push({ title:o.name_latin[0], id:o.uid });				// Add it					
+trace({ title:o.name_latin[0], id:o.uid })
+}
+				});
+			}
+	
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
 	{
 		var i,o;
@@ -260,6 +274,7 @@ class SearchUI  {
 				}
 			}
 		});
+//		this.GetFacetTerms("terms")
 	}
 
 	Query()																						// QUERY AND UPDATE RESULTS
@@ -280,7 +295,7 @@ class SearchUI  {
 				if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
 				if (o.ancestors_txt && o.ancestors_txt.length)	o.ancestors_txt.splice(0,1);		// Remove 1st ancestor from trail
 				if (o.asset_type == "Audio-video") 	o.asset_type="Audio-Video";						// Handle AV
-				if (o.asset_type == "Texts")		o.url_thumb="gradient.jpg";								// Use gradient for texts
+				if (o.asset_type == "Texts")		o.url_thumb="gradient.jpg";						// Use gradient for texts
 				else if (!o.url_thumb)				o.url_thumb="gradient.jpg";						// Use gradient for generic
 				if (o.display_label) o.title=o.display_label;										// Get title form display
 				}
@@ -903,7 +918,6 @@ class SearchUI  {
 				var lvla=Math.max(path.split("/").length+1,2);										// Set level
 				var type=facet;																		// Set type
 				if ((type == "features") ||  (type == "languages")) type="subjects";				// Features and languages are in subjects
-				trace(type,path,lvla,lvla)
 				var url=sui.solrUtil.buildQuery(base,type,path,lvla,lvla);							// Build query using Yuji's builder
 				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
 					trace(res)	

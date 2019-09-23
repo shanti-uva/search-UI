@@ -12,7 +12,7 @@ class Pages  {
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
-		else if (kmap.asset_type == "Images") 		this.DrawIframe(kmap);						// Image
+		else if (kmap.asset_type == "Images") 		this.DrawImage(kmap);						// Image
 		else if (kmap.asset_type == "Audio-Video") 	this.DrawIframe(kmap);						// AV
 		else if (kmap.asset_type == "Texts") 		this.DrawIframe(kmap);						// Text
 		else if (kmap.asset_type == "Visuals") 		this.DrawIframe(kmap);						// Visual
