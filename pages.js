@@ -99,24 +99,26 @@ class Pages  {
 
 	DrawImage(o)																			// DRAW IMAGE PAGE FROM KMAP
 	{
+		var asp=o.url_thumb_height/o.url_thumb_width;
+		var h=$("#sui-results").width()/2*asp;
 		var str=`<div class='sui-imagesBox'>
-		<div style='overflow:hidden;width:50%;'>
-			<img src='${o.url_thumb.replace(/200,200/,"2000,2000")}'> 
+		<div style='overflow:hidden;width:50%;height:${h}px;margin-left:auto; margin-right:auto; user-select:none'>
+			<img id='sui-thisPic' src='${o.url_thumb.replace(/200,200/,"2000,2000")}' style='width:100%'> 
 		</div><br>
 		<p>${sui.assets[o.asset_type].g}&nbsp;&nbsp;${o.title[0]}<br>
-		${"Yeshi Wangchuk"} | ${"Photograph"} | ${"4000 x 3000"} px</p></div><br>
+		${"Yeshi Wangchuk"} | ${"Photograph"} | ${"4000 x 3000"} px</p>
+		</div>
 		<div class='sui-sources'>
-		<div style='text-align:center'><b>&#xe633&nbsp;&nbsp;MANDALA COLLECTION</b>:&nbsp;&nbsp;${o.collection_title}</div>
-		<hr style='border-top: 1px solid #b49c59;margin-top:12px'>
-		<div style='width:calc(49% - 24px);border-right:1px solid #eee;display:inline-block;margin-right:24px;vertical-align:top;height:100%'>
-		<p><b>${sui.assets[o.asset_type].g}&nbsp;&nbsp;TITLE</b>:&nbsp;&nbsp;${o.title[0]}</p>
-		<p><b>&#xe600&nbsp;&nbsp;CREATOR</b>:&nbsp;&nbsp;${"Yeshi Wangchuk"}</p>
-		<p><b>&#xe659&nbsp;&nbsp;TYPE</b>:&nbsp;&nbsp;${"Photograph"}</p>
-		<p><b>&#xe663&nbsp;&nbsp;SIZE</b>:&nbsp;&nbsp;${"4000 x 3000 px"}</p>
-		<p><b>PHOTOGRAPHER</b>:&nbsp;&nbsp;${"Yeshi Wangchuk (03/29/2015)"}</p>
-		<p><b>ONLY DIGITAL</b>:&nbsp;&nbsp;${"Yes"}&nbsp;&nbsp;<b>COLOR</b>:&nbsp;&nbsp;${"Yes"}</p>
-		<p><b>QUALITY</b>:&nbsp;&nbsp;${"Average"}&nbsp;&nbsp;<b>ROTATION</b>:&nbsp;&nbsp;${"0"}</p>
-
+			<div style='text-align:center'><b>&#xe633&nbsp;&nbsp;MANDALA COLLECTION</b>:&nbsp;&nbsp;${o.collection_title}</div>
+			<hr style='border-top: 1px solid #b49c59;margin-top:12px'>
+			<div style='width:calc(49% - 24px);border-right:1px solid #eee;display:inline-block;margin-right:24px;vertical-align:top;height:100%'>
+			<p><b>${sui.assets[o.asset_type].g}&nbsp;&nbsp;TITLE</b>:&nbsp;&nbsp;${o.title[0]}</p>
+			<p><b>&#xe600&nbsp;&nbsp;CREATOR</b>:&nbsp;&nbsp;${"Yeshi Wangchuk"}</p>
+			<p><b>&#xe659&nbsp;&nbsp;TYPE</b>:&nbsp;&nbsp;${"Photograph"}</p>
+			<p><b>&#xe663&nbsp;&nbsp;SIZE</b>:&nbsp;&nbsp;${"4000 x 3000 px"}</p>
+			<p><b>PHOTOGRAPHER</b>:&nbsp;&nbsp;${"Yeshi Wangchuk (03/29/2015)"}</p>
+			<p><b>ONLY DIGITAL</b>:&nbsp;&nbsp;${"Yes"}&nbsp;&nbsp;<b>COLOR</b>:&nbsp;&nbsp;${"Yes"}</p>
+			<p><b>QUALITY</b>:&nbsp;&nbsp;${"Average"}&nbsp;&nbsp;<b>ROTATION</b>:&nbsp;&nbsp;${"0"}</p>
 		</div>
 		<div style='width:49%;display:inline-block;vertical-align:top'>
 		<p><b>&#xe62B&nbsp;&nbsp;LOCATION</b>:&nbsp;&nbsp;${"Ugyenchhoeling"}</p>
@@ -126,25 +128,27 @@ class Pages  {
 		<p><b>ORIGINAL FILE</b>:&nbsp;&nbsp;${"BU_TANG_2017_08_26_OGYEN_CHOLING_MUSEUM_T_R3_070.jp2"}</p>
 		<p><b>UPLOADED BY</b>:&nbsp;&nbsp;${"Sam Chrisinger"}</p>
 		<p><b>LICENSE</b>:&nbsp;&nbsp;${"Creative Commons — Attribution-NonCommercial 4.0 International — CC BY-NC 4.0"}</p>
-		
-		</div>`;
-
-	
-	
-	
-/*	
-		if (o.creator && o.creator.length) {
-			str+=`<span style='color:${sui.assets[o.asset_type].c}'>&#xe600</span>
-			&nbsp;&nbsp;${o.creator.join(", ")}<br><br>`;
-			}
-		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</p>";
-		if (!o.puYear)	o.pubYear="n/a";
-		str+="<p>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText'>"+o.pubYear+"</span>";
-		str+="<p>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
-		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
-*/		str+="</div>";
+		</div></div>`;
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-	}
-
+			
+		$("#sui-picEnlarge").on("click",()=> {
+			$("#sui-thisPic").css("width","auto");
+			var sx,sy,px,py;
+			var pic=$("#sui-thisPic")[0];
+			pic.style.cursor="grab";
+			pic.onmousedown=(e)=> {
+				e=e||window.event;		e.preventDefault();
+				sx=e.pageX;    			sy=e.pageY;
+				px=$("#sui-thisPic").offset().left;
+				py=$("#sui-thisPic").offset().top;
+				document.onmousemove=(e)=> {
+					e=e||window.event;		e.preventDefault();
+					var dx=e.pageX-sx;   	var dy=e.pageY-sy;
+					$("#sui-thisPic").offset({left:px+dx,top:py+dy});
+					};
+				document.onmouseup=(e)=> { document.onmouseup=document.onmousemove=null; }; 
+				};
+			});
+		}
 
 } // Pages class closure
