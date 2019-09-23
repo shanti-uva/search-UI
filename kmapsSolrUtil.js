@@ -342,5 +342,11 @@ class KmapsSolrUtil {
 		return result;
 	}
 
+	buildAssetQuery(queryObj)
+	{
+		var url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/?"+"q=*&fl=*&wt=json&json.wrf=?&sort=id asc&start=0&rows=100";
+		return url;
+	}
+
 
 }

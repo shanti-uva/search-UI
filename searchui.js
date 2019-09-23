@@ -61,19 +61,19 @@ class SearchUI  {
 	
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
+		this.SetSearchState(null);																	// Init search state to default
 		$.ajax( { url:"kmapsSolrUtil.js", dataType:"script" }).done(()=> { 							// Dynamically load search class
 				this.solrUtil=new KmapsSolrUtil();													// Alloc
 				this.GetFacetData();																// Get data about SOLR categories for each facet
-				}); 	
+				this.Query();																		// Get intial data
+			}); 	
 		if (mode == "standalone") {																	// If in standalone
-			$.ajax(	{ url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); 	// Dynamically load and alloc places class
-			$.ajax(	{ url:"pages.js",  dataType:"script" }).done(()=> { this.pages=new Pages(); }); 	// Dynamically load and alloc pages class
+				$.ajax(	{ url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); 	// Dynamically load and alloc places class
+				$.ajax(	{ url:"pages.js",  dataType:"script" }).done(()=> { this.pages=new Pages(); }); 	// Dynamically load and alloc pages class
 			}
-		this.SetSearchState(null);																	// Init search state to default
- 		this.AddFrame();																			// Add div framework
-		this.Query();																				// Get intial data
+			
+		this.AddFrame();																			// Add div framework
 		this.Draw();																				// Draw
-		
 		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw
 		}
 
@@ -286,6 +286,7 @@ trace({ title:o.name_latin[0], id:o.uid })
 			asset="asset_type%3A"+this.ss.type.toLowerCase()+" AND ";								// Set asset type						
 		var search=this.FormQuery();																// Form SOLR search from query object
 		var url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/?"+"q="+asset+search+"&fl=*&wt=json&json.wrf=?&sort=id asc&start="+s+"&rows="+this.ss.pageSize;
+//		var url=this.solrUtil.buildAssetQuery(this.ss);
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
 			var i,o;
 			this.curResults=data.response.docs;														// Save current results
