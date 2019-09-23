@@ -12,7 +12,7 @@ class Pages  {
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
-		else if (kmap.asset_type == "Images") 		this.DrawImage(kmap);						// Image
+		else if (kmap.asset_type == "Images") 		this.DrawIframe(kmap);						// Image
 		else if (kmap.asset_type == "Audio-Video") 	this.DrawIframe(kmap);						// AV
 		else if (kmap.asset_type == "Texts") 		this.DrawIframe(kmap);						// Text
 		else if (kmap.asset_type == "Visuals") 		this.DrawIframe(kmap);						// Visual
@@ -100,7 +100,9 @@ class Pages  {
 	DrawImage(o)																			// DRAW IMAGE PAGE FROM KMAP
 	{
 		var str=`<div class='sui-imagesBox'>
-		<img src='${o.url_thumb.replace(/200\/200/,"1200/1200")}' width="50%"><br>
+		<div style='overflow:hidden;width:50%;'>
+			<img src='${o.url_thumb.replace(/200,200/,"2000,2000")}'> 
+		</div><br>
 		<p>${sui.assets[o.asset_type].g}&nbsp;&nbsp;${o.title[0]}<br>
 		${"Yeshi Wangchuk"} | ${"Photograph"} | ${"4000 x 3000"} px</p></div><br>
 		<div class='sui-sources'>

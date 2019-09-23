@@ -884,7 +884,7 @@ class SearchUI  {
 			for (k in tops) {																			// For each top row
 				id=facet+"-"+tops[k];																	// id
 				str+="<li class='parent'><a id='"+id+"'";												// Start row
-				str+="' data-path=''>"+k;																// Add path/header
+				str+="' data-path='"+tops[k]+"'>"+k;													// Add path/header
 				str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
 				str+="</a></li>";																		// Add label
 				}
@@ -900,12 +900,13 @@ class SearchUI  {
 				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
 				if (init) 	path=""+init;															// Force path as string
 				else 		path=""+row.data().path;												// Get path	as string										
-				var lvla=path.split("/").length+1;													// Set level
+				var lvla=Math.max(path.split("/").length+1,2);										// Set level
 				var type=facet;																		// Set type
 				if ((type == "features") ||  (type == "languages")) type="subjects";				// Features and languages are in subjects
-
+				trace(type,path,lvla,lvla)
 				var url=sui.solrUtil.buildQuery(base,type,path,lvla,lvla);							// Build query using Yuji's builder
-					$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
+				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {					// Run query
+					trace(res)	
 					var o,i,re,f="";
 					var str="<ul>";																	// Wrapper, show if not initting
 					if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
