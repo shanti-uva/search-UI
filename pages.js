@@ -6,7 +6,7 @@ class Pages  {
 
 	Draw(kmap)																				// DRAW KMAP PAGE
 	{
-		trace(kmap);
+		sui.GetJSONFromKmap(kmap);
 		this.DrawHeader(kmap);																	// Draw header
 		if (kmap.asset_type == "Places")			sui.places.Draw(kmap);						// Show place
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source

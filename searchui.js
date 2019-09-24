@@ -233,7 +233,19 @@ trace({ title:o.name_latin[0], id:o.uid })
 }
 				});
 			}
-	
+
+	GetJSONFromKmap(kmap, callback)															// GET JSON FROM KMAP
+	{
+		var url=kmap.url_json;																		// Get json
+		if (!url) return;
+		url=url.replace(/.shanti.virginia.edu/i,"-dev.shanti.virginia.edu");						// Look in dev			
+		url+="?callback=myfunc";																	// Add callback
+		if (kmap.asset_type == "Audio-Video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
+		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {										// Get JSON
+			callback(data.response.docs[0]);														// Return kmap
+			});
+	}
+		
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
 	{
 		var i,o;
@@ -247,7 +259,8 @@ trace({ title:o.name_latin[0], id:o.uid })
 			else if (!o.url_thumb)							o.url_thumb="gradient.jpg";				// Use gradient for generic
 			if (o.display_label) 							o.title=o.display_label;				// Get title form display
 			}
-		return data;
+
+			return data;
 	}
 
 	GetFacetData()																				// GET FACET DATA
