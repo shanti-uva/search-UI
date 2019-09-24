@@ -221,7 +221,6 @@ class SearchUI  {
 
 	GetFacetTerms(facet)																	// GET TERMS FROM FACET
 	{
-
 			var i,o;
 			var url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select?wt=json&q=asset_type:terms&fl=uid,name*&rows=2000";
 			$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {				// Get facets
@@ -234,15 +233,15 @@ trace({ title:o.name_latin[0], id:o.uid })
 				});
 			}
 
-	GetJSONFromKmap(kmap, callback)															// GET JSON FROM KMAP
+	GetJSONFromKmap(kmap, callback)																// GET JSON FROM KMAP
 	{
 		var url=kmap.url_json;																		// Get json
-		if (!url) return;
+		if (!url) return;																			// No asset type
 		url=url.replace(/.shanti.virginia.edu/i,"-dev.shanti.virginia.edu");						// Look in dev			
 		url+="?callback=myfunc";																	// Add callback
 		if (kmap.asset_type == "Audio-Video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {										// Get JSON
-			callback(data.response.docs[0]);														// Return kmap
+			callback(data);																			// Return data
 			});
 	}
 		
@@ -259,8 +258,7 @@ trace({ title:o.name_latin[0], id:o.uid })
 			else if (!o.url_thumb)							o.url_thumb="gradient.jpg";				// Use gradient for generic
 			if (o.display_label) 							o.title=o.display_label;				// Get title form display
 			}
-
-			return data;
+		return data;
 	}
 
 	GetFacetData()																				// GET FACET DATA
@@ -287,7 +285,6 @@ trace({ title:o.name_latin[0], id:o.uid })
 				}
 			}
 		});
-//		this.GetFacetTerms("terms")
 	}
 
 	Query()																						// QUERY AND UPDATE RESULTS
@@ -301,18 +298,8 @@ trace({ title:o.name_latin[0], id:o.uid })
 		var url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/?"+"q="+asset+search+"&fl=*&wt=json&json.wrf=?&sort=id asc&start="+s+"&rows="+this.ss.pageSize;
 //		var url=this.solrUtil.buildAssetQuery(this.ss);
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
-			var i,o;
 			this.curResults=data.response.docs;														// Save current results
-			for (i=0;i<this.curResults.length;++i) {												// For each result, massage data
-				o=this.curResults[i];																// Point at item
-				o.asset_type=o.asset_type.charAt(0).toUpperCase()+o.asset_type.slice(1);			// UC 1st char
-				if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
-				if (o.ancestors_txt && o.ancestors_txt.length)	o.ancestors_txt.splice(0,1);		// Remove 1st ancestor from trail
-				if (o.asset_type == "Audio-video") 	o.asset_type="Audio-Video";						// Handle AV
-				if (o.asset_type == "Texts")		o.url_thumb="gradient.jpg";						// Use gradient for texts
-				else if (!o.url_thumb)				o.url_thumb="gradient.jpg";						// Use gradient for generic
-				if (o.display_label) o.title=o.display_label;										// Get title form display
-				}
+			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData();																	// Get facet data counts
 			this.assets[this.ss.type].n=data.response.numFound;										// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
