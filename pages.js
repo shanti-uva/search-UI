@@ -14,7 +14,7 @@ class Pages  {
 		else if (kmap.asset_type == "Images") 		this.DrawImage(kmap);						// Image
 		else if (kmap.asset_type == "Audio-Video") 	this.DrawIframe(kmap);						// AV
 		else if (kmap.asset_type == "Texts") 		this.DrawIframe(kmap);						// Text
-		else if (kmap.asset_type == "Visuals") 		this.DrawIframe(kmap);						// Visual
+		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
 	}
 
 	DrawHeader(o)																			// DRAW HEADER
@@ -41,6 +41,16 @@ class Pages  {
 			var id=e.currentTarget.id.substring(10).toLowerCase();								// Get id
 			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
 			});
+	}
+
+
+	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
+	{
+		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });
+		function drawDetails(j) {	
+			trace(j)
+			}
+
 	}
 
 	DrawIframe(o)																				// DRAW AV PAGE FROM KMAP
