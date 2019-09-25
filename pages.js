@@ -19,7 +19,7 @@ class Pages  {
 
 	DrawHeader(o)																			// DRAW HEADER
 	{
-		var i,j;
+		var i;
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=(o.asset_type == "Places") ? o.title[0].toUpperCase() : o.title[0];				// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
@@ -41,6 +41,17 @@ class Pages  {
 			var id=e.currentTarget.id.substring(10).toLowerCase();								// Get id
 			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
 			});
+	}
+
+	DrawItem(icon, label, value, def, style)												// DRAW ITEM
+	{
+		var s="<p>";
+		if (icon)	s+=icon+"&nbsp;&nbsp;";														// Add icon
+		if (label)	s+="<span class='sui-pageLab'>"+label+":&nbsp;&nbsp;</span>";				// Add label
+		s+="<span class='";																		// Add value span
+		s+=(style ? style : "sui-pageVal")+"'>";												// Default, or special style
+		s+=(!typeof value == "undefined") ? def : value;											// Add def if bad value or show value
+		return s+"</span></p>";																	// Return item
 	}
 
 
@@ -108,47 +119,64 @@ class Pages  {
 
 	DrawImage(o)																			// DRAW IMAGE PAGE FROM KMAP
 	{
+		var i,mid;
 		var asp=o.url_thumb_height/o.url_thumb_width;
-		var h=$("#sui-results").width()/2*asp;
+		var w=$("#sui-results").width()/2;
+		var h=w*asp;
+		for (i=0;i<sui.curResults.length;++i) {	if (o.id == sui.curResults[i].id)	mid=i; }
+
 		var str=`<div class='sui-imagesBox'>
 		<div id='sui-imageDiv' style='overflow:hidden;width:50%;height:${h}px;margin-left:auto; margin-right:auto; user-select:none'>
 			<img id='sui-thisPic' src='${o.url_thumb.replace(/200,200/,"2000,2000")}' style='width:100%'> 
 		</div><br>
 		<p>${o.title[0]}<br>
-		${o.creator} | ${o.img_width_s} x ${o.img_height_s} px</p>
-		<p id='sui-picEnlarge' style='cursor:pointer' title='Click to enlarge and pan'>&#xe650</div>`;
-		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });
+		${o.creator} | ${o.img_width_s} x ${o.img_height_s} px<br>
+		<div id='sui-picEnlarge' style='cursor:pointer;margin-top:6px' title='Click to enlarge and pan'>&#xe650</div></p>
+		<div class='sui-imageGal'id='sui-imageGal'>`;
+				
+		for (i=mid-1;i>=0;--i) 
+			if (sui.curResults[i].asset_type == "Images")
+				str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
+		str+=`<div class='sui-pageThumb' style=' border-color:#fff'><img id='sui-pageThumb-${mid}' src='${o.url_thumb}' style='height:100%'></div>`;	
+			for (i=mid+1;i<sui.curResults.length;++i) 
+				if (sui.curResults[i].asset_type == "Images")
+					str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
+		str+="</div></div><br>";
+		
+		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Load detaill from JSON
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$("#sui-imageGal").scrollLeft($("#sui-pageThumb-"+mid).offset().left-w+25);				// Scroll to center
 
+		var d=this.DrawItem;																	// Point at item drawer
 		function drawDetails(j) {	
-			str=`<div class='sui-sources'>
-				<div style='text-align:center'><b>&#xe633&nbsp;&nbsp;MANDALA COLLECTION</b>:&nbsp;&nbsp;${o.collection_title}</div>
-				<hr style='border-top: 1px solid #b49c59;margin-top:12px'>
-				<div style='width:calc(49% - 24px);border-right:1px solid #eee;display:inline-block;margin-right:24px;vertical-align:top;height:100%'>`;
-				str+=`<p><b>${sui.assets[o.asset_type].g}&nbsp;&nbsp;TITLE</b>:&nbsp;&nbsp;${o.title[0]}</p>`;
-				str+=`<p><b>&#xe600&nbsp;&nbsp;CREATOR</b>:&nbsp;&nbsp;${o.creator}</p>`;
-				str+=`<p><b>&#xe659&nbsp;&nbsp;TYPE</b>:&nbsp;&nbsp;${j.field_image_type.und[0].value}</p>`;
-				str+=`<p><b>&#xe663&nbsp;&nbsp;SIZE</b>:&nbsp;&nbsp; ${o.img_width_s} x ${o.img_height_s} px</p>`;
-				str+=`<p><b>PHOTOGRAPHER</b>:&nbsp;&nbsp;${o.creator}</p>`;
-				str+=`<p><b>ONLY DIGITAL</b>:&nbsp;&nbsp;${j.field_image_digital.und[0].value ? "Yes" : "No"}
-				&nbsp;&nbsp;<b>COLOR</b>:&nbsp;&nbsp;${j.field_image_color.und[0].value ? "Yes" : "No"}</p>`;
-				str+=`<p><b>QUALITY</b>:&nbsp;&nbsp;${j.field_image_quality.und[0].value}&nbsp;&nbsp;<b>ROTATION</b>:&nbsp;&nbsp;${j.field_image_rotation.und[0].value}&deg;</p>`;
-			str+=`</div><div style='width:49%;display:inline-block;vertical-align:top'>`;
-				str+=`<p><b>&#xe62B&nbsp;&nbsp;LOCATION</b>:&nbsp;&nbsp;${o.kmapid_strict_ss ? o.kmapid_strict_ss[0] : ""}&nbsp;&nbsp; 
-			${(j.field_latitude && j.field_latitude.und) ? "("+j.field_latitude.und[0].value+")" : ""}</p>`;
-				if (j.field_keywords && j.field_keywords.und)
-					str+=`<p><b>&#xe634&nbsp;&nbsp;SUBJECT</b>:&nbsp;&nbsp;${j.field_keywords.und[0].value}</p>`;
-				if (j.field_image_capture_device && j.field_image_capture_device.und)
-					str+=`<p><b>&#xe634&nbsp;&nbsp;CAPURE DEVICE</b>:&nbsp;&nbsp;${j.field_image_capture_device.und[0].value}</p>`;
-				if (j.field_copyright_holder && j.field_copyright_holder.und)
-					str+=`<p><b>&copy;&nbsp;&nbsp;COPYRIGHT HOLDER</b>:&nbsp;&nbsp;${j.field_copyright_holder.und[0].value}</p>`;
-				str+=`<p><b>ORIGINAL&nbsp;FILE</b>:&nbsp;&nbsp;${j.field_original_filename.und[0].value}</p>`;
-				str+=`<p><b>UPLOADED&nbsp;BY</b>:&nbsp;&nbsp;${o.node_user_full_s}</p>`;
-				if (j.field_license_url && j.field_license_url.und)
-					str+=`<p><b>LICENSE</b>:&nbsp;&nbsp;${j.field_license_url.und[0].value}</p>`;
-			str+=`</div></div>`;
+			str="<div class='sui-sources' style='padding-top:0'>";
+			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
+			str+="<hr style='border-top: 1px solid #b49c59;margin-top:12px'>";
+			str+="<div style='width:calc(49% - 24px);border-right:1px solid #ddd;display:inline-block;margin-right:24px;vertical-align:top;height:100%;'>";
+				try{ str+=d(sui.assets[o.asset_type].g,"TITLE",o.title[0],"Untitled"); } catch(e){}
+				try{ str+=d("&#xe600","CREATOR",o.creator); } catch(e){}
+				try{ str+=d("&#xe62a","TYPE",j.field_image_type.und[0].value); } catch(e){}
+				try{ str+=d("&#xe663","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
+				try{ str+="<p><b>&#xe67f&nbsp;&nbsp;ONLY DIGITAL</b>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
+					 str+="&nbsp;&nbsp;<b>COLOR</b>:&nbsp;&nbsp;"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"; } catch(e){}
+				try{ str+="<p><b>&#xe67f&nbsp;&nbsp;QUALITY</b>:&nbsp;&nbsp;"+j.field_image_quality.und[0].value+"&nbsp;&nbsp;<b>ROTATION</b>:&nbsp;&nbsp;"+j.field_image_rotation.und[0].value+"&deg;</p>"; } catch(e){}
+				try{ str+=d("&#xe659","CAPURE DEVICE",j.field_image_capture_device.und[0].value); } catch(e){}
+			str+="</div><div style='width:49%;display:inline-block;vertical-align:top'>";
+				try{ str+="<p><b>&#xe62B&nbsp;&nbsp;LOCATION</b>:&nbsp;&nbsp;"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;";
+				  	 str+=j.field_latitude.und[0].value+"</p>"; } catch(e){}
+				try{ str+=d("&#xe634","SUBJECT",j.field_keywords.und[0].value); } catch(e){}
+				try{ str+=d("&copy;","COPYRIGHT HOLDER",j.field_copyright_holder.und[0].value); } catch(e){}
+				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } catch(e){}
+				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } catch(e){}
+				try{ str+=d("&#xe678","LICENSE",j.field_license_url.und[0].value); } catch(e){}
+				str+="</div></div>";
 			$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-		}
+			}
+
+		$("[id^=sui-pageThumb-]").on("click",(e)=> {												// ON THUMBNAIL CLICK
+			var id=e.currentTarget.id.split("-")[2];												// Get id
+			this.DrawImage(sui.curResults[id]);														// Show image
+			});
 
 		$("#sui-picEnlarge").on("click",()=> {														// ON RESIZE PIC
 			var sx,sy,px,py;
