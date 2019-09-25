@@ -183,7 +183,7 @@
 .sui-crumb:hover { 	text-decoration:underline;
 					}
 .sui-sources {		max-width:900px;margin:8px auto 8px auto; background-color: #fff; border:1px solid #999;
-					border-radius:6px; padding: 24px; color:#666; font-size:14x; font-weight:400;
+					border-radius:6px; padding: 50px; color:#666; font-size:14x; font-weight:400;
 					}
 .sui-sourceText	{	font-family:EB Garamond,serif; font-weight:500; line-height:24px; font-size:17px;
 					}
@@ -212,3 +212,4 @@
 .sui-main ::-webkit-scrollbar-thumb:hover { background: #888 }
 .sui-main ::-webkit-input-placeholder { color: #bbb }	::placeholder { color: #bbb }
 
+a { color:#5a57ad }

@@ -100,21 +100,30 @@ class Pages  {
 
 	DrawSource(o)																			// DRAW SOURCE PAGE FROM KMAP
 	{
-		var str=`<div class='sui-sources'>
+		var str=`<div class='sui-sources' id='sui-sources'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
-		<hr style='border-top: 1px solid #aaa'><br>`;
+		<hr style='border-top: 1px solid #aaa'>
+		<div id='sui-srcSec' style='font-size:18px;font-weight:400'></div><br>`;
 		if (o.creator && o.creator.length) {
 			str+=`<span style='color:${sui.assets[o.asset_type].c}'>&#xe600</span>
 			&nbsp;&nbsp;${o.creator.join(", ")}<br><br>`;
 			}
+		if (o.url_thumb && !o.url_thumb.match(/gradient.jpg/)) str+="<img src='"+o.url_thumb+"' style='float:right;width:33%; padding:0 0 12px 12px'>";
 		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</p>";
-		if (!o.puYear)	o.pubYear="n/a";
-		str+="<p>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText'>"+o.pubYear+"</span>";
+		str+="<p>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcYear'></span>";
+		str+="<p>PAGES:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPages'></span>";
 		str+="<p>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
 		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
 		str+="</div>";
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		
+		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
+			if (d.biblio_pages) 			$("#sui-srcPages").html(d.biblio_pages);			// Add pages
+			if (d.biblio_year) 				$("#sui-srcYear").html(d.biblio_year);				// Year
+			if (d.biblio_secondary_title) 	$("#sui-srcSec").html(d.biblio_secondary_title);	// Pub
+			if (d.biblio_url) 				$("#sui-sources").append("<p>URL:&nbsp;&nbsp;<a target='_blank' href='"+d.biblio_url+"'>"+d.biblio_url+"</a></p>");	// URL
+			});									
 	}
 
 	DrawImage(o)																			// DRAW IMAGE PAGE FROM KMAP
@@ -152,16 +161,18 @@ class Pages  {
 			str="<div class='sui-sources' style='padding-top:0'>";
 			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
 			str+="<hr style='border-top: 1px solid #b49c59;margin-top:12px'>";
-			str+="<div style='width:calc(49% - 24px);border-right:1px solid #ddd;display:inline-block;margin-right:24px;vertical-align:top;height:100%;'>";
+			str+="<div style='width:calc(49% - 24px);display:inline-block;margin-right:16px;vertical-align:top;height:100%;'>";
 				try{ str+=d(sui.assets[o.asset_type].g,"TITLE",o.title[0],"Untitled"); } catch(e){}
+				str+="<hr>";
 				try{ str+=d("&#xe600","CREATOR",o.creator); } catch(e){}
 				try{ str+=d("&#xe62a","TYPE",j.field_image_type.und[0].value); } catch(e){}
 				try{ str+=d("&#xe663","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
+				str+="<hr>";
 				try{ str+="<p><b>&#xe67f&nbsp;&nbsp;ONLY DIGITAL</b>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
 					 str+="&nbsp;&nbsp;<b>COLOR</b>:&nbsp;&nbsp;"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"; } catch(e){}
 				try{ str+="<p><b>&#xe67f&nbsp;&nbsp;QUALITY</b>:&nbsp;&nbsp;"+j.field_image_quality.und[0].value+"&nbsp;&nbsp;<b>ROTATION</b>:&nbsp;&nbsp;"+j.field_image_rotation.und[0].value+"&deg;</p>"; } catch(e){}
+			str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
 				try{ str+=d("&#xe659","CAPURE DEVICE",j.field_image_capture_device.und[0].value); } catch(e){}
-			str+="</div><div style='width:49%;display:inline-block;vertical-align:top'>";
 				try{ str+="<p><b>&#xe62B&nbsp;&nbsp;LOCATION</b>:&nbsp;&nbsp;"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;";
 				  	 str+=j.field_latitude.und[0].value+"</p>"; } catch(e){}
 				try{ str+=d("&#xe634","SUBJECT",j.field_keywords.und[0].value); } catch(e){}
