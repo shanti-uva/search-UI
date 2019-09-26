@@ -150,16 +150,50 @@ class KmapsSolrUtil {
 
         // create request object
 
+        // console.error("State = " + JSON.stringify(state, undefined, 2));
+
+
         var searchstring = state.query.text || "";
         var page = state.page || 0;
         var pageSize = state.pageSize || 100;
-        console.log (JSON.stringify(state));
+        // console.log (JSON.stringify(state));
         var starts = searchstring + "*";
         var search = "*" + searchstring + "*";
         var slashy = searchstring + "/";
          if ($.type(searchstring) === "undefined" || searchstring.length === 0 ) {
              searchstring = search = slashy = "*";
          }
+         var start = page * pageSize;
+
+
+         var fq_array = [];
+
+         // places
+        if (state.query.places && state.query.places.length) {
+            fq_array.push(this.buildFq(state.query.places, "kmapid"));
+        }
+
+        // subjects
+        if (state.query.subjects && state.query.subjects.length) {
+            fq_array.push(this.buildFq(state.query.subjects, "kmapid"));
+        }
+
+        // features
+        if (state.query.features && state.query.features.length) {
+            fq_array.push(this.buildFq(state.query.features, "feature_types_ss", "title"));
+        }
+
+        // collections
+        if (state.query.collections && state.query.collections.length) {
+            fq_array.push(this.buildFq(state.query.collections, "collection_title", "title"));
+        }
+
+        // languages
+        if (state.query.languages && state.query.languages.length) {
+            fq_array.push(this.buildFq(state.query.languages, "node_lang", "title"));
+        }
+
+        // console.log(JSON.stringify (fq_array, undefined, 2));
 
         var req =
             {
@@ -187,7 +221,7 @@ class KmapsSolrUtil {
                 "wt": "json",
 
                 // paging
-                "start": page,
+                "start": start,
                 "rows": pageSize,
 
                 // facets
@@ -201,7 +235,6 @@ class KmapsSolrUtil {
                 "hl.fragsize": 0,
                 "hl.tag.pre": "<mark>",
                 "hl.tag.post": "</mark>",
-
                 // debug settings  -- set both to false in production?
                 "echoParams": "explicit",
                 "indent": "true"
@@ -209,10 +242,46 @@ class KmapsSolrUtil {
 
         var baseurl = state.solrUrl;
         var params = new URLSearchParams(req);
+
+        // process the fq's
+
+        for (var i = 0; i < fq_array.length; i++) {
+            params.append("fq",fq_array[i]);
+        }
         var url = new URL(baseurl + "?" + params.toString());
         return url;
     }
 
+
+    buildFq(facets, facet_field, type) {
+
+        if (!type) { type = "id"; };
+        // console.log("Got facet values: " + JSON.stringify(facets));
+        var st = "";
+        for (var i = 0; i < facets.length; i++) {
+            var entry = facets[i];
+            // console.log("Got facet: " + JSON.stringify(entry));
+            var km = entry[type];
+            var op = "";
+
+            if (entry.bool === "AND") {
+                op = "+";
+            } else if (entry.bool === "NOT") {
+                op = "-";
+            } else if (entry.bool === "OR") {
+                op = "";
+            } else {
+                console.error("Unknown operator = " + entry.bool + " : " + JSON.stringify(entry));
+            }
+
+            st += " " + op + "\"" + km + "\"";
+        }
+
+        var fq = facet_field +
+            ":(" + st + ")";
+        // console.log("FQ: " + fq);
+        return fq;
+    }
 
     createAdvancedFacetQuery(state) {
         state = $.extend(true, {}, this.defaultState, state);
@@ -224,7 +293,7 @@ class KmapsSolrUtil {
         var searchstring = state.query.text || "";
         var page = state.page || 0;
         var pageSize = state.pageSize || 100;
-        console.log (JSON.stringify(state));
+        // console.log (JSON.stringify(state));
         var starts = searchstring + "*";
         var search = "*" + searchstring + "*";
         var slashy = searchstring + "/";
@@ -344,7 +413,8 @@ class KmapsSolrUtil {
 
 	buildAssetQuery(queryObj)
 	{
-		var url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/?"+"q=*&fl=*&wt=json&json.wrf=?&sort=id asc&start=0&rows=100";
+	   var url = this.createBasicQuery(queryObj);
+        // console.log("Returning " + url);
 		return url;
 	}
 
