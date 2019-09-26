@@ -50,7 +50,7 @@ class Pages  {
 		if (label)	s+="<span class='sui-pageLab'>"+label+":&nbsp;&nbsp;</span>";				// Add label
 		s+="<span class='";																		// Add value span
 		s+=(style ? style : "sui-pageVal")+"'>";												// Default, or special style
-		s+=(!typeof value == "undefined") ? def : value;											// Add def if bad value or show value
+		s+=value ? value : def;																				// Add def if bad value or show value
 		return s+"</span></p>";																	// Return item
 	}
 
@@ -58,8 +58,35 @@ class Pages  {
 	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
 	{
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });
+		var url="//visuals.shanti.virginia.edu/sites/all/libraries/SHIVA/go.htm?m=//visuals.shanti.virginia.edu/data/json/";
+		url+=o.id;
+		var d=this.DrawItem;																	// Point at item drawer
+	
 		function drawDetails(j) {	
 			trace(j)
+			var shivaNode=$.parseJSON(j.shivanode_json.und[0].value)
+			var wid=shivaNode.width ? shivaNode.width+"px" : "100%";							// If width set use it 
+			var hgt=shivaNode.height ? shivaNode.height+"px" : "calc(100% - 155px)";			// Height 
+			var src=shivaNode.dataSourceUrl ? shivaNode.dataSourceUrl : "";						// Data source
+			var str=`<iframe id='sui-iframe' frameborder='0' scrolling='no' src='${url}' 
+			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></iframe><br>`;	
+			
+			str+="<div class='sui-sources' style='padding-top:0'>";
+			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
+			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
+			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
+			try{ str+=d("&#xe62a","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
+			try{ str+="&#xe600&nbsp;&nbsp;<b>CREATOR</b>:&nbsp;&nbsp;";
+				str+=(o.node_user_full) ? o.node_user_full+"&nbsp;&nbsp" : "";
+				str+=(o.node_user) ? o.node_user : ""; }	catch(e){}
+			try{ str+=d("&#xe60c","DATE",o.node_created.substr(0,10)) } catch(e){}
+			if (src) 		str+="<p>&#xe678&nbsp;&nbsp;<a target='_blank' href='"+src+"'>External spreadsheet</a></p>"; 
+			if (o.caption)	str+=o.caption;		
+			str+="<hr>"+d("&#xe630","LINK",url); 
+			str+=d("&#xe630","WORDPRESS",`[iframe src="${url}" width="${wid}" height="${hgt}"]`); 
+			str+=d("&#xe630","IFRAME",`&lt;iframe src="${url}" width="${wid}" height="${hgt}"&gt;`); 
+
+			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
 			}
 
 	}

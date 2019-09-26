@@ -212,4 +212,4 @@
 .sui-main ::-webkit-scrollbar-thumb:hover { background: #888 }
 .sui-main ::-webkit-input-placeholder { color: #bbb }	::placeholder { color: #bbb }
 
-a { color:#5a57ad }
+a { color:#5a57ad ; text-decoration:none; font-weight:500}
