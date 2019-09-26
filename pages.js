@@ -13,7 +13,7 @@ class Pages  {
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
 		else if (kmap.asset_type == "Images") 		this.DrawImage(kmap);						// Image
 		else if (kmap.asset_type == "Audio-Video") 	this.DrawIframe(kmap);						// AV
-		else if (kmap.asset_type == "Texts") 		this.DrawIframe(kmap);						// Text
+		else if (kmap.asset_type == "Texts") 		this.DrawText(kmap);						// Text
 		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
 	}
 
@@ -54,6 +54,12 @@ class Pages  {
 		return s+"</span></p>";																	// Return item
 	}
 
+	DrawText(o)																				// DRAW TEXTS PAGE FROM KMAP
+	{
+		var str=`<iframe id='sui-iframe' frameborder='0' 
+		src='${o.url_html}' style='height:calc(100vh - 155px);width:100%'></iframe>`;	
+		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+	}
 
 	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
 	{
@@ -63,14 +69,13 @@ class Pages  {
 		var d=this.DrawItem;																	// Point at item drawer
 	
 		function drawDetails(j) {	
-			trace(j)
 			var shivaNode=$.parseJSON(j.shivanode_json.und[0].value)
 			var wid=shivaNode.width ? shivaNode.width+"px" : "100%";							// If width set use it 
 			var hgt=shivaNode.height ? shivaNode.height+"px" : "calc(100% - 155px)";			// Height 
 			var src=shivaNode.dataSourceUrl ? shivaNode.dataSourceUrl : "";						// Data source
 			var str=`<iframe id='sui-iframe' frameborder='0' scrolling='no' src='${url}' 
 			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></iframe><br>`;	
-			
+	
 			str+="<div class='sui-sources' style='padding-top:0'>";
 			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
@@ -85,10 +90,8 @@ class Pages  {
 			str+="<hr>"+d("&#xe630","LINK",url); 
 			str+=d("&#xe630","WORDPRESS",`[iframe src="${url}" width="${wid}" height="${hgt}"]`); 
 			str+=d("&#xe630","IFRAME",`&lt;iframe src="${url}" width="${wid}" height="${hgt}"&gt;`); 
-
 			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
 			}
-
 	}
 
 	DrawIframe(o)																				// DRAW AV PAGE FROM KMAP
