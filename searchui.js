@@ -659,25 +659,26 @@ class SearchUI  {
 			});
 	}
 
-	DrawFacetList(id, open, searchItem)															// DRAW LIST FACET PICKER
+	DrawFacetList(facet, open, searchItem)														// DRAW LIST FACET PICKER
 	{
 		var i;
 		var sorted=0;
 		if (tot > 300) tot="300+";																	// Too many, cap to 300
-		if (!open && ($("#sui-advEdit-"+id).css("display") != "none")) {							// If open
-			$("#sui-advEdit-"+id).slideUp();														// Close it 
+		if (!open && ($("#sui-advEdit-"+facet).css("display") != "none")) {							// If open
+			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
 			}
-		var items=this.facets[id].data;																// Point at items
+		var items=this.facets[facet].data;															// Point at items
+
 		var tot=items.length;																		// Number of items
 		var n=Math.min(300,items.length);															// Cap at 300
 		if (tot > 300) tot="300+";																	// Too many, cap to 300
-		var str=`<input id='sui-advEditFilter-${id}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
+		var str=`<input facet='sui-advEditFilter-${facet}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>`;
-		if (this.facets[id].type == "tree")	
-			str+=`<div class='sui-advEditBut' id='sui-advListMap-${id}' title='Tree view'>&#xe638</div>`;
-		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${id}' title='Sort'>&#xe652</div>
-		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${id}s</div>
+		if (this.facets[facet].type == "tree")	
+			str+=`<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div>`;
+		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
+		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${facet}s</div>
 		<hr style='border: .5px solid #a4baec'>
 		<div class='sui-advEditList'>`;
 		
@@ -685,10 +686,10 @@ class SearchUI  {
 			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
 			if (items[i].id.split("-")[1] != 0)
 				str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>`;					
-			str+=`${items[i].title}</div>`;																// Add item to list
+			str+=`${items[i].title}</div>`;															// Add item to list
 			}
-		$("#sui-advEdit-"+id).html(str+"</div>".replace(/\t|\n|\r/g,""));							// Add to div
-		$("#sui-advEdit-"+id).slideDown();															// Show it
+		$("#sui-advEdit-"+facet).html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
+		$("#sui-advEdit-"+facet).slideDown();														// Show it
 		
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			var v=e.target.id.split("-");															// Get ids		
@@ -696,7 +697,7 @@ class SearchUI  {
 			else	this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
 			});
 	
-		$("#sui-advEditFilter-"+id).on("keydown",(e)=> {											// ON FILTER CHANGE
+		$("#sui-advEditFilter-"+facet).on("keydown",(e)=> {											// ON FILTER CHANGE
 			var line,found=0;
 			var r=$("#sui-advEditFilter-"+id).val();												// Get filter text
 			if ((e.keyCode > 31) && (e.keyCode < 91)) r+=e.key;										// Add current key if a-Z
@@ -710,7 +711,7 @@ class SearchUI  {
 			else 				$("#sui-advListNum").text(found+"/"+tot);							// Show ones found	
 			});
 
-		$("#sui-advEditSort-"+id).on("click",()=> {													// ON SORT BUTTON CLICK
+		$("#sui-advEditSort-"+facet).on("click",()=> {												// ON SORT BUTTON CLICK
 			sorted=1-sorted;																		// Toggle flag	
 			str="";
 			if (!sorted) {																			// If not sorted
@@ -718,10 +719,10 @@ class SearchUI  {
 				for (i=0;i<n;++i) {																	// For each one
 					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
 					if (items[i].id.split("-")[1] != 0) str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>`;					
-					str+=`${items[i].title}</div>`;														// Add item to list
+					str+=`${items[i].title}</div>`;													// Add item to list
 					}
 				$(".sui-advEditList").html(str);													// Add back
-				$("#sui-advEditSort-"+id).css("color","#666");											// Off
+				$("#sui-advEditSort-"+id).css("color","#666");										// Off
 				return;																				// Quit
 				}
 			var itms=$(".sui-advEditLine");															// Items to sort
@@ -736,8 +737,8 @@ class SearchUI  {
 			$("#sui-advEditSort-"+id).css("color","#668eec");										// On
 			});                  
 		
-		$("#sui-advListMap-"+id).on("click", ()=> {													// ON CLICK TREE BUTTON
-			this.DrawFacetTree(id,1,$("#sui-advEditFilter-"+id).val());								// Close it and open as tree
+		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
+			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
 			});      
 	}
 
