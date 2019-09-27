@@ -89,7 +89,7 @@ class SearchUI  {
 			this.ss.page=0;																			// Current page being shown
 			this.ss.pageSize=100;																	// Results per page	
 			this.ss.query={ 																		// Current query
-				text:"",																			// Search word 
+				text:"mindfulness",																			// Search word 
 				places:[],																			// Places
 				collections:[],																		// Collections
 				languages:[],																		// Languages
@@ -224,14 +224,10 @@ class SearchUI  {
 		if (!url) return;																			// No asset type
 		url=url.replace(/images.shanti.virginia.edu/i,"images-dev.shanti.virginia.edu");			// Look in dev			
 		url+="?callback=myfunc";																	// Add callback
-trace(url)
 		if (kmap.asset_type == "Audio-Video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
-		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {										// Get JSON
-trace(data)
-			callback(data);																			// Return data
-			});
+		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> { callback(data); });					// Get JSON and send to callback
 	}
-		
+
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
 	{
 		var i,o;

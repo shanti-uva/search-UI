@@ -1,3 +1,13 @@
+/* MANDALA PAGE DISPLAY
+
+	Requires: 	jQuery 												// Almost any version should work
+	Calls:		seachui.js											// Other JS modules that are dynamically loaded (not ued in plain search)
+	CSS:		searchui.css										// All styles are prefixed with 'sui-'
+				https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css				
+	JS:			ECMA-6												// Uses lambda (arrow) functions
+	Globals:	sui													// Declared globally
+*/
+
 class Pages  {																					
 
 	constructor()   																		// CONSTRUCTOR
@@ -50,15 +60,50 @@ class Pages  {
 		if (label)	s+="<span class='sui-pageLab'>"+label+":&nbsp;&nbsp;</span>";				// Add label
 		s+="<span class='";																		// Add value span
 		s+=(style ? style : "sui-pageVal")+"'>";												// Default, or special style
-		s+=value ? value : def;																				// Add def if bad value or show value
+		s+=value ? value : def;																	// Add def if bad value or show value
 		return s+"</span></p>";																	// Return item
 	}
 
 	DrawText(o)																				// DRAW TEXTS PAGE FROM KMAP
 	{
-		var str=`<iframe id='sui-iframe' frameborder='0' 
-		src='${o.url_html}' style='height:calc(100vh - 155px);width:100%'></iframe>`;	
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		var content=["","",""];
+		var str="<div class='sui-texts'>";
+		if (!$(".shanti-texts-section-content"))												// No CSS yet
+			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
+		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
+url="https://texts-dev.shanti.virginia.edu/shanti_texts/node_embed/50951?callback=pfunc";
+
+		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
+			str+=data+`</div>																
+			<div style='display:inline-block;width:calc(40% - 128px);margin:12px 0 0 6px;vertical-align:top'>
+			<div class='sui-textTop' id='sui-textTop'>
+				<div class='sui-textTab' id='sui-textTab0'>
+					<div style='display:inline-block;padding-top:10px'>CONTENTS</div></div>
+				<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc; border-right:1px solid #ccc'>
+					<div style='display:inline-block;padding-top:10px'>DESCRIPTION</div></div>
+				<div class='sui-textTab' id='sui-textTab2'>
+					<div style='display:inline-block;padding-top:10px'>VIEWS</div></div>
+			</div>
+			<div class='sui-textSide' id='sui-textSide'></div></div>`;
+			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
+			content[0]=$("#shanti-texts-toc").html();											// Save toc
+			$("#shanti-texts-sidebar").html("");												// Erase original sidebar
+			showTab(0);
+	
+			$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
+				var id=e.currentTarget.id.substring(11);										// Get index of tab	
+					showTab(id);																	// Draw it
+				});
+	
+			function showTab(which) {
+				$("#sui-textSide").html("<div class='sui-sourceText'>"+o.title+"<div><hr>");		// Set title
+				$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
+				$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
+				$("#sui-textSide").append(content[which]);										// Set content
+			}
+		});					
+
+			
 	}
 
 	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
