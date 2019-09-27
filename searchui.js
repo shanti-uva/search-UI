@@ -89,7 +89,7 @@ class SearchUI  {
 			this.ss.page=0;																			// Current page being shown
 			this.ss.pageSize=100;																	// Results per page	
 			this.ss.query={ 																		// Current query
-				text:"mindfulness",																			// Search word 
+				text:"",																			// Search word 
 				places:[],																			// Places
 				collections:[],																		// Collections
 				languages:[],																		// Languages
@@ -268,7 +268,7 @@ class SearchUI  {
 	Query()																						// QUERY AND UPDATE RESULTS
 	{
 		this.LoadingIcon(true,64);																	// Show loading icon
-		this.ss.query.assets=[this.ss.type.toLowerCase()];
+		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
 		var url=this.solrUtil.buildAssetQuery(this.ss);
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
 			this.curResults=data.response.docs;														// Save current results
