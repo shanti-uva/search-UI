@@ -222,10 +222,12 @@ class SearchUI  {
 	{
 		var url=kmap.url_json;																		// Get json
 		if (!url) return;																			// No asset type
-		url=url.replace(/.shanti.virginia.edu/i,"-dev.shanti.virginia.edu");						// Look in dev			
+		url=url.replace(/images.shanti.virginia.edu/i,"images-dev.shanti.virginia.edu");			// Look in dev			
 		url+="?callback=myfunc";																	// Add callback
+trace(url)
 		if (kmap.asset_type == "Audio-Video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {										// Get JSON
+trace(data)
 			callback(data);																			// Return data
 			});
 	}
