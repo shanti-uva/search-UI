@@ -68,7 +68,7 @@ class Pages  {
 	{
 		var content=["","",""];
 		var str="<div class='sui-texts'>";
-		if (!$(".shanti-texts-section-content"))												// No CSS yet
+		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
 		$("#sui-results").html("");																// Clear page	
