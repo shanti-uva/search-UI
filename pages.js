@@ -71,11 +71,13 @@ class Pages  {
 		if (!$(".shanti-texts-section-content"))												// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
-url="https://texts-dev.shanti.virginia.edu/shanti_texts/node_embed/50951?callback=pfunc";
+		$("#sui-results").html("");																// Clear page	
+		sui.LoadingIcon(true,64);																// Show loading icon
 
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
+			sui.LoadingIcon(false);																// Hide loading icon
 			str+=data+`</div>																
-			<div style='display:inline-block;width:calc(40% - 128px);margin:12px 0 0 6px;vertical-align:top'>
+			<div style='display:inline-block;width:calc(34% + 3px);margin-left:-8px;vertical-align:top'>
 			<div class='sui-textTop' id='sui-textTop'>
 				<div class='sui-textTab' id='sui-textTab0'>
 					<div style='display:inline-block;padding-top:10px'>CONTENTS</div></div>
@@ -87,16 +89,29 @@ url="https://texts-dev.shanti.virginia.edu/shanti_texts/node_embed/50951?callbac
 			<div class='sui-textSide' id='sui-textSide'></div></div>`;
 			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
 			content[0]=$("#shanti-texts-toc").html();											// Save toc
-			$("#shanti-texts-sidebar").html("");												// Erase original sidebar
+			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
 			showTab(0);
 	
+			let s=`<p><b>ALTERNATIVE FORMATS</b></p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/book_pubreader/${o.id}'>&#xe678&nbsp;&nbsp;View in PubReader</a></p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/voyant/${o.id}'>&#xe678&nbsp;&nbsp;View in Voyant</a></p>
+			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/node_ajax_text/${o.id}'>&#xe678&nbsp;&nbsp;View as raw text</a></p>`;
+			content[2]=s.replace(/\t|\n|\r/g,"");												// Set view content
+	
+			s="<p>&#xe633&nbsp;&nbsp<b>COLLECTION</b>:&nbsp;&nbsp;"+(o.collection_title ? o.collection_title : "None")+"</p>";
+			if (o.summary) s+=o.summary+"<hr>";
+			if (o.kmapid_strict_ss)
+				s+="<p>&#xe634&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;"+o.kmapid_strict_ss.join(" , ")+"</p>";
+			s+="<p>&#xe635&nbsp;&nbsp<b>TERMS</b>:&nbsp;&nbsp;</p>";
+			content[1]=s.replace(/\t|\n|\r/g,"");												// Set view content
+
 			$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
 				var id=e.currentTarget.id.substring(11);										// Get index of tab	
-					showTab(id);																	// Draw it
+					showTab(id);																// Draw it
 				});
 	
 			function showTab(which) {
-				$("#sui-textSide").html("<div class='sui-sourceText'>"+o.title+"<div><hr>");		// Set title
+				$("#sui-textSide").html("<div class='sui-sourceText'>"+o.title+"<div><hr>");	// Set title
 				$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
 				$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
 				$("#sui-textSide").append(content[which]);										// Set content
@@ -122,7 +137,7 @@ url="https://texts-dev.shanti.virginia.edu/shanti_texts/node_embed/50951?callbac
 			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></iframe><br>`;	
 	
 			str+="<div class='sui-sources' style='padding-top:0'>";
-			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
+			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTIONCOLLECTION",o.collection_title,"None")+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
 			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
 			try{ str+=d("&#xe62a","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
