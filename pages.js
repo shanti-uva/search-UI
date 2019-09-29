@@ -22,7 +22,7 @@ class Pages  {
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
 		else if (kmap.asset_type == "Images") 		this.DrawImage(kmap);						// Image
-		else if (kmap.asset_type == "Audio-Video") 	this.DrawIframe(kmap);						// AV
+		else if (kmap.asset_type == "Audio-Video") 	this.DrawAV(kmap);							// AV
 		else if (kmap.asset_type == "Texts") 		this.DrawText(kmap);						// Text
 		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
 	}
@@ -67,19 +67,31 @@ class Pages  {
 
 	DrawAV(o)
 	{
+		trace(o)
 		let partnerId="381832";
 		let playerId='kplay';
 		let uiConfId="31832371";
 		let entryId="1_2d82cvg5";
-		let str=`<div id="kplay"><img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));										// Add player widget
-		str=`"http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
-		$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
-			trace(e)
-			kWidget.embed({
-				targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
-				entry_id:entryId,	flashvars:{ autoPlay:false },	params:{ "wmode": "transparent" } });
-			});
+		let w=$("#sui-results").width()*.66;
+		let str=`<div class='sui-vPlayer' style='width:${w}px;height:${w*0.5625}px' id='kplay'>
+		<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
+		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Add player widget
+		if (typeof kWidget != "undefined") kWidget.embed({ targetId:playerId });				// If Kalturs player already inittted yet
+		else{																					// Init Kaltura player	
+			str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
+			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
+				kWidget.embed({
+					targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
+					entry_id:entryId,	flashvars:{ autoPlay:false },	params:{ "wmode": "transparent" } });
+					});
+			}
+		sui.LoadingIcon(true,64);																// Show loading icon
+		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
+			trace(d)
+			sui.LoadingIcon(false);																// Hide loading icon
+				trace(d.field_video.en[0].entryid)														
+				});
+	
 }
 	
 	
