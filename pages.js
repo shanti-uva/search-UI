@@ -64,6 +64,25 @@ class Pages  {
 		return s+"</span></p>";																	// Return item
 	}
 
+
+	DrawAV(o)
+	{
+		let partnerId="381832";
+		let playerId='kplay';
+		let uiConfId="31832371";
+		let entryId="1_2d82cvg5";
+		let str=`<div id="kplay"><img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
+		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));										// Add player widget
+		str=`"http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
+		$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
+			trace(e)
+			kWidget.embed({
+				targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
+				entry_id:entryId,	flashvars:{ autoPlay:false },	params:{ "wmode": "transparent" } });
+			});
+}
+	
+	
 	DrawText(o)																				// DRAW TEXTS PAGE FROM KMAP
 	{
 		var content=["","",""];
