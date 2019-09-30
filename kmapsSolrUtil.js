@@ -152,7 +152,6 @@ class KmapsSolrUtil {
 
         // console.error("State = " + JSON.stringify(state, undefined, 2));
 
-
         var searchstring = state.query.text || "";
         var page = state.page || 0;
         var pageSize = state.pageSize || 100;
@@ -191,6 +190,29 @@ class KmapsSolrUtil {
         // languages
         if (state.query.languages && state.query.languages.length) {
             fq_array.push(this.buildFq(state.query.languages, "node_lang", "title"));
+        }
+
+        if (state.query.assets && state.query.assets.length) {
+
+            // handle "all" id
+            for (var i = 0; i < state.query.assets.length; i++) {
+
+                console.log("asset id = " + state.query.assets[i].id);
+                if (state.query.assets[i].id === "all") {
+                    state.query.assets =   [
+                        { id: "audio-video", title: "audio-video", bool: "OR" },
+                        { id: "images", title: "images", bool: "OR" },
+                        { id: "texts", title: "texts", bool: "OR"},
+                        { id: "visuals", title: "texts", bool: "OR"},
+                        { id: "sources", title: "texts", bool: "OR"},
+                        { id: "subjects", title: "texts", bool: "OR"},
+                        { id: "places", title: "texts", bool: "OR"},
+                        { id: "terms", title: "texts", bool: "OR"}
+                    ];
+                }
+            }
+
+            fq_array.push(this.buildFq(state.query.assets, "asset_type", "id"));
         }
 
         // console.log(JSON.stringify (fq_array, undefined, 2));
@@ -255,7 +277,7 @@ class KmapsSolrUtil {
 
     buildFq(facets, facet_field, type) {
 
-        if (!type) { type = "id"; };
+        if (!type) { type = "id"; }
         // console.log("Got facet values: " + JSON.stringify(facets));
         var st = "";
         for (var i = 0; i < facets.length; i++) {
