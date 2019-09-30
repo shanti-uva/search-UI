@@ -144,7 +144,7 @@ class Pages  {
 				try{ str+="<p><b>TERMS</b>:&nbsp;&nbsp;"+d.field_terms.und[0].header+"</p>"; } catch(e) {}
 				try{ str+="<p><b>COPYRIGHT OWNER</b>:&nbsp;&nbsp;"+d.field_copyright_owner.en[0].value+"</p>"; } catch(e) {}
 				try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
-				content[0]=str;
+				content[0]=str; 
 				showTab(0);
 			
 				$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
