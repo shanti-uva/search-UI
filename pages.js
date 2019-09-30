@@ -125,7 +125,7 @@ class Pages  {
 					$("#sui-trans").html("<ul class='list-group>'"+tr+"</ul>");
 				});																
 
-			str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
+			str=`//cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
 					targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
