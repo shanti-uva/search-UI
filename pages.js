@@ -214,14 +214,12 @@ class Pages  {
 				});
 	
 			function showTab(which) {
-				$("#sui-textSide").html("<div class='sui-sourceText'>"+o.title+"<div><hr>");	// Set title
+				$("#sui-textSide").html("<div class='sui-sourceText' style='font-size:18px;color:#000'>"+o.title+"<div><hr>");	// Set title
 				$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
 				$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
 				$("#sui-textSide").append(content[which]);										// Set content
 			}
-		});					
-
-			
+		});							
 	}
 
 	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
