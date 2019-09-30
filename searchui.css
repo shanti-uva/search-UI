@@ -156,7 +156,7 @@
 					}														
 /* TREE */
 
-.sui-tree {      	user-select: none; overflow-x:hidden; max-height:120px; padding-left:6px; font-size:12px; 
+.sui-tree {      	user-select: none; overflow-x:hidden; max-height:360px; padding-left:6px; font-size:12px; 
 					}
 .sui-tree ul { 		list-style:none outside none; padding:0; margin:0 }
 .sui-tree li a { 	line-height: 19px; cursor: pointer; }
@@ -206,7 +206,7 @@
 					}
 .sui-textSide {		background-color: #fff; width:calc(100% - 44px); overflow-y:auto; max-height:calc(100vh - 241px); color:#666;
 					padding:22px; border-bottom:1px solid #999; border-left:1px solid #999; border-right:1px solid #999; 
-}
+					}
 .sui-textTop {		background-color: #fff; border-top:2px solid #8b5aa1; width:100%; overflow-x:hidden; white-space:nowrap;
  					border-left:1px solid #999; border-right:1px solid #999; font-weight:500; font-size:13px; color:#555;
 					}
@@ -220,6 +220,13 @@
 .sui-avTop {		background-color: #fff; border-top:1px solid #999; width:100%; overflow-x:hidden; white-space:nowrap;
 					border-left:1px solid #999; border-right:1px solid #999; font-weight:500; font-size:13px; color:#555;
 					}					
+.sui-trans {		display:inline-block;background-color: #fefefe;  overflow-y:auto; max-height:calc(100vh - 190px); 
+					border: 1px solid #999;
+					}
+.sui-transTab {		display:inline-block; background-color: #555; height:43px; width:calc(16.6667% - 1px); text-align:center;
+					font-weight:500; font-size:25px; color:#fff; cursor:pointer; padding-top:12px; border-right:1px solid #fefefe; }
+					.sui-transTab:hover { background-color: #444; 
+					}
 
 /* PSUEDO ELEMENTS */
 

@@ -67,12 +67,14 @@ class Pages  {
 
 	DrawAV(o)
 	{
-		trace(o)
-		let partnerId="381832";
-		let playerId='kplay';
-		let uiConfId="31832371";
-		let entryId="1_2d82cvg5";
-		let w=$("#sui-results").width()*0.66;
+		var partnerId="381832";
+		var playerId='sui-kplayer';
+		var uiConfId="31832371";
+		var entryId="1_2d82cvg5";
+		var inPlay=false;
+		let w=$("#sui-results").width()*0.5;
+		if (!$(".shanti-texts-section-content").length)											// No CSS yet
+			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://audio-video-dev.shanti.virginia.edu/sites/all/themes/sarvaka_mediabase/css/shanti-av-transcript.css?pyko81" }).appendTo("head"); 	// Load CSS
 		$("#sui-results").html("");																// Clear screen
 		if (typeof kWidget != "undefined") 	kWidget.destroy(playerId);							// If Kaltura player already initted yet, kill it
 		sui.LoadingIcon(true,64);																// Show loading icon
@@ -80,7 +82,7 @@ class Pages  {
 			if (d.field_video.und)		entryId=d.field_video.und[0].entryid;					// If id is in uns
 			else if (d.field_video.en)	entryId=d.field_video.en[0].entryid;					// In ens
 			var str=`<div style='display:inline-block;width:${w}px'>
-				<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='kplay'>
+				<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='${playerId}'>
 				<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
 				str+=`<br><br>
 					<div style='display:inline-block;width:250px;margin-left:16px'>
@@ -104,23 +106,31 @@ class Pages  {
 				</div>
 				<div class='sui-textSide' id='sui-textSide'></div>
 			</div>
-			<div id=sui-trans' style='display:inline-block;width:calc(34% - 20px);margin-left:12px;vertical-align:top'>Transcript goes here</div>`;
+			<div style='display:inline-block;width:calc(50% - 24px); margin-left:12px; vertical-align:top;'>
+				<div id='sui-transTab0' class='sui-transTab' title='Options'>&#xe66f</div>
+				<div id='sui-transTab1' class='sui-transTab' title='Play/Pause'>&#xe641</div>
+				<div id='sui-transTab2' class='sui-transTab' title='Previous line'>&#xe602</div>
+				<div id='sui-transTab3' class='sui-transTab' title='Same line'>&#xe632</div>
+				<div id='sui-transTab4' class='sui-transTab' title='Next line'>&#xe604</div>
+				<div id='sui-transTab5' class='sui-transTab' style='border:none' title='Search transcript'>&#xe623</div>
+				<div id='sui-trans' class='sui-trans'></div>
+			</div>`;
 			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Add player and details
 
-/*			var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";			// Make url
+			var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";			// Make url
 			url="//audio-video-dev.shanti.virginia.edu/services/node/ajax/18566?callback=pfunc";			// Make url
 			$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
-					trace(data)
+					$("#sui-trans").html(data);
+					var tr=($(".list-group").html()) 
+					$("#sui-trans").html("<ul class='list-group>'"+tr+"</ul>");
 				});																
-*/
-	
-	str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
+
+			str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
 					targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
 					entry_id:entryId,	flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} });
 					});
-				trace(d)
 				sui.LoadingIcon(false);															// Hide loading icon
 				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
 	
@@ -141,7 +151,14 @@ class Pages  {
 					var id=e.currentTarget.id.substring(11);										// Get index of tab	
 						showTab(id);																// Draw it
 					});
-		
+
+
+				$("#sui-transTab1").on("click", (e)=> {												// ON PLAY CLICK
+					inPlay=!inPlay;																	// Toggle state
+					$("#sui-transTab1").html(inPlay ? "&#xe681" : "&#xe641" );						// Change button
+					$("#"+playerId)[0].sendNotification(inPlay ? "doPlay" : "doPause");				// Act
+					});
+
 				function showTab(which) {
 					$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
 					$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});

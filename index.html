@@ -32,8 +32,10 @@ sui.places=new Places();																// Alloc places (standalone only)
 sui.pages=new Pages();																	// Alloc pages (standalone)
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	sui.pages.DrawAV()
-	});
+	$("#sui-kplayer")[0].sendNotification( "doPlay" );
+
+
+});
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
 	{
