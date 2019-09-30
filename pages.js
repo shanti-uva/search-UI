@@ -113,7 +113,8 @@ class Pages  {
 					trace(data)
 				});																
 */
-			str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
+	
+str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
 					targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
