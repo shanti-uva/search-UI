@@ -72,29 +72,83 @@ class Pages  {
 		let playerId='kplay';
 		let uiConfId="31832371";
 		let entryId="1_2d82cvg5";
-		let w=$("#sui-results").width()*.66;
-		let str=`<div class='sui-vPlayer' style='width:${w}px;height:${w*0.5625}px' id='kplay'>
-		<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Add player widget
-		if (typeof kWidget != "undefined") kWidget.embed({ targetId:playerId });				// If Kalturs player already inittted yet
-		else{																					// Init Kaltura player	
+		let w=$("#sui-results").width()*0.66;
+		$("#sui-results").html("");																// Clear screen
+		if (typeof kWidget != "undefined") 	kWidget.destroy(playerId);							// If Kaltura player already initted yet, kill it
+		sui.LoadingIcon(true,64);																// Show loading icon
+		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
+			if (d.field_video.und)		entryId=d.field_video.und[0].entryid;					// If id is in uns
+			else if (d.field_video.en)	entryId=d.field_video.en[0].entryid;					// In ens
+			var str=`<div style='display:inline-block;width:${w}px'>
+				<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='kplay'>
+				<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
+				str+=`<br><br>
+					<div style='display:inline-block;width:250px;margin-left:16px'>
+						<div title='Duration'>&#xe61c&nbsp;&nbsp;&nbsp;${o.duration_s}</div>`
+						try{ str+="<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published "+d.field_year_published.en[0].value+"</div>"; } catch(e) {}
+					str+=`</div>
+					<div style='display:inline-block;vertical-align:top;width:${w-270}px'>`;
+						try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
+						try{ if (o.collection_title)str+="<div title='Collection'>&#xe633&nbsp;&nbsp;&nbsp;"+o.collection_title+"</div>"; } catch(e) {}
+				str+=`</div>
+				<br><br>
+				<div style='display:inline-block;width:100%'>
+					<div class='sui-avTop'>
+						<div class='sui-textTab' id='sui-textTab0'>
+							<div style='display:inline-block;padding-top:10px'>DETAILS</div></div>
+						<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc; border-right:1px solid #ccc'>
+							<div style='display:inline-block;padding-top:10px'>PEOPLE</div></div>
+						<div class='sui-textTab' id='sui-textTab2'>
+							<div style='display:inline-block;padding-top:10px'>TECHNICAL</div></div>
+					</div>
+				</div>
+				<div class='sui-textSide' id='sui-textSide'></div>
+			</div>
+			<div id=sui-trans' style='display:inline-block;width:calc(34% - 20px);margin-left:12px;vertical-align:top'>Transcript goes here</div>`;
+			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Add player and details
+
+/*			var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";			// Make url
+			url="//audio-video-dev.shanti.virginia.edu/services/node/ajax/18566?callback=pfunc";			// Make url
+			$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
+					trace(data)
+				});																
+*/
 			str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
 					targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
-					entry_id:entryId,	flashvars:{ autoPlay:false },	params:{ "wmode": "transparent" } });
+					entry_id:entryId,	flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} });
 					});
-			}
-		sui.LoadingIcon(true,64);																// Show loading icon
-		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
-			trace(d)
-			sui.LoadingIcon(false);																// Hide loading icon
-				trace(d.field_video.en[0].entryid)														
-				});
+				trace(d)
+				sui.LoadingIcon(false);															// Hide loading icon
+				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
 	
-}
-	
-	
+				var content=["","",""];
+				str="";
+				try{ if (o.collection_title) str+="<p title='Collection'><b>COLLECTION</b>:&nbsp;&nbsp;"+o.collection_title+"</p>"; } catch(e) {}
+				try{ str+="<p><b>SUBCOLLECTION</b>:&nbsp;&nbsp;"+d.field_subcollection_new.und[0].header+"</p>"; } catch(e) {}
+				try{ str+="<p><b>SUBJECT</b>:&nbsp;&nbsp;"+d.field_subject.und[0].header+"</p>"; } catch(e) {}
+				try{ str+="<p><b>RECORDING LOCATION</b>:&nbsp;&nbsp;"+d.field_location.und[0].header+"</p>"; } catch(e) {}
+				try{ str+="<p'><b>LANGUAGE</b>:&nbsp;&nbsp;"+d.field_language_kmap.und[0].header+"</p>"; } catch(e) {}
+				try{ str+="<p><b>TERMS</b>:&nbsp;&nbsp;"+d.field_terms.und[0].header+"</p>"; } catch(e) {}
+				try{ str+="<p><b>COPYRIGHT OWNER</b>:&nbsp;&nbsp;"+d.field_copyright_owner.en[0].value+"</p>"; } catch(e) {}
+				try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
+				content[0]=str;
+				showTab(0);
+			
+				$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
+					var id=e.currentTarget.id.substring(11);										// Get index of tab	
+						showTab(id);																// Draw it
+					});
+		
+				function showTab(which) {
+					$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
+					$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
+					$("#sui-textSide").html(content[which]);										// Set content
+				}
+			});
+	}
+		
 	DrawText(o)																				// DRAW TEXTS PAGE FROM KMAP
 	{
 		var content=["","",""];

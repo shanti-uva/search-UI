@@ -66,11 +66,6 @@ class SearchUI  {
 				this.solrUtil=new KmapsSolrUtil();													// Alloc
 				this.Query();																		// Get intial data
 			}); 	
-		if (mode == "standalone") {																	// If in standalone
-			try{ $.ajax( { url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); } catch(e) {} 	// Dynamically load and alloc places class
-			try{ $.ajax( { url:"pages.js",  dataType:"script" }).done(()=> { this.pages=new Pages(); });   } catch(e) {} 	// Dynamically load and alloc pages class
-			}
-			
 		this.AddFrame();																			// Add div framework
 		this.Draw();																				// Draw
 		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw

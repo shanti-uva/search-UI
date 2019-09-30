@@ -216,6 +216,9 @@
 					}
 .sui-vPlayer {		display:inline-block;margin:0; padding:0;
 					}
+.sui-avTop {		background-color: #fff; border-top:1px solid #999; width:100%; overflow-x:hidden; white-space:nowrap;
+					border-left:1px solid #999; border-right:1px solid #999; font-weight:500; font-size:13px; color:#555;
+					}					
 
 /* PSUEDO ELEMENTS */
 
