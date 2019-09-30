@@ -114,7 +114,7 @@ class Pages  {
 				});																
 */
 	
-str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
+	str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
 					targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
@@ -311,12 +311,12 @@ str=`http://cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/ui
 		for (i=0;i<sui.curResults.length;++i) {	if (o.id == sui.curResults[i].id)	mid=i; }
 
 		var str=`<div class='sui-imagesBox'>
+		<div id='sui-picEnlarge' style='cursor:pointer;font-size:16px' title='Click to enlarge and pan'>&#xe650</div></p>
 		<div id='sui-imageDiv' style='overflow:hidden;width:50%;height:${h}px;margin-left:auto; margin-right:auto; user-select:none'>
 			<img id='sui-thisPic' src='${o.url_thumb.replace(/200,200/,"2000,2000")}' style='width:100%'> 
 		</div><br>
-		<p>${o.title[0]}<br>
-		${o.creator} | ${o.img_width_s} x ${o.img_height_s} px<br>
-		<div id='sui-picEnlarge' style='cursor:pointer;margin-top:6px' title='Click to enlarge and pan'>&#xe650</div></p>
+		<div><span style='font-size:14px;vertical-align:-2px;color:#ccc'>&#xe62a</span>&nbsp;&nbsp;${o.title[0]}</div>
+		<div style='color:#ccc;margin-bottom:24px'>${o.creator}&nbsp;&nbsp;|&nbsp;&nbsp;${o.img_width_s} x ${o.img_height_s} px</div>
 		<div class='sui-imageGal'id='sui-imageGal'>`;
 				
 		for (i=mid-1;i>=0;--i) 
