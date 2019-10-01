@@ -79,21 +79,23 @@ class Pages  {
 		if (typeof kWidget != "undefined") 	kWidget.destroy(playerId);							// If Kaltura player already initted yet, kill it
 		sui.LoadingIcon(true,64);																// Show loading icon
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
-			if (d.field_video.und)		entryId=d.field_video.und[0].entryid;					// If id is in uns
-			else if (d.field_video.en)	entryId=d.field_video.en[0].entryid;					// In ens
-			var str=`<div style='display:inline-block;width:${w}px'>
-				<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='${playerId}'>
+			var str=`<div style='display:inline-block;width:${w}px'>`;
+			if (d.field_video) {																// If a video field spec'd
+				if (d.field_video.und)			entryId=d.field_video.und[0].entryid;			// If id is in uns
+				else if (d.field_video.en)		entryId=d.field_video.en[0].entryid;			// In ens
+				str+=`<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='${playerId}'>
 				<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
-				str+=`<br><br>
-					<div style='display:inline-block;width:250px;margin-left:16px'>
-						<div title='Duration'>&#xe61c&nbsp;&nbsp;&nbsp;${o.duration_s}</div>`
-						try{ str+="<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published "+d.field_year_published.en[0].value+"</div>"; } catch(e) {}
-					str+=`</div>
-					<div style='display:inline-block;vertical-align:top;width:${w-270}px'>`;
-						try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
-						try{ if (o.collection_title)str+="<div title='Collection'>&#xe633&nbsp;&nbsp;&nbsp;"+o.collection_title+"</div>"; } catch(e) {}
-				str+=`</div>
-				<br><br>
+				}
+			else str+="<img style='width:100%' src='"+o.url_thumb+"'>";
+			str+=`<br><br><div style='display:inline-block;width:250px;margin-left:16px'>
+			<div title='Duration'>&#xe61c&nbsp;&nbsp;&nbsp;${o.duration_s}</div>`
+			try{ str+="<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published "+d.field_year_published.en[0].value+"</div>"; } catch(e) {}
+			str+=`</div>
+			<div style='display:inline-block;vertical-align:top;width:${w-270}px'>`;
+				try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
+				try{ if (o.collection_title)str+="<div title='Collection'>&#xe633&nbsp;&nbsp;&nbsp;"+o.collection_title+"</div>"; } catch(e) {}
+			str+=`</div>
+			<br><br>
 				<div style='display:inline-block;width:100%'>
 					<div class='sui-avTop'>
 						<div class='sui-textTab' id='sui-textTab0'>
@@ -241,10 +243,10 @@ class Pages  {
 			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTIONCOLLECTION",o.collection_title,"None")+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
 			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
-			try{ str+=d("&#xe62a","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
-			try{ str+="&#xe600&nbsp;&nbsp;<b>CREATOR</b>:&nbsp;&nbsp;";
-				str+=(o.node_user_full) ? o.node_user_full+"&nbsp;&nbsp" : "";
-				str+=(o.node_user) ? o.node_user : ""; }	catch(e){}
+			try{ str+=d("&#x632a","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
+			try{ str+="&#xe600&nbsp;&nbsp;<span class='sui-pageLab'>CREATOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>";
+				str+=(o.node_user_full) ? o.node_user_full+"&nbsp;&nbsp" : "" +"";
+				str+=(o.node_user) ? o.node_user : ""; str+="</span>"; } catch(e) {}
 			try{ str+=d("&#xe60c","DATE",o.node_created.substr(0,10)) } catch(e){}
 			if (src) 		str+="<p>&#xe678&nbsp;&nbsp;<a target='_blank' href='"+src+"'>External spreadsheet</a></p>"; 
 			if (o.caption)	str+=o.caption;		
@@ -285,7 +287,17 @@ class Pages  {
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`
-		str+="</div>";
+		if (o.caption)	str+="<p>"+o.caption+"</p>";
+		str+="<p style='width:calc(100% - 16px);background-color:#888;color:#fff;padding:8px'><b>NAMES</b></p><table>";
+		if (o.names_txt && o.names_txt.length) {												// If names
+			for (var i=0;i<o.names_txt.length;++i) {											// For each name
+				if (o.names_txt[i].match(/lang="bo"/i))											// Language id - bo
+					str+="<tr><td style='color:#000099;font-size:20px'>"+o.names_txt[i]+"&nbsp;&nbsp;&nbsp;</td><td><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
+				else 
+					str+="<tr><td></td><td>> "+o.names_txt[i]+"</td></tr>";						// Add it
+				}
+			}	
+		str+="</table></div>";
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
@@ -303,6 +315,8 @@ class Pages  {
 		if (o.url_thumb && !o.url_thumb.match(/gradient.jpg/)) str+="<img src='"+o.url_thumb+"' style='float:right;width:33%; padding:0 0 12px 12px'>";
 		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</p>";
 		str+="<p>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcYear'></span>";
+		if (o.publisher_s) str+="<p>PUBLISHER:&nbsp;&nbsp<span class='sui-sourceText'>"+o.publisher_s+"</p>";
+		str+="<p>PLACE OF PUBLICATION:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPlc'></span>";
 		str+="<p>PAGES:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPages'></span>";
 		str+="<p>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
 		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
@@ -313,9 +327,14 @@ class Pages  {
 			if (d.biblio_pages) 			$("#sui-srcPages").html(d.biblio_pages);			// Add pages
 			if (d.biblio_year) 				$("#sui-srcYear").html(d.biblio_year);				// Year
 			if (d.biblio_secondary_title) 	$("#sui-srcSec").html(d.biblio_secondary_title);	// Pub
+			if (d.biblio_place_published) 	$("#sui-srcPlc").html(d.biblio_place_published);	// Pub place
 			if (d.biblio_url) 				$("#sui-sources").append("<p>URL:&nbsp;&nbsp;<a target='_blank' href='"+d.biblio_url+"'>"+d.biblio_url+"</a></p>");	// URL
 			});									
 	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// IMAGE
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	DrawImage(o)																			// DRAW IMAGE PAGE FROM KMAP
 	{
@@ -349,6 +368,7 @@ class Pages  {
 
 		var d=this.DrawItem;																	// Point at item drawer
 		function drawDetails(j) {	
+			trace(j)
 			str="<div class='sui-sources' style='padding-top:0'>";
 			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
 			str+="<hr style='border-top: 1px solid #b49c59;margin-top:12px'>";
@@ -356,21 +376,21 @@ class Pages  {
 				try{ str+=d(sui.assets[o.asset_type].g,"TITLE",o.title[0],"Untitled"); } catch(e){}
 				str+="<hr>";
 				try{ str+=d("&#xe600","CREATOR",o.creator); } catch(e){}
-				try{ str+=d("&#xe62a","TYPE",j.field_image_type.und[0].value); } catch(e){}
+				try{ str+=d("&#xe62a","TYPE",j.field_image_type.und[0].value.charAt(0).toUpperCase()+j.field_image_type.und[0].value.slice(1)); } catch(e){}
 				try{ str+=d("&#xe663","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
 				str+="<hr>";
-				try{ str+="<p><b>&#xe67f&nbsp;&nbsp;ONLY DIGITAL</b>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
-					 str+="&nbsp;&nbsp;<b>COLOR</b>:&nbsp;&nbsp;"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"; } catch(e){}
-				try{ str+="<p><b>&#xe67f&nbsp;&nbsp;QUALITY</b>:&nbsp;&nbsp;"+j.field_image_quality.und[0].value+"&nbsp;&nbsp;<b>ROTATION</b>:&nbsp;&nbsp;"+j.field_image_rotation.und[0].value+"&deg;</p>"; } catch(e){}
-			str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
+				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>ONLY DIGITAL</span>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
+					 str+="&nbsp;&nbsp;<span class='sui-pageLab'>COLOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"+"</span>"; } catch(e){}
+				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>QUALITY</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_quality.und[0].value+"</span>&nbsp;&nbsp;<span class='sui-pageLab'>ROTATION</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_rotation.und[0].value+"&deg;</span></p>"; } catch(e){}
+				str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
 				try{ str+=d("&#xe659","CAPURE DEVICE",j.field_image_capture_device.und[0].value); } catch(e){}
-				try{ str+="<p><b>&#xe62B&nbsp;&nbsp;LOCATION</b>:&nbsp;&nbsp;"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;";
+				try{ str+="<p>&#xe62B&nbsp;&nbsp;<span class='sui-pageLab'>LOCATION</span>:&nbsp;&nbsp;"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;";
 				  	 str+=j.field_latitude.und[0].value+"</p>"; } catch(e){}
 				try{ str+=d("&#xe634","SUBJECT",j.field_keywords.und[0].value); } catch(e){}
 				try{ str+=d("&copy;","COPYRIGHT HOLDER",j.field_copyright_holder.und[0].value); } catch(e){}
 				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } catch(e){}
 				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } catch(e){}
-				try{ str+=d("&#xe678","LICENSE",j.field_license_url.und[0].value); } catch(e){}
+				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>LICENSE</span>:&nbsp;&nbsp;<span class='sui-pageVal'><a style='font-weight:400' target='_blank' href='"+j.field_license_url.und[0].value+"'>"+j.field_license_url.und[0].value+"</a>" } catch(e){} 
 				str+="</div></div>";
 			$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 			}
