@@ -31,9 +31,9 @@ class Pages  {
 	{
 		var i;
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
-		str+=(o.asset_type == "Places") ? o.title[0].toUpperCase() : o.title[0];				// Add title
+		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
-			str+="<div class='sui-breadCrumbs'>";												// Holds bread crumbs
+			str+="<br><div class='sui-breadCrumbs'>";											// Holds bread crumbs
 			for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
 				str+=`<span class='sui-crumb' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
 				${o.ancestors_txt[i]}</span>`;											
