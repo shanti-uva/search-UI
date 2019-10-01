@@ -64,6 +64,13 @@ class Pages  {
 		return s+"</span></p>";																	// Return item
 	}
 
+	AddDrop()																				// ADD KMAP DROP DOWN
+	{
+		let str=`&nbsp;<div style='width:11px;font-size:8px;height:11px;color:#fff;padding-left:7px;
+		border-radius:2px;background-color:#5a65d1;display:inline-block' title='KMap popdown happens here'>
+		&#xe627</div>`;	
+		return str;
+	}
 
 	DrawAV(o)
 	{
@@ -360,24 +367,39 @@ class Pages  {
 			for (i=mid+1;i<sui.curResults.length;++i) 
 				if (sui.curResults[i].asset_type == "Images")
 					str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
-		str+="</div></div><br>";
+		str+="</div></div>";
 		
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Load detaill from JSON
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 		$("#sui-imageGal").scrollLeft($("#sui-pageThumb-"+mid).offset().left-w+25);				// Scroll to center
 
+		var places=[],subjects=[];
+		for (i=0;i<o.kmapid_strict.length;++i) {
+			if (o.kmapid_strict[i].match(/places/))		places.push(o.kmapid_strict_ss[i]+this.AddDrop(o.kmapid_strict[i]));
+			if (o.kmapid_strict[i].match(/subjects/))	subjects.push(o.kmapid_strict_ss[i]+this.AddDrop(o.kmapid_strict[i]));
+			}
+		str=`<table class='sui-imageMid'>
+			<tr class='sui-pageLab' style='font-size:16px;padding-bottom:4px'><td style='width:50%'>MANDALA COLLECTIONS</td><td>CLASSIFICATION</td></tr>
+			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;${o.collection_title ? o.collection_title : "None"}</td><td>`;
+			if (subjects.length) {																// If subjects	
+				str+="&#xe634&nbsp;&nbsp";														// Add icon
+				for (i=0;i<subjects.length;++i) str+=subjects[i]+"<br>";						// Add item
+				}	
+			if (places.length) {																// If places	
+				str+="&#xe62b&nbsp;&nbsp";														// Add icon
+				for (i=0;i<subjects.length;++i) str+=subjects[i]+"<br>";						// Add item
+				}	
+			str+="</td></tr></table>";
+
 		var d=this.DrawItem;																	// Point at item drawer
 		function drawDetails(j) {	
-			trace(j)
-			str="<div class='sui-sources' style='padding-top:0'>";
-			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
-			str+="<hr style='border-top: 1px solid #b49c59;margin-top:12px'>";
+			str+="<div class='sui-images'>";
 			str+="<div style='width:calc(49% - 24px);display:inline-block;margin-right:16px;vertical-align:top;height:100%;'>";
-				try{ str+=d(sui.assets[o.asset_type].g,"TITLE",o.title[0],"Untitled"); } catch(e){}
+				try{ str+=d(sui.assets[o.asset_type].g,"CAPTION",o.title[0],"Untitled"); } catch(e){}
 				str+="<hr>";
 				try{ str+=d("&#xe600","CREATOR",o.creator); } catch(e){}
 				try{ str+=d("&#xe62a","TYPE",j.field_image_type.und[0].value.charAt(0).toUpperCase()+j.field_image_type.und[0].value.slice(1)); } catch(e){}
-				try{ str+=d("&#xe663","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
+				try{ str+=d("&#xe665","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
 				str+="<hr>";
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>ONLY DIGITAL</span>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
 					 str+="&nbsp;&nbsp;<span class='sui-pageLab'>COLOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"+"</span>"; } catch(e){}

@@ -204,6 +204,11 @@
 .sui-imageGal {		width:calc(100% - 24px); overflow-x:scroll; overflow-y:hidden; white-space:nowrap; margin:0 12px 0 12px;
 					-webkit-scrollbar-track-background: #000; 
 					}
+.sui-imageMid {		max-width:900px; margin:8px auto 8px auto; padding-left:0 50px 0 50px; width:100%;
+					}
+.sui-images {		max-width:900px;margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
+					padding:50px; font-weight:400; padding-top:0; border-top:4px solid #b49c59; border-bottom:4px solid #b49c59;
+					}
 .sui-textSide {		background-color: #fff; width:calc(100% - 44px); overflow-y:auto; max-height:calc(100vh - 241px); color:#666;
 					padding:22px; border-bottom:1px solid #999; border-left:1px solid #999; border-right:1px solid #999; line-height:22px;
 					} .sui-textSide a { color:#333; }
