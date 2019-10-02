@@ -23,8 +23,9 @@ class Places  {
 		$.ajax(		 { url:"https://js.arcgis.com/4.12", dataType: "script"  }); 
 	}
 
-	Draw(kmap)
+	Draw(kmap, related)
 	{
+		
 		this.kmap=kmap;
 		sui.LoadingIcon(true,64);																	// Show loading icon
 		var app={ container:"plc-main",																// Holds startup parameters													
@@ -32,7 +33,8 @@ class Places  {
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
 			  center: [91.1721, 29.6524], zoom:12, tilt:80,
-			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/KMLLayer", "esri/core/watchUtils"]
+			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/KMLLayer", "esri/core/watchUtils"],
+			div: "#sui-results"								
 	   		};
 	
 /*		app.kml=`http://www.thlib.org:8080/thdl-geoserver/wms
@@ -76,7 +78,15 @@ class Places  {
 				else if (key == "GraphicsLayer")	GraphicsLayer=arguments[i];
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
-					
+						
+		var str="<div style='position:absolute;text-align:center'>";											
+		str+="</div><div style='width:calc(100% - 177px);height:75%;margin-left:177px' id='plc-main'></div>";
+		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
+			str+="<p style='margin-left:177px'<b>FEATURE TYPE:</b>";															// Add header
+			for (i=0;i<kmap.feature_types_ss.length;++i) str+=" <i>"+kmap.feature_types_ss[i]+" &#xe613</i>";  // Feature types
+			str+="</p>";
+			}
+		$(app.div).html(str.replace(/\t|\n|\r|/g,""));
 		if (!$("#plc-switch-btn").length) {															// If not initted yet
 			var str=`<div id="plc-infoDiv">
 				<input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-switch-btn" value="3D"             title="Change view" />
@@ -86,32 +96,10 @@ class Places  {
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-sketch-btn" src="sketchicon.gif"   title="Show sketch" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-book-btn"   src="bookmarkicon.gif" title="Show bookmarks" />		
 				</div>`;
-			$("#sui-main").append(str);
+			$("#plc-main").append(str);
 			}
-	
-		var str="<div style='position:absolute;text-align:center'>";											
-		str+="<div style='margin-bottom:8px'>RELATED ASSETS</div>";									// Title
-		str+="<div id='plc-typeList' class='plc-typeList'>";										// Enclosing div for list
-		for (var k in sui.assets) {																	// For each asset type														
-			var n=sui.assets[k].n;																	// Get number of items
-			if (n > 1000)	n=Math.floor(n/1000)+"K";												// Shorten
-			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:24px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
-			}
-		str+=`<br><img src='https://staging-mms.thlib.org/images/0050/8753/63691_essay.jpg' style='width:100%'></div>`;
-		str+="</div><div style='width:calc(100% - 177px);height:75%;margin-left:177px' id='plc-main'></div>";
-		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
-			str+="<p style='margin-left:177px'<b>FEATURE TYPE:</b>";															// Add header
-			for (i=0;i<kmap.feature_types_ss.length;++i) str+=" <i>"+kmap.feature_types_ss[i]+" &#xe613</i>";  // Feature types
-			str+="</p>";
-			}
-		if (kmap.caption)	str+=`<p class='sui-sourceText' style='margin-left:177px;max-width:900px'>${kmap.caption}</p>`;
-		$("#sui-results").html(str.replace(/\t|\n|\r|/g,""));
-		$("[id^=sui-tl-]").on("click", (e)=> {														// ON CLICK ON ASSET 
-			sui.ss.type=e.currentTarget.id.substring(7);											// Get asset name		
-			$("#sui-typeList").remove();															// Remove type list
-			sui.ss.page=0;																			// Start at beginning
-			sui.Query(); 																			// Get new results
-			});	
+
+		sui.pages.DrawRelatedAssets();																// Show related assets
 
 		app.ShowOptions=function() {																// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
@@ -201,9 +189,9 @@ class Places  {
 			$("#plc-customMap").on("click", ()=> {
 				if ($("#plc-infoDiv").length) {
 					$("#plc-infoDiv").remove();
-					var h=$("#sui-results").height()-4;
+					var h=$(app.div).height()-4;
 					var link="https://www.thlib.org/places/maps/interactive_ajax/#fid:"+sui.places.id;
-					$("#sui-results").html("<iframe frameborder='0' src='"+link+"' style='height:"+h+"px;width:100%'></iframe>");
+					$(app.div).html("<iframe frameborder='0' src='"+link+"' style='height:"+h+"px;width:100%'></iframe>");
 					}
 				else sui.places.Draw(sui.places.id);
 				});
@@ -217,7 +205,7 @@ class Places  {
 				<p style='color:#668eec'><b>NAMES</b></p><span style=font-size:12px>`;
 				if (kmap.names_txt)	for (i=0;i<kmap.names_txt.length;++i) str+=kmap.names_txt[i]+"<br>";
 				str+=`</span><p style='color:#668eec'><b>LOCATION</b></p><span style=font-size:12px>103.5964, 34.0343</span></div>`;
-				$("#sui-results").append(str);
+				$(app.div).append(str);
 				$("#plc-viewInfo").slideDown();
 				$("#plc-viewInfoCancel").on("click", ()=> { $("#plc-viewInfo").slideUp(); });
 			});

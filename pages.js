@@ -12,12 +12,14 @@ class Pages  {
 
 	constructor()   																		// CONSTRUCTOR
 	{
+		this.div="#sui-results";
 	}
 
-	Draw(kmap)																				// DRAW KMAP PAGE
+	Draw(kmap, related)																		// DRAW KMAP PAGE
 	{
-		this.DrawHeader(kmap);																	// Draw header
-		if (kmap.asset_type == "Places")			sui.places.Draw(kmap);						// Show place
+		this.div=related ? "#sui-relatedItems" : "#sui-results";								// Div to draw into
+		if (!related) this.DrawHeader(kmap);													// Draw header
+		if (kmap.asset_type == "Places")			sui.places.Draw(kmap,related);				// Show place
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
@@ -30,6 +32,7 @@ class Pages  {
 	DrawHeader(o)																			// DRAW HEADER
 	{
 		var i;
+		if (this.related)	return;
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
@@ -72,6 +75,59 @@ class Pages  {
 		return str;
 	}
 
+	DrawRelatedAssets(kmap)
+	{
+		$("#sui-relatedAssets").remove();														// Remove old one
+		var str="<div id='sui-relatedAssets' class='sui-related'>";											
+		str+="<div style='float:left:text-align:center;color:#fff;margin:-26px 0 0 28px'>RELATED ASSETS</div>";	// Title
+		str+="<div id='sui-relateType' style='float:right;text-align:center;margin:-20px 24px 0 0;color:#fff'></div>";
+		str+="<div id='plc-typeList' class='plc-typeList'>";									// Enclosing div for list
+			for (var k in sui.assets) {																// For each asset type														
+			var n=sui.assets[k].n;																// Get number of items
+			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
+			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
+			}
+		str+"</div></div>";
+		$("#sui-results").append(str);
+
+		$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
+			var type=e.currentTarget.id.substring(7);											// Get asset name		
+			$("#sui-tl-back").remove();															// Remove back button
+			$("#plc-typeList").append("<div id='sui-tl-back'><hr>&#xe601&nbsp;&nbsp;&nbsp;Back to PLACE</div>");	// Back button
+			$("#sui-relatedAssets").width($("#sui-results").width());									// Set width
+			$("#sui-relatedAssets").height($("#sui-results").height()-36);							// Set height
+			$("#sui-relateType").html(sui.assets[type].g+"&nbsp;&nbsp;"+type.toUpperCase());	// Show type
+			$("#sui-relatedItems").remove();													// Remove items div
+			let str="<div id='sui-relatedItems' style='width:calc(100% - 199px);padding:16px;display:inline-block'>";
+			for (var i=0;i<sui.curResults.length;++i) 	str+=sui.DrawListItem(i,true);			// Draw items
+			str+="</div>";
+			
+			$("#sui-relatedAssets").append(str.replace(/\t|\n|\r/g,""));						// Remove format and add items to div
+
+			$(".sui-itemPlus").on("click",(e)=> { 												// ON MORE BUTTON CLICK
+				sui.ShowItemMore(e.currentTarget.id.substring(13));								// Show more info below
+				});
+
+			$("[id^=sui-itemTitle-] ").on("click",(e)=> { 										// ON TITLE CLICK
+				var num=e.currentTarget.id.substring(14);										// Get index of result	
+				sui.pages.Draw(sui.curResults[num],true);										// Show to page
+				});
+	
+			$("[id^=sui-itemIcon-] ").on("click",(e)=> { 										// ON ICON CLICK
+				var num=e.currentTarget.id.substring(13);										// Get index of result	
+				sui.pages.Draw(sui.curResults[num],true);										// Show to page
+				});
+
+			$("#sui-tl-back").on("click", ()=> {												// ON CLICK OF BACK BUTTON
+				$("#sui-relateType").html("");													// Remove type
+				$("#sui-relatedItems").html("");												// Remove items div
+				$("#sui-tl-back").remove();														// Remove it
+				$("#sui-relatedAssets").css({height:"auto", width:"165px"});					// Restore menu
+				});
+			});	
+
+	}
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // AV
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -83,10 +139,10 @@ class Pages  {
 		var uiConfId="31832371";
 		var entryId="";
 		var inPlay=false;
-		let w=$("#sui-results").width()*0.5;
+		let w=$(this.div).width()*0.5;
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://audio-video-dev.shanti.virginia.edu/sites/all/themes/sarvaka_mediabase/css/shanti-av-transcript.css?pyko81" }).appendTo("head"); 	// Load CSS
-		$("#sui-results").html("");																// Clear screen
+		$(this.div).html("");																	// Clear screen
 		if (typeof kWidget != "undefined") 	kWidget.destroy(playerId);							// If Kaltura player already initted yet, kill it
 		sui.LoadingIcon(true,64);																// Show loading icon
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
@@ -128,7 +184,8 @@ class Pages  {
 				<div id='sui-transTab5' class='sui-transTab' style='border:none' title='Search transcript'>&#xe623</div>
 				<div id='sui-trans' class='sui-trans'></div>
 			</div>`;
-			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Add player and details
+			
+			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player and details
 
 			var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";			// Make url
 			url="//audio-video-dev.shanti.virginia.edu/services/node/ajax/18566?callback=pfunc";			// Make url
@@ -191,7 +248,7 @@ class Pages  {
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
-		$("#sui-results").html("");																// Clear page	
+		$(this.div).html("");																// Clear page	
 		sui.LoadingIcon(true,64);																// Show loading icon
 
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
@@ -207,7 +264,7 @@ class Pages  {
 					<div style='display:inline-block;padding-top:10px'>VIEWS</div></div>
 			</div>
 			<div class='sui-textSide' id='sui-textSide'></div></div>`;
-			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
+			$(this.div).html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
 			content[0]=$("#shanti-texts-toc").html();											// Save toc
 			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
 			showTab(0);
@@ -280,7 +337,7 @@ class Pages  {
 				</div>`;
 
 			$("#sui-resShare").html("<b>LINK</b>: ${url}"); $("#sui-resShare").toggle()
-			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
+			$(this.div).html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
 			
 			$("[id^=sui-share-]").on("click",(e)=> {											// ON THUMBNAIL CLICK
 				var id=e.currentTarget.id.split("-")[2];										// Get id
@@ -291,14 +348,13 @@ class Pages  {
 				});
 		}
 
-
 	}
 
 	DrawIframe(o)																				// DRAW AV PAGE FROM KMAP
 	{
 		var str=`<iframe id='sui-iframe' frameborder='0' 
 		src='${o.url_html}' style='height:calc(100vh - 155px);width:100%'></iframe>`;	
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
 	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
@@ -315,7 +371,7 @@ class Pages  {
 		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
 	DrawSubject(o)																			// DRAW SUBJECT PAGE FROM KMAP
@@ -335,7 +391,7 @@ class Pages  {
 				}
 			}	
 		str+="</table></div>";
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
 	DrawSource(o)																			// DRAW SOURCE PAGE FROM KMAP
@@ -358,7 +414,7 @@ class Pages  {
 		str+="<p>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
 		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
 		str+="</div>";
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 		
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
 			if (d.biblio_pages) 			$("#sui-srcPages").html(d.biblio_pages);			// Add pages
@@ -377,7 +433,7 @@ class Pages  {
 	{
 		var i,mid;
 		var asp=o.url_thumb_height/o.url_thumb_width;
-		var w=$("#sui-results").width()/2;
+		var w=$(this.div).width()/2;
 		var h=w*asp;
 		for (i=0;i<sui.curResults.length;++i) {	if (o.id == sui.curResults[i].id)	mid=i; }
 
@@ -400,7 +456,7 @@ class Pages  {
 		str+="</div></div>";
 		
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Load detaill from JSON
-		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 		$("#sui-imageGal").scrollLeft($("#sui-pageThumb-"+mid).offset().left-w+25);				// Scroll to center
 
 		var places=[],subjects=[];
@@ -444,7 +500,7 @@ class Pages  {
 				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } catch(e){}
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>LICENSE</span>:&nbsp;&nbsp;<span class='sui-pageVal'><a style='font-weight:400' target='_blank' href='"+j.field_license_url.und[0].value+"'>"+j.field_license_url.und[0].value+"</a>" } catch(e){} 
 				str+="</div></div>";
-			$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+			$(sui.pages.div).append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 			}
 
 		$("[id^=sui-pageThumb-]").on("click",(e)=> {												// ON THUMBNAIL CLICK

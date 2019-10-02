@@ -194,6 +194,7 @@ class SearchUI  {
 	Draw(mode)																					// DRAW SEARCH
 	{
 		$("#sui-typeList").remove();																// Remove type list
+		$("#sui-relatedAssets").remove();														// Remove old one
 		if (mode) this.ss.mode=mode;																// If mode spec'd, use it
 		this.DrawResults();																			// Draw results page if active
 		this.DrawAdvanced();																		// Draw search UI if active
@@ -265,6 +266,7 @@ class SearchUI  {
 		this.LoadingIcon(true,64);																	// Show loading icon
 		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
 		var url=this.solrUtil.buildAssetQuery(this.ss);
+		$("#sui-relatedAssets").remove();															// Remove relate assets panel
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
