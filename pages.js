@@ -72,12 +72,16 @@ class Pages  {
 		return str;
 	}
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// AV
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	DrawAV(o)
 	{
 		var partnerId="381832";
 		var playerId='sui-kplayer';
 		var uiConfId="31832371";
-		var entryId="1_2d82cvg5";
+		var entryId="";
 		var inPlay=false;
 		let w=$("#sui-results").width()*0.5;
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
@@ -176,6 +180,10 @@ class Pages  {
 			});
 	}
 		
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// TEXT
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	DrawText(o)																				// DRAW TEXTS PAGE FROM KMAP
 	{
 		var content=["","",""];
@@ -231,6 +239,10 @@ class Pages  {
 		});							
 	}
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// VISUAL
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
 	{
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });
@@ -257,11 +269,29 @@ class Pages  {
 			try{ str+=d("&#xe60c","DATE",o.node_created.substr(0,10)) } catch(e){}
 			if (src) 		str+="<p>&#xe678&nbsp;&nbsp;<a target='_blank' href='"+src+"'>External spreadsheet</a></p>"; 
 			if (o.caption)	str+=o.caption;		
-			str+="<hr>"+d("&#xe630","LINK",url); 
-			str+=d("&#xe630","WORDPRESS",`[iframe src="${url}" width="${wid}" height="${hgt}"]`); 
-			str+=d("&#xe630","IFRAME",`&lt;iframe src="${url}" width="${wid}" height="${hgt}"&gt;`); 
+	
+			var urlw=`[iframe src="${url}" width="${wid}" height="${hgt}"]`;				// Wordpress embed code
+			var urli=`&lt;iframe src=\"${url}\" width=\"${wid}\" height=\"${hgt}\"&gt;`;		// Iframe
+			str+=`<hr>&#xe600&nbsp;&nbsp;<span class='sui-pageLab'>SHARE AS</span>:&nbsp;&nbsp;
+				<a id='sui-share-1' style='display:inline-block;cursor:pointer'>Link&nbsp;&nbsp;&nbsp;</a>
+				<a id='sui-share-2' style='display:inline-block;cursor:pointer'>WordPress&nbsp;&nbsp;&nbsp;</a>
+				<a id='sui-share-3' style='display:inline-block;cursor:pointer'>Iframe&nbsp;&nbsp;&nbsp;</a>
+				<p id='sui-resShare' style='border-radius:4px;background-color:#fff;padding:8px;display:none;border:1px solid #ccc'></p>
+				</div>`;
+
+			$("#sui-resShare").html("<b>LINK</b>: ${url}"); $("#sui-resShare").toggle()
 			$("#sui-results").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
-			}
+			
+			$("[id^=sui-share-]").on("click",(e)=> {											// ON THUMBNAIL CLICK
+				var id=e.currentTarget.id.split("-")[2];										// Get id
+				if (id == "1")		$("#sui-resShare").html(url);								// Link
+				else if (id == "2")	$("#sui-resShare").html(`[iframe src="${url}" width="${wid}" height="${hgt}"]`);		// Wordpress embed code
+				else if (id == "3")	$("#sui-resShare").html(`&lt;iframe src="${url}" width="${wid}" height="${hgt}"&gt;`);	// Iframe
+				$("#sui-resShare").show();														// Toggle state	
+				});
+		}
+
+
 	}
 
 	DrawIframe(o)																				// DRAW AV PAGE FROM KMAP
