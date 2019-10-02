@@ -39,8 +39,7 @@
 					color:#666; border-radius:0 0 8px 8px; display:inline-block; width:139px; cursor: pointer; 
 					border: 1px solid #999; padding:12px; border: 1px solid #999; pointer-events:initial
 					}
-.sui-related {		position:absolute; left:0; top:0; margin:12px 0 12px 12px; background-color:#ddd; width:165px;
-					border-top:34px solid #888; 
+.sui-related {		position:absolute; left:0; top:0; margin:12px 0 12px 12px; background-color:#ddd; width:177px;
 					}	
 .sui-typeItem:hover { background-color: #dee7f1
 					}
@@ -174,7 +173,7 @@
 
 #plc-infoDiv { 		position: absolute; top: 250px; left: 200px; pointer-events:initial; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
-.plc-typeList {		display:inline-block; background-color:#fff; font-size:14px; text-align:left; margin-top:16px; vertical-align:top;
+.plc-typeList {		display:inline-block; background-color:#fff; font-size:14px; text-align:left; vertical-align:top;
 					color:#666; border-radius:8px; width:139px; cursor: pointer; border: 1px solid #888; padding:12px; 
 					}
 /* PAGES */

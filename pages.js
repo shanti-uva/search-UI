@@ -79,10 +79,12 @@ class Pages  {
 	{
 		$("#sui-relatedAssets").remove();														// Remove old one
 		var str="<div id='sui-relatedAssets' class='sui-related'>";											
-		str+="<div style='float:left:text-align:center;color:#fff;margin:-26px 0 0 28px'>RELATED ASSETS</div>";	// Title
-		str+="<div id='sui-relateType' style='float:right;text-align:center;margin:-20px 24px 0 0;color:#fff'></div>";
+		str+="<div style='margin:-4px 0 6px 32px;'>RELATED ASSETS</div>";							// Title
 		str+="<div id='plc-typeList' class='plc-typeList'>";									// Enclosing div for list
-			for (var k in sui.assets) {																// For each asset type														
+		var k=kmap.asset_type;
+		str+="<div class='sui-typeItem' id='sui-tl-home'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> Home </div>";
+
+		for (var k in sui.assets) {																// For each asset type														
 			var n=sui.assets[k].n;																// Get number of items
 			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
 			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
@@ -93,12 +95,10 @@ class Pages  {
 		$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 			var type=e.currentTarget.id.substring(7);											// Get asset name		
 			$("#sui-tl-back").remove();															// Remove back button
-			$("#plc-typeList").append("<div id='sui-tl-back'><hr>&#xe601&nbsp;&nbsp;&nbsp;Back to PLACE</div>");	// Back button
-			$("#sui-relatedAssets").width($("#sui-results").width());									// Set width
-			$("#sui-relatedAssets").height($("#sui-results").height()-36);							// Set height
-			$("#sui-relateType").html(sui.assets[type].g+"&nbsp;&nbsp;"+type.toUpperCase());	// Show type
+			$("#sui-relatedAssets").width($("#sui-results").width());							// Set width
+			$("#sui-relatedAssets").height($("#sui-results").height());							// Set height
 			$("#sui-relatedItems").remove();													// Remove items div
-			let str="<div id='sui-relatedItems' style='width:calc(100% - 199px);padding:16px;display:inline-block'>";
+			let str="<div id='sui-relatedItems' style='width:calc(100% - 211px);padding:16px;display:inline-block;margin:-20px 0 0 12px'>";
 			for (var i=0;i<sui.curResults.length;++i) 	str+=sui.DrawListItem(i,true);			// Draw items
 			str+="</div>";
 			
@@ -118,10 +118,9 @@ class Pages  {
 				sui.pages.Draw(sui.curResults[num],true);										// Show to page
 				});
 
-			$("#sui-tl-back").on("click", ()=> {												// ON CLICK OF BACK BUTTON
+			$("#sui-tl-home").on("click", ()=> {												// ON CLICK OF HOME BUTTON
 				$("#sui-relateType").html("");													// Remove type
 				$("#sui-relatedItems").html("");												// Remove items div
-				$("#sui-tl-back").remove();														// Remove it
 				$("#sui-relatedAssets").css({height:"auto", width:"165px"});					// Restore menu
 				});
 			});	

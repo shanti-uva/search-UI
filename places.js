@@ -23,7 +23,7 @@ class Places  {
 		$.ajax(		 { url:"https://js.arcgis.com/4.12", dataType: "script"  }); 
 	}
 
-	Draw(kmap, related)
+	Draw(kmap)
 	{
 		
 		this.kmap=kmap;
@@ -99,7 +99,7 @@ class Places  {
 			$("#plc-main").append(str);
 			}
 
-		sui.pages.DrawRelatedAssets();																// Show related assets
+		sui.pages.DrawRelatedAssets(kmap);																// Show related assets
 
 		app.ShowOptions=function() {																// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
