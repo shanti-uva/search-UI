@@ -15,11 +15,10 @@ class Pages  {
 		this.div="#sui-results";
 	}
 
-	Draw(kmap, related)																		// DRAW KMAP PAGE
+	Draw(kmap)																				// DRAW KMAP PAGE
 	{
-		this.div=related ? "#sui-relatedItems" : "#sui-results";								// Div to draw into
-		if (!related) this.DrawHeader(kmap);													// Draw header
-		if (kmap.asset_type == "Places")			sui.places.Draw(kmap,related);				// Show place
+		this.DrawHeader(kmap);																	// Draw header
+		if (kmap.asset_type == "Places")			sui.places.Draw(kmap);						// Show place
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
 		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
@@ -28,60 +27,6 @@ class Pages  {
 		else if (kmap.asset_type == "Texts") 		this.DrawText(kmap);						// Text
 		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
 	}
-
-/*	DrawRelatedAssets(kmap)
-	{
-		str+="<div id='plc-typeList' class='plc-typeList'>";									// Enclosing div for list
-		var k=kmap.asset_type;
-		str+="<div class='sui-typeItem' id='sui-tl-home'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> Home </div>";
-
-		for (var k in sui.assets) {																// For each asset type														
-			var n=sui.assets[k].n;																// Get number of items
-			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
-			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
-			}
-		str+"</div>";
-		$("#sui-related").html(str);
-
-
-		$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET
-			// Get items into curResults array
-			
-			$("#sui-related").css({ "background-color":sui.assets[kmap.asset_type].c,"color":"#fff"});
-			sui.Draw("related");																// Draw results in related mode
-
-		var type=e.currentTarget.id.substring(7);											// Get asset name		
-			$("#sui-tl-back").remove();															// Remove back button
-			$("#sui-relatedAssets").width($("#sui-results").width());							// Set width
-			$("#sui-relatedAssets").height($("#sui-results").height());							// Set height
-			$("#sui-relatedItems").remove();													// Remove items div
-			let str="<div id='sui-relatedItems' style='width:calc(100% - 211px);padding:16px;display:inline-block;margin:-20px 0 0 12px'>";
-			for (var i=0;i<sui.curResults.length;++i) 	str+=sui.DrawListItem(i,true);			// Draw items
-			str+="</div>";
-			
-			$("#sui-relatedAssets").append(str.replace(/\t|\n|\r/g,""));						// Remove format and add items to div
-
-			$(".sui-itemPlus").on("click",(e)=> { 												// ON MORE BUTTON CLICK
-				sui.ShowItemMore(e.currentTarget.id.substring(13));								// Show more info below
-				});
-
-			$("[id^=sui-itemTitle-] ").on("click",(e)=> { 										// ON TITLE CLICK
-				var num=e.currentTarget.id.substring(14);										// Get index of result	
-				sui.pages.Draw(sui.curResults[num],true);										// Show to page
-				});
-	
-			$("[id^=sui-itemIcon-] ").on("click",(e)=> { 										// ON ICON CLICK
-				var num=e.currentTarget.id.substring(13);										// Get index of result	
-				sui.pages.Draw(sui.curResults[num],true);										// Show to page
-				});
-
-			$("#sui-tl-home").on("click", ()=> {												// ON CLICK OF HOME BUTTON
-				$("#sui-related").css({ "background":"none","color":"#000"});
-				});
-			});	
-
-	}
-*/
 
 	DrawRelatedAssets(o)
 	{
@@ -92,7 +37,7 @@ class Pages  {
 			}
 		var n=sui.assets.All.n;																	// Get number of items in current asset
 		if (n >= 1000)	n=Math.floor(n/1000)+"K";												// Shorten if need be
-		var str=`ASSETS RELATED TO THIS &nbsp; 
+		var str=`ASSETS RELATED TO &nbsp; 
 			<div id='sui-relType' class='sui-type' title='Choose asset type'>
 			<div class='sui-typeIcon' style='background-color:#ccc;color:#333'>
 			${sui.assets[o.asset_type].g}</div>All (${n}) 
@@ -126,7 +71,9 @@ class Pages  {
 	DrawHeader(o)																			// DRAW HEADER
 	{
 		var i;
+		if (sui.ss.mode == "related")	return;
 		this.DrawRelatedAssets(o);																// Add relateds maybe
+	
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
