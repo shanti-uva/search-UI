@@ -30,7 +30,7 @@
 .sui-type {			background-color:#fff; font-size:12px; color:#666; border-radius:8px; display:inline-block; width:220px; 
 					}	
 .sui-typeIcon {		display:inline-block; border-radius:8px 0 0 8px; width:25px; height:20px; padding:6px; vertical-align:-3px;
-					text-align:center; font-size:18px; color:#fff; background-color:#5b66cb; margin-right:8px;
+					text-align:center; font-size:18px; color:#fff; margin-right:8px;
 					}
 .sui-typeSet {		float:right; border-radius:0 8px 8px 0; width:20px; height:26px; padding-top:6px; cursor:pointer;
 					text-align:center; font-size:18px; color:#666;	background-color:#ddd; }  .sui-typeSet:hover{ opacity:.66; 
@@ -39,8 +39,6 @@
 					color:#666; border-radius:0 0 8px 8px; display:inline-block; width:139px; cursor: pointer; 
 					border: 1px solid #999; padding:12px; border: 1px solid #999; pointer-events:initial
 					}
-.sui-related {		position:absolute; left:0; top:0; margin:12px 0 12px 12px; background-color:#ddd; width:177px;
-					}	
 .sui-typeItem:hover { background-color: #dee7f1
 					}
 .sui-left { 		position:absolute; left:0; top:94px; width:100%; height:calc(100% - 94px); background-color:#fff; display:none; pointer-events:initial
@@ -171,7 +169,7 @@
 
 /* PLACES */
 
-#plc-infoDiv { 		position: absolute; top: 250px; left: 200px; pointer-events:initial; }
+#plc-infoDiv { 		position: absolute; top:250px; left:27px; pointer-events:initial; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
 .plc-typeList {		display:inline-block; background-color:#fff; font-size:14px; text-align:left; vertical-align:top;
 					color:#666; border-radius:8px; width:139px; cursor: pointer; border: 1px solid #888; padding:12px; 

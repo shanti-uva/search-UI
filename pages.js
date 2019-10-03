@@ -29,10 +29,104 @@ class Pages  {
 		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
 	}
 
+/*	DrawRelatedAssets(kmap)
+	{
+		str+="<div id='plc-typeList' class='plc-typeList'>";									// Enclosing div for list
+		var k=kmap.asset_type;
+		str+="<div class='sui-typeItem' id='sui-tl-home'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> Home </div>";
+
+		for (var k in sui.assets) {																// For each asset type														
+			var n=sui.assets[k].n;																// Get number of items
+			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
+			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
+			}
+		str+"</div>";
+		$("#sui-related").html(str);
+
+
+		$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET
+			// Get items into curResults array
+			
+			$("#sui-related").css({ "background-color":sui.assets[kmap.asset_type].c,"color":"#fff"});
+			sui.Draw("related");																// Draw results in related mode
+
+		var type=e.currentTarget.id.substring(7);											// Get asset name		
+			$("#sui-tl-back").remove();															// Remove back button
+			$("#sui-relatedAssets").width($("#sui-results").width());							// Set width
+			$("#sui-relatedAssets").height($("#sui-results").height());							// Set height
+			$("#sui-relatedItems").remove();													// Remove items div
+			let str="<div id='sui-relatedItems' style='width:calc(100% - 211px);padding:16px;display:inline-block;margin:-20px 0 0 12px'>";
+			for (var i=0;i<sui.curResults.length;++i) 	str+=sui.DrawListItem(i,true);			// Draw items
+			str+="</div>";
+			
+			$("#sui-relatedAssets").append(str.replace(/\t|\n|\r/g,""));						// Remove format and add items to div
+
+			$(".sui-itemPlus").on("click",(e)=> { 												// ON MORE BUTTON CLICK
+				sui.ShowItemMore(e.currentTarget.id.substring(13));								// Show more info below
+				});
+
+			$("[id^=sui-itemTitle-] ").on("click",(e)=> { 										// ON TITLE CLICK
+				var num=e.currentTarget.id.substring(14);										// Get index of result	
+				sui.pages.Draw(sui.curResults[num],true);										// Show to page
+				});
+	
+			$("[id^=sui-itemIcon-] ").on("click",(e)=> { 										// ON ICON CLICK
+				var num=e.currentTarget.id.substring(13);										// Get index of result	
+				sui.pages.Draw(sui.curResults[num],true);										// Show to page
+				});
+
+			$("#sui-tl-home").on("click", ()=> {												// ON CLICK OF HOME BUTTON
+				$("#sui-related").css({ "background":"none","color":"#000"});
+				});
+			});	
+
+	}
+*/
+
+	DrawRelatedAssets(o)
+	{
+		var s="<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>";
+		if ((o.asset_type != "Places") && (o.asset_type != "Subjects") && (o.asset_type != "Terms")) {	// No related assets
+			$("#sui-headRight").html(s);	
+			return;
+			}
+		var n=sui.assets.All.n;																	// Get number of items in current asset
+		if (n >= 1000)	n=Math.floor(n/1000)+"K";												// Shorten if need be
+		var str=`ASSETS RELATED TO THIS &nbsp; 
+			<div id='sui-relType' class='sui-type' title='Choose asset type'>
+			<div class='sui-typeIcon' style='background-color:#ccc;color:#333'>
+			${sui.assets[o.asset_type].g}</div>All (${n}) 
+		<div id='sui-relSet' class='sui-typeSet'>&#xe609</div>
+		</div>&nbsp;&nbsp;${s}`;
+		$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
+	
+		$("#sui-resClose").on("click", ()=> { this.Draw("input"); });							// ON QUIT
+		
+		$("#sui-relType").on("click", ()=> {													// ON CHANGE ASSET BUTTON
+			$("#sui-relList").remove();															// Remove type list
+			str="<div id='sui-relList' class='sui-typeList'>";									// Enclosing div for list
+			var k=o.asset_type;																	// Point at type
+			str+="<div class='sui-typeItem' id='sui-rl-home'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> Home </div>";
+			for (k in sui.assets) {																// For each asset type														
+				n=sui.assets[k].n;																// Get number of items
+				if (n > 1000)	n=Math.floor(n/1000)+"K";										// Shorten
+				str+="<div class='sui-typeItem' id='sui-rl-"+k+"'><span style='font-size:18px; line-height: 24px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
+				}
+			$("#sui-main").append(str);															// Add to main div
+			$("[id^=sui-rl-]").on("click", (e)=> {												// ON CLICK ON ASSET 
+//				type=e.currentTarget.id.substring(7);											// Get asset name		
+				sui.Draw("related");															// Draw results in related mode
+				$("#sui-relList").remove();														// Remove type list
+				sui.ss.page=0;																	// Start at beginning
+				});							
+			});
+	}
+
+
 	DrawHeader(o)																			// DRAW HEADER
 	{
 		var i;
-		if (this.related)	return;
+		this.DrawRelatedAssets(o);																// Add relateds maybe
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
@@ -44,7 +138,6 @@ class Pages  {
 				}
 			}
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
-		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
 		$("#sui-footer").html(`<div style='float:right;font-size:14px;margin-right:16px'>${o.asset_type.toUpperCase()} ID: ${o.id}</div>`);	// Set footer
 		$("#sui-header").css("background-color",sui.assets[o.asset_type].c);					// Color header
 		$("#sui-footer").css("background-color",sui.assets[o.asset_type].c);					// Color footer
@@ -73,58 +166,6 @@ class Pages  {
 		border-radius:2px;background-color:#5a65d1;display:inline-block' title='KMap popdown happens here'>
 		&#xe627</div>`;	
 		return str;
-	}
-
-	DrawRelatedAssets(kmap)
-	{
-		$("#sui-relatedAssets").remove();														// Remove old one
-		var str="<div id='sui-relatedAssets' class='sui-related'>";											
-		str+="<div style='margin:-4px 0 6px 32px;'>RELATED ASSETS</div>";							// Title
-		str+="<div id='plc-typeList' class='plc-typeList'>";									// Enclosing div for list
-		var k=kmap.asset_type;
-		str+="<div class='sui-typeItem' id='sui-tl-home'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> Home </div>";
-
-		for (var k in sui.assets) {																// For each asset type														
-			var n=sui.assets[k].n;																// Get number of items
-			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
-			str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
-			}
-		str+"</div></div>";
-		$("#sui-results").append(str);
-
-		$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-			var type=e.currentTarget.id.substring(7);											// Get asset name		
-			$("#sui-tl-back").remove();															// Remove back button
-			$("#sui-relatedAssets").width($("#sui-results").width());							// Set width
-			$("#sui-relatedAssets").height($("#sui-results").height());							// Set height
-			$("#sui-relatedItems").remove();													// Remove items div
-			let str="<div id='sui-relatedItems' style='width:calc(100% - 211px);padding:16px;display:inline-block;margin:-20px 0 0 12px'>";
-			for (var i=0;i<sui.curResults.length;++i) 	str+=sui.DrawListItem(i,true);			// Draw items
-			str+="</div>";
-			
-			$("#sui-relatedAssets").append(str.replace(/\t|\n|\r/g,""));						// Remove format and add items to div
-
-			$(".sui-itemPlus").on("click",(e)=> { 												// ON MORE BUTTON CLICK
-				sui.ShowItemMore(e.currentTarget.id.substring(13));								// Show more info below
-				});
-
-			$("[id^=sui-itemTitle-] ").on("click",(e)=> { 										// ON TITLE CLICK
-				var num=e.currentTarget.id.substring(14);										// Get index of result	
-				sui.pages.Draw(sui.curResults[num],true);										// Show to page
-				});
-	
-			$("[id^=sui-itemIcon-] ").on("click",(e)=> { 										// ON ICON CLICK
-				var num=e.currentTarget.id.substring(13);										// Get index of result	
-				sui.pages.Draw(sui.curResults[num],true);										// Show to page
-				});
-
-			$("#sui-tl-home").on("click", ()=> {												// ON CLICK OF HOME BUTTON
-				$("#sui-relateType").html("");													// Remove type
-				$("#sui-relatedItems").html("");												// Remove items div
-				$("#sui-relatedAssets").css({height:"auto", width:"165px"});					// Restore menu
-				});
-			});	
-
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

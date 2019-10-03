@@ -117,7 +117,7 @@ class SearchUI  {
 			</div>
 			<div id='sui-left' class='sui-left'>
 				<div id='sui-results' class='sui-results scrollbar'></div>
-				<div id='sui-footer' class='sui-footer'></div>
+					<div id='sui-footer' class='sui-footer'></div>
 				<div id='sui-adv' class='sui-adv'>
 					<div class='sui-advTop'>Advanced search
 					<div id='sui-advClose' style='float:right;font-size:12px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
@@ -136,11 +136,13 @@ class SearchUI  {
 						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 						<div class='sui-advEdit' id='sui-advEdit-${key}'></div>`;
 						}
-					str+=`</div>
-					<div class='sui-advHeader' id='sui-advOptions-text'>&#xe623&nbsp;&nbsp;SEARCH WORD OPTIONS</div>
+					str+=`<div class='sui-advHeader' id='sui-advOptions-text'>&#xe623&nbsp;&nbsp;SEARCH WORD OPTIONS
+						<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
+						</div>
+					</div>
 				<div class='sui-advTerm' id='sui-advTerm-text'></div>
-				<div class='sui-advEdit' id='sui-advEdit-text'></div>`;
-				str+=`</div>
+				<div class='sui-advEdit' id='sui-advEdit-text'></div>;
+				</div>
 			</div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
 
@@ -194,7 +196,6 @@ class SearchUI  {
 	Draw(mode)																					// DRAW SEARCH
 	{
 		$("#sui-typeList").remove();																// Remove type list
-		$("#sui-relatedAssets").remove();														// Remove old one
 		if (mode) this.ss.mode=mode;																// If mode spec'd, use it
 		this.DrawResults();																			// Draw results page if active
 		this.DrawAdvanced();																		// Draw search UI if active
@@ -315,6 +316,7 @@ class SearchUI  {
 
 	DrawHeader()																				// DRAW RESULTS HEADER
 	{
+		if (this.ss.mode == "related") 	return;														// Advanced search
 		var s=this.ss.page*this.ss.pageSize+1;														// Starting item number
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset

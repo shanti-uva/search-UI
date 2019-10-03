@@ -80,9 +80,9 @@ class Places  {
 				}
 						
 		var str="<div style='position:absolute;text-align:center'>";											
-		str+="</div><div style='width:calc(100% - 177px);height:75%;margin-left:177px' id='plc-main'></div>";
+		str+="</div><div style='width:100%;height:75%' id='plc-main'></div>";
 		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
-			str+="<p style='margin-left:177px'<b>FEATURE TYPE:</b>";															// Add header
+			str+="<p'<b>FEATURE TYPE:</b>";															// Add header
 			for (i=0;i<kmap.feature_types_ss.length;++i) str+=" <i>"+kmap.feature_types_ss[i]+" &#xe613</i>";  // Feature types
 			str+="</p>";
 			}
@@ -98,8 +98,6 @@ class Places  {
 				</div>`;
 			$("#plc-main").append(str);
 			}
-
-		sui.pages.DrawRelatedAssets(kmap);																// Show related assets
 
 		app.ShowOptions=function() {																// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
