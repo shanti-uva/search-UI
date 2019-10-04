@@ -169,7 +169,7 @@
 
 /* PLACES */
 
-#plc-infoDiv { 		position: absolute; top:250px; left:27px; pointer-events:initial; }
+#plc-infoDiv { 		position: absolute; top:250px; left:219px; pointer-events:initial; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
 
 /* PAGES */

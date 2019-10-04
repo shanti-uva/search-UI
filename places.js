@@ -78,11 +78,11 @@ class Places  {
 				else if (key == "GraphicsLayer")	GraphicsLayer=arguments[i];
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
-						
+
 		var str="<div style='position:absolute;text-align:center'>";											
-		str+="</div><div style='width:100%;height:75%' id='plc-main'></div>";
+		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
 		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
-			str+="<p'<b>FEATURE TYPE:</b>";															// Add header
+			str+="<p style='margin-left:192px'><b>FEATURE TYPE:</b>";								// Add header
 			for (i=0;i<kmap.feature_types_ss.length;++i) str+=" <i>"+kmap.feature_types_ss[i]+" &#xe613</i>";  // Feature types
 			str+="</p>";
 			}
@@ -211,6 +211,7 @@ class Places  {
 		}
 
 	app.DrawFooter();
+	sui.pages.DrawRelatedAssets(kmap);															// Draw related assets menu
 		
 		
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -321,13 +321,13 @@ class SearchUI  {
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
 		if (n >= 1000)	n=Math.floor(n/1000)+"K";													// Shorten if need be
-		$("#sui-header").css("background-color","#888");											// Set b/g color
-	
 		var str=`
 			<span id='sui-resClose' class='sui-resClose'>&#xe60f</span>
 			Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}
 			`;
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+		$("#sui-header").css("background-color","#888");											// Set b/g color
+	
 		str=`
 			SHOW&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
@@ -360,7 +360,7 @@ class SearchUI  {
 	DrawFooter()																				// DRAW RESULTS FOOTER
 	{
 		var lastPage=Math.floor(this.numItems/this.ss.pageSize);									// Calc last page
-		$("#sui-footer").css("background-color","#888");											// Set b/g color
+		if (this.ss.mode != "related")	$("#sui-footer").css("background-color","#888");			// Set b/g color
 		var str=`
 		<div style='float:left;font-size:18px'>
 			<div id='sui-viewModeList' class='sui-resDisplay' title='List view'>&#xe61f</div>
@@ -412,10 +412,13 @@ class SearchUI  {
 			});							
 	}
 
-	DrawItems()																					// DRAW RESULT ITEMS
+	DrawItems(related)																			// DRAW RESULT ITEMS
 	{
 		var i,str="";
 		$("#sui-results").css({ "background-color":(this.ss.view == "List") ? "#fff" : "#ddd" }); 	// White b/g for list only
+		if (related)  $("#sui-results").css({ "padding-left": "192px", width:"calc(100% - 216px"});	// Shrink page
+		else  		  $("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});	// Reset to normal size
+
 		for (i=0;i<this.curResults.length;++i) {													// For each result
 			if (this.ss.view == "Card")			str+=this.DrawCardItem(i);							// Draw if shoing as cards
 			else if (this.ss.view == "Grid")	str+=this.DrawGridItem(i);							// Grid
@@ -424,6 +427,7 @@ class SearchUI  {
 		if (!this.curResults.length)																// No results
 			str="<br><br><br><div style='text-align:center;color:#666'>Sorry, there were no items found<br>Try broadening your search</div>";
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+		if (related) this.pages.DrawRelatedAssets(this.pages.curKmap,related);						// Draw related assets menu
 
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
@@ -920,7 +924,7 @@ class SearchUI  {
 		$("#sui-results").append(str);																// Add icon to results
 	}
 
-	SendMessage(msg, kmap)																// SEND MESSAGE TO HOST
+	SendMessage(msg, kmap)																		// SEND MESSAGE TO HOST
 	{
 		if (this.pages && (this.runMode == "standalone")) {											// If a standalone													
 			this.pages.Draw(kmap);																	// Route to page

@@ -12,12 +12,20 @@ class Pages  {
 
 	constructor()   																		// CONSTRUCTOR
 	{
-		this.div="#sui-results";
+		this.div="#sui-results";																// Div to hold page
+		this.baseKmap=null;																		// Holds based kmap for related
+		this.curRelatedType="Home";																// Holds current related category
+		this.lastMode=sui.ss.mode;																// Previous search mode
 	}
 
 	Draw(kmap)																				// DRAW KMAP PAGE
 	{
 		this.DrawHeader(kmap);																	// Draw header
+		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
+		if (sui.ss.mode == "related") {															// If browsing related pages
+			if (!kmap.asset_type.match(/Places|Subjects|Terms/))								// Need to add space for these types
+				$("#sui-results").css({ "padding-left": "192px", width:"calc(100% - 216px"});	// Shrink page
+			}
 		if (kmap.asset_type == "Places")			sui.places.Draw(kmap);						// Show place
 		else if (kmap.asset_type == "Sources") 		this.DrawSource(kmap);						// Source
 		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
@@ -28,14 +36,18 @@ class Pages  {
 		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
 	}
 
-	DrawRelatedAssets(o, type)
+	DrawRelatedAssets(o)																	// DRAW RELATED ASSETS MENU
 	{
+		if (sui.ss.mode == "related")	o=this.baseKmap;										// If related, use base
+		else							this.lastMode=sui.ss.mode;								// Save last search mode
+		if (!o.asset_type.match(/Places|Subjects|Terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
 		var k=o.asset_type;																		// Get thus asset type																	
 		var n=sui.assets.All.n;																	// Get number of items in current asset
-		var str=`<div class='sui-related'>														
+	
+		var str=`<div class='sui-related' style='border-color:${sui.assets[k].c}'>														
 		<div style='text-align:center;color:${sui.assets[k].c};'><b>ASSETS RELATED<br>TO THIS ${k.toUpperCase().substr(0,k.length-1)}</b></div><br>
 		<div class='sui-relatedList'>`;
-		str+="<div class='sui-relatedItem' id='sui-rl-home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
+		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
 			n=sui.assets[k].n;																	// Get number of items
 			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
@@ -43,32 +55,32 @@ class Pages  {
 			}
 		str+="</div></div>";	
 		$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
-		$("#sui-rl-"+type).css({ width:"176px", "background-color":"#f7f7f7"});					// Hilite current
+		$("#sui-rl-"+this.curRelatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 
-		$("#sui-relType").on("click", ()=> {													// ON CHANGE ASSET BUTTON
-			$("#sui-relList").remove();															// Remove type list
-			str="<div id='sui-relList' class='sui-typeList'>";									// Enclosing div for list
-			var k=o.asset_type;																	// Point at type
-			str+="<div class='sui-typeItem' id='sui-rl-home'><span style='font-size:18px;line-height:28px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> Home </div>";
-			for (k in sui.assets) {																// For each asset type														
-				n=sui.assets[k].n;																// Get number of items
-				if (n > 1000)	n=Math.floor(n/1000)+"K";										// Shorten
-				str+="<div class='sui-typeItem' id='sui-rl-"+k+"'><span style='font-size:18px; line-height: 24px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
+		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
+			this.curRelatedType=e.currentTarget.id.substring(7);								// Get asset type		
+			if (this.curRelatedType == "Home")	{												// Home asset
+				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
+				this.baseMap=null;																// No base and set to home
+				this.Draw(this.baseKmap);														// Show
 				}
-			$("#sui-main").append(str);															// Add to main div
-			$("[id^=sui-rl-]").on("click", (e)=> {												// ON CLICK ON ASSET 
-//				type=e.currentTarget.id.substring(7);											// Get asset name		
-				sui.Draw("related");															// Draw results in related mode
-				$("#sui-relList").remove();														// Remove type list
+			else{
+								// Get kmaps in sui.curResults
+				sui.ss.mode="related";															// Go to related mode
+				if (!this.baseKmap)	 this.baseKmap=o;											// If starting fresh
+				sui.DrawItems();																// Draw items																
+				sui.DrawFooter();																// Draw footer
 				sui.ss.page=0;																	// Start at beginning
-				});							
-			});
+				}
+			});							
 	}
-
 
 	DrawHeader(o)																			// DRAW HEADER
 	{
 		var i;
+		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
+		$("#plc-closeBut").on("click", ()=> { sui.Draw(this.lastMode); });						// Close handler
+
 		if (sui.ss.mode == "related")	return;
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
@@ -84,7 +96,6 @@ class Pages  {
 		$("#sui-footer").html(`<div style='float:right;font-size:14px;margin-right:16px'>${o.asset_type.toUpperCase()} ID: ${o.id}</div>`);	// Set footer
 		$("#sui-header").css("background-color",sui.assets[o.asset_type].c);					// Color header
 		$("#sui-footer").css("background-color",sui.assets[o.asset_type].c);					// Color footer
-		$("#plc-closeBut").on("click", ()=> { sui.Draw(); });									// Close handler
 	
 		$("[id^=sui-crumb-]").on("click",(e)=> {												// ON BREAD CRUMB CLICK
 			var id=e.currentTarget.id.substring(10).toLowerCase();								// Get id
@@ -199,7 +210,8 @@ class Pages  {
 				try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
 				content[0]=str; 
 				showTab(0);
-			
+				this.DrawRelatedAssets(o);															// Draw related assets menu if active
+				
 				$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
 					var id=e.currentTarget.id.substring(11);										// Get index of tab	
 						showTab(id);																// Draw it
@@ -247,7 +259,9 @@ class Pages  {
 					<div style='display:inline-block;padding-top:10px'>VIEWS</div></div>
 			</div>
 			<div class='sui-textSide' id='sui-textSide'></div></div>`;
-			$(this.div).html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
+			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
+			this.DrawRelatedAssets(o);															// Draw related assets menu if active
+
 			content[0]=$("#shanti-texts-toc").html();											// Save toc
 			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
 			showTab(0);
@@ -319,9 +333,10 @@ class Pages  {
 				<p id='sui-resShare' style='border-radius:4px;background-color:#fff;padding:8px;display:none;border:1px solid #ccc'></p>
 				</div>`;
 
-			$("#sui-resShare").html("<b>LINK</b>: ${url}"); $("#sui-resShare").toggle()
-			$(this.div).html(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
-			
+			$("#sui-resShare").html("<b>LINK</b>: ${url}"); $("#sui-resShare").toggle();
+			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
+			this.DrawRelatedAssets(o);															// Draw related assets menu if active
+		
 			$("[id^=sui-share-]").on("click",(e)=> {											// ON THUMBNAIL CLICK
 				var id=e.currentTarget.id.split("-")[2];										// Get id
 				if (id == "1")		$("#sui-resShare").html(url);								// Link
@@ -338,6 +353,7 @@ class Pages  {
 		var str=`<iframe id='sui-iframe' frameborder='0' 
 		src='${o.url_html}' style='height:calc(100vh - 155px);width:100%'></iframe>`;	
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+		this.DrawRelatedAssets(o);																// Draw related assets menu if active
 	}
 
 	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
@@ -355,7 +371,7 @@ class Pages  {
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-		this.DrawRelatedAssets(o,"home");														// Draw related assets me
+		this.DrawRelatedAssets(o);																// Draw related assets menu
 	}
 
 	DrawSubject(o)																			// DRAW SUBJECT PAGE FROM KMAP
@@ -376,7 +392,7 @@ class Pages  {
 			}	
 		str+="</table></div>";
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-		this.DrawRelatedAssets(o,"home");														// Draw related assets me
+		this.DrawRelatedAssets(o);																// Draw related assets menu
 	}
 
 	DrawSource(o)																			// DRAW SOURCE PAGE FROM KMAP
@@ -399,7 +415,8 @@ class Pages  {
 		str+="<p>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
 		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
 		str+="</div>";
-		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+		this.DrawRelatedAssets();																// Draw related assets menu if active
 		
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
 			if (d.biblio_pages) 			$("#sui-srcPages").html(d.biblio_pages);			// Add pages
@@ -441,7 +458,8 @@ class Pages  {
 		str+="</div></div>";
 		
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Load detaill from JSON
-		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+		this.DrawRelatedAssets();																// Draw related assets menu if active
 		$("#sui-imageGal").scrollLeft($("#sui-pageThumb-"+mid).offset().left-w+25);				// Scroll to center
 
 		var places=[],subjects=[];
