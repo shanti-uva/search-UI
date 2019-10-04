@@ -171,16 +171,21 @@
 
 #plc-infoDiv { 		position: absolute; top:250px; left:27px; pointer-events:initial; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
-.plc-typeList {		display:inline-block; background-color:#fff; font-size:14px; text-align:left; vertical-align:top;
-					color:#666; border-radius:8px; width:139px; cursor: pointer; border: 1px solid #888; padding:12px; 
-					}
+
 /* PAGES */
 
 .sui-breadCrumbs {  display:inline-block; font-size:13px; margin-left:24x; cursor:pointer;
 					}
 .sui-crumb:hover { 	text-decoration:underline;
 					}
-.sui-sources {		max-width:900px;margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
+.sui-related {		position:absolute; top:0; left:0; width:168px; background-color:#ddd;
+					border-left:12px solid #a2733f; padding:18px 0 0 12px;
+					}
+.sui-relatedList {	font-size:14px; color:#222; padding:0;
+					}
+.sui-relatedItem {  cursor:pointer; padding: 6px 3px 3px 6px; border-radius:4px; } 	.sui-relatedItem:hover { background-color: #f7f7f7;
+					}
+.sui-sources {		max-width:900px; margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
 					border-radius:6px; padding:50px; font-weight:400;
 					}
 .sui-sourceText	{	font-family:"EB Garamond",serif; font-weight:400; line-height:24px; font-size:17px; 

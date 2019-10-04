@@ -28,25 +28,23 @@ class Pages  {
 		else if (kmap.asset_type == "Visuals") 		this.DrawVisual(kmap);						// Visual
 	}
 
-	DrawRelatedAssets(o)
+	DrawRelatedAssets(o, type)
 	{
-		var s="<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>";
-		if ((o.asset_type != "Places") && (o.asset_type != "Subjects") && (o.asset_type != "Terms")) {	// No related assets
-			$("#sui-headRight").html(s);	
-			return;
-			}
+		var k=o.asset_type;																		// Get thus asset type																	
 		var n=sui.assets.All.n;																	// Get number of items in current asset
-		if (n >= 1000)	n=Math.floor(n/1000)+"K";												// Shorten if need be
-		var str=`ASSETS RELATED TO &nbsp; 
-			<div id='sui-relType' class='sui-type' title='Choose asset type'>
-			<div class='sui-typeIcon' style='background-color:#ccc;color:#333'>
-			${sui.assets[o.asset_type].g}</div>All (${n}) 
-		<div id='sui-relSet' class='sui-typeSet'>&#xe609</div>
-		</div>&nbsp;&nbsp;${s}`;
-		$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
-	
-		$("#sui-resClose").on("click", ()=> { this.Draw("input"); });							// ON QUIT
-		
+		var str=`<div class='sui-related'>														
+		<div style='text-align:center;color:${sui.assets[k].c};'><b>ASSETS RELATED<br>TO THIS ${k.toUpperCase().substr(0,k.length-1)}</b></div><br>
+		<div class='sui-relatedList'>`;
+		str+="<div class='sui-relatedItem' id='sui-rl-home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
+		for (k in sui.assets) {																	// For each asset type														
+			n=sui.assets[k].n;																	// Get number of items
+			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
+			str+="<div class='sui-relatedItem' id='sui-rl-"+k+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
+			}
+		str+="</div></div>";	
+		$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
+		$("#sui-rl-"+type).css({ width:"176px", "background-color":"#f7f7f7"});					// Hilite current
+
 		$("#sui-relType").on("click", ()=> {													// ON CHANGE ASSET BUTTON
 			$("#sui-relList").remove();															// Remove type list
 			str="<div id='sui-relList' class='sui-typeList'>";									// Enclosing div for list
@@ -72,8 +70,6 @@ class Pages  {
 	{
 		var i;
 		if (sui.ss.mode == "related")	return;
-		this.DrawRelatedAssets(o);																// Add relateds maybe
-	
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
@@ -341,13 +337,13 @@ class Pages  {
 	{
 		var str=`<iframe id='sui-iframe' frameborder='0' 
 		src='${o.url_html}' style='height:calc(100vh - 155px);width:100%'></iframe>`;	
-		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 	}
 
 	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
 	{
 		var latin=(typeof(o.name_latin) == "string" ) ? o.name_latin : o.name_latin.join(", ");
-		var str=`<div class='sui-sources'>
+		var str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
@@ -358,12 +354,13 @@ class Pages  {
 		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
-		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+		this.DrawRelatedAssets(o,"home");														// Draw related assets me
 	}
 
 	DrawSubject(o)																			// DRAW SUBJECT PAGE FROM KMAP
 	{
-		var str=`<div class='sui-sources'>
+		var str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`
@@ -378,7 +375,8 @@ class Pages  {
 				}
 			}	
 		str+="</table></div>";
-		$(this.div).html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+		this.DrawRelatedAssets(o,"home");														// Draw related assets me
 	}
 
 	DrawSource(o)																			// DRAW SOURCE PAGE FROM KMAP

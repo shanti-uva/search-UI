@@ -84,7 +84,7 @@ class SearchUI  {
 			this.ss.page=0;																			// Current page being shown
 			this.ss.pageSize=100;																	// Results per page	
 			this.ss.query={ 																		// Current query
-				text:"",																			// Search word 
+				text:"lhasa",																			// Search word 
 				places:[],																			// Places
 				collections:[],																		// Collections
 				languages:[],																		// Languages
