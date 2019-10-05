@@ -13,7 +13,7 @@ class Pages  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div="#sui-results";																// Div to hold page
-		this.relatedBase=null;																		// Holds based kmap for related
+		this.relatedBase=null;																	// Holds based kmap for related
 		this.curRelatedType="Home";																// Holds current related category
 		this.lastMode=sui.ss.mode;																// Previous search mode
 	}
@@ -83,7 +83,6 @@ class Pages  {
 		var i;
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
 		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); });	// Close handler, release related base
-
 		if (sui.ss.mode == "related")	return;
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
@@ -129,6 +128,17 @@ class Pages  {
 // AV
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	DrawTranscript(o, div)
+	{
+		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/av_dev/select?indent=on&q=is_trid:2898&wt=json&start=0&rows=1000"
+//		url="//audio-video-dev.shanti.virginia.edu/services/node/ajax/18566?callback=pfunc";			// Make url
+		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
+			trace(data)
+			});
+
+
+	}
+
 	DrawAV(o)
 	{
 		var partnerId="381832";
@@ -136,6 +146,7 @@ class Pages  {
 		var uiConfId="31832371";
 		var entryId="";
 		var inPlay=false;
+
 		let w=$(this.div).width()*0.5;
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://audio-video-dev.shanti.virginia.edu/sites/all/themes/sarvaka_mediabase/css/shanti-av-transcript.css?pyko81" }).appendTo("head"); 	// Load CSS
@@ -172,17 +183,32 @@ class Pages  {
 				</div>
 				<div class='sui-textSide' id='sui-textSide'></div>
 			</div>
-			<div style='display:inline-block;width:calc(50% - 24px); margin-left:12px; vertical-align:top;'>
+			<div style='display:inline-block;width:calc(50% - 24px);margin-left:12px;vertical-align:top;'>
 				<div id='sui-transTab0' class='sui-transTab' title='Options'>&#xe66f</div>
+
 				<div id='sui-transTab1' class='sui-transTab' title='Play/Pause'>&#xe641</div>
 				<div id='sui-transTab2' class='sui-transTab' title='Previous line'>&#xe602</div>
 				<div id='sui-transTab3' class='sui-transTab' title='Same line'>&#xe632</div>
 				<div id='sui-transTab4' class='sui-transTab' title='Next line'>&#xe604</div>
 				<div id='sui-transTab5' class='sui-transTab' style='border:none' title='Search transcript'>&#xe623</div>
+				<div id='sui-transOps' class='sui-transOps'></div>
 				<div id='sui-trans' class='sui-trans'></div>
 			</div>`;
 			
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player and details
+			str=`<div class='sui-transRow'>Transcript options<span class='sui-transCheck'
+			onclick='$("#sui-transOps").slideToggle()'>&#xe60f</span></div>
+			<div class='sui-transLab'>LANGUAGES</div>
+			<div class='sui-transRow'>- Tibetan<span id='sui-transL1' class='sui-transCheck'>&#xe60e</span></div>	
+			<div class='sui-transLab'>SPEAKERS</div>
+			<div class='sui-transRow'>- Tibetan<span id='sui-transS1' class='sui-transCheck'>&#xe60e</span></div>	
+			<div class='sui-transLab'>LAYOUTS</div>
+			<div class='sui-transRow'>- Minimal<span id='sui-transY1' class='sui-transCheck'>&#xe60e</span></div>
+			<div class='sui-transRow'>- Reversed<span id='sui-transY2' class='sui-transCheck'>&#xe60e</span></div>
+			<div class='sui-transLab'>DOWNLOADS</div>
+			<div class='sui-transRow'>- SRT file<span id='sui-transDL' class='sui-transCheck' style='color:#58aab4'>&#xe616</span></div>`;
+			$("#sui-transOps").html(str.replace(/\t|\n|\r/g,""))
+			$("#sui-transTab0").on("click",()=>{ $("#sui-transOps").slideToggle(); });			// Shoe/hide options menu
 
 			var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";			// Make url
 			url="//audio-video-dev.shanti.virginia.edu/services/node/ajax/18566?callback=pfunc";			// Make url
@@ -246,10 +272,10 @@ class Pages  {
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
-		$(this.div).html("");																// Clear page	
+		$(this.div).html("");																	// Clear page	
 		sui.LoadingIcon(true,64);																// Show loading icon
 
-		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
+		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {									// Get json
 			sui.LoadingIcon(false);																// Hide loading icon
 			str+=data+`</div>																
 			<div style='display:inline-block;width:calc(34% + 3px);margin-left:-8px;vertical-align:top'>
@@ -302,13 +328,13 @@ class Pages  {
 
 	DrawVisual(o)																			// DRAW VISUAL PAGE FROM KMAP
 	{
-		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });
+		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Gert JSON
 		var url="//visuals.shanti.virginia.edu/sites/all/libraries/SHIVA/go.htm?m=//visuals.shanti.virginia.edu/data/json/";
-		url+=o.id;
+		url+=o.id;																				// Full url
 		var d=this.DrawItem;																	// Point at item drawer
 	
-		function drawDetails(j) {	
-			var shivaNode=$.parseJSON(j.shivanode_json.und[0].value)
+		function drawDetails(j) {																// Draw details
+			var shivaNode=$.parseJSON(j.shivanode_json.und[0].value);
 			var wid=shivaNode.width ? shivaNode.width+"px" : "100%";							// If width set use it 
 			var hgt=shivaNode.height ? shivaNode.height+"px" : "calc(100% - 155px)";			// Height 
 			var src=shivaNode.dataSourceUrl ? shivaNode.dataSourceUrl : "";						// Data source
@@ -327,7 +353,7 @@ class Pages  {
 			if (src) 		str+="<p>&#xe678&nbsp;&nbsp;<a target='_blank' href='"+src+"'>External spreadsheet</a></p>"; 
 			if (o.caption)	str+=o.caption;		
 	
-			var urlw=`[iframe src="${url}" width="${wid}" height="${hgt}"]`;				// Wordpress embed code
+			var urlw=`[iframe src="${url}" width="${wid}" height="${hgt}"]`;					// Wordpress embed code
 			var urli=`&lt;iframe src=\"${url}\" width=\"${wid}\" height=\"${hgt}\"&gt;`;		// Iframe
 			str+=`<hr>&#xe600&nbsp;&nbsp;<span class='sui-pageLab'>SHARE AS</span>:&nbsp;&nbsp;
 				<a id='sui-share-1' style='display:inline-block;cursor:pointer'>Link&nbsp;&nbsp;&nbsp;</a>
@@ -347,11 +373,10 @@ class Pages  {
 				else if (id == "3")	$("#sui-resShare").html(`&lt;iframe src="${url}" width="${wid}" height="${hgt}"&gt;`);	// Iframe
 				$("#sui-resShare").show();														// Toggle state	
 				});
-		}
-
+			}
 	}
 
-	DrawIframe(o)																				// DRAW AV PAGE FROM KMAP
+	DrawIframe(o)																			// DRAW AV PAGE FROM KMAP
 	{
 		var str=`<iframe id='sui-iframe' frameborder='0' 
 		src='${o.url_html}' style='height:calc(100vh - 155px);width:100%'></iframe>`;	
