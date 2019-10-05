@@ -84,7 +84,7 @@ class SearchUI  {
 			this.ss.page=0;																			// Current page being shown
 			this.ss.pageSize=100;																	// Results per page	
 			this.ss.query={ 																		// Current query
-				text:"lhasa",																			// Search word 
+				text:"",																			// Search word 
 				places:[],																			// Places
 				collections:[],																		// Collections
 				languages:[],																		// Languages
@@ -412,12 +412,12 @@ class SearchUI  {
 			});							
 	}
 
-	DrawItems(related)																			// DRAW RESULT ITEMS
+	DrawItems()																			// DRAW RESULT ITEMS
 	{
 		var i,str="";
 		$("#sui-results").css({ "background-color":(this.ss.view == "List") ? "#fff" : "#ddd" }); 	// White b/g for list only
-		if (related)  $("#sui-results").css({ "padding-left": "192px", width:"calc(100% - 216px"});	// Shrink page
-		else  		  $("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});	// Reset to normal size
+		if (this.ss.mode == "related")  $("#sui-results").css({ "padding-left": "204px", width:"calc(100% - 216px"});	// Shrink page
+		else  		 					$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});	// Reset to normal size
 
 		for (i=0;i<this.curResults.length;++i) {													// For each result
 			if (this.ss.view == "Card")			str+=this.DrawCardItem(i);							// Draw if shoing as cards
@@ -427,7 +427,7 @@ class SearchUI  {
 		if (!this.curResults.length)																// No results
 			str="<br><br><br><div style='text-align:center;color:#666'>Sorry, there were no items found<br>Try broadening your search</div>";
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-		if (related) this.pages.DrawRelatedAssets(this.pages.curKmap,related);						// Draw related assets menu
+		if (this.ss.mode == "related") this.pages.DrawRelatedAssets();								// Draw related assets menu
 
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	

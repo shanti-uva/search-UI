@@ -179,7 +179,7 @@
 .sui-crumb:hover { 	text-decoration:underline;
 					}
 .sui-related {		position:absolute; top:0; left:0; width:168px; background-color:#ddd;
-					border-left:12px solid #a2733f; padding:18px 0 0 12px;
+					border-left:12px solid transparent; padding:18px 0 0 12px;
 					}
 .sui-relatedList {	font-size:14px; color:#222; padding:0;
 					}

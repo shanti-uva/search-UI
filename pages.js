@@ -13,7 +13,7 @@ class Pages  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div="#sui-results";																// Div to hold page
-		this.baseKmap=null;																		// Holds based kmap for related
+		this.relatedBase=null;																		// Holds based kmap for related
 		this.curRelatedType="Home";																// Holds current related category
 		this.lastMode=sui.ss.mode;																// Previous search mode
 	}
@@ -38,16 +38,17 @@ class Pages  {
 
 	DrawRelatedAssets(o)																	// DRAW RELATED ASSETS MENU
 	{
-		if (sui.ss.mode == "related")	o=this.baseKmap;										// If related, use base
+		if (sui.ss.mode == "related")	o=this.relatedBase;										// If related, use base
 		else							this.lastMode=sui.ss.mode;								// Save last search mode
 		if (!o.asset_type.match(/Places|Subjects|Terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
 		var k=o.asset_type;																		// Get thus asset type																	
 		var n=sui.assets.All.n;																	// Get number of items in current asset
 	
-		var str=`<div class='sui-related' style='border-color:${sui.assets[k].c}'>														
-		<div style='text-align:center;color:${sui.assets[k].c};'><b>ASSETS RELATED<br>TO THIS ${k.toUpperCase().substr(0,k.length-1)}</b></div><br>
-		<div class='sui-relatedList'>`;
-		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
+		var str=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"}'>`;														
+		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";
+		str+="<div class='sui-relatedList'>";
+		if (sui.ss.mode == "related")
+			str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
 			n=sui.assets[k].n;																	// Get number of items
 			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
@@ -62,12 +63,14 @@ class Pages  {
 			if (this.curRelatedType == "Home")	{												// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				this.baseMap=null;																// No base and set to home
-				this.Draw(this.baseKmap);														// Show
+				this.Draw(this.relatedBase);													// Show
 				}
 			else{
 								// Get kmaps in sui.curResults
 				sui.ss.mode="related";															// Go to related mode
-				if (!this.baseKmap)	 this.baseKmap=o;											// If starting fresh
+				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
+				str=sui.assets[k].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
+				$("#sui-headLeft").html(str);													// Add to div
 				sui.DrawItems();																// Draw items																
 				sui.DrawFooter();																// Draw footer
 				sui.ss.page=0;																	// Start at beginning
@@ -79,7 +82,7 @@ class Pages  {
 	{
 		var i;
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=> { sui.Draw(this.lastMode); });						// Close handler
+		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); });	// Close handler, release related base
 
 		if (sui.ss.mode == "related")	return;
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
