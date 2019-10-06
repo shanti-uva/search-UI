@@ -128,37 +128,93 @@ class Pages  {
 // AV
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawTranscript(o, div)
+	DrawTranscript(kmap, div)																	// DRAW TRANSCRIPT FROM SOLR 
 	{
-		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/av_dev/select?indent=on&q=is_trid:2898&wt=json&start=0&rows=1000"
-//		url="//audio-video-dev.shanti.virginia.edu/services/node/ajax/18566?callback=pfunc";			// Make url
-		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
-			trace(data)
+		var i,o,seg;
+		var l={};																				// Holds filed:language pairs
+		if (!kmap.trid_i)	return;																// Quit if no transcript
+		
+		l.ts_content_rus="Russian";		l.content_bod="Tibetan";		l.dzo_bod="Dzongkha";				l.ts_content_sgt="Brokpake";	
+		l.ts_content_kjz="Bumthangkha";	l.ts_content_tgf="Chalikha";	l.ts_content_cgk="Chocangacakha";	l.ts_content_dka="Dakpakha";	
+		l.ts_content_dzl="Dzalakha";	l.ts_content_goe="Gongduk";		l.ts_content_xkz="Kurtop";			l.ts_content_kru="Kuruz";		
+		l.ts_content_lkh="Lakha";		l.ts_content_lya="Layakha";		l.ts_content_lep="Lepcha";			l.ts_content_lhp="Lhokpu";		
+		l.ts_content_luk="Lunanakha";	l.ts_content_npb="Nupbikha";	l.ts_content_neh="Mangdekha";		l.ts_content_ole="Olekha";		
+		l.ts_content_tsj="Tshangla";	l.ts_content_xkf="Khengkha";	l.ts_content_wylie="Wylie";			l.ts_content_gyal="Gyalsumdo";
+		l.ts_content_gvr="Gurung";		l.ts_content_npa="Nar Phu";		l.ts_content_nmm="Manange";			l.ts_content_kte="Nubri";	
+		l.ts_content_tsum="Tsum";		l.ts_content_nep="Nepali";		l.ts_content_eng="English";			l.ts_content_zho="Chinese"; 
+		l.ts_content_und="Unknown";		l.ts_content_gloss="Morpheme glossing";
+		
+		var res={ languages:{},speakers:{}, segs:[]};											// Final data								
+		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/av_dev/select?indent=on&q=is_trid:"+kmap.trid_i+"&wt=json&start=0&rows=1000";
+		trace(url)
+		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {				// Get transcript data
+			data.response.docs.sort(function(a,b) { return (a.fts_start > b.fts_start) ? 1 : -1; }); // Sort
+			for (i=0;i<data.response.docs.length;++i) {											// For each seg in doc
+				o=data.response.docs[i];														// Point at it
+				seg={ start: o.fts_start, end: o.fts_end, dur:o.fts_duration };					// Make seg with timings
+				if (o.ss_speaker_bod) { res.speakers[o.ss_speaker_bod]=1; seg.speaker=o.ss_speaker_bod; }	// Set speaker?
+				seg.lang=o.ss_language ? o.ss_language : "";									// Set seg language
+					for (var lang in l) {														// For each seg
+						if (o[lang]) {															// If a language match	
+							seg[l[lang]]=o[lang];												// Add to transcript under language
+							res.languages[l[lang]]=1;											// Add to languages list
+							}
+						}
+					res.segs.push(seg);															// Add seg to list														
+				}
+			if (!res.segs.length)	return;														// Quit if no segs
+
+			$("#sui-viewerSide").width($(this.div).width()*0.5);								// Halve viewer width
+			$("#sui-kplayer").height($(this.div).width()*0.5*.5625);							// Set height based on aspect ratio
+			var str=`<div style='display:inline-block;width:calc(50% - 24px);margin-left:12px;vertical-align:top;'>
+				<div id='sui-transTab0' class='sui-transTab' title='Options'>&#xe66f</div>
+				<div id='sui-transTab1' class='sui-transTab' title='Play/Pause'>&#xe641</div>
+				<div id='sui-transTab2' class='sui-transTab' title='Previous line'>&#xe602</div>
+				<div id='sui-transTab3' class='sui-transTab' title='Same line'>&#xe632</div>
+				<div id='sui-transTab4' class='sui-transTab' title='Next line'>&#xe604</div>
+				<div id='sui-transTab5' class='sui-transTab' style='border:none' title='Search transcript'>&#xe623</div>
+				<div id='sui-transOps' class='sui-transOps'></div>
+				<div id='sui-trans' class='sui-trans'></div>
+			</div>`;
+			$(this.div).append(str.replace(/\t|\n|\r/g,""))
+			$("#sui-transTab0").on("click",()=>{ $("#sui-transOps").slideToggle(); });			// Show/hide options menu
+
+			str=`<div class='sui-transRow'>Transcript options<span class='sui-transCheck'
+			onclick='$("#sui-transOps").slideToggle()'>&#xe60f</span></div>
+			<div class='sui-transLab'>LANGUAGES</div>`;
+			for (i in res.languages)															// Add each language found in transcript
+				str+="<div class='sui-transRow'>- "+i+"<span id='sui-transL1' class='sui-transCheck'>&#xe60e</span></div>";	
+			str+=`<div class='sui-transLab'>SPEAKERS</div>
+			<div class='sui-transRow'>- Tibetan<span id='sui-transS1' class='sui-transCheck'>&#xe60e</span></div>	
+			<div class='sui-transLab'>LAYOUTS</div>
+			<div class='sui-transRow'>- Minimal<span id='sui-transY1' class='sui-transCheck'>&#xe60e</span></div>
+			<div class='sui-transRow'>- Reversed<span id='sui-transY2' class='sui-transCheck'>&#xe60e</span></div>
+			<div class='sui-transLab'>DOWNLOADS</div>
+			<div class='sui-transRow'>- SRT file<span id='sui-transDL' class='sui-transCheck' style='color:#58aab4'>&#xe616</span></div>`;
+			$("#sui-transOps").html(str.replace(/\t|\n|\r/g,""))
+			trace(res,data)
 			});
-
-
 	}
 
 	DrawAV(o)
 	{
 		var partnerId="381832";
-		var playerId='sui-kplayer';
 		var uiConfId="31832371";
 		var entryId="";
 		var inPlay=false;
 
-		let w=$(this.div).width()*0.5;
+		let w=$(this.div).width();
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://audio-video-dev.shanti.virginia.edu/sites/all/themes/sarvaka_mediabase/css/shanti-av-transcript.css?pyko81" }).appendTo("head"); 	// Load CSS
 		$(this.div).html("");																	// Clear screen
-		if (typeof kWidget != "undefined") 	kWidget.destroy(playerId);							// If Kaltura player already initted yet, kill it
+		if (typeof kWidget != "undefined") 	kWidget.destroy("sui-kplayer");						// If Kaltura player already initted yet, kill it
 		sui.LoadingIcon(true,64);																// Show loading icon
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
-			var str=`<div style='display:inline-block;width:${w}px'>`;
+			var str=`<div id='sui-viewerSide' style='display:inline-block;width:${w}px'>`;		// Left side
 			if (d.field_video) {																// If a video field spec'd
 				if (d.field_video.und)			entryId=d.field_video.und[0].entryid;			// If id is in uns
 				else if (d.field_video.en)		entryId=d.field_video.en[0].entryid;			// In ens
-				str+=`<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='${playerId}'>
+				str+=`<div class='sui-vPlayer'style='width:100%;height:${w*0.5625}px' id='sui-kplayer'>
 				<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
 				}
 			else str+="<img style='width:100%' src='"+o.url_thumb+"'>";
@@ -166,7 +222,7 @@ class Pages  {
 			<div title='Duration'>&#xe61c&nbsp;&nbsp;&nbsp;${o.duration_s}</div>`
 			try{ str+="<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published "+d.field_year_published.en[0].value+"</div>"; } catch(e) {}
 			str+=`</div>
-			<div style='display:inline-block;vertical-align:top;width:${w-270}px'>`;
+			<div style='display:inline-block;vertical-align:top;width:calc(100% - 270}px'>`;
 				try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
 				try{ if (o.collection_title)str+="<div title='Collection'>&#xe633&nbsp;&nbsp;&nbsp;"+o.collection_title+"</div>"; } catch(e) {}
 			str+=`</div>
@@ -182,47 +238,16 @@ class Pages  {
 					</div>
 				</div>
 				<div class='sui-textSide' id='sui-textSide'></div>
-			</div>
-			<div style='display:inline-block;width:calc(50% - 24px);margin-left:12px;vertical-align:top;'>
-				<div id='sui-transTab0' class='sui-transTab' title='Options'>&#xe66f</div>
-
-				<div id='sui-transTab1' class='sui-transTab' title='Play/Pause'>&#xe641</div>
-				<div id='sui-transTab2' class='sui-transTab' title='Previous line'>&#xe602</div>
-				<div id='sui-transTab3' class='sui-transTab' title='Same line'>&#xe632</div>
-				<div id='sui-transTab4' class='sui-transTab' title='Next line'>&#xe604</div>
-				<div id='sui-transTab5' class='sui-transTab' style='border:none' title='Search transcript'>&#xe623</div>
-				<div id='sui-transOps' class='sui-transOps'></div>
-				<div id='sui-trans' class='sui-trans'></div>
 			</div>`;
-			
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player and details
-			str=`<div class='sui-transRow'>Transcript options<span class='sui-transCheck'
-			onclick='$("#sui-transOps").slideToggle()'>&#xe60f</span></div>
-			<div class='sui-transLab'>LANGUAGES</div>
-			<div class='sui-transRow'>- Tibetan<span id='sui-transL1' class='sui-transCheck'>&#xe60e</span></div>	
-			<div class='sui-transLab'>SPEAKERS</div>
-			<div class='sui-transRow'>- Tibetan<span id='sui-transS1' class='sui-transCheck'>&#xe60e</span></div>	
-			<div class='sui-transLab'>LAYOUTS</div>
-			<div class='sui-transRow'>- Minimal<span id='sui-transY1' class='sui-transCheck'>&#xe60e</span></div>
-			<div class='sui-transRow'>- Reversed<span id='sui-transY2' class='sui-transCheck'>&#xe60e</span></div>
-			<div class='sui-transLab'>DOWNLOADS</div>
-			<div class='sui-transRow'>- SRT file<span id='sui-transDL' class='sui-transCheck' style='color:#58aab4'>&#xe616</span></div>`;
-			$("#sui-transOps").html(str.replace(/\t|\n|\r/g,""))
-			$("#sui-transTab0").on("click",()=>{ $("#sui-transOps").slideToggle(); });			// Shoe/hide options menu
-
-			var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";			// Make url
-			url="//audio-video-dev.shanti.virginia.edu/services/node/ajax/18566?callback=pfunc";			// Make url
-			$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {
-					$("#sui-trans").html(data);
-					var tr=($(".list-group").html()) 
-					$("#sui-trans").html("<ul class='list-group>'"+tr+"</ul>");
-				});																
-
+			this.DrawTranscript(o,"#sui-trans");												// Draw transcript in div
+			
+	
 			str=`//cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
-					targetId:playerId,  wid:"_"+partnerId,				uiconf_id:uiConfId,    
-					entry_id:entryId,	flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} });
+					targetId:"sui-kplayer",  wid:"_"+partnerId,				uiconf_id:uiConfId,    
+					entry_id:entryId,		flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} });
 					});
 				sui.LoadingIcon(false);															// Hide loading icon
 				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
@@ -250,7 +275,7 @@ class Pages  {
 				$("#sui-transTab1").on("click", (e)=> {												// ON PLAY CLICK
 					inPlay=!inPlay;																	// Toggle state
 					$("#sui-transTab1").html(inPlay ? "&#xe681" : "&#xe641" );						// Change button
-					$("#"+playerId)[0].sendNotification(inPlay ? "doPlay" : "doPause");				// Act
+					$("#sui-kplayer")[0].sendNotification(inPlay ? "doPlay" : "doPause");			// Act
 					});
 
 				function showTab(which) {
