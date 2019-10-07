@@ -40,6 +40,7 @@ class Pages  {
 	{
 		if (sui.ss.mode == "related")	o=this.relatedBase;										// If related, use base
 		else							this.lastMode=sui.ss.mode;								// Save last search mode
+		if (!o)							return;													// No related to show
 		if (!o.asset_type.match(/Places|Subjects|Terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
 		var k=o.asset_type;																		// Get thus asset type																	
 		var n=sui.assets.All.n;																	// Get number of items in current asset
