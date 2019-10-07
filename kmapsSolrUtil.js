@@ -53,32 +53,52 @@ class KmapsSolrUtil {
                 "field": "asset_type",
                 "domain": {"excludeTags": "ast"}
             },
-            "places": {
+            // "places": {
+            //     "limit": 300,
+            //     "type": "terms",
+            //     "field": "kmapid",
+            //     "prefix": "places",
+            //     "facet": {
+            //         "title": {
+            //             "limit":1,
+            //             "type":"terms",
+            //             "field":"title"
+            //         }
+            //     }
+            // },
+            "xplaces": {
                 "limit": 300,
                 "type": "terms",
-                "field": "kmapid",
-                "prefix": "places",
-                "facet": {
-                    "title": {
-                        "limit":1,
-                        "type":"terms",
-                        "field":"title"
-                    }
-                }
+                "field": "kmapid_places_idfacet"
             },
-            "subjects": {
+            "xsubjects": {
                 "limit": 300,
                 "type": "terms",
-                "field": "kmapid",
-                "prefix": "subjects",
-                "facet": {
-                    "title": {
-                        "limit":1,
-                        "type":"terms",
-                        "field":"title"
-                    }
-                }
+                "field": "kmapid_subjects_idfacet"
             },
+            "xterms": {
+                "limit": 300,
+                "type": "terms",
+                "field": "kmapid_terms_idfacet"
+            },
+            "xfeature_types": {
+                "limit": 300,
+                "type": "terms",
+                "field": "feature_types_idfacet"
+            },
+            // "subjects": {
+            //     "limit": 300,
+            //     "type": "terms",
+            //     "field": "kmapid",
+            //     "prefix": "subjects",
+            //     "facet": {
+            //         "title": {
+            //             "limit":1,
+            //             "type":"terms",
+            //             "field":"title"
+            //         }
+            //     }
+            // },
             "collection_nid": {
                 "limit": 300,
                 "type": "terms",
@@ -117,7 +137,12 @@ class KmapsSolrUtil {
                 "limit": 300,
                 "type": "terms",
                 "field": "node_lang"
-            }
+            },
+            // "schema_version": {
+            //     "limit": -1,
+            //     "type": "terms",
+            //     "field": "schema_version_i"
+            // }
         };
 
 
@@ -250,6 +275,7 @@ class KmapsSolrUtil {
                 "facet": "on",
                 "json.facet": JSON.stringify(this.facetJSON),
 
+                /*
                 // highlighting
                 "hl": "on",
                 "hl.method": "unified",
@@ -257,6 +283,8 @@ class KmapsSolrUtil {
                 "hl.fragsize": 0,
                 "hl.tag.pre": "<mark>",
                 "hl.tag.post": "</mark>",
+                */
+
                 // debug settings  -- set both to false in production?
                 "echoParams": "explicit",
                 "indent": "true"
