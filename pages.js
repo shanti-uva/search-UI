@@ -16,6 +16,9 @@ class Pages  {
 		this.relatedBase=null;																	// Holds based kmap for related
 		this.curRelatedType="Home";																// Holds current related category
 		this.lastMode=sui.ss.mode;																// Previous search mode
+		this.inPlay=false;																		// If AV is in play
+		this.curTransSeg=-1;																	// Currently active transceipt segment
+		this.transRes=null;																		// Holds transcript resources	
 	}
 
 	Draw(kmap)																				// DRAW KMAP PAGE
@@ -129,12 +132,13 @@ class Pages  {
 // AV
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawTranscript(kmap, div)																	// DRAW TRANSCRIPT FROM SOLR 
+	DrawTranscript(kmap, div)																// DRAW TRANSCRIPT FROM SOLR 
 	{
 		var i,o,seg;
 		var l={};																				// Holds filed:language pairs
 		if (!kmap.trid_i)	return;																// Quit if no transcript
-		
+		this.curTransSeg=-1;																	// Start at top
+
 		l.ts_content_rus="Russian";		l.content_bod="Tibetan";		l.dzo_bod="Dzongkha";				l.ts_content_sgt="Brokpake";	
 		l.ts_content_kjz="Bumthangkha";	l.ts_content_tgf="Chalikha";	l.ts_content_cgk="Chocangacakha";	l.ts_content_dka="Dakpakha";	
 		l.ts_content_dzl="Dzalakha";	l.ts_content_goe="Gongduk";		l.ts_content_xkz="Kurtop";			l.ts_content_kru="Kuruz";		
@@ -145,9 +149,8 @@ class Pages  {
 		l.ts_content_tsum="Tsum";		l.ts_content_nep="Nepali";		l.ts_content_eng="English";			l.ts_content_zho="Chinese"; 
 		l.ts_content_und="Unknown";		l.ts_content_gloss="Morpheme glossing";
 		
-		var res={ languages:{},speakers:{}, segs:[]};											// Final data								
+		var res={ languages:{}, speakers:{}, segs:[], layout:"Minimal" };						// Final data								
 		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/av_dev/select?indent=on&q=is_trid:"+kmap.trid_i+"&wt=json&start=0&rows=1000";
-		trace(url)
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {				// Get transcript data
 			data.response.docs.sort(function(a,b) { return (a.fts_start > b.fts_start) ? 1 : -1; }); // Sort
 			for (i=0;i<data.response.docs.length;++i) {											// For each seg in doc
@@ -164,7 +167,7 @@ class Pages  {
 					res.segs.push(seg);															// Add seg to list														
 				}
 			if (!res.segs.length)	return;														// Quit if no segs
-
+			this.transRes=res;																	// Set segs
 			$("#sui-viewerSide").width($(this.div).width()*0.5);								// Halve viewer width
 			$("#sui-kplayer").height($(this.div).width()*0.5*.5625);							// Set height based on aspect ratio
 			var str=`<div style='display:inline-block;width:calc(50% - 24px);margin-left:12px;vertical-align:top;'>
@@ -178,7 +181,6 @@ class Pages  {
 				<div id='sui-trans' class='sui-trans'></div>
 			</div>`;
 			$(this.div).append(str.replace(/\t|\n|\r/g,""))
-			$("#sui-transTab0").on("click",()=>{ $("#sui-transOps").slideToggle(); });			// Show/hide options menu
 
 			str=`<div class='sui-transRow'>Transcript options<span class='sui-transCheck'
 			onclick='$("#sui-transOps").slideToggle()'>&#xe60f</span></div>
@@ -193,16 +195,92 @@ class Pages  {
 			<div class='sui-transLab'>DOWNLOADS</div>
 			<div class='sui-transRow'>- SRT file<span id='sui-transDL' class='sui-transCheck' style='color:#58aab4'>&#xe616</span></div>`;
 			$("#sui-transOps").html(str.replace(/\t|\n|\r/g,""))
-			trace(res,data)
-			});
+			
+			this.DrawTransContent();															// Draw the transcipt content
+			trace(res,data);
+
+			$("#sui-transTab0").on("click",()=>{ $("#sui-transOps").slideToggle(); });			// ON OPTIONS MENU CLICK
+	
+			$("#sui-transTab1").on("click", ()=> {												// ON PLAY CLICK
+				clearInterval(this.transTimer);													// Kill timer
+				if (this.inPlay)	$("#sui-kplayer")[0].sendNotification("doPause");			// Pause
+				else				this.PlayAV(),$("#sui-kplayer")[0].sendNotification("doPlay"); // Play
+				});						
+
+			$("#sui-transTab2").on("click", ()=> {												// ON PLAY PREVIOUS SEG CLICK
+				this.curTransSeg=Math.max(this.curTransSeg-1,0);								// Go back one
+				this.PlayAV(res.segs[this.curTransSeg].start, res.segs[this.curTransSeg].end);	// Play it
+				$("#sui-kplayer")[0].sendNotification("doPlay");								// Start playing
+				});							
+		
+			$("#sui-transTab3").on("click", ()=> {												// ON PLAY THIS SEG CLICK
+				this.PlayAV(res.segs[this.curTransSeg].start, res.segs[this.curTransSeg].end);	// Play it
+				$("#sui-kplayer")[0].sendNotification("doPlay");								// Start playing
+				});
+		
+			$("#sui-transTab4").on("click", ()=> {												// ON PLAY NEXT SEG CLICK
+				this.curTransSeg=Math.min(this.curTransSeg+1,res.segs.length-1);				// Go to next one
+				this.PlayAV(res.segs[this.curTransSeg].start,res.segs[this.curTransSeg].end);	// Play it
+				$("#sui-kplayer")[0].sendNotification("doPlay");								// Start playing
+				});
+		});																						// AJAX closure
 	}
 
-	DrawAV(o)
+	PlayAV(start, end)																	// PLAY TRANSCRIPT SEGMENT
 	{
-		var partnerId="381832";
-		var uiConfId="31832371";
-		var entryId="";
-		var inPlay=false;
+		var i;
+		var res=this.transRes;																	// Point at res
+		clearInterval(this.transTimer);															// Kill timer
+		if (start != undefined)	 $("#sui-kplayer")[0].sendNotification("doSeek",start);			// Seek to start 
+		this.transTimer=setInterval((e)=> {														// Set interval and handler
+			var now=$("#sui-kplayer")[0].evaluate("{video.player.currentTime}");				// Get current player time
+			trace(now,start,end)
+			if ((end != undefined) && (now >= end)) {											// An end set and past it
+				clearInterval(this.transTimer);													// Kill timer
+				$("#sui-kplayer")[0].sendNotification("doPause");								// Pause video	
+				return;	
+				}
+			for (i=0;i<res.segs.length;++i) {													// For each seg
+				if ((now >= res.segs[i].start) && (now < res.segs[i].end)) {					// In this one
+					this.curTransSeg=i;															// Set as current
+					break;																		// Quit looking
+					}
+				}
+			$("[id^=sui-transMinSeg-]").css("border-color","#fff");								// All borders off
+			$("[id^=sui-transMinBox-]").css("background-color","#fff");							// All backgrounds off
+			$("#sui-transMinSeg-"+this.curTransSeg).css("border-color","#999");					// Hilite active one				
+			$("#sui-transMinBox-"+this.curTransSeg).css("background-color","#eee");				// Hilite active one				
+			},100);
+		}		
+
+	DrawTransContent()																		// DRAW TRANSCRIPT CONTENNT IN WINDOW
+	{
+		var i,o,lang,str="";
+		var res=this.transRes;																	// Point at res
+		if (res.layout == "Minimal") {															// Drawing minimal layput
+			for (i=0;i<res.segs.length;++i) {													// For each seg
+				str+=`<div class='sui-transMinSeg' id='sui-transMinSeg-${i}'>										
+				<div class='sui-transPlay' id='sui-transPlay-${i}' title='Play line'>&#xe680</div> 
+				<div class='sui-transMinBox' id='sui-transMinBox-${i}'>`;
+				for (lang in res.languages)  str+="<div>"+res.segs[i][lang]+"</div>";			// Add each language's transcription
+				str+="</div></div>";															// Close box and seg
+				}
+			}
+		$("#sui-trans").html(str.replace(/\t|\n|\r/g,""));										// Add transcript to div
+
+		$("[id^=sui-transPlay-]").on("click", (e)=> {											// ON PLAY CLICK
+			this.curTransSeg=e.currentTarget.id.substring(14);									// Get index of seg	
+			this.PlayAV(res.segs[this.curTransSeg].start,res.segs[this.curTransSeg].end);		// Play seg
+			$("#sui-kplayer")[0].sendNotification("doPlay");									// Start playing
+		});
+	}																
+
+	DrawAV(o)																				// DRAW AUDIO/VIDEI PAGR
+	{
+		var partnerId="381832";																	// Kaltura partner id
+		var uiConfId="31832371";																// Kaltura confidential code
+		var entryId="";																			// Media id
+		this.inPlay=false;																		// Not playying yet
 
 		let w=$(this.div).width();
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
@@ -215,7 +293,7 @@ class Pages  {
 			if (d.field_video) {																// If a video field spec'd
 				if (d.field_video.und)			entryId=d.field_video.und[0].entryid;			// If id is in uns
 				else if (d.field_video.en)		entryId=d.field_video.en[0].entryid;			// In ens
-				str+=`<div class='sui-vPlayer'style='width:100%;height:${w*0.5625}px' id='sui-kplayer'>
+				str+=`<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='sui-kplayer'>
 				<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
 				}
 			else str+="<img style='width:100%' src='"+o.url_thumb+"'>";
@@ -242,17 +320,21 @@ class Pages  {
 			</div>`;
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player and details
 			this.DrawTranscript(o,"#sui-trans");												// Draw transcript in div
-			
 	
 			str=`//cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
 					targetId:"sui-kplayer",  wid:"_"+partnerId,				uiconf_id:uiConfId,    
-					entry_id:entryId,		flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} });
+					entry_id:entryId,		flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} 
 					});
+				kWidget.addReadyCallback(()=> {													// When ready, add icon callback
+					var kdp=document.getElementById("sui-kplayer");								// Get div
+					kdp.kBind("doPlay.test", ()=> {	$("#sui-transTab1").html("&#xe681"); this.inPlay=true; /*this.PlayAV();*/ });	// Pause icon
+					kdp.kBind("doPause.test",()=> { $("#sui-transTab1").html("&#xe641"); this.inPlay=false; clearInterval(this.transTimer); });	// Play
+					});
+			});
 				sui.LoadingIcon(false);															// Hide loading icon
 				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
-	
 				var content=["","",""];
 				str="";
 				try{ if (o.collection_title) str+="<p title='Collection'><b>COLLECTION</b>:&nbsp;&nbsp;"+o.collection_title+"</p>"; } catch(e) {}
@@ -270,13 +352,6 @@ class Pages  {
 				$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
 					var id=e.currentTarget.id.substring(11);										// Get index of tab	
 						showTab(id);																// Draw it
-					});
-
-
-				$("#sui-transTab1").on("click", (e)=> {												// ON PLAY CLICK
-					inPlay=!inPlay;																	// Toggle state
-					$("#sui-transTab1").html(inPlay ? "&#xe681" : "&#xe641" );						// Change button
-					$("#sui-kplayer")[0].sendNotification(inPlay ? "doPlay" : "doPause");			// Act
 					});
 
 				function showTab(which) {
