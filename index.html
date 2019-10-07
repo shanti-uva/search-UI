@@ -6,6 +6,8 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,400i,500%7COpen+Sans:400,400i,600&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext" rel="stylesheet">
 	<script src="searchui.js"></script>
+	<script src="pages.js"></script>
+	<script src="places.js"></script>
 	<link REL="SHORTCUT ICON" HREF="img/shanti.ico">
 	<title>Mandala Search UI</title>
 </head>
@@ -26,10 +28,11 @@
 <script>
 
 var sui=new SearchUI("standalone");														// Alloc new search object
-
+sui.places=new Places();																// Alloc places (standalone only)
+sui.pages=new Pages();																	// Alloc pages (standalone)
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	sui.pages.DrawAV()
+	sui.pages.DrawTranscript({trid_i:2898});
 	});
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 

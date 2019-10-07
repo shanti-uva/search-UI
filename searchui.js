@@ -66,11 +66,6 @@ class SearchUI  {
 				this.solrUtil=new KmapsSolrUtil();													// Alloc
 				this.Query();																		// Get intial data
 			}); 	
-		if (mode == "standalone") {																	// If in standalone
-			try{ $.ajax( { url:"places.js", dataType:"script" }).done(()=> { this.places=new Places(); }); } catch(e) {} 	// Dynamically load and alloc places class
-			try{ $.ajax( { url:"pages.js",  dataType:"script" }).done(()=> { this.pages=new Pages(); });   } catch(e) {} 	// Dynamically load and alloc pages class
-			}
-			
 		this.AddFrame();																			// Add div framework
 		this.Draw();																				// Draw
 		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw
@@ -122,7 +117,7 @@ class SearchUI  {
 			</div>
 			<div id='sui-left' class='sui-left'>
 				<div id='sui-results' class='sui-results scrollbar'></div>
-				<div id='sui-footer' class='sui-footer'></div>
+					<div id='sui-footer' class='sui-footer'></div>
 				<div id='sui-adv' class='sui-adv'>
 					<div class='sui-advTop'>Advanced search
 					<div id='sui-advClose' style='float:right;font-size:12px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
@@ -141,11 +136,13 @@ class SearchUI  {
 						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 						<div class='sui-advEdit' id='sui-advEdit-${key}'></div>`;
 						}
-					str+=`</div>
-					<div class='sui-advHeader' id='sui-advOptions-text'>&#xe623&nbsp;&nbsp;SEARCH WORD OPTIONS</div>
+					str+=`<div class='sui-advHeader' id='sui-advOptions-text'>&#xe623&nbsp;&nbsp;SEARCH WORD OPTIONS
+						<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
+						</div>
+					</div>
 				<div class='sui-advTerm' id='sui-advTerm-text'></div>
-				<div class='sui-advEdit' id='sui-advEdit-text'></div>`;
-				str+=`</div>
+				<div class='sui-advEdit' id='sui-advEdit-text'></div>;
+				</div>
 			</div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
 
@@ -270,6 +267,7 @@ class SearchUI  {
 		this.LoadingIcon(true,64);																	// Show loading icon
 		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
 		var url=this.solrUtil.buildAssetQuery(this.ss);
+		$("#sui-relatedAssets").remove();															// Remove relate assets panel
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
@@ -318,17 +316,18 @@ class SearchUI  {
 
 	DrawHeader()																				// DRAW RESULTS HEADER
 	{
+		if (this.ss.mode == "related") 	return;														// Advanced search
 		var s=this.ss.page*this.ss.pageSize+1;														// Starting item number
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
 		if (n >= 1000)	n=Math.floor(n/1000)+"K";													// Shorten if need be
-		$("#sui-header").css("background-color","#888");											// Set b/g color
-	
 		var str=`
 			<span id='sui-resClose' class='sui-resClose'>&#xe60f</span>
 			Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}
 			`;
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+		$("#sui-header").css("background-color","#888");											// Set b/g color
+	
 		str=`
 			SHOW&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
@@ -361,7 +360,7 @@ class SearchUI  {
 	DrawFooter()																				// DRAW RESULTS FOOTER
 	{
 		var lastPage=Math.floor(this.numItems/this.ss.pageSize);									// Calc last page
-		$("#sui-footer").css("background-color","#888");											// Set b/g color
+		if (this.ss.mode != "related")	$("#sui-footer").css("background-color","#888");			// Set b/g color
 		var str=`
 		<div style='float:left;font-size:18px'>
 			<div id='sui-viewModeList' class='sui-resDisplay' title='List view'>&#xe61f</div>
@@ -413,10 +412,13 @@ class SearchUI  {
 			});							
 	}
 
-	DrawItems()																					// DRAW RESULT ITEMS
+	DrawItems()																			// DRAW RESULT ITEMS
 	{
 		var i,str="";
 		$("#sui-results").css({ "background-color":(this.ss.view == "List") ? "#fff" : "#ddd" }); 	// White b/g for list only
+		if (this.ss.mode == "related")  $("#sui-results").css({ "padding-left": "204px", width:"calc(100% - 216px"});	// Shrink page
+		else  		 					$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});	// Reset to normal size
+
 		for (i=0;i<this.curResults.length;++i) {													// For each result
 			if (this.ss.view == "Card")			str+=this.DrawCardItem(i);							// Draw if shoing as cards
 			else if (this.ss.view == "Grid")	str+=this.DrawGridItem(i);							// Grid
@@ -425,6 +427,7 @@ class SearchUI  {
 		if (!this.curResults.length)																// No results
 			str="<br><br><br><div style='text-align:center;color:#666'>Sorry, there were no items found<br>Try broadening your search</div>";
 		$("#sui-results").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+		if (this.ss.mode == "related") this.pages.DrawRelatedAssets();								// Draw related assets menu
 
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
@@ -921,7 +924,7 @@ class SearchUI  {
 		$("#sui-results").append(str);																// Add icon to results
 	}
 
-	SendMessage(msg, kmap)																// SEND MESSAGE TO HOST
+	SendMessage(msg, kmap)																		// SEND MESSAGE TO HOST
 	{
 		if (this.pages && (this.runMode == "standalone")) {											// If a standalone													
 			this.pages.Draw(kmap);																	// Route to page
