@@ -117,12 +117,12 @@ class Pages  {
 		return s+"</span></p>";																	// Return item
 	}
 
-	AddDrop()																				// ADD KMAP DROP DOWN
+	AddDrop(id)																				// ADD KMAP DROP DOWN
 	{
-		let str=`&nbsp;<div style='width:11px;font-size:8px;height:11px;color:#fff;padding-left:7px;
-		border-radius:2px;background-color:#5a65d1;display:inline-block' title='KMap popdown happens here'>
-		&#xe627</div>`;	
-		return str;
+		let str=`&nbsp;<span style='width:11px;font-size:8px;height:11px;color:#fff;padding-left:7px;line-height:normal;
+		border-radius:2px;background-color:#5a65d1;display:inline-block' title='KMap popdown happens here: (${id})'>
+		&#xe627</span>`;	
+		return str.replace(/\t|\n|\r/g,"");
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,6 +138,9 @@ class Pages  {
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
 		$(this.div).html("");																	// Clear page	
 		sui.LoadingIcon(true,64);																// Show loading icon
+
+//		sui.GetJSONFromKmap(o, (d)=> { trace(d); });										// Get JSON
+
 
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {									// Get json
 			sui.LoadingIcon(false);																// Hide loading icon
@@ -164,7 +167,8 @@ class Pages  {
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/voyant/${o.id}'>&#xe678&nbsp;&nbsp;View in Voyant</a></p>
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/node_ajax_text/${o.id}'>&#xe678&nbsp;&nbsp;View as raw text</a></p>`;
 			content[2]=s.replace(/\t|\n|\r/g,"");												// Set view content
-	
+
+			
 			s="<p>&#xe633&nbsp;&nbsp<b>COLLECTION</b>:&nbsp;&nbsp;"+(o.collection_title ? o.collection_title : "None")+"</p>";
 			if (o.summary) s+=o.summary+"<hr>";
 			if (o.kmapid_strict_ss)
