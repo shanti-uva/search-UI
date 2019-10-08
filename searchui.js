@@ -10,7 +10,7 @@
 	A sui=close message is sent to host.
 
 	Requires: 	jQuery 												// Almost any version should work
-	Calls:		kmapsSolrUtil.js, [places.js, pages.js]				// Other JS modules that are dynamically loaded (not ued in plain search)
+	Calls:		kmapsSolrUtil.js, [places.js, pages.js, audiovideo.js]				// Other JS modules that are dynamically loaded (not used in plain search)
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		loading.gif, gradient.jpg, treebuts.png
