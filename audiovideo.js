@@ -14,6 +14,7 @@ class AudioVideo  {
 		this.transRes=null;																		// Holds transcript resources	
 		this.scrollStart=0;																		// Initial transcript scroll distance when starting play
 		this.playEnd=0;	
+		this.kmap=null;
 	}
 
 	Draw(o)																					// DRAW AUDIO/VIDEO PAGE
@@ -26,6 +27,7 @@ class AudioVideo  {
 		let w=$(this.div).width();																// Width of area
 		$(this.div).css("background-color","#eee");												// BG color
 		$(this.div).html("");																	// Clear screen
+		this.kmap=o;																			// Save kmap
 		if (typeof kWidget != "undefined") 	kWidget.destroy("sui-kplayer");						// If Kaltura player already initted yet, kill it
 		
 		sui.LoadingIcon(true,64);																// Show loading icon
@@ -131,7 +133,7 @@ class AudioVideo  {
 		l.ts_content_tsum="Tsum";		l.ts_content_nep="Nepali";		l.ts_content_eng="English";			l.ts_content_zho="Chinese"; 
 		l.ts_content_und="Unknown";		l.ts_content_gloss="Morpheme glossing";
 		
-		var res={ languages:{}, speakers:{}, segs:[], layout:"Normal", rev:0 };					// Final data								
+		var res={ languages:{}, speakers:{}, segs:[], layout:"Normal", rev:0, speaker:"" };		// Final data								
 		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/av_dev/select?indent=on&q=is_trid:"+kmap.trid_i+"&wt=json&start=0&rows=1000";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {				// Get transcript data
 			data.response.docs.sort(function(a,b) { return (a.fts_start > b.fts_start) ? 1 : -1; }); // Sort
@@ -150,7 +152,8 @@ class AudioVideo  {
 				}
 			if (!res.segs.length)	return;														// Quit if no segs
 			this.transRes=res;																	// Set segs
-			$("#sui-viewerSide").width($(this.div).width()*0.5);								// Halve viewer width
+			if ($(this.div).width() > 700)														// If mobile
+				$("#sui-viewerSide").width($(this.div).width()*0.5);							// Halve viewer width
 			$("#sui-kplayer").height($(this.div).width()*0.5*.5625);							// Set height based on aspect ratio
 			this.DrawTranscriptMenu();															// Draw transcripts header	
 			this.DrawTransContent();															// Draw the transcipt content
@@ -161,7 +164,7 @@ class AudioVideo  {
 	DrawTranscriptMenu()																	// DRAW TRANSCRIPT MENU 
 	{
 		var res=this.transRes;																	// Point at res
-		var str=`<div style='display:inline-block;width:calc(50% - 24px);margin-left:12px;vertical-align:top;'>
+		var str=`<div style='display:inline-block;width:calc(50% - 24px);margin-left:12px;vertical-align:top; min-width:350px;'>
 			<div id='sui-transTab0' class='sui-transTab' title='Options'>&#xe66f</div>
 			<div id='sui-transTab1' class='sui-transTab' title='Play/Pause'>&#xe641</div>
 			<div id='sui-transTab2' class='sui-transTab' title='Previous line'>&#xe602</div>
@@ -177,15 +180,24 @@ class AudioVideo  {
 		onclick='$("#sui-transOps").slideToggle()'>&#xe60f</span></div>
 		<div class='sui-transLab'>LANGUAGES</div>`;
 		for (var lang in res.languages)															// Add each language found in transcript
-			str+="<div class='sui-transRow'>- "+lang+"<span id='sui-transL1' class='sui-transCheck'>&#xe60e</span></div>";	
+			str+="<div class='sui-transRow' id='sui-transLan-"+lang+"'>- "+lang+"<span id='sui-transLang-"+lang+"' class='sui-transCheck' style='color:#58aab4'>&#xe60e</span></div>";	
 		str+=`<div class='sui-transLab'>SPEAKERS</div>
-		<div class='sui-transRow'>- Tibetan<span id='sui-transS1' class='sui-transCheck'>&#xe60e</span></div>	
+		<div class='sui-transRow'>- Tibetan<span id='sui-transS1' class='sui-transCheck' style='color:#58aab4'>&#xe60e</span></div>	
 		<div class='sui-transLab'>LAYOUTS</div>
 		<div class='sui-transRow' id='sui-transMinR'>- Minimal<span id='sui-transMin' class='sui-transCheck'>&#xe60e</span></div>
 		<div class='sui-transRow' id='sui-transRevR'>- Reversed<span id='sui-transRev' class='sui-transCheck'>&#xe60e</span></div>
 		<div class='sui-transLab'>DOWNLOADS</div>
-		<div class='sui-transRow'>- SRT file<span id='sui-transDL' class='sui-transCheck' style='color:#58aab4'>&#xe616</span></div>`;
+		<div class='sui-transRow' id='sui-transStr'->- SRT file<span class='sui-transCheck' style='color:#58aab4'>&#xe616</span></div>`;
 		$("#sui-transOps").html(str.replace(/\t|\n|\r/g,""))
+
+		$("#sui-transStr").on("click",()=> { this.SaveStrFile(); });						// ON SAVE SRT FILE
+
+		$("[id^=sui-transLan-]").on("click", (e)=> {										// ON LANGUAGE CLICK
+			var lang=e.currentTarget.id.substring(13);										// Get language
+			res.languages[lang]=1-res.languages[lang];										// Toggle value
+			$("#sui-transLang-"+lang).css("color",(res.languages[lang]) ? "#58aab4" : "#ccc");	// Set check color
+			this.DrawTransContent();														// Redraw
+			});			
 
 		$("#sui-transMinR").on("click",()=> { 												// ON CLICK MINIMAL/NORMAL
 			res.layout=(res.layout == "Minimal") ? "Normal" : "Minimal";					// Toggle state
@@ -225,6 +237,29 @@ class AudioVideo  {
 			});
 	}			
 
+	SaveStrFile()																		// SAVE AS SRT FILE
+	{
+		var res=this.transRes;																// Point at res
+		let lang,i,o,str="";
+		for (i=0;i<res.segs.length;++i) {													// For each seg
+			o=res.segs[i];																	// Point at it
+			str+=`${(i+1)}\n${o.start},000 --> ${o.end},000\n${o.speaker ? ">> "+o.speaker+ "\n" : ""}`;
+			for (lang in res.languages) { 													// For each language
+				if (res.segs[i][lang] && res.languages[lang]) 								// If something there and checked
+					str+=res.segs[i][lang]+"\n";											// Add transcription	
+				}
+			str+="\n";
+			}
+		var element = document.createElement('a');
+		element.setAttribute('href','data:text/plain;charset=utf-8,'+encodeURIComponent(str));
+		element.setAttribute('download', "transcript-"+this.kmap.id+".str");
+		element.style.display = 'none';
+		document.body.appendChild(element);
+		element.click();
+		document.body.removeChild(element);
+	}
+	
+	
 	DrawTransContent()																		// DRAW TRANSCRIPT CONTENNT IN WINDOW
 	{
 		var i,lang,str="";
@@ -232,10 +267,14 @@ class AudioVideo  {
 		if (res.layout == "Minimal") {															// Drawing minimal layput
 			for (i=0;i<res.segs.length;++i) {													// For each seg
 				str+=`<div class='sui-transMinSeg' id='sui-transMinSeg-${i}'>										
+				<div style='float:${(res.rev) ? "right" : "left"};font-size:18px;'>
+				${(res.segs[i].speaker) ? res.segs[i].speaker+"<br>" : ""}
 				<div class='sui-transMinPlay' id='sui-transPlay-${i}' title='Play line ${this.SecondsToTimecode(res.segs[i].start)}'>&#xe680</div> 
-				<div class='sui-transMinBox' id='sui-transMinBox-${i}'>`;
+				</div>
+				<div class='sui-transMinBox' id='sui-transMinBox-${i}'
+				style='margin:${(res.rev) ? "0 150px 0 0" : "0  0 0 150px"}'>`;										
 				for (lang in res.languages)  													// For each language
-					if (res.segs[i][lang])														// If something there
+					if (res.segs[i][lang] && res.languages[lang])								// If something there and checked
 						str+="<div>"+res.segs[i][lang]+"</div>";								// Add transcription	
 				str+="</div></div>";															// Close box and seg
 				}
@@ -243,15 +282,16 @@ class AudioVideo  {
 		else{																					// Normal
 			for (i=0;i<res.segs.length;++i) {													// For each seg
 				str+=`<div class='sui-transSeg' id='sui-transSeg-${i}'>
+				<div style='float:${(res.rev) ? "right" : "left"};font-size:18px;'>
+				${(res.segs[i].speaker) ? res.segs[i].speaker+"<br>" : ""}
 				<div class='sui-transPlay' id='sui-transPlay-${i}' 
-				style='float:${(res.rev) ? "right" : "left"}' 
 				title='Play line'>&#xe680
 				<span style='margin-left:24px;font-size:12px;vertical-align:4px'>
-				${this.SecondsToTimecode(res.segs[i].start)}</span></div> 
+				${this.SecondsToTimecode(res.segs[i].start)}</span></div></div> 
 				<div class='sui-transBox' id='sui-transBox-${i}'
 				style='margin:${(res.rev) ? "0 150px 0 0" : "0  0 0 150px"}'>`;										
 				for (lang in res.languages)  													// For each language
-					if (res.segs[i][lang])														// If something there
+					if (res.segs[i][lang] && res.languages[lang])								// If something there and checked
 						str+="<div>"+res.segs[i][lang]+"</div>";								// Add transcription	
 				str+="</div></div>";															// Close box and seg
 				}
@@ -292,9 +332,9 @@ class AudioVideo  {
 				}							
 			$("[id^=sui-transSeg-]").css("background-color","#ddd");							// All backgrounds off
 			$("[id^=sui-transMinSeg-]").css("border-color","#fff");								// All borders off
-			$("[id^=sui-transMinBox-]").css("background-color","#fff");							// All backgrounds off
+			$("[id^=sui-transMinSeg-]").css("background-color","#fff");							// All backgrounds off
 			$("#sui-transMinSeg-"+this.curTransSeg).css("border-color","#999");					// Hilite active one				
-			$("#sui-transMinBox-"+this.curTransSeg).css("background-color","#eee");				// Hilite active one				
+			$("#sui-transMinSeg-"+this.curTransSeg).css("background-color","#eee");				// Hilite active one				
 			$("#sui-transSeg-"+this.curTransSeg).css("background-color","#aaa");				// Hilite active one				
 		},100);
 		}		
