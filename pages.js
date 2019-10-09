@@ -139,8 +139,6 @@ class Pages  {
 		$(this.div).html("");																	// Clear page	
 		sui.LoadingIcon(true,64);																// Show loading icon
 
-//		sui.GetJSONFromKmap(o, (d)=> { trace(d); });										// Get JSON
-
 
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {									// Get json
 			sui.LoadingIcon(false);																// Hide loading icon
@@ -168,14 +166,47 @@ class Pages  {
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/node_ajax_text/${o.id}'>&#xe678&nbsp;&nbsp;View as raw text</a></p>`;
 			content[2]=s.replace(/\t|\n|\r/g,"");												// Set view content
 
+			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
+				let i;
+				trace(d)
+				let str="<p>&#xe633&nbsp;&nbsp<b>COLLECTION</b>:&nbsp;&nbsp;"+(o.collection_title ? o.collection_title : "None")+"</p>";
+				if (o.summary) s+=o.summary+"<hr>";
+				if (d.field_book_author && d.field_book_author.und) {
+					str+="<p>&#xe600&nbsp;&nbsp<b>AUTHOR</b>:&nbsp;&nbsp;";
+					for (i=0;i<d.field_book_author.und.length;++i)	
+						str+=d.field_book_author.und[i].value+",";
+					str=str.substr(0,str.length-3)+"</p>";
+					}
+				try{
+					str+="<p>&#xe633&nbsp;&nbsp<b>YEAR PUBLISHED</b>:&nbsp;&nbsp;"+(d.field_dc_date_publication_year.und ? d.field_dc_date_publication_year.und[0].value.substr(0,4) : "")+"</p>";
+					} catch(e) {}
+				try{
+					str+="<p>&#xe633&nbsp;&nbsp<b>ORIGINAL YEAR PUBLISHED</b>:&nbsp;&nbsp;"+(d.field_dc_date_original_year.und ? d.field_dc_date_original_year.und[0].value.substr(0,4) : "")+"</p>";
+					} catch(e) {}
+				if (o.kmapid_strict_ss)
+					str+="<p>&#xe634&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;"+o.kmapid_strict_ss.join(" , ")+"</p>";
+				str+="<p>&#xe635&nbsp;&nbsp<b>TERMS</b>:&nbsp;&nbsp;</p>";
+				if (d.field_book_editor && d.field_book_editor.und) {
+					str+="<p>&#xe600&nbsp;&nbsp<b>EDITOR</b>:&nbsp;&nbsp;";
+					for (i=0;i<d.field_book_editor.und.length;++i)	
+						str+=d.field_book_editor.und[i].value+",";
+					str=str.substr(0,str.length-3)+"</p>";
+					}
+				if (d.field_book_translator && d.field_book_translator.und) {
+					str+="<p>&#xe600&nbsp;&nbsp<b>TRANSLATOR</b>:&nbsp;&nbsp;";
+					for (i=0;i<d.field_book_translator.und.length;++i)	
+						str+=d.field_book_translator.und[i].value+",";
+					str=str.substr(0,str.length-3)+"</p>";
+					}
+				if (d.field_language_original && d.field_language_original.und) {
+						str+="<p>&#xe600&nbsp;&nbsp<b>LANGUAGE</b>:&nbsp;&nbsp;";
+						for (i=0;i<d.field_language_original.und.length;++i)	
+							str+=d.field_language_original.und[i].value+",";
+						str=str.substr(0,str.length-3)+"</p>";
+						}
+					content[1]=str.replace(/\t|\n|\r/g,"");												// Set view content
+				});
 			
-			s="<p>&#xe633&nbsp;&nbsp<b>COLLECTION</b>:&nbsp;&nbsp;"+(o.collection_title ? o.collection_title : "None")+"</p>";
-			if (o.summary) s+=o.summary+"<hr>";
-			if (o.kmapid_strict_ss)
-				s+="<p>&#xe634&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;"+o.kmapid_strict_ss.join(" , ")+"</p>";
-			s+="<p>&#xe635&nbsp;&nbsp<b>TERMS</b>:&nbsp;&nbsp;</p>";
-			content[1]=s.replace(/\t|\n|\r/g,"");												// Set view content
-
 			$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
 				var id=e.currentTarget.id.substring(11);										// Get index of tab	
 					showTab(id);																// Draw it

@@ -238,30 +238,30 @@
 .sui-transOps {		position:absolute; background-color:#f7f7f7; border:1px solid #999; border-radius: 0 0 6px 6px; 
 					display:none; width:180px; font-size: 13px; 
 					}
-
 .sui-transRow {		padding:5px 12px 5px 24px; cursor:pointer; }	.sui-transRow:hover{ background-color:#eee;
 					}	
 .sui-transLab {		padding:5px 12px 5px 12px; background-color:#e8e8e8; color:#333; font-weight:600; font-style:italic;
 					}	
 .sui-transCheck	{	float:right; color: #ccc;
 					}
-.sui-transMinSeg {	background-color:#fff; padding:0; width:calc(100% - 8px); margin:6px 0 6px 0; 
-					border-left:8px solid #fff;
+.sui-transMinSeg {	background-color:#fff; padding:0 0 0 8px; width:calc(100% - 12px); margin:6px 0 6px 0; 
+					border-left:4px solid #fff; min-height:70px;
 					}
-.sui-transMinBox {	width:calc(100% - 21px); border-left:1px solid #ddd; margin:0 12px 0 0; padding: 6px 12px 6px 8px
+.sui-transMinBox {	width:calc(100% - 174px); margin:0 0 0 150px; border-left:1px solid #eee; padding: 0 12px 6px 8px
 					}
-.sui-transMinPlay {	float:right;color:#ccc; font-size:20px; margin-right:12px; cursor:pointer; border-radius:16px; width:25px; padding:2px 0 0 4px }
+.sui-transMinPlay {	float:right;color:#ccc; font-size:20px; cursor:pointer; border-radius:16px; 
+					width:25px; padding:2px 0 0 4px; margin: 6px 44px 0 0;  }
 					.sui-transMinPlay:hover { background-color: #999; color: #fff;
 					}					
-.sui-transSeg	{	background-color:#ddd; border-radius: 6px 6px 0 0; padding-bottom:2px; padding:8px; width:calc(100% - 16px); margin:4px 0 4px 0;
+.sui-transSeg	{	background-color:#ddd; border-radius: 6px 6px 0 0; padding-bottom:2px; padding:8px; width:calc(100% - 16px); 
+					margin:4px 0 4px 0; min-height:80px;
 					}
 .sui-transBox	{	margin:0 0 0 150px; background-color:#fff; border-radius:6px; padding:12px; width:calc(100% - 174px);
 					}
-.sui-transPlay {	float:left; color:#fff; font-size:20px; margin:auto 0 auto 0;cursor:pointer; border-radius:6px; width:90px; height:26px;
-					padding:2px 0 0 4px; background-color:#bbb }
+.sui-transPlay {	color:#fff; font-size:20px; cursor:pointer; border-radius:6px; width:90px; height:26px;
+					padding:2px 0 0 4px; background-color:#bbb; margin: 6px 44px 0 0; }
 					.sui-transPlay:hover { background-color: #999;
 					}					
-.
 
 /* PSUEDO ELEMENTS */
 
