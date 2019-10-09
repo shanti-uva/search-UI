@@ -240,21 +240,23 @@ class AudioVideo  {
 				str+="</div></div>";															// Close box and seg
 				}
 			}
-		else{
+		else{																					// Normal
 			for (i=0;i<res.segs.length;++i) {													// For each seg
-				str+=`<div class='sui-transSeg' id='sui-transSeg-${i}'>										
-				<div class='sui-transPlay' id='sui-transPlay-${i}' title='Play line'>&#xe680
+				str+=`<div class='sui-transSeg' id='sui-transSeg-${i}'>
+				<div class='sui-transPlay' id='sui-transPlay-${i}' 
+				style='float:${(res.rev) ? "right" : "left"}' 
+				title='Play line'>&#xe680
 				<span style='margin-left:24px;font-size:12px;vertical-align:4px'>
 				${this.SecondsToTimecode(res.segs[i].start)}</span></div> 
-				<div class='sui-transBox' id='sui-transBox-${i}'>`;
+				<div class='sui-transBox' id='sui-transBox-${i}'
+				style='margin:${(res.rev) ? "0 150px 0 0" : "0  0 0 150px"}'>`;										
 				for (lang in res.languages)  													// For each language
 					if (res.segs[i][lang])														// If something there
 						str+="<div>"+res.segs[i][lang]+"</div>";								// Add transcription	
 				str+="</div></div>";															// Close box and seg
 				}
 			}
-			$("#sui-trans").html(str.replace(/\t|\n|\r/g,""));										// Add transcript to div
-
+		$("#sui-trans").html(str.replace(/\t|\n|\r/g,""));										// Add transcript to div
 		$("[id^=sui-transPlay-]").on("click", (e)=> {											// ON PLAY CLICK
 			this.curTransSeg=e.currentTarget.id.substring(14);									// Get index of seg	
 			this.PlayAV(res.segs[this.curTransSeg].start,res.segs[this.curTransSeg].end);		// Play seg
