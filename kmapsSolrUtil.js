@@ -28,7 +28,7 @@ class KmapsSolrUtil {
             "sort": "Alpha",
             "type": "All",
             "page": 0,																			// Current page being shown
-            "pageSize": 100,																	// Results per page
+            "pageSize": 10,																	// Results per page
             "query": { 																		// Current query
                 "text": "",																			// Search word
                 "places": [],																			// Places
@@ -170,13 +170,13 @@ class KmapsSolrUtil {
         };
     }
 
-    createBasicQuery(state, selected_facets) {
+    createBasicQuery(state, selected_facets, filter_facet) {
         state = $.extend(true, {}, this.defaultState, state);
-
 
         // process selected facets.
         var currentFacets = {};
 
+        // selected facets
         if (selected_facets && selected_facets.length > 0) {
             for (var n = 0; n < selected_facets.length; n++) {
                 var sf = selected_facets[n];
@@ -194,11 +194,40 @@ class KmapsSolrUtil {
             console.log("no currentFacets so using ALL facets");
             currentFacets = this.facetJSON;
         }
+
+
+        var facet_fqs = [];
+        // argument form [ facetname:filterstring ]
+        if (filter_facet) {
+            if (filter_facet.length > 0) {
+                for (var m=0; m < filter_facet.length; m++) {
+                    var split = filter_facet[m].split(':');
+                    var facet_name = split[0];
+                    var facet_filter = split[1];
+                    // console.dir({ "facet_name": facet_name, "facet_filter": facet_filter });
+
+                    var facet_blob = this.facetJSON[facet_name];
+                    // console.dir(facet_blob);
+
+                    var field = facet_blob.field;
+
+                    // console.log ("FIELD: "+ field);
+                    var new_fq = field + ":*" + facet_filter + "*"
+                    facet_fqs.push(new_fq);
+                }
+            }
+        }
+
+        // console.dir(facet_fqs);
+
         // create request object
 
         var searchstring = state.query.text || "";
         var page = state.page || 0;
         var pageSize = state.pageSize || 100;
+
+        if (facet_fqs.length > 0) pageSize = 0;  // zero pagesize if this is a facet filtering situation
+
         // console.log (JSON.stringify(state));
         var starts = searchstring + "*";
         var search = "*" + searchstring + "*";
@@ -317,6 +346,11 @@ class KmapsSolrUtil {
         for (var i = 0; i < fq_array.length; i++) {
             params.append("fq",fq_array[i]);
         }
+
+        for (var p = 0; p < facet_fqs.length; p++ ) {
+            params.append( "fq",facet_fqs[p]);
+        }
+
         var url = new URL(baseurl + "?" + params.toString());
         return url;
     }
