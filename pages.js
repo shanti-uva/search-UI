@@ -106,15 +106,27 @@ class Pages  {
 			});
 	}
 
-	DrawItem(icon, label, value, def, style)												// DRAW ITEM
+	DrawItem(icon, label, value, def, style, bold)												// DRAW ITEM
 	{
-		var s="<p>";
-		if (icon)	s+=icon+"&nbsp;&nbsp;";														// Add icon
-		if (label)	s+="<span class='sui-pageLab'>"+label+":&nbsp;&nbsp;</span>";				// Add label
-		s+="<span class='";																		// Add value span
-		s+=(style ? style : "sui-pageVal")+"'>";												// Default, or special style
-		s+=value ? value : def;																	// Add def if bad value or show value
-		return s+"</span></p>";																	// Return item
+		let i,str="<p>";
+		if ((value == null) || (value == undefined))	return "";								// Return nothing
+		if (icon)	str+=icon+"&nbsp;&nbsp;";													// Add icon
+		str+="<span class='sui-pageLab'";														// Label head
+		if (bold)	str+=" style='font-weight:600'";											// Bold?
+		str+=">"+label+":&nbsp;&nbsp;</span>";													// Add label
+		str+="<span class='";																	// Add value span
+		str+=(style ? style : "sui-pageVal")+"'>";												// Default, or special style
+		if (typeof(value) == "object") {														// If an array
+			for (i=0;i<value.length;++i)	{													// For each item
+				if (value[i].header)		str+=value[i].header;								// Use .header
+				else if (value[i].value)	str+=value[i].value;								// .value
+				else if (value[i].val)		str+=value[i].val;									// .val
+				else 						str+=value[i].length[i];							// Plain	
+				if (i != value.length-1)	str+=", ";											// Add separator
+				}
+			}
+		else str+=value ? value : def;															// Add def if bad value or show value
+		return str+"</span></p>";																// Return item
 	}
 
 	AddDrop(id)																				// ADD KMAP DROP DOWN
@@ -138,7 +150,6 @@ class Pages  {
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
 		$(this.div).html("");																	// Clear page	
 		sui.LoadingIcon(true,64);																// Show loading icon
-
 
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {									// Get json
 			sui.LoadingIcon(false);																// Hide loading icon
@@ -167,44 +178,43 @@ class Pages  {
 			content[2]=s.replace(/\t|\n|\r/g,"");												// Set view content
 
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
-				let i;
-				trace(d)
-				let str="<p>&#xe633&nbsp;&nbsp<b>COLLECTION</b>:&nbsp;&nbsp;"+(o.collection_title ? o.collection_title : "None")+"</p>";
-				if (o.summary) s+=o.summary+"<hr>";
-				if (d.field_book_author && d.field_book_author.und) {
-					str+="<p>&#xe600&nbsp;&nbsp<b>AUTHOR</b>:&nbsp;&nbsp;";
-					for (i=0;i<d.field_book_author.und.length;++i)	
-						str+=d.field_book_author.und[i].value+",";
-					str=str.substr(0,str.length-3)+"</p>";
-					}
-				try{
-					str+="<p>&#xe633&nbsp;&nbsp<b>YEAR PUBLISHED</b>:&nbsp;&nbsp;"+(d.field_dc_date_publication_year.und ? d.field_dc_date_publication_year.und[0].value.substr(0,4) : "")+"</p>";
-					} catch(e) {}
-				try{
-					str+="<p>&#xe633&nbsp;&nbsp<b>ORIGINAL YEAR PUBLISHED</b>:&nbsp;&nbsp;"+(d.field_dc_date_original_year.und ? d.field_dc_date_original_year.und[0].value.substr(0,4) : "")+"</p>";
-					} catch(e) {}
-				if (o.kmapid_strict_ss)
-					str+="<p>&#xe634&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;"+o.kmapid_strict_ss.join(" , ")+"</p>";
-				str+="<p>&#xe635&nbsp;&nbsp<b>TERMS</b>:&nbsp;&nbsp;</p>";
-				if (d.field_book_editor && d.field_book_editor.und) {
-					str+="<p>&#xe600&nbsp;&nbsp<b>EDITOR</b>:&nbsp;&nbsp;";
-					for (i=0;i<d.field_book_editor.und.length;++i)	
-						str+=d.field_book_editor.und[i].value+",";
-					str=str.substr(0,str.length-3)+"</p>";
-					}
-				if (d.field_book_translator && d.field_book_translator.und) {
-					str+="<p>&#xe600&nbsp;&nbsp<b>TRANSLATOR</b>:&nbsp;&nbsp;";
-					for (i=0;i<d.field_book_translator.und.length;++i)	
-						str+=d.field_book_translator.und[i].value+",";
-					str=str.substr(0,str.length-3)+"</p>";
-					}
-				if (d.field_language_original && d.field_language_original.und) {
-						str+="<p>&#xe600&nbsp;&nbsp<b>LANGUAGE</b>:&nbsp;&nbsp;";
-						for (i=0;i<d.field_language_original.und.length;++i)	
-							str+=d.field_language_original.und[i].value+",";
-						str=str.substr(0,str.length-3)+"</p>";
+				let i,str="";
+				trace(o,d)
+				if (o.summary) str+=o.summary+"<hr>";											// Add summary
+				try { str+=this.DrawItem("&#xe633","COLLECTION",o.collection_title,"","sui-pageLab",1); } catch(e) {}
+				try { str+=this.DrawItem("&#xe600","AUTHOR",d.field_book_author.und,"","sui-pageLab",1); } catch(e) {}
+				try { str+=this.DrawItem("&#xe633","YEAR PUBLISHED", d.field_dc_date_publication_year.und[0].value.substr(0,4),"","sui-pageLab",1); }		catch(e) {}
+				try { str+=this.DrawItem("&#xe633","ORIGINAL YEAR PUBLISHED", d.field_dc_date_orginial_year.und[0].value.substr(0,4),"","sui-pageLab",1); }	catch(e) {}
+				if (o.kmapid_strict_ss) {														// If subjects and/or places
+					str+="<p class='sui-pageLab'>&#xe62b&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;";// Add subjects header
+					for (i=0;i<o.kmapid_strict_ss.length;++i) {									// For each item
+						if (!o.kmapid_strict[i].match(/subjects/i)) continue;					// Only looking for subjects
+						str+=o.kmapid_strict_ss[i]+this.AddDrop(o.kmapid_strict[i]);;			// Add name and drop
+						if (i < o.kmapid_strict_ss.length-1)	str+=", ";						// Add separator
 						}
-					content[1]=str.replace(/\t|\n|\r/g,"");												// Set view content
+					str+="</p>";																// End SUBJECTS
+					str+="<p class='sui-pageLab'>&#xe634&nbsp;&nbsp<b>PLACES</b>:&nbsp;&nbsp;";	// Add places header
+					for (i=0;i<o.kmapid_strict_ss.length;++i) {									// For each item
+						if (!o.kmapid_strict[i].match(/places/i)) continue;						// Only looking for places
+						str+=o.kmapid_strict_ss[i]+this.AddDrop(o.kmapid_strict[i]);;				// Add name and drop
+						if (i < o.kmapid_strict_ss.length-1)	str+=", ";						// Add separator
+						}
+					str+="</p>";																// End PLACES
+					}
+				str+="<p class='sui-pageLab'>&#xe635&nbsp;&nbsp<b>TERMS</b>:&nbsp;&nbsp;";		// Add TERMS header
+				if (d.field_kmap_terms && d.field_kmap_terms.und) {								// If terms
+					for (i=0;i<d.field_kmap_terms.und.length;++i) {								// For each item
+						str+=d.field_kmap_terms.und[i].header;									// Add name
+						str+=this.AddDrop(d.field_kmap_terms.und[i].domain+"-"+d.field_kmap_terms.und[i].id);	// Add drop
+						if (i < d.field_kmap_terms.und.length-1)	str+=", ";					// Add separator
+						}
+					}
+				str+="</p>";																	// End TERMS
+				try { str+=this.DrawItem("&#xe675","EDITOR",d.field_book_editor.und,"","sui-pageLab",1); }				catch(e) {}
+				try { str+=this.DrawItem("&#xe674","TRANSLATOR",d.field_book_translator.und,"","sui-pageLab",1); }		catch(e) {}
+				try { str+=this.DrawItem("&#xe670","LANGUAGE",d.field_dc_language_original.und,"","sui-pageLab",1); }	catch(e) {}
+				try { str+=this.DrawItem("&copy;","RIGHTS", d.field_dc_rights_general.und,"","sui-pageLab",1); }		catch(e) {}
+				content[1]=str.replace(/\t|\n|\r/g,"");												// Set view content
 				});
 			
 			$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
