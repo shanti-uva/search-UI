@@ -259,6 +259,7 @@ class SearchUI  {
 				this.facets.collections.data=[];													// Clear
 				for (i=0;i<buckets.length;++i) 														// For each item
 					this.facets.collections.data.push({title:buckets[i].collection_title.buckets[0].val, id:"collections-0"});	// Add to list
+				this.ResetFacetList("collections");													// Fill collections list in adv edit
 				}
 	}
 
@@ -278,33 +279,23 @@ class SearchUI  {
 			});
 	}
     
-    QueryFacets(facet)                                                                              // QUERY AND UPDATE FACET OPTIONS
+    QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
-        this.LoadingIcon(true,64);                                                                  // Show loading icon
-        this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];    // Put in assets section
-        var url=this.solrUtil.buildAssetQuery(this.ss);
-        $("#sui-relatedAssets").remove();                                                           // Remove relate assets panel
-        $.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
-            this.LoadingIcon(false);                                                                // Hide loading icon
+		this.LoadingIcon(true,64); 																	// Show loading icon
+  		var url=this.solrUtil.createBasicQuery(this.ss,["x"+facet]);								// Get query url
+		  $.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
+			this.LoadingIcon(false);                                                                // Hide loading icon
             var i,o,v;
-			if (data.facets.xplaces) {																// If something there
-				o=data.facets.xplaces.buckets;														// Point at data
-				this.facets.places.data=[];															// Start fresh
+			if (data.facets["x"+facet]) {															// If something there
+				o=data.facets["x"+facet].buckets;													// Point at data
+				this.facets[facet].data=[];															// Start fresh
 				for (i=0;i<Math.min(300,o.length);++i)	{											// Get items
 					v=o[i].val.split("|");															// Split into parts
-					this.facets.places.data.push({ title:v[0], id: v[1], n:o[i].count }); 			// Add to assets data
+					this.facets[facet].data.push({ title:v[0], id: v[1], n:o[i].count }); 			// Add to assets data
 					}	
-				this.ResetFacetList("places");														// Reset list UI elements
 				}
-			o=data.facets.xsubjects.buckets;														// Point at data
-            this.facets.subjects.data=[];															// Start fresh
-            for (i=0;i<Math.min(300,o.length);++i)													// Get items
-                this.facets.subjects.data.push({ title: o[i].val.split("|")[0], id: o[i].val.split("|")[1], n:o[i].count }); 
-            o=data.facets.xterms.buckets;															// Point at data
-            this.facets.terms.data=[];																// Start fresh
-            for (i=0;i<Math.min(300,o.length);++i)													// Get items
-        		this.facets.terms.data.push({ title: o[i].val.split("|")[0], id: o[i].val.split("|")[1], n:o[i].count }); 
-			});
+			this.ResetFacetList(facet);																// Reset list UI elements
+		});
 
 		}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -692,6 +683,7 @@ class SearchUI  {
 	{
 		var i,str="";
 		let n=Math.min(300,this.facets[facet].data.length);											// Cap at 300
+		$("[id^=sui-advEditLine-]").remove();														// Remove old members, in all facets
 		for (i=0;i<n;++i) {																			// Add items
 			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
 			str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
@@ -713,53 +705,45 @@ class SearchUI  {
 
 	DrawFacetList(facet, open, searchItem)														// DRAW LIST FACET PICKER
 	{
-		var i;
-		var sorted=0;
-		if (tot > 300) tot="300+";																	// Too many, cap to 300
+		var i,sorted=0;
 		if (!open && ($("#sui-advEdit-"+facet).css("display") != "none")) {							// If open
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
 			}
 		this.QueryFacets(facet);																	// Get initial list	
-		var items=this.facets[facet].data;															// Point at items
-		var tot=items.length;																		// Number of items
-		var n=Math.min(300,items.length);															// Cap at 300
-		if (tot > 300) tot="300+";																	// Too many, cap to 300
 		var str=`<input id='sui-advEditFilter-${facet}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>`;
-		if (this.facets[facet].type == "tree")	
+		if (this.facets[facet].type == "tree")
 			str+=`<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div>`;
 		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
-		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${facet}s</div>
+		<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}</div>
 		<hr style='border: .5px solid #a4baec'>
 		<div class='sui-advEditList' id='sui-advEditList-${facet}'></div>`;
 		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add to div
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
 	
+		$("[id^=sui-advEditFilter-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advEditFilter-"+facet).on("keydown",(e)=> {											// ON FILTER CHANGE
-			var line,found=0;
-			var r=$("#sui-advEditFilter-"+facet).val();												// Get filter text
-		trace(r,123)
-			var lastText=this.ss.query.text;														// Save last text															
-			this.ss.query.text=r;																	// Search on this
-			this.QueryFacets(facet);																// Get facet items
-			this.ss.query.text=lastText;															// Restore last text															
-			
+			let line;
+			var n=Math.min(300,this.facets[facet].data.length);										// Cap at 300
+			let r=$("#sui-advEditFilter-"+facet).val();												// Get filter text
 			if ((e.keyCode > 31) && (e.keyCode < 91)) r+=e.key;										// Add current key if a-Z
-			var r=RegExp(r,"i");																	// Tuun into regex
-			
-				for (i=0;i<n;++i) {																		// For each item
+			if ((e.keyCode == 8) && r.length)	r=r.slice(0,-1);									// Remove last char on backspace
+//			this.QueryFacets(facet, r);																// Get facet items
+			r=RegExp(r,"i");																		// Turn into regex
+			for (i=0;i<n;++i) {																		// For each item
 				line=$("#sui-advEditLine-"+i);														// Point at line
-				if (line.text().match(r))	line.css("display","block"),found++;					// Show item if it matches
+				if (line.text().match(r))	line.css("display","block");							// Show item if it matches
 				else						line.css("display","none");								// Hide
 				}
-			if (found == tot)	$("#sui-advListNum").text(tot);										// All
-			else 				$("#sui-advListNum").text(found+"/"+tot);							// Show ones found	
 			});
 
+		$("[id^=sui-advEditSort-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advEditSort-"+facet).on("click",()=> {												// ON SORT BUTTON CLICK
-			sorted=1-sorted;																		// Toggle flag	
 			str="";
+			let items=this.facets[facet].data;														// Point at items
+			var n=Math.min(300,items.length);														// Cap at 300
+			sorted=1-sorted;																		// Toggle flag	
 			if (!sorted) {																			// If not sorted
 				$(".sui-advEditList").empty();														// Remove items from list
 				for (i=0;i<n;++i) {																	// For each one
@@ -768,7 +752,7 @@ class SearchUI  {
 					str+=`${items[i].title}</div>`;													// Add item to list
 					}
 				$(".sui-advEditList").html(str);													// Add back
-				$("#sui-advEditSort-"+id).css("color","#666");										// Off
+				$("#sui-advEditSort-"+facet).css("color","#666");									// Off
 				return;																				// Quit
 				}
 			var itms=$(".sui-advEditLine");															// Items to sort
@@ -780,9 +764,10 @@ class SearchUI  {
 				else				return 0;														// The same
 				});
 			itms.detach().appendTo($(".sui-advEditList"));
-			$("#sui-advEditSort-"+id).css("color","#668eec");										// On
+			$("#sui-advEditSort-"+facet).css("color","#668eec");									// On
 			});                  
 		
+		$("[id^=sui-advListMap-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
 			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
 			});      
@@ -833,10 +818,12 @@ class SearchUI  {
 					$(this).addClass('parent');                              						// Make parent class
 				});
 
+			$("[id^=sui-advTreeMap-]").off("click");												// KILL OLD HANDLER
 			$("#sui-advTreeMap-"+facet).on("click", ()=> {											// ON CLICK LIST BUTTON
 				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
 				});      
 
+			$("[id^=sui-advTreeFilter-]").off("click");												// KILL OLD HANDLER
 			$("#sui-advTreeFilter").on("keydown", (e)=> {											// ON TYPING IN TEXT BOX
 				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
 				$("#sui-advEditFilter-"+facet).focus();												// Focus on input in list
@@ -881,7 +868,6 @@ class SearchUI  {
 				tops.ra=185531;		tops.la=193509;		tops.sha=199252;	tops.sa=204036;	tops.ha=215681;		tops.a=219022;
 				}
 			else if (facet == "subjects") {
-				var xxxx=0;
 				tops["Administration"]=5550;		tops["Architecture"]=6669;			tops["Collections"]=2823;		tops["Community Services Project Types"]=5553;
 				tops["Contemplation"]=5806;			tops["Cultural Landscapes"]=8868;	tops["Cultural Regions"]=305;	tops["Event"]=2743;
 				tops["General"]=6793;				tops["Geographical Features"]=20;	tops["Grammars"]=5812;			tops["Higher Education Digital Tools"]=6404;
