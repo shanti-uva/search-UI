@@ -170,12 +170,31 @@ class KmapsSolrUtil {
         };
     }
 
-    createBasicQuery(state) {
+    createBasicQuery(state, selected_facets) {
         state = $.extend(true, {}, this.defaultState, state);
 
-        // create request object
 
-        // console.error("State = " + JSON.stringify(state, undefined, 2));
+        // process selected facets.
+        var currentFacets = {};
+
+        if (selected_facets && selected_facets.length > 0) {
+            for (var n = 0; n < selected_facets.length; n++) {
+                var sf = selected_facets[n];
+                var fac = this.facetJSON[sf];
+                if (fac) {
+                    currentFacets[sf] = fac;
+                } else {
+                    console.log("Warning: ignoring unknown facet: " + sf);
+                }
+            }
+        }
+
+
+        if ($.isEmptyObject(currentFacets)) {
+            console.log("no currentFacets so using ALL facets");
+            currentFacets = this.facetJSON;
+        }
+        // create request object
 
         var searchstring = state.query.text || "";
         var page = state.page || 0;
@@ -273,7 +292,7 @@ class KmapsSolrUtil {
 
                 // facets
                 "facet": "on",
-                "json.facet": JSON.stringify(this.facetJSON),
+                "json.facet": JSON.stringify(currentFacets),
 
                 /*
                 // highlighting
