@@ -725,8 +725,8 @@ class SearchUI  {
 		$("[id^=sui-advEditFilter-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advEditFilter-"+facet).on("keydown",(e)=> {											// ON FILTER CHANGE
 			let line;
-			let n=Math.min(300,this.facets[facet].data.length);										// Cap at 300
-			var r=$("#sui-advEditFilter-"+facet).val();												// Get filter text
+			var n=Math.min(300,this.facets[facet].data.length);										// Cap at 300
+			let r=$("#sui-advEditFilter-"+facet).val();												// Get filter text
 			if ((e.keyCode > 31) && (e.keyCode < 91)) r+=e.key;										// Add current key if a-Z
 			if ((e.keyCode == 8) && r.length)	r=r.slice(0,-1);									// Remove last char on backspace
 //			this.QueryFacets(facet, r);																// Get facet items
@@ -738,10 +738,12 @@ class SearchUI  {
 				}
 			});
 
-			$("[id^=sui-advEditSort-]").off("click");												// KILL OLD HANDLER
-			$("#sui-advEditSort-"+facet).on("click",()=> {											// ON SORT BUTTON CLICK
-			sorted=1-sorted;																		// Toggle flag	
+		$("[id^=sui-advEditSort-]").off("click");													// KILL OLD HANDLER
+		$("#sui-advEditSort-"+facet).on("click",()=> {												// ON SORT BUTTON CLICK
 			str="";
+			let items=this.facets[facet].data;														// Point at items
+			var n=Math.min(300,items.length);														// Cap at 300
+			sorted=1-sorted;																		// Toggle flag	
 			if (!sorted) {																			// If not sorted
 				$(".sui-advEditList").empty();														// Remove items from list
 				for (i=0;i<n;++i) {																	// For each one
