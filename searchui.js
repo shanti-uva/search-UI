@@ -10,7 +10,7 @@
 	A sui=close message is sent to host.
 
 	Requires: 	jQuery 												// Almost any version should work
-	Calls:		kmapsSolrUtil.js, [places.js, pages.js]				// Other JS modules that are dynamically loaded (not ued in plain search)
+	Calls:		kmapsSolrUtil.js, [places.js, pages.js, audiovideo.js]				// Other JS modules that are dynamically loaded (not used in plain search)
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		loading.gif, gradient.jpg, treebuts.png
@@ -277,8 +277,36 @@ class SearchUI  {
 			this.DrawResults();																		// Draw results page if active
 			});
 	}
+    
+    QueryFacets(facet)                                                                              // QUERY AND UPDATE FACET OPTIONS
+    {
+        this.LoadingIcon(true,64);                                                                  // Show loading icon
+        this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];    // Put in assets section
+        var url=this.solrUtil.buildAssetQuery(this.ss);
+        $("#sui-relatedAssets").remove();                                                           // Remove relate assets panel
+        $.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
+            this.LoadingIcon(false);                                                                // Hide loading icon
+            var i,o,v;
+			if (data.facets.xplaces) {																// If something there
+				o=data.facets.xplaces.buckets;														// Point at data
+				this.facets.places.data=[];															// Start fresh
+				for (i=0;i<Math.min(300,o.length);++i)	{											// Get items
+					v=o[i].val.split("|");															// Split into parts
+					this.facets.places.data.push({ title:v[0], id: v[1], n:o[i].count }); 			// Add to assets data
+					}	
+				this.ResetFacetList("places");														// Reset list UI elements
+				}
+			o=data.facets.xsubjects.buckets;														// Point at data
+            this.facets.subjects.data=[];															// Start fresh
+            for (i=0;i<Math.min(300,o.length);++i)													// Get items
+                this.facets.subjects.data.push({ title: o[i].val.split("|")[0], id: o[i].val.split("|")[1], n:o[i].count }); 
+            o=data.facets.xterms.buckets;															// Point at data
+            this.facets.terms.data=[];																// Start fresh
+            for (i=0;i<Math.min(300,o.length);++i)													// Get items
+        		this.facets.terms.data.push({ title: o[i].val.split("|")[0], id: o[i].val.split("|")[1], n:o[i].count }); 
+			});
 
-
+		}
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  RESULTS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -412,7 +440,7 @@ class SearchUI  {
 			});							
 	}
 
-	DrawItems()																			// DRAW RESULT ITEMS
+	DrawItems()																					// DRAW RESULT ITEMS
 	{
 		var i,str="";
 		$("#sui-results").css({ "background-color":(this.ss.view == "List") ? "#fff" : "#ddd" }); 	// White b/g for list only
@@ -660,6 +688,29 @@ class SearchUI  {
 			});
 	}
 
+	ResetFacetList(facet)																		// RESET FACET LIST UI
+	{
+		var i,str="";
+		let n=Math.min(300,this.facets[facet].data.length);											// Cap at 300
+		for (i=0;i<n;++i) {																			// Add items
+			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
+			str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
+			str+=`${this.facets[facet].data[i].title}</div>`;										// Add item to list
+			}
+		$("#sui-advEditList-"+facet).html("</div>"+str.replace(/\t|\n|\r/g,""));					// Add to div
+		$("[id^=sui-advEditLine-]").off("click");													// KILL OLD HANDLERS
+		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
+			let v=e.target.id.split("-");															// Get ids		
+			let items=this.facets[facet].data;														// Point at items
+			if (v[0].match(/ViewListPage/))	this.GetKmapFromID(items[v[1]].id,(kmap)=>{ this.SendMessage("page="+items[v[1]].url,kmap); }); // Get kmap and show page
+			else{																					// Add term
+				this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND");							// Add to search state
+				this.QueryFacets(facet);															// Requery the facets
+				}
+			});
+		$("#sui-advListNum").html((n < 300) ? n : n="300+");										// Set number
+	}
+
 	DrawFacetList(facet, open, searchItem)														// DRAW LIST FACET PICKER
 	{
 		var i;
@@ -669,41 +720,35 @@ class SearchUI  {
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
 			}
+		this.QueryFacets(facet);																	// Get initial list	
 		var items=this.facets[facet].data;															// Point at items
-
 		var tot=items.length;																		// Number of items
 		var n=Math.min(300,items.length);															// Cap at 300
 		if (tot > 300) tot="300+";																	// Too many, cap to 300
-		var str=`<input facet='sui-advEditFilter-${facet}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
+		var str=`<input id='sui-advEditFilter-${facet}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>`;
 		if (this.facets[facet].type == "tree")	
 			str+=`<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div>`;
 		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
 		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${facet}s</div>
 		<hr style='border: .5px solid #a4baec'>
-		<div class='sui-advEditList'>`;
-		
-		for (i=0;i<n;++i) {																			// For each one
-			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
-			if (items[i].id.split("-")[1] != 0)
-				str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>`;					
-			str+=`${items[i].title}</div>`;															// Add item to list
-			}
-		$("#sui-advEdit-"+facet).html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
+		<div class='sui-advEditList' id='sui-advEditList-${facet}'></div>`;
+		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add to div
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
-		
-		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
-			var v=e.target.id.split("-");															// Get ids		
-			if (v[0].match(/ViewListPage/))	this.SendMessage("page="+items[v[1]].url,this.curResults[v[1]]);	// If viewing, ask for that page
-			else	this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND");						// Add term to search state
-			});
 	
 		$("#sui-advEditFilter-"+facet).on("keydown",(e)=> {											// ON FILTER CHANGE
 			var line,found=0;
-			var r=$("#sui-advEditFilter-"+id).val();												// Get filter text
+			var r=$("#sui-advEditFilter-"+facet).val();												// Get filter text
+		trace(r,123)
+			var lastText=this.ss.query.text;														// Save last text															
+			this.ss.query.text=r;																	// Search on this
+			this.QueryFacets(facet);																// Get facet items
+			this.ss.query.text=lastText;															// Restore last text															
+			
 			if ((e.keyCode > 31) && (e.keyCode < 91)) r+=e.key;										// Add current key if a-Z
 			var r=RegExp(r,"i");																	// Tuun into regex
-			for (i=0;i<n;++i) {																		// For each item
+			
+				for (i=0;i<n;++i) {																		// For each item
 				line=$("#sui-advEditLine-"+i);														// Point at line
 				if (line.text().match(r))	line.css("display","block"),found++;					// Show item if it matches
 				else						line.css("display","none");								// Hide

@@ -8,6 +8,7 @@
 	<script src="searchui.js"></script>
 	<script src="pages.js"></script>
 	<script src="places.js"></script>
+	<script src="audiovideo.js"></script>
 	<link REL="SHORTCUT ICON" HREF="img/shanti.ico">
 	<title>Mandala Search UI</title>
 </head>
@@ -29,10 +30,11 @@
 
 var sui=new SearchUI("standalone");														// Alloc new search object
 sui.places=new Places();																// Alloc places (standalone only)
-sui.pages=new Pages();																	// Alloc pages (standalone)
+sui.pages=new Pages();																	// Alloc pages (standalone)s
+sui.av=new AudioVideo();																// Alloc AV (standalone)
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	sui.pages.DrawTranscript({trid_i:2898});
+	sui.QueryFacets();
 	});
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
