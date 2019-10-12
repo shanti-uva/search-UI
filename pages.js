@@ -516,10 +516,25 @@ class Pages  {
 				try{ str+=d("&#xe678","TECHNICAL&nbsp;NOTES",j.field_technical_notes.und[0].value); } 	catch(e){}
 				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } catch(e){}
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>LICENSE</span>:&nbsp;&nbsp;<span class='sui-pageVal'><a style='font-weight:400' target='_blank' href='"+j.field_license_url.und[0].value+"'>"+j.field_license_url.und[0].value+"</a>" } catch(e){} 
-				str+="</div></div>";
-			$(sui.pages.div).append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
-			}
-
+				
+				let asp=o.img_height_s/o.img_width_s;
+				str+=`<p class='sui-pageLab' style='cursor:pointer' onclick='$("#sui-dlOps").toggle()'>
+				&#xe616&nbsp;&nbsp;<a>CLICK TO DOWNLOAD IMAGE</a>
+					<div id='sui-dlOps' style='display:none;margin-left:24px;font-size:12px'>			
+					<a target='_blank' href='${o.url_thumb.replace(/200,200/,o.img_width_s+","+o.img_width_s)}'
+					style='display:inline-block;cursor:pointer'>Original (${o.img_width_s}x${o.img_height_s})</a><br>
+					<a target='_blank' href='${o.url_thumb.replace(/200,200/,"1200,1200")}'
+					style='display:inline-block;cursor:pointer'>Large (1200x${1200*asp}))</a><br>
+					<a target='_blank' href='${o.url_thumb.replace(/200,200/,"800,800")}'
+					style='display:inline-block;cursor:pointer'>Medium (800x${800*asp})</a><br>
+					<a target='_blank' href='${o.url_thumb.replace(/200,200/,"400,400")}'
+					style='display:inline-block;cursor:pointer'>Small (400x${400*asp})</a>
+					<p><i>Right-click and select "Download/Save Linked File"</i></p>
+					</div>
+				</p></div></div></div>`;
+				$(sui.pages.div).append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		}
+	
 		$("[id^=sui-pageThumb-]").on("click",(e)=> {												// ON THUMBNAIL CLICK
 			var id=e.currentTarget.id.split("-")[2];												// Get id
 			this.DrawImage(sui.curResults[id]);														// Show image
