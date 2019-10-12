@@ -121,7 +121,8 @@ class Pages  {
 				if (value[i].header)		str+=value[i].header;								// Use .header
 				else if (value[i].value)	str+=value[i].value;								// .value
 				else if (value[i].val)		str+=value[i].val;									// .val
-				else 						str+=value[i].length[i];							// Plain	
+				else if (value[i].title)	str+=value[i].title;								// .title
+				else 						str+=value[i];										// Plain	
 				if (i != value.length-1)	str+=", ";											// Add separator
 				}
 			}
@@ -131,7 +132,7 @@ class Pages  {
 
 	AddDrop(id)																				// ADD KMAP DROP DOWN
 	{
-		let str=`&nbsp;<span style='width:11px;font-size:8px;height:11px;color:#fff;padding-left:7px;line-height:normal;
+		let str=`&nbsp;<span style='width:11px;font-size:8px;height:11px;color:#fff;padding-left:7px;line-height:normal;cursor:pointer;
 		border-radius:2px;background-color:#5a65d1;display:inline-block' title='KMap popdown happens here: (${id})'>
 		&#xe627</span>`;	
 		return str.replace(/\t|\n|\r/g,"");
@@ -179,7 +180,6 @@ class Pages  {
 
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
 				let i,str="";
-				trace(o,d)
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
 				try { str+=this.DrawItem("&#xe633","COLLECTION",o.collection_title,"","sui-pageLab",1); } catch(e) {}
 				try { str+=this.DrawItem("&#xe600","AUTHOR",d.field_book_author.und,"","sui-pageLab",1); } catch(e) {}
@@ -334,33 +334,63 @@ class Pages  {
 
 	DrawSource(o)																			// DRAW SOURCE PAGE FROM KMAP
 	{
+		var i;
 		var str=`<div class='sui-sources' id='sui-sources'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid #aaa'>
 		<div id='sui-srcSec' style='font-size:18px;font-weight:400'></div><br>`;
 		if (o.creator && o.creator.length) {
-			str+=`<span style='color:${sui.assets[o.asset_type].c}'>&#xe600</span>
+			str+=`<span class='sui-pageLab' style='color:${sui.assets[o.asset_type].c}'>&#xe600</span>
 			&nbsp;&nbsp;${o.creator.join(", ")}<br><br>`;
 			}
 		if (o.url_thumb && !o.url_thumb.match(/gradient.jpg/)) str+="<img src='"+o.url_thumb+"' style='float:right;width:33%; padding:0 0 12px 12px'>";
 		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</p>";
-		str+="<p>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcYear'></span>";
+		str+="<p class='sui-pageLab'>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcYear'></span>";
 		if (o.publisher_s) str+="<p>PUBLISHER:&nbsp;&nbsp<span class='sui-sourceText'>"+o.publisher_s+"</p>";
-		str+="<p>PLACE OF PUBLICATION:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPlc'></span>";
-		str+="<p>PAGES:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPages'></span>";
-		str+="<p>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
+		str+="<p class='sui-pageLab'>PLACE OF PUBLICATION:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPlc'></span>";
+		str+="<p class='sui-pageLab'>PAGES:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPages'></span>";
+		str+="<p class='sui-pageLab'>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
 		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
 		str+="</div>";
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 		this.DrawRelatedAssets();																// Draw related assets menu if active
 		
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
+			let i,str="";
 			if (d.biblio_pages) 			$("#sui-srcPages").html(d.biblio_pages);			// Add pages
 			if (d.biblio_year) 				$("#sui-srcYear").html(d.biblio_year);				// Year
 			if (d.biblio_secondary_title) 	$("#sui-srcSec").html(d.biblio_secondary_title);	// Pub
 			if (d.biblio_place_published) 	$("#sui-srcPlc").html(d.biblio_place_published);	// Pub place
-			if (d.biblio_url) 				$("#sui-sources").append("<p>URL:&nbsp;&nbsp;<a target='_blank' href='"+d.biblio_url+"'>"+d.biblio_url+"</a></p>");	// URL
+			if (d.field_kmaps_subjects && d.field_kmaps_subjects.und) {							// If subjects
+				str+="<p class='sui-pageLab'>SUBJECTS:&nbsp;&nbsp;";							// Add header
+				for (i=0;i<d.field_kmaps_subjects.und.length;++i) {								// For each item
+					str+=d.field_kmaps_subjects.und[i].header;									// Add name
+					str+=this.AddDrop(d.field_kmaps_subjects.und[i].domain+"-"+d.field_kmaps_subjects.und[i].id);	// Add drop
+					if (i < d.field_kmaps_subjects.und.length-1)	str+=", ";					// Add separator
+					}
+				str+="</p>";																	// End TERMS
+				}
+			if (d.field_kmaps_places && d.field_kmaps_places.und) {								// If places
+				str+="<p class='sui-pageLab'>TERMS:&nbsp;&nbsp;";								// Add header
+				for (i=0;i<d.field_kmaps_places.und.length;++i) {								// For each item
+					str+=d.field_kmaps_places.und[i].header;									// Add name
+					str+=this.AddDrop(d.field_kmasp_places.und[i].domain+"-"+d.field_kmaps_places.und[i].id);	// Add drop
+					if (i < d.field_kmaps_places.und.length-1)	str+=", ";						// Add separator
+					}
+				str+="</p>";																	// End PLACES
+				}
+			if (d.field_kmap_terms && d.field_kmap_terms.und) {									// If terms
+				str+="<p class='sui-pageLab'>TERMS:&nbsp;&nbsp;";								// Add TERMS header
+				for (i=0;i<d.field_kmap_terms.und.length;++i) {									// For each item
+					str+=d.field_kmap_terms.und[i].header;										// Add name
+					str+=this.AddDrop(d.field_kmap_terms.und[i].domain+"-"+d.field_kmap_terms.und[i].id);	// Add drop
+					if (i < d.field_kmap_terms.und.length-1)	str+=", ";						// Add separator
+					}
+				str+="</p>";																	// End TERMS
+				}
+			if (d.biblio_url) str+="<p class='sui-pageLab'>URL:&nbsp;&nbsp;<a target='_blank' href='"+d.biblio_url+"'>"+d.biblio_url+"</a></p>";	// URL
+			$("#sui-sources").append(str);
 			});									
 	}
 
@@ -425,20 +455,30 @@ class Pages  {
 			str+="<div style='width:calc(49% - 24px);display:inline-block;margin-right:16px;vertical-align:top;height:100%;'>";
 				try{ str+=d(sui.assets[o.asset_type].g,"CAPTION",o.title[0],"Untitled"); } catch(e){}
 				str+="<hr>";
-				try{ str+=d("&#xe600","CREATOR",o.creator); } catch(e){}
+				try{ str+=d("&#xe600","CREATOR",o.creator) } catch(e){}
 				try{ str+=d("&#xe62a","TYPE",j.field_image_type.und[0].value.charAt(0).toUpperCase()+j.field_image_type.und[0].value.slice(1)); } catch(e){}
 				try{ str+=d("&#xe665","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
 				str+="<hr>";
+				try{ str+="<p class='sui-pageLab'>";
+					for (i=0;i<j.field_image_descriptions.und.length;++i) 							// For each note
+						str+=j.field_image_descriptions.und[i].title+"<br>";						// Add it
+					str+="</p>";  } catch(e){}
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>ONLY DIGITAL</span>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
 					 str+="&nbsp;&nbsp;<span class='sui-pageLab'>COLOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"+"</span>"; } catch(e){}
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>QUALITY</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_quality.und[0].value+"</span>&nbsp;&nbsp;<span class='sui-pageLab'>ROTATION</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_rotation.und[0].value+"&deg;</span></p>"; } catch(e){}
+				try{ str+=d("&#xe665","PHYSICAL SIZE",j.field_physical_size.und[0].value); } 	catch(e){}
+				try{ str+=d("&#xe659","CAPURE DEVICE",j.field_image_capture_device.und[0].value); } 	catch(e){}
+				try{ str+=d("&#xe65f","MATERIALS",j.field_image_materials.und[0].value); } 				catch(e){}
 				str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
-				try{ str+=d("&#xe659","CAPURE DEVICE",j.field_image_capture_device.und[0].value); } catch(e){}
+				try{ str+=d("&#xe66c","ENHANCEMENT",j.field_image_enhancement.und[0].value); } 			catch(e){}
 				try{ str+="<p>&#xe62B&nbsp;&nbsp;<span class='sui-pageLab'>LOCATION</span>:&nbsp;&nbsp;"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;";
 				  	 str+=j.field_latitude.und[0].value+"</p>"; } catch(e){}
-				try{ str+=d("&#xe634","SUBJECT",j.field_keywords.und[0].value); } catch(e){}
-				try{ str+=d("&copy;","COPYRIGHT HOLDER",j.field_copyright_holder.und[0].value); } catch(e){}
-				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } catch(e){}
+				try{ str+=d("&#xe634","SUBJECT",j.field_keywords.und[0].value); } 						catch(e){}
+				try{ str+=d("&copy;","COPYRIGHT HOLDER",j.field_copyright_holder.und[0].value); } 		catch(e){}
+				try{ str+=d("&copy;","COPYRIGHT STATEMENT",j.field_copyright_statement.und[0].value); } catch(e){}
+				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } 	catch(e){}
+				try{ str+=d("&#xe678","IMAGE&nbsp;NOTES",j.field_image_descriptions.und[0].title); } 	catch(e){}
+				try{ str+=d("&#xe678","TECHNICAL&nbsp;NOTES",j.field_technical_notes.und[0].value); } 	catch(e){}
 				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } catch(e){}
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>LICENSE</span>:&nbsp;&nbsp;<span class='sui-pageVal'><a style='font-weight:400' target='_blank' href='"+j.field_license_url.und[0].value+"'>"+j.field_license_url.und[0].value+"</a>" } catch(e){} 
 				str+="</div></div>";
