@@ -44,7 +44,7 @@ class AudioVideo  {
 			<div title='Duration'>&#xe61c&nbsp;&nbsp;&nbsp;${o.duration_s}</div>
 			<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published `;
 			if (d.field_year_published && d.field_year_published.en)	str+=+d.field_year_published.en[0].value;
-			else if (o.node_created)									str+=o.node_created.substr(0,9);
+			else if (o.node_created) 									str+=sui.pages.FormatDate(o.node_created);
 			str+=`</div></div>
 			<div style='display:inline-block;vertical-align:top;width:calc(100% - 270px)'>`;
 				try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
@@ -157,7 +157,6 @@ class AudioVideo  {
 			$("#sui-kplayer").height($(this.div).width()*0.5*.5625);							// Set height based on aspect ratio
 			this.DrawTranscriptMenu();															// Draw transcripts header	
 			this.DrawTransContent();															// Draw the transcipt content
-			trace(res,data);
 		});																						// AJAX closure
 	}
 
@@ -165,7 +164,7 @@ class AudioVideo  {
 	{
 		var res=this.transRes;																	// Point at res
 		var str=`<div style='display:inline-block;width:calc(50% - 24px);margin-left:12px;vertical-align:top; min-width:350px;'>
-			<div id='sui-transTab0' class='sui-transTab' title='Options'>&#xe66f</div>
+			<div id='sui-transTab0' class='sui-transTab' title='Options'>&#xe66f&#xe609</div>
 			<div id='sui-transTab1' class='sui-transTab' title='Play/Pause'>&#xe641</div>
 			<div id='sui-transTab2' class='sui-transTab' title='Previous line'>&#xe602</div>
 			<div id='sui-transTab3' class='sui-transTab' title='Same line'>&#xe632</div>

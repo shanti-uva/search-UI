@@ -138,6 +138,14 @@ class Pages  {
 		return str.replace(/\t|\n|\r/g,"");
 	}
 
+	FormatDate(date)																		// FRIENDLY FORMAT OF DATE
+	{
+		let m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];		// Array of mos
+		let d=new Date(date);																	// Parse date
+		if (d)	date=d.getDate()+" "+m[d.getMonth()]+ " "+d.getFullYear();						// Remake it
+		return date;
+	}		
+
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TEXT
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,7 +251,7 @@ class Pages  {
 		var d=this.DrawItem;																	// Point at item drawer
 	
 		function drawDetails(j) {																// Draw details
-			var shivaNode=$.parseJSON(j.shivanode_json.und[0].value);
+			var shivaNode=$.parseJSON(j.shivanode_json.und[0].value);							// Get shiva data
 			var wid=shivaNode.width ? shivaNode.width+"px" : "100%";							// If width set use it 
 			var hgt=shivaNode.height ? shivaNode.height+"px" : "calc(100% - 155px)";			// Height 
 			var src=shivaNode.dataSourceUrl ? shivaNode.dataSourceUrl : "";						// Data source
@@ -251,14 +259,41 @@ class Pages  {
 			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></iframe><br>`;	
 	
 			str+="<div class='sui-sources' style='padding-top:0'>";
-			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTIONCOLLECTION",o.collection_title,"None")+"</div>";
+			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
 			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
-			try{ str+=d("&#x632a","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
+			try{ str+=d("&#x65f","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
+			try{ str+=d("&#xe60c","DATE",o.node_created.substr(0,10)) } catch(e){}
 			try{ str+="&#xe600&nbsp;&nbsp;<span class='sui-pageLab'>CREATOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>";
 				str+=(o.node_user_full) ? o.node_user_full+"&nbsp;&nbsp" : "" +"";
 				str+=(o.node_user) ? o.node_user : ""; str+="</span>"; } catch(e) {}
-			try{ str+=d("&#xe60c","DATE",o.node_created.substr(0,10)) } catch(e){}
+				if (j.field_kmaps_subjects && j.field_kmaps_subjects.und) {							// If subjects
+					str+="<p class='sui-pageLab'>SUBJECTS:&nbsp;&nbsp;";							// Add header
+					for (i=0;i<j.field_kmaps_subjects.und.length;++i) {								// For each item
+						str+=j.field_kmaps_subjects.und[i].header;									// Add name
+						str+=this.AddDrop(j.field_kmaps_subjects.und[i].domain+"-"+j.field_kmaps_subjects.und[i].id);	// Add drop
+						if (i < j.field_kmaps_subjects.und.length-1)	str+=", ";					// Add separator
+						}
+					str+="</p>";																	// End TERMS
+					}
+				if (j.field_kmaps_places && j.field_kmaps_places.und) {								// If places
+					str+="<p class='sui-pageLab'>TERMS:&nbsp;&nbsp;";								// Add header
+					for (i=0;i<j.field_kmaps_places.und.length;++i) {								// For each item
+						str+=j.field_kmaps_places.und[i].header;									// Add name
+						str+=this.AddDrop(j.field_kmaps_places.und[i].domain+"-"+j.field_kmaps_places.und[i].id);	// Add drop
+						if (i < j.field_kmaps_places.und.length-1)	str+=", ";						// Add separator
+						}
+					str+="</p>";																	// End PLACES
+					}
+				if (j.field_kmap_terms && j.field_kmap_terms.und) {									// If terms
+					str+="<p class='sui-pageLab'>TERMS:&nbsp;&nbsp;";								// Add TERMS header
+					for (i=0;i<j.field_kmap_terms.und.length;++i) {									// For each item
+						str+=j.field_kmap_terms.und[i].header;										// Add name
+						str+=this.AddDrop(j.field_kmap_terms.und[i].domain+"-"+j.field_kmap_terms.und[i].id);	// Add drop
+						if (i < j.field_kmap_terms.und.length-1)	str+=", ";						// Add separator
+						}
+					str+="</p>";																	// End TERMS
+					}		
 			if (src) 		str+="<p>&#xe678&nbsp;&nbsp;<a target='_blank' href='"+src+"'>External spreadsheet</a></p>"; 
 			if (o.caption)	str+=o.caption;		
 	
@@ -375,7 +410,7 @@ class Pages  {
 				str+="<p class='sui-pageLab'>TERMS:&nbsp;&nbsp;";								// Add header
 				for (i=0;i<d.field_kmaps_places.und.length;++i) {								// For each item
 					str+=d.field_kmaps_places.und[i].header;									// Add name
-					str+=this.AddDrop(d.field_kmasp_places.und[i].domain+"-"+d.field_kmaps_places.und[i].id);	// Add drop
+					str+=this.AddDrop(d.field_kmaps_places.und[i].domain+"-"+d.field_kmaps_places.und[i].id);	// Add drop
 					if (i < d.field_kmaps_places.und.length-1)	str+=", ";						// Add separator
 					}
 				str+="</p>";																	// End PLACES
