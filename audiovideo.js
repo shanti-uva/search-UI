@@ -94,10 +94,23 @@ class AudioVideo  {
 					str+="</p>"; } catch(e) {}
 				try{ str+="<p><b>RECORDING LOCATION</b>:&nbsp;&nbsp;"+d.field_recording_location_new.und[0].header+sui.pages.AddDrop(d.field_recording_location_new.und[0].domain+"-"+d.field_recording_location_new.und[0].id)+"</p>"; } catch(e) {}
 				try{ str+="<p'><b>LANGUAGE</b>:&nbsp;&nbsp;"+d.field_language_kmap.und[0].header+sui.pages.AddDrop(d.field_language_kmap.und[0].domain+"-"+d.field_language_kmap.und[0].id)+"</p>"; } catch(e) {}
+				try{ str+="<p'><b>TIME PERIOD</b>:&nbsp;&nbsp;"+o.duration_s+"</p>"; } catch(e) {}
 				try{ str+="<p><b>TERMS</b>:&nbsp;&nbsp;"+d.field_terms.und[0].header+"</p>"; } catch(e) {}
 				try{ str+="<p><b>COPYRIGHT OWNER</b>:&nbsp;&nbsp;"+d.field_copyright_owner.en[0].value+"</p>"; } catch(e) {}
+				try{ str+="<p><b>YEAR PUBLISHED</b>:&nbsp;&nbsp;"+d.field_year_published.en[0].value+"</p>"; } catch(e) {}
+				try{ str+="<p><b>RIGHTS SUMMARY</b>:&nbsp;&nbsp;"+d.field_pbcore_rights_summary.en[0].value+"</p>"; } catch(e) {}
 				try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
 				content[0]=str; 
+				str="";
+				try{ str+="<p><b>CREATOR</b>:&nbsp;&nbsp;"+o.creator+"</p>"; } catch(e) {}
+				try{ str+="<p><b>DATA ENTRY</b>:&nbsp;&nbsp;"+o.node_user_full_s+"</p>"; } catch(e) {}
+				content[1]=str; 
+	
+
+
+
+				
+				
 				showTab(0);
 				sui.pages.DrawRelatedAssets(o);														// Draw related assets menu if active
 				
@@ -259,7 +272,7 @@ class AudioVideo  {
 	}
 	
 	
-	DrawTransContent()																		// DRAW TRANSCRIPT CONTENNT IN WINDOW
+	DrawTransContent()																		// DRAW TRANSCRIPT CONTENT IN WINDOW
 	{
 		var i,lang,str="";
 		var res=this.transRes;																	// Point at res
@@ -274,7 +287,7 @@ class AudioVideo  {
 				style='margin:${(res.rev) ? "0 150px 0 0" : "0  0 0 150px"}'>`;										
 				for (lang in res.languages)  													// For each language
 					if (res.segs[i][lang] && res.languages[lang])								// If something there and checked
-						str+="<div>"+res.segs[i][lang]+"</div>";								// Add transcription	
+						str+=res.segs[i][lang]+"<hr style='margin:0;border-top:1px dashed #eee'>";	// Add transcription and dividing line	
 				str+="</div></div>";															// Close box and seg
 				}
 			}
@@ -291,8 +304,8 @@ class AudioVideo  {
 				style='margin:${(res.rev) ? "0 150px 0 0" : "0  0 0 150px"}'>`;										
 				for (lang in res.languages)  													// For each language
 					if (res.segs[i][lang] && res.languages[lang])								// If something there and checked
-						str+="<div>"+res.segs[i][lang]+"</div>";								// Add transcription	
-				str+="</div></div>";															// Close box and seg
+						str+=res.segs[i][lang]+"<hr style='margin:0;border-top:1px dashed #eee'>";	// Add transcription and dividing line	
+					str+="</div></div>";															// Close box and seg
 				}
 			}
 		$("#sui-trans").html(str.replace(/\t|\n|\r/g,""));										// Add transcript to div
