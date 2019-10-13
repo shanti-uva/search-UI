@@ -188,7 +188,7 @@
 .sui-sources {		max-width:900px; margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
 					border-radius:6px; padding:50px; font-weight:400;
 					}
-.sui-sourceText	{	font-family:"EB Garamond",serif; font-weight:400; line-height:24px; font-size:17px; 
+.sui-sourceText	{	font-family:"EB Garamond",serif,shanticon; font-weight:400; line-height:24px; font-size:17px; 
 					}
 .sui-termSpeak {	border-radius:16px; background-color:#f8f8f8; border:1px-solid #999; padding:4px; color:#000;
 					}
@@ -261,8 +261,13 @@
 .sui-transPlay {	color:#fff; font-size:20px; cursor:pointer; border-radius:6px; width:90px; height:26px;
 					padding:2px 0 0 4px; background-color:#bbb; margin: 6px 44px 0 0; }
 					.sui-transPlay:hover { background-color: #999;
+					}
+.sui-popover {		position:absolute; width:300px; min-height: 100px; padding:12px; font-size:13px; border-radius: 4px;
+					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); 
 					}					
-
+.sui-popItem:hover{ color:#a4baec
+					}								
+				
 /* PSUEDO ELEMENTS */
 
 .sui-main ::-webkit-scrollbar { width: 10px; height:8px } 

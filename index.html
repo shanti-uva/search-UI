@@ -34,8 +34,9 @@ sui.pages=new Pages();																	// Alloc pages (standalone)s
 sui.av=new AudioVideo();																// Alloc AV (standalone)
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	sui.QueryFacets();
-	});
+	sui.Draw("simple");
+	sui.GetKmapFromID("terms-4525",(kmap)=>{ sui.SendMessage("",kmap); }); // Get kmap and show page
+});
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
 	{

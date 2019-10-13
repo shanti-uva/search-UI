@@ -191,6 +191,8 @@ class SearchUI  {
 			else if (this.facets[id].type == "tree")	this.DrawFacetTree(id);						// Open tree editor				
 			else										this.DrawFacetList(id);						// Draw list editor
 			});
+
+		$("#sui-results").on("click",()=>{ $("#sui-popover").remove(); });							// ON CLICK OF RESULTS PAGE 
 		}
 
 	Draw(mode)																					// DRAW SEARCH

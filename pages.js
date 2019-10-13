@@ -1,10 +1,11 @@
 /* MANDALA PAGE DISPLAY
 
 	Requires: 	jQuery 												// Almost any version should work
-	Calls:		seachui.js											// Other JS modules that are dynamically loaded (not ued in plain search)
+	Calls:		seachui.js, audiovideo.js, places.js				// Other JS modules that are dynamically loaded (not ued in plain search)
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 				https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css				
 	JS:			ECMA-6												// Uses lambda (arrow) functions
+	Images:		popover.png
 	Globals:	sui													// Declared globally
 */
 
@@ -16,10 +17,12 @@ class Pages  {
 		this.relatedBase=null;																	// Holds based kmap for related
 		this.curRelatedType="Home";																// Holds current related category
 		this.lastMode=sui.ss.mode;																// Previous search mode
+		this.curKmap=null;																		// Currently active page kmap
 	}
 
 	Draw(kmap)																				// DRAW KMAP PAGE
 	{
+		this.curKmap=kmap;																		// Set active page's map
 		this.DrawHeader(kmap);																	// Draw header
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
 		if (sui.ss.mode == "related") {															// If browsing related pages
@@ -130,13 +133,63 @@ class Pages  {
 		return str+"</span></p>";																// Return item
 	}
 
-	AddDrop(id)																				// ADD KMAP DROP DOWN
+	AddDrop(id)																				// ADD KMAP POPOVER
 	{
-		let str=`&nbsp;<span style='width:11px;font-size:8px;height:11px;color:#fff;padding-left:7px;line-height:normal;cursor:pointer;
-		border-radius:2px;background-color:#5a65d1;display:inline-block' title='KMap popdown happens here: (${id})'>
-		&#xe627</span>`;	
-		return str.replace(/\t|\n|\r/g,"");
+		return "&nbsp;<img src='popover.png' onmouseenter='sui.pages.ShowPopover(\""+id+"\",event)'>";	// Add image call to show popover
 	}
+
+	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
+	{
+		var i;
+		$("#sui-popover").remove();																// Remove old one
+		var pos=$(event.target).position();														// Get position of icon
+		let str=`<div id='sui-popover' class='sui-popover' 
+		style='top:${pos.top+24}px;left:${pos.left-150}px'>
+		<div style='width:0;height:0;border-left:10px solid transparent;
+		border-right:10px solid transparent;border-bottom:10px solid #999;
+		margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
+		<div style='width:0;height:0;border-left:8px solid transparent;
+		border-right:8px solid transparent;border-bottom:10px solid #fff;
+		margin-left:calc(50% - 8px)'</div>
+		</div>`;
+		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+	
+		sui.GetKmapFromID(id,(o)=>{ 
+			let str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
+			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
+			<span style='font-size:12px;'>
+				For more information about this ${o.asset_type.toLowerCase().slice(0,-1)}, see Full Entry below.<br>
+				<b><p>${o.asset_type}: </b>`;
+				for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
+					str+=`<span class='sui-crumb' style='color:#000099' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
+					${o.ancestors_txt[i]}</span>`;											
+					if (i < o.ancestors_txt.length-2)	str+=" / ";									// Add separator
+					}
+				str+=`</p></span><br>
+				<div style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
+				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
+				<p class='sui-popItem' id='sui-pop-${id}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
+				<p class='sui-popItem' style='cursor:pointer'>&#xe634&nbsp;&nbsp;Related Subjects (1)</p>
+				<p class='sui-popItem' style='cursor:pointer'>&#xe62a&nbsp;&nbsp;Related Images (32)</p>
+				</div>`;
+			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
+
+			$("[id^=sui-pop-]").on("click",(e)=> {												// ON ITEM CLICK
+				var id=e.currentTarget.id.substring(8).toLowerCase();							// Get id
+				sui.ss.mode="related";															// Related mode
+				this.relatedBase=this.curKmap;													// Set base
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				});
+	
+			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
+				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
+				sui.ss.mode="related";															// Related mode
+				this.relatedBase=this.curKmap;													// Set base
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				});
+			});
+	}
+
 
 	FormatDate(date)																		// FRIENDLY FORMAT OF DATE
 	{
@@ -336,9 +389,14 @@ class Pages  {
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>TIBETAN:&nbsp;&nbsp<span class='sui-sourceText'>${o.name_tibt}&nbsp;&nbsp;(Tibetan script, original)</span></p>
-		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>
-		<p>PHONEME:&nbsp;&nbsp<span class='sui-sourceText'>${o.data_phoneme_ss.join(", ")}</span></p>
-		<p><span style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
+		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>`;
+		try{ str+="<p>PHONEME:&nbsp;&nbsp<span class='sui-sourceText'>";						// Add header
+			for (let i=0;i<o.data_phoneme_ss.length;++i) {										// For each item
+				str+=o.data_phoneme_ss[i]+this.AddDrop(o.related_uid_ss[i]);					// Add name and drop
+				if (i < o.data_phoneme_ss.length-1)	str+=", ";									// Add separator
+				}
+			str+="</p>"; } catch(e){trace(e)}
+		str+=`<p><span style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
 		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;

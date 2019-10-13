@@ -2,6 +2,7 @@
 
 	Requires: 	jQuery 												// Almost any version should work
 	Kaltura 	https://cfvod.kaltura.com,	//cdnapi.kaltura.com,	// Kaltura API
+	JSON:		
 */
 
 class AudioVideo  {																					
@@ -104,13 +105,7 @@ class AudioVideo  {
 				str="";
 				try{ str+="<p><b>CREATOR</b>:&nbsp;&nbsp;"+o.creator+"</p>"; } catch(e) {}
 				try{ str+="<p><b>DATA ENTRY</b>:&nbsp;&nbsp;"+o.node_user_full_s+"</p>"; } catch(e) {}
-				content[1]=str; 
-	
-
-
-
-				
-				
+				content[1]=str; 			
 				showTab(0);
 				sui.pages.DrawRelatedAssets(o);														// Draw related assets menu if active
 				
