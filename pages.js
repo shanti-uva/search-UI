@@ -168,9 +168,9 @@ class Pages  {
 				str+=`</p></span><br>
 				<div style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
 				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
-				<p class='sui-popItem' id='sui-pop-${id}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
-				<p class='sui-popItem' style='cursor:pointer'>&#xe634&nbsp;&nbsp;Related Subjects (1)</p>
-				<p class='sui-popItem' style='cursor:pointer'>&#xe62a&nbsp;&nbsp;Related Images (32)</p>
+				<p class='sui-popItem' id='sui-full-${id}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
+				<p class='sui-popItem' id='sui-pop-${id}' style='cursor:pointer'>&#xe634&nbsp;&nbsp;Related Subjects (1)</p>
+				<p class='sui-popItem'id='sui-pop-${id}'  style='cursor:pointer'>&#xe62a&nbsp;&nbsp;Related Images (32)</p>
 				</div>`;
 			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
 
@@ -178,13 +178,30 @@ class Pages  {
 				var id=e.currentTarget.id.substring(8).toLowerCase();							// Get id
 				sui.ss.mode="related";															// Related mode
 				this.relatedBase=this.curKmap;													// Set base
-				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
+				$("#sui-headLeft").html(str);													// Add to div
+				// Get real items
+				sui.DrawItems();																// Draw items																
+				sui.DrawFooter();																// Draw footer															
+				sui.ss.page=0;																	// Start at beginning
 				});
 	
+			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
+				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
+				trace(id)
+				sui.ss.mode="related";															// Related mode
+				this.relatedBase=this.curKmap;													// Set base
+				str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
+				$("#sui-headLeft").html(str);													// Add to div
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				});
+			
 			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
 				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
 				sui.ss.mode="related";															// Related mode
 				this.relatedBase=this.curKmap;													// Set base
+				str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
+				$("#sui-headLeft").html(str);													// Add to div
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				});
 			});
