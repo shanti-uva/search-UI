@@ -144,7 +144,7 @@ class Pages  {
 		$("#sui-popover").remove();																// Remove old one
 		var pos=$(event.target).position();														// Get position of icon
 		let str=`<div id='sui-popover' class='sui-popover' 
-		style='top:${pos.top+24}px;left:${pos.left-150}px'>
+		style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${pos.left-150}px'>
 		<div style='width:0;height:0;border-left:10px solid transparent;
 		border-right:10px solid transparent;border-bottom:10px solid #999;
 		margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
@@ -206,7 +206,6 @@ class Pages  {
 				});
 			});
 	}
-
 
 	FormatDate(date)																		// FRIENDLY FORMAT OF DATE
 	{
