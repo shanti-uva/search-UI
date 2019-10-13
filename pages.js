@@ -168,9 +168,9 @@ class Pages  {
 				str+=`</p></span><br>
 				<div style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
 				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
-				<p class='sui-popItem' id='sui-full-${id}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
-				<p class='sui-popItem' id='sui-pop-${id}' style='cursor:pointer'>&#xe634&nbsp;&nbsp;Related Subjects (1)</p>
-				<p class='sui-popItem'id='sui-pop-${id}'  style='cursor:pointer'>&#xe62a&nbsp;&nbsp;Related Images (32)</p>
+				<p class='sui-popItem' id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
+				<p class='sui-popItem' id='sui-pop-${o.uid}' style='cursor:pointer'>&#xe634&nbsp;&nbsp;Related Subjects (1)</p>
+				<p class='sui-popItem'id='sui-pop-${o.id}' style='cursor:pointer'>&#xe62a&nbsp;&nbsp;Related Images (32)</p>
 				</div>`;
 			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
 
@@ -188,11 +188,8 @@ class Pages  {
 	
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
-				trace(id)
 				sui.ss.mode="related";															// Related mode
 				this.relatedBase=this.curKmap;													// Set base
-				str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
-				$("#sui-headLeft").html(str);													// Add to div
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				});
 			
@@ -411,7 +408,7 @@ class Pages  {
 				str+=o.data_phoneme_ss[i]+this.AddDrop(o.related_uid_ss[i]);					// Add name and drop
 				if (i < o.data_phoneme_ss.length-1)	str+=", ";									// Add separator
 				}
-			str+="</p>"; } catch(e){trace(e)}
+			str+="</p>"; } catch(e){}
 		str+=`<p><span style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
 		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
