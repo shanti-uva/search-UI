@@ -129,7 +129,7 @@ class Pages  {
 				if (i != value.length-1)	str+=", ";											// Add separator
 				}
 			}
-		else str+=value ? value : def;															// Add def if bad value or show value
+		else str+=(value && (!value.match(/undefined/))) ? value : def;							// Add def if bad value or show value
 		return str+"</span></p>";																// Return item
 	}
 
@@ -141,6 +141,7 @@ class Pages  {
 	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
 	{
 		var i;
+		if (id && id.match(/collections-/))	return;												// No maps for collections yet
 		$("#sui-popover").remove();																// Remove old one
 		var pos=$(event.target).position();														// Get position of icon
 		let str=`<div id='sui-popover' class='sui-popover' 
@@ -169,8 +170,8 @@ class Pages  {
 				<div style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
 				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
 				<p class='sui-popItem' id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
-				<p class='sui-popItem' id='sui-pop-${o.uid}' style='cursor:pointer'>&#xe634&nbsp;&nbsp;Related Subjects (1)</p>
-				<p class='sui-popItem'id='sui-pop-${o.id}' style='cursor:pointer'>&#xe62a&nbsp;&nbsp;Related Images (32)</p>
+				<p class='sui-popItem' id='sui-pop-${o.uid}' style='cursor:pointer'><span style='color:#6faaf1'>&#xe634</span>&nbsp;&nbsp;Related Subjects (1)</p>
+				<p class='sui-popItem'id='sui-pop-${o.id}' style='cursor:pointer'><span style='color:#b49c59'>&#xe62a</span>&nbsp;&nbsp;Related Images (32)</p>
 				</div>`;
 			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
 
@@ -255,7 +256,7 @@ class Pages  {
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
 				let i,str="";
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
-				try { str+=this.DrawItem("&#xe633","COLLECTION",o.collection_title,"","sui-pageLab",1); } catch(e) {}
+				try { str+=this.DrawItem("&#xe633","COLLECTION",o.collection_title+this.AddDrop("collections-"+o.collection_nid),"","sui-pageLab",1); } catch(e) {}
 				try { str+=this.DrawItem("&#xe600","AUTHOR",d.field_book_author.und,"","sui-pageLab",1); } catch(e) {}
 				try { str+=this.DrawItem("&#xe633","YEAR PUBLISHED", d.field_dc_date_publication_year.und[0].value.substr(0,4),"","sui-pageLab",1); }		catch(e) {}
 				try { str+=this.DrawItem("&#xe633","ORIGINAL YEAR PUBLISHED", d.field_dc_date_orginial_year.und[0].value.substr(0,4),"","sui-pageLab",1); }	catch(e) {}
@@ -325,7 +326,7 @@ class Pages  {
 			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></iframe><br>`;	
 	
 			str+="<div class='sui-sources' style='padding-top:0'>";
-			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title,"None")+"</div>";
+			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title+sui.pages.AddDrop("collections-"+o.collection_nid),"None")+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
 			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
 			try{ str+=d("&#x65f","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
@@ -337,7 +338,7 @@ class Pages  {
 					str+="<p class='sui-pageLab'>SUBJECTS:&nbsp;&nbsp;";							// Add header
 					for (i=0;i<j.field_kmaps_subjects.und.length;++i) {								// For each item
 						str+=j.field_kmaps_subjects.und[i].header;									// Add name
-						str+=this.AddDrop(j.field_kmaps_subjects.und[i].domain+"-"+j.field_kmaps_subjects.und[i].id);	// Add drop
+						str+=sui.pages.AddDrop(j.field_kmaps_subjects.und[i].domain+"-"+j.field_kmaps_subjects.und[i].id);	// Add drop
 						if (i < j.field_kmaps_subjects.und.length-1)	str+=", ";					// Add separator
 						}
 					str+="</p>";																	// End TERMS
@@ -346,7 +347,7 @@ class Pages  {
 					str+="<p class='sui-pageLab'>TERMS:&nbsp;&nbsp;";								// Add header
 					for (i=0;i<j.field_kmaps_places.und.length;++i) {								// For each item
 						str+=j.field_kmaps_places.und[i].header;									// Add name
-						str+=this.AddDrop(j.field_kmaps_places.und[i].domain+"-"+j.field_kmaps_places.und[i].id);	// Add drop
+						str+=sui.pages.AddDrop(j.field_kmaps_places.und[i].domain+"-"+j.field_kmaps_places.und[i].id);	// Add drop
 						if (i < j.field_kmaps_places.und.length-1)	str+=", ";						// Add separator
 						}
 					str+="</p>";																	// End PLACES
@@ -355,7 +356,7 @@ class Pages  {
 					str+="<p class='sui-pageLab'>TERMS:&nbsp;&nbsp;";								// Add TERMS header
 					for (i=0;i<j.field_kmap_terms.und.length;++i) {									// For each item
 						str+=j.field_kmap_terms.und[i].header;										// Add name
-						str+=this.AddDrop(j.field_kmap_terms.und[i].domain+"-"+j.field_kmap_terms.und[i].id);	// Add drop
+						str+=sui.pages.AddDrop(j.field_kmap_terms.und[i].domain+"-"+j.field_kmap_terms.und[i].id);	// Add drop
 						if (i < j.field_kmap_terms.und.length-1)	str+=", ";						// Add separator
 						}
 					str+="</p>";																	// End TERMS
@@ -542,17 +543,20 @@ class Pages  {
 				if (o.kmapid_strict[i].match(/subjects/))	subjects.push(o.kmapid_strict_ss[i]+this.AddDrop(o.kmapid_strict[i]));
 				}
 		} catch(e) {}
+	
 		str=`<table class='sui-imageMid'>
 			<tr class='sui-pageLab' style='font-size:16px;padding-bottom:4px'><td style='width:50%'>MANDALA COLLECTIONS</td><td>CLASSIFICATION</td></tr>
-			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;${o.collection_title ? o.collection_title : "None"}</td><td>`;
+			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;${o.collection_title ? o.collection_title+this.AddDrop("collections-"+o.collection_nid) : "None"}</td><td>`;
 			if (subjects.length) {																// If subjects	
-				str+="&#xe634&nbsp;&nbsp";														// Add icon
-				for (i=0;i<subjects.length;++i) str+=subjects[i]+"<br>";						// Add item
+				str+="<span style='color:#cc4c39'>&#xe634</span>&nbsp;&nbsp";					// Add icon
+				for (i=0;i<subjects.length;++i) str+=subjects[i]+", ";							// Add item
+				str=str.slice(0,-2)+"<br>";														// Remove last comma
 				}	
 			if (places.length) {																// If places	
-				str+="&#xe62b&nbsp;&nbsp";														// Add icon
-				for (i=0;i<subjects.length;++i) str+=subjects[i]+"<br>";						// Add item
-				}	
+				str+="<span style='color:#cc4c39'>&#xe62b</span>&nbsp;&nbsp";					// Add icon
+				for (i=0;i<places.length;++i) str+=places[i]+", ";								// Add item
+				str=str.slice(0,-2)+"<br>";														// Remove last comma
+			}	
 			str+="</td></tr></table>";
 
 		var d=this.DrawItem;																	// Point at item drawer

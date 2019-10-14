@@ -903,7 +903,6 @@ class SearchUI  {
 				if ((type == "features") ||  (type == "languages")) type="subjects";				// Features and languages are in subjects
 				var url=sui.solrUtil.buildQuery(base,type,path,lvla,lvla);							// Build query using Yuji's builder
 				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
-					trace(res)	
 					var o,i,re,f="";
 					var str="<ul>";																	// Wrapper, show if not initting
 					if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
