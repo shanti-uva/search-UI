@@ -26,11 +26,10 @@
             var searchstring = $('input#search').val();
             var state = {
                 "page": 0,																			// Current page being shown
-                "pageSize": 10,
+                "pageSize": 100,
                 "query": { "text": searchstring }
             };
             // var url = util.createBasicQuery(state, [ "xplaces", "xfeature_types", "beetle" ], [ "xplaces:lha"]);
-
             var url = util.createKmapQuery(searchstring);
             $.ajax({
                     url: url, dataType: 'jsonp', jsonp: 'json.wrf',
