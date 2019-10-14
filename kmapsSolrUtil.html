@@ -29,7 +29,9 @@
                 "pageSize": 10,
                 "query": { "text": searchstring }
             };
-            var url = util.createBasicQuery(state);
+            // var url = util.createBasicQuery(state, [ "xplaces", "xfeature_types", "beetle" ], [ "xplaces:lha"]);
+
+            var url = util.createKmapQuery(searchstring);
             $.ajax({
                     url: url, dataType: 'jsonp', jsonp: 'json.wrf',
                     success: function (data) {

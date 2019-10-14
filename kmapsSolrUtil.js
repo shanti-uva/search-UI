@@ -288,29 +288,44 @@ class KmapsSolrUtil {
             fq_array.push(this.buildFq(state.query.assets, "asset_type", "id"));
         }
 
+
+        var kmapid = "*";
+        if (state.query.kmapid) {
+            kmapid = state.query.kmapid;
+        }
         // console.log(JSON.stringify (fq_array, undefined, 2));
 
-        var req =
+        var basic_req = {
+            // search: tweak for scoping later
+            "q": "(" +
+                " title:${xact}^100" +
+                " title:${slashy}^100" +
+                " names_txt:${xact}^90" +
+                " title:${starts}^80" +
+                " names_txt:${starts}^70" +
+                " title:${search}^10" +
+                " caption:${search}" +
+                " summary:${search}" +
+                " names_txt:${search}" +
+                ")",
+
+            // search strings
+            "xact": searchstring,
+            "starts": starts,
+            "search": search,
+            "slashy": slashy,
+        };
+
+        var kmapid_req = {
+            "q":        "(uid:${kmapid}^100 kmapid:${kmapid})",
+            "kmapid":   kmapid
+        };
+
+        var reqbase = (kmapid)?kmapid_req:basic_req;
+
+        var req = $.extend(
+            {},
             {
-                // search: tweak for scoping later
-                "q": "(" +
-                    " title:${xact}^100" +
-                    " title:${slashy}^100" +
-                    " names_txt:${xact}^90" +
-                    " title:${starts}^80" +
-                    " names_txt:${starts}^70" +
-                    " title:${search}^10" +
-                    " caption:${search}" +
-                    " summary:${search}" +
-                    " names_txt:${search}" +
-                    ")",
-
-                // search strings
-                "xact": searchstring,
-                "starts": starts,
-                "search": search,
-                "slashy": slashy,
-
                 // generic settings (maybe tweak for efficiency later)
                 "fl": "*",
                 "wt": "json",
@@ -336,7 +351,8 @@ class KmapsSolrUtil {
                 // debug settings  -- set both to false in production?
                 "echoParams": "explicit",
                 "indent": "true"
-            };
+            },
+            reqbase);
 
         var baseurl = state.solrUrl;
         var params = new URLSearchParams(req);
@@ -355,6 +371,16 @@ class KmapsSolrUtil {
         return url;
     }
 
+    createKmapQuery(kmapid) {
+        return this.createBasicQuery (
+            {
+                query: {
+                    kmapid: kmapid
+                }
+            },
+            [ 'asset_counts']
+            );
+    }
 
     buildFq(facets, facet_field, type) {
 
@@ -455,10 +481,6 @@ class KmapsSolrUtil {
         var url = new URL(baseurl + "?" + params.toString());
         return url;
     }
-
-
-
-
 	
 	buildQuery(termIndexRoot, type, path, lvla, lvlb) 
 	{
