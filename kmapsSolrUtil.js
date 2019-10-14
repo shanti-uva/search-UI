@@ -28,7 +28,7 @@ class KmapsSolrUtil {
             "sort": "Alpha",
             "type": "All",
             "page": 0,																			// Current page being shown
-            "pageSize": 10,																	// Results per page
+            "pageSize": 100,																	// Results per page
             "query": { 																		// Current query
                 "text": "",																			// Search word
                 "places": [],																			// Places
