@@ -178,10 +178,50 @@ class AudioVideo  {
 			<div id='sui-transTab3' class='sui-transTab' title='Same line'>&#xe632</div>
 			<div id='sui-transTab4' class='sui-transTab' title='Next line'>&#xe604</div>
 			<div id='sui-transTab5' class='sui-transTab' style='border:none' title='Search transcript'>&#xe623</div>
+			<div id='sui-transSrc' class='sui-transSrc'>
+				<div style='display:inline-block;margin:14px 0 0 16px;user-select:none'>
+					<div id='sui-transSrcB' style='display:inline-block;color:#fff;;font-size:20px;cursor:pointer' title='Previous result'>&#xe640</div>
+					<div id='sui-transSrcN' style='display:inline-block;color:#fff;margin:0 16px;font-size:12px;cursor:pointer;vertical-align:4px'>0 of 0</div>
+					<div id='sui-transSrcF' style='display:inline-block;color:#fff;font-size:20px;cursor:pointer' title='Previous result'>&#xe641</div>
+					</div>
+				<div id='sui-transSrcGo' class='sui-search4' style='float:right;margin:12px 16px 0 0'>&#xe623</div>
+				<div class='sui-search1' style='float:right;margin-top:12px'>
+					<input type='text' id='sui-transSrcInp' class='sui-search2' placeholder='Search this transcript'>
+					<div id='sui-clear' class='sui-search3'>&#xe610</div>
+				</div>
+				</div>
 			<div id='sui-transOps' class='sui-transOps'></div>
 			<div id='sui-trans' class='sui-trans'></div>
 		</div>`;
-		$(this.div).append(str.replace(/\t|\n|\r/g,""))
+		$(this.div).append(str.replace(/\t|\n|\r/g,""));
+		
+		var curHit=0,hits=[];																	// Holds search hits
+
+		$("#sui-transSrcGo").on("click", ()=>{													// ON SEARCH
+			let i,r,lang;
+			hits=[]; 	curHit=0;																// Reset hits
+		
+			if ($("#sui-transSrcInp").val()) {													// If a valid term
+				r=RegExp($("#sui-transSrcInp").val(),"i");										// Turn into regex
+				for (i=0;i<res.segs.length;++i) 												// For each seg
+					for (lang in res.languages) 												// For each language
+						if (res.segs[i][lang] && res.segs[i][lang].match(r)) hits.push(i);		// If something there 
+				}
+			show();																				// Show status
+			});
+	
+		$("#sui-transSrcInp").on("change", ()=>{ $("#sui-transSrcGo").trigger("click"); });		// ON TEXT CHANGED
+		$("#sui-transSrcB").on("click",    ()=>{ curHit=Math.max(0,curHit-1); show();	});		// ON PREVIOUS
+		$("#sui-transSrcF").on("click",    ()=>{ curHit=Math.min(hits.length-1,curHit+1); show(); });	// ON NEXT
+		
+		function show() {																		// SHOW STATUS
+			var t=hits.length ? curHit+1 : 0;													// Current number
+			$("#sui-transSrcN").html(t+" of "+hits.length);										// Set number found
+			if (hits.length) {																	// If somthing
+				sui.av.curTransSeg=hits[curHit];												// Set cur seg														
+				sui.av.HighlightSeg(sui.av.curTransSeg,undefined);								// Highlight seg
+				}
+		}
 
 		str=`<div class='sui-transRow'>Transcript options<span class='sui-transCheck'
 		onclick='$("#sui-transOps").slideToggle()'>&#xe60f</span></div>
@@ -219,7 +259,8 @@ class AudioVideo  {
 			});			
 	
 		$("#sui-transTab0").on("click",()=>{ $("#sui-transOps").slideToggle(); });			// ON OPTIONS MENU CLICK
-	
+		$("#sui-transTab5").on("click",()=>{ $("#sui-transSrc").slideToggle(); });			// ON SEARCH MENU CLICK
+
 		$("#sui-transTab1").on("click", ()=> {												// ON PLAY CLICK
 			clearInterval(this.transTimer);													// Kill timer
 			if (this.inPlay) $("#sui-kplayer")[0].sendNotification("doPause");				// Pause
@@ -325,7 +366,7 @@ class AudioVideo  {
 				clearInterval(this.transTimer);													// Kill timer
 				$("#sui-kplayer")[0].sendNotification("doPause");								// Pause video	
 				this.playEnd=0;																	// Clear end
-				return;	
+				return;																			// Quit
 				}
 			for (i=0;i<res.segs.length;++i) {													// For each seg
 				if ((now >= res.segs[i].start) && (now < res.segs[i].end)) {					// In this one
@@ -333,18 +374,21 @@ class AudioVideo  {
 					break;																		// Quit looking
 					}
 				}
-			if (this.curTransSeg > 0) {															// Not the prelude
-				i=$(`#sui-trans${res.layout == "Minimal" ? "Min" : ""}Seg-${this.curTransSeg}`).position().top-$(`#sui-trans${res.layout == "Minimal" ? "Min" : ""}Seg-0`).position().top;	// Get offset to top seg
-				if (start == undefined)	 $("#sui-trans").scrollTop(i-this.scrollStart);			// Scroll to position if not playing a particular seg
-				}							
-			$("[id^=sui-transSeg-]").css("background-color","#ddd");							// All backgrounds off
-			$("[id^=sui-transMinSeg-]").css("border-color","#fff");								// All borders off
-			$("[id^=sui-transMinSeg-]").css("background-color","#fff");							// All backgrounds off
-			$("#sui-transMinSeg-"+this.curTransSeg).css("border-color","#999");					// Hilite active one				
-			$("#sui-transMinSeg-"+this.curTransSeg).css("background-color","#eee");				// Hilite active one				
-			$("#sui-transSeg-"+this.curTransSeg).css("background-color","#aaa");				// Hilite active one				
-		},100);
-		}		
+			if (this.curTransSeg > 0) this.HighlightSeg(this.curTransSeg,start);				// Highlight seg if note prelude
+			},100);																				// Time ~10fps
+	}		
+
+	HighlightSeg(num, start)																	// HIGHLIGHT A SEGMENT
+	{
+		let t=$(`#sui-trans${this.transRes.layout == "Minimal" ? "Min" : ""}Seg-${num}`).position().top-$(`#sui-trans${this.transRes.layout == "Minimal" ? "Min" : ""}Seg-0`).position().top;	// Get offset to top seg
+		if (start == undefined)	 $("#sui-trans").scrollTop(t-this.scrollStart);					// Scroll to position if not playing a particular seg
+		$("[id^=sui-transSeg-]").css("background-color","#ddd");								// All backgrounds off
+		$("[id^=sui-transMinSeg-]").css("border-color","#fff");									// All borders off
+		$("[id^=sui-transMinSeg-]").css("background-color","#fff");								// All backgrounds off
+		$("#sui-transMinSeg-"+num).css("border-color","#999");									// Hilite active one				
+		$("#sui-transMinSeg-"+num).css("background-color","#eee");								// Hilite active one				
+		$("#sui-transSeg-"+num).css("background-color","#aaa");									// Hilite active one				
+	}
 
 	TimecodeToSeconds(timecode) 															// CONVERT TIMECODE TO SECONDS
 	{

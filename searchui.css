@@ -238,6 +238,8 @@
 .sui-transOps {		position:absolute; background-color:#f7f7f7; border:1px solid #999; border-radius: 0 0 6px 6px; 
 					display:none; width:180px; font-size: 13px; 
 					}
+.sui-transSrc {		background-color:#999; display:none; height:55px; width:calc(100% - 1px);
+					}
 .sui-transRow {		padding:5px 12px 5px 24px; cursor:pointer; }	.sui-transRow:hover{ background-color:#eee;
 					}	
 .sui-transLab {		padding:5px 12px 5px 12px; background-color:#e8e8e8; color:#333; font-weight:600; font-style:italic;

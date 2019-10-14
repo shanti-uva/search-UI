@@ -254,6 +254,7 @@ class Pages  {
 			content[2]=s.replace(/\t|\n|\r/g,"");												// Set view content
 
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
+				trace(d)
 				let i,str="";
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
 				try { str+=this.DrawItem("&#xe633","COLLECTION",o.collection_title+this.AddDrop("collections-"+o.collection_nid),"","sui-pageLab",1); } catch(e) {}
@@ -290,7 +291,8 @@ class Pages  {
 				try { str+=this.DrawItem("&#xe670","LANGUAGE",d.field_dc_language_original.und,"","sui-pageLab",1); }	catch(e) {}
 				try { str+=this.DrawItem("&copy;","RIGHTS", d.field_dc_rights_general.und,"","sui-pageLab",1); }		catch(e) {}
 				content[1]=str.replace(/\t|\n|\r/g,"");												// Set view content
-				});
+//				try{ content[2]+="<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='"+d.field_pdf_version.und[0]+"'>&#xe678&nbsp;&nbsp;View as PDF</a></p>"; } catch(e) {}
+			});
 			
 			$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
 				var id=e.currentTarget.id.substring(11);										// Get index of tab	
