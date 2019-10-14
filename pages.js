@@ -45,18 +45,32 @@ class Pages  {
 		else							this.lastMode=sui.ss.mode;								// Save last search mode
 		if (!o)							return;													// No related to show
 		if (!o.asset_type.match(/Places|Subjects|Terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
-		var k=o.asset_type;																		// Get thus asset type																	
+		var url=sui.solrUtil.createKmapQuery(o.uid);											// Get query url
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
+			var i,n,tot=0;
+			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
+				let d=data.facets.asset_counts.buckets;											// Point at bucket array
+				for (i=0;i<d.length;++i) {														// For each bucket
+					n=d[i].count;																// Get count													
+					tot+=n;																		// Add to total
+					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
+					$("#sui-rln-"+d[i].val).html(n);											// Set number
+					}
+				if (tot > 1000)	tot=Math.floor(tot/1000)+"K";									// Shorten
+				$("#sui-rln-all").html(tot);													// Set number
+				}
+			});
+
+		var k=o.asset_type;																		// Get this asset type																	
 		var n=sui.assets.All.n;																	// Get number of items in current asset
-	
 		var str=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"}'>`;														
 		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";
 		str+="<div class='sui-relatedList'>";
 		if (sui.ss.mode == "related")
 			str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
-			n=sui.assets[k].n;																	// Get number of items
-			if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
-			str+="<div class='sui-relatedItem' id='sui-rl-"+k+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> "+k+" ("+n+")</div>";
+			str+="<div class='sui-relatedItem' id='sui-rl-"+k+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
+			str+=k+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
 		str+="</div></div>";	
 		$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
@@ -154,7 +168,26 @@ class Pages  {
 		margin-left:calc(50% - 8px)'</div>
 		</div>`;
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-	
+
+		var url=sui.solrUtil.createKmapQuery(id);												// Get query url
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
+			let i,n,str="";
+			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
+				let d=data.facets.asset_counts.buckets;											// Point at bucket array
+				for (i=0;i<d.length;++i) {														// For each bucket
+					n=d[i].count;																// Get count													
+					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
+					var f=d[i].val.charAt(0).toUpperCase()+d[i].val.slice(1);					// Match assets list
+					if (f == "Audio-video") f="Audio-Video";									// Handle AV
+					str+=`<p class='sui-popItem' id='sui-pop-${id}' style='cursor:pointer'>
+					<span style='color:${sui.assets[f].c}'>${sui.assets[f].g}</span>
+					&nbsp;&nbsp;Related ${f} (${n})</p>`;
+					$("#sui-rln-"+d[i].val).html(n);											// Set number
+					}
+				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
+				}
+			});
+
 		sui.GetKmapFromID(id,(o)=>{ 
 			let str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
 			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
@@ -167,11 +200,9 @@ class Pages  {
 					if (i < o.ancestors_txt.length-2)	str+=" / ";									// Add separator
 					}
 				str+=`</p></span><br>
-				<div style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
+				<div id='sui-popbot' style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
 				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
 				<p class='sui-popItem' id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
-				<p class='sui-popItem' id='sui-pop-${o.uid}' style='cursor:pointer'><span style='color:#6faaf1'>&#xe634</span>&nbsp;&nbsp;Related Subjects (1)</p>
-				<p class='sui-popItem'id='sui-pop-${o.id}' style='cursor:pointer'><span style='color:#b49c59'>&#xe62a</span>&nbsp;&nbsp;Related Images (32)</p>
 				</div>`;
 			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
 
@@ -254,7 +285,6 @@ class Pages  {
 			content[2]=s.replace(/\t|\n|\r/g,"");												// Set view content
 
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
-				trace(d)
 				let i,str="";
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
 				try { str+=this.DrawItem("&#xe633","COLLECTION",o.collection_title+this.AddDrop("collections-"+o.collection_nid),"","sui-pageLab",1); } catch(e) {}
