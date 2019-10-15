@@ -1,6 +1,13 @@
 /* TEXTS
 
+	This module puts up the text page based on a kmap from SOLR
+	The actual marked up text come from an AJAX call to Drupal
+
 	Requires: 	jQuery 												// Almost any version should work
+	CSS:		searchui.css										// All styles are prefixed with 'sui-'
+	JS:			ECMA-6												// Uses lambda (arrow) functions
+	JSON:		From Drupal site
+	Globals:	Looks for sui and sui.pages
 
 */
 
@@ -84,7 +91,7 @@ class Texts  {
 				try { str+=sui.pages.DrawItem("&#xe670","LANGUAGE",d.field_dc_language_original.und,"","sui-pageLab",1); }	catch(e) {}
 				try { str+=sui.pages.DrawItem("&copy;","RIGHTS", d.field_dc_rights_general.und,"","sui-pageLab",1); }		catch(e) {}
 				content[1]=str.replace(/\t|\n|\r/g,"");												// Set view content
-//				try{ content[2]+="<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='"+d.field_pdf_version.und[0]+"'>&#xe678&nbsp;&nbsp;View as PDF</a></p>"; } catch(e) {}
+				try{ content[2]+="<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='"+d.field_pdf_version.und[0].url+"'>&#xe678&nbsp;&nbsp;View as PDF</a></p>"; } catch(e) {}
 			});
 			
 			$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK

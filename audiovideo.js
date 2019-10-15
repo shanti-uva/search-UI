@@ -1,8 +1,14 @@
 /* AUDIOVIDEO
 
+	This module puts up the audio video page based on a kmap from SOLR
+	It uses the Kaltura media player to actually play the video
+	Has transcript  module that tracks video
+	CSS:		searchui.css										// All styles are prefixed with 'sui-'
+	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Requires: 	jQuery 												// Almost any version should work
-	Kaltura 	https://cfvod.kaltura.com,	//cdnapi.kaltura.com,	// Kaltura API
-	JSON:		
+	Kaltura: 	https://cfvod.kaltura.com,	//cdnapi.kaltura.com,	// Kaltura API
+	JSON:		From Drupal site
+	Globals:	Looks for sui and sui.pages
 */
 
 class AudioVideo  {																					
@@ -70,7 +76,7 @@ class AudioVideo  {
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
 					targetId:"sui-kplayer",  wid:"_"+partnerId,				uiconf_id:uiConfId,    
-					entry_id:entryId,		flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} 
+					entry_id:entryId,		 flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} 
 					});
 				kWidget.addReadyCallback(()=> {													// When ready, add icon callback
 					var kdp=document.getElementById("sui-kplayer");								// Get div

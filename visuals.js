@@ -1,6 +1,10 @@
 /* VISUALS
 
 	Requires: 	jQuery 												// Almost any version should work
+	CSS:		searchui.css										// All styles are prefixed with 'sui-'
+	JS:			ECMA-6												// Uses lambda (arrow) functions
+	JSON:		From Drupal site
+	Globals:	looks for sui and sui.pages
 
 */
 
