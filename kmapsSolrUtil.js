@@ -289,7 +289,7 @@ class KmapsSolrUtil {
         }
 
 
-        var kmapid = "*";
+        var kmapid = "";
         if (state.query.kmapid) {
             kmapid = state.query.kmapid;
         }
@@ -321,7 +321,7 @@ class KmapsSolrUtil {
             "kmapid":   kmapid
         };
 
-        var reqbase = (kmapid)?kmapid_req:basic_req;
+        var reqbase = (kmapid.length)?kmapid_req:basic_req;
 
         var req = $.extend(
             {},
