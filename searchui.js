@@ -1,4 +1,4 @@
-/* MANDALA SEARCH UI
+/* 	MANDALA SEARCH UI ****************************************************************************************************************************
 
 	When allocated, attaches a <div> framework containing a search button in the top white bar of the Mandala app.
 	When clicked, it will expand to cover the entire screen. 
@@ -22,8 +22,9 @@
 				sui=query|searchState ->							// Asks Drupul to turn search state (JSON) into SOLR query string
 				sui=close ->										// Tells Drupal search page is closed
 				-> sui=open|[searchState] 							// Open search page is to search state
-				-> sui=close										// Close search page 	
-*/
+				-> sui=close										// Close search page 
+
+**********************************************************************************************************************************************/
 
 $=jQuery;																							// For Drupal only
 
@@ -38,7 +39,6 @@ class SearchUI  {
 		this.ss={};																					// Holds search state
 		this.runMode=mode;																			// Current mode
 		this.curTree="";																			// Holds current tree open
-
 		this.facets={};																				
 		this.facets.places=			{ type:"tree",  icon:"&#xe62b", data:[] };						// Places 
 		this.facets.collections=	{ type:"list",  icon:"&#xe633", data:[] };						// Collections 
@@ -208,7 +208,6 @@ class SearchUI  {
 //  QUERY
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
 	{
 		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=uid:"+id+"&wt=json";
@@ -266,17 +265,20 @@ class SearchUI  {
 				}
 	}
 
-	Query()																						// QUERY AND UPDATE RESULTS
+	Query(relatedId)																	// QUERY AND UPDATE RESULTS
 	{
+		let url;
 		this.LoadingIcon(true,64);																	// Show loading icon
 		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
-		var url=this.solrUtil.buildAssetQuery(this.ss);
-		$("#sui-relatedAssets").remove();															// Remove relate assets panel
-		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {
+		if (relatedId)	url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
+		else			url=this.solrUtil.buildAssetQuery(this.ss);									// Get assets that match query
+		$("#sui-relatedAssets").remove();															// Remove related assets panel
+trace(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase())		
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
-			this.assets.All.n=data.response.numFound;												// Set counts
+			if (!relatedId)		this.assets.All.n=data.response.numFound;							// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			});
@@ -966,7 +968,7 @@ class SearchUI  {
 		trace("sui="+msg);																			// Show message sent on console
 		window.postMessage("sui="+msg,"*");															// Send message to drupal app
 		this.Draw("input");																			// Return to hidden mode
-		}
+	}
 
 	Popup(msg, time, x, y)																		// POPUP 
 	{

@@ -15,7 +15,8 @@ class Pages  {
 	{
 		this.div="#sui-results";																// Div to hold page
 		this.relatedBase=null;																	// Holds based kmap for related
-		this.curRelatedType="Home";																// Holds current related category
+		this.relatedType="Home";																// Holds current related category
+		this.relatedId="";																		// Holds current related id
 		this.lastMode=sui.ss.mode;																// Previous search mode
 		this.curKmap=null;																		// Currently active page kmap
 	}
@@ -73,21 +74,22 @@ class Pages  {
 			}
 		str+="</div></div>";	
 		$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
-		$("#sui-rl-"+this.curRelatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
+		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-			this.curRelatedType=e.currentTarget.id.substring(7);								// Get asset type		
-			if (this.curRelatedType == "Home")	{												// Home asset
+			this.relatedType=e.currentTarget.id.substring(7);								// Get asset type		
+			if (this.relatedType == "Home")	{												// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				this.baseMap=null;																// No base and set to home
 				this.Draw(this.relatedBase);													// Show
 				}
 			else{
-								// Get kmaps in sui.curResults
 				sui.ss.mode="related";															// Go to related mode
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
 				str=sui.assets[k].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
 				$("#sui-headLeft").html(str);													// Add to div
+				this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;				// Set id
+				sui.Query(this.relatedId,this.relatedType);								//	 Query and show results
 				sui.DrawItems();																// Draw items																
 				sui.DrawFooter();																// Draw footer
 				sui.ss.page=0;																	// Start at beginning
@@ -150,12 +152,26 @@ class Pages  {
 					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
 					var f=d[i].val.charAt(0).toUpperCase()+d[i].val.slice(1);					// Match assets list
 					if (f == "Audio-video") f="Audio-Video";									// Handle AV
-					str+=`<p class='sui-popItem' id='sui-pop-${id}' style='cursor:pointer'>
+					str+=`<p class='sui-popItem' id='sui-pop-${id}-${f}' style='cursor:pointer'>
 					<span style='color:${sui.assets[f].c}'>${sui.assets[f].g}</span>
 					&nbsp;&nbsp;Related ${f} (${n})</p>`;
 					$("#sui-rln-"+d[i].val).html(n);											// Set number
 					}
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
+				
+				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
+					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
+					sui.ss.mode="related";														// Related mode
+					this.relatedBase=this.curKmap;												// Set base
+					this.relatedId=v[2]+"-"+v[3];												// Related id
+					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];				// Set type
+					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
+					$("#sui-headLeft").html(str);												// Add to div
+					sui.Query(this.relatedId,this.relatedType);								// Query and show results
+					sui.DrawItems();															// Draw items																
+					sui.DrawFooter();															// Draw footer															
+					sui.ss.page=0;																// Start at beginning
+					});
 				}
 			});
 
@@ -177,18 +193,6 @@ class Pages  {
 				</div>`;
 			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
 
-			$("[id^=sui-pop-]").on("click",(e)=> {												// ON ITEM CLICK
-				var id=e.currentTarget.id.substring(8).toLowerCase();							// Get id
-				sui.ss.mode="related";															// Related mode
-				this.relatedBase=this.curKmap;													// Set base
-				str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
-				$("#sui-headLeft").html(str);													// Add to div
-				// Get real items
-				sui.DrawItems();																// Draw items																
-				sui.DrawFooter();																// Draw footer															
-				sui.ss.page=0;																	// Start at beginning
-				});
-	
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
 				sui.ss.mode="related";															// Related mode
