@@ -170,7 +170,23 @@ class KmapsSolrUtil {
         };
     }
 
+    allAssets() {
+        return [
+            {id: "audio-video", title: "audio-video", bool: "OR"},
+            {id: "images", title: "images", bool: "OR"},
+            {id: "texts", title: "texts", bool: "OR"},
+            {id: "visuals", title: "texts", bool: "OR"},
+            {id: "sources", title: "texts", bool: "OR"},
+            {id: "subjects", title: "texts", bool: "OR"},
+            {id: "places", title: "texts", bool: "OR"},
+            {id: "terms", title: "texts", bool: "OR"}
+        ];
+    }
+
     createBasicQuery(state, selected_facets, filter_facet) {
+
+        const ALL_ASSETS = this.allAssets();
+
         state = $.extend(true, {}, this.defaultState, state);
 
         // process selected facets.
@@ -189,12 +205,10 @@ class KmapsSolrUtil {
             }
         }
 
-
         if ($.isEmptyObject(currentFacets)) {
             console.log("no currentFacets so using ALL facets");
             currentFacets = this.facetJSON;
         }
-
 
         var facet_fqs = [];
         // argument form [ facetname:filterstring ]
@@ -270,18 +284,9 @@ class KmapsSolrUtil {
             // handle "all" id
             for (var i = 0; i < state.query.assets.length; i++) {
 
-                console.log("asset id = " + state.query.assets[i].id);
+                // console.log("asset id = " + state.query.assets[i].id);
                 if (state.query.assets[i].id === "all") {
-                    state.query.assets =   [
-                        { id: "audio-video", title: "audio-video", bool: "OR" },
-                        { id: "images", title: "images", bool: "OR" },
-                        { id: "texts", title: "texts", bool: "OR"},
-                        { id: "visuals", title: "texts", bool: "OR"},
-                        { id: "sources", title: "texts", bool: "OR"},
-                        { id: "subjects", title: "texts", bool: "OR"},
-                        { id: "places", title: "texts", bool: "OR"},
-                        { id: "terms", title: "texts", bool: "OR"}
-                    ];
+                    state.query.assets =   ALL_ASSETS;
                 }
             }
 
@@ -371,11 +376,19 @@ class KmapsSolrUtil {
         return url;
     }
 
-    createKmapQuery(kmapid) {
+    createKmapQuery(kmapid, atype, page, pageSize ) {
+
+        const ALL_ASSETS = this.allAssets();
+        pageSize = (pageSize)?pageSize:10;
+        page = (page)?page:0;
+        var alist = (atype)?[  {id: atype, title: atype, bool: "OR"} ]:ALL_ASSETS;
         return this.createBasicQuery (
             {
+                page: page,
+                pageSize: pageSize,
                 query: {
-                    kmapid: kmapid
+                    kmapid: kmapid,
+                    assets: alist
                 }
             },
             [ 'asset_counts']
