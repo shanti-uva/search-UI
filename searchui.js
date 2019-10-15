@@ -265,20 +265,19 @@ class SearchUI  {
 				}
 	}
 
-	Query(relatedId)																	// QUERY AND UPDATE RESULTS
+	Query()																						// QUERY AND UPDATE RESULTS
 	{
 		let url;
 		this.LoadingIcon(true,64);																	// Show loading icon
 		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
-		if (relatedId)	url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
-		else			url=this.solrUtil.buildAssetQuery(this.ss);									// Get assets that match query
+		if (this.ss.mode == "related")	url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
+		else							url=this.solrUtil.buildAssetQuery(this.ss);									// Get assets that match query
 		$("#sui-relatedAssets").remove();															// Remove related assets panel
-trace(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase())		
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
-			if (!relatedId)		this.assets.All.n=data.response.numFound;							// Set counts
+			if (this.ss.mode == "related") this.assets.All.n=data.response.numFound;				// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			});

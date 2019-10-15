@@ -89,7 +89,7 @@ class Pages  {
 				str=sui.assets[k].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
 				$("#sui-headLeft").html(str);													// Add to div
 				this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;				// Set id
-				sui.Query(this.relatedId,this.relatedType);								//	 Query and show results
+				sui.Query();																	// Query and show results
 				sui.DrawItems();																// Draw items																
 				sui.DrawFooter();																// Draw footer
 				sui.ss.page=0;																	// Start at beginning
@@ -101,7 +101,7 @@ class Pages  {
 	{
 		var i;
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); });	// Close handler, release related base
+		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); sui.Query()});	// Close handler, release related base
 		if (sui.ss.mode == "related")	return;
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
@@ -164,10 +164,10 @@ class Pages  {
 					sui.ss.mode="related";														// Related mode
 					this.relatedBase=this.curKmap;												// Set base
 					this.relatedId=v[2]+"-"+v[3];												// Related id
-					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];				// Set type
+					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
 					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
 					$("#sui-headLeft").html(str);												// Add to div
-					sui.Query(this.relatedId,this.relatedType);								// Query and show results
+					sui.Query();																// Query and show results
 					sui.DrawItems();															// Draw items																
 					sui.DrawFooter();															// Draw footer															
 					sui.ss.page=0;																// Start at beginning
