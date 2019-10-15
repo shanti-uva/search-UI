@@ -30,7 +30,7 @@
                 "query": { "text": searchstring }
             };
             // var url = util.createBasicQuery(state, [ "xplaces", "xfeature_types", "beetle" ], [ "xplaces:lha"]);
-            var url = util.createKmapQuery(searchstring);
+            var url = util.createKmapQuery(searchstring,"audio-video",0,15);
             $.ajax({
                     url: url, dataType: 'jsonp', jsonp: 'json.wrf',
                     success: function (data) {
