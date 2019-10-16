@@ -1,4 +1,4 @@
-/* TEXTS
+/* 	TEXT PAGES ****************************************************************************************************************************
 
 	This module puts up the text page based on a kmap from SOLR
 	The actual marked up text come from an AJAX call to Drupal
@@ -9,7 +9,7 @@
 	JSON:		From Drupal site
 	Globals:	Looks for sui and sui.pages
 
-*/
+******************************************************************************************************************************************/
 
 class Texts  {																					
 
@@ -42,7 +42,7 @@ class Texts  {
 			</div>
 			<div class='sui-textSide' id='sui-textSide'></div></div>`;
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
-			sui.pages.DrawRelatedAssets(o);															// Draw related assets menu if active
+			sui.pages.DrawRelatedAssets(o);														// Draw related assets menu if active
 
 			content[0]=$("#shanti-texts-toc").html();											// Save toc
 			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
@@ -65,14 +65,14 @@ class Texts  {
 					str+="<p class='sui-pageLab'>&#xe62b&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;";// Add subjects header
 					for (i=0;i<o.kmapid_strict_ss.length;++i) {									// For each item
 						if (!o.kmapid_strict[i].match(/subjects/i)) continue;					// Only looking for subjects
-						str+=o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]);;			// Add name and drop
+						str+=o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]);		// Add name and drop
 						if (i < o.kmapid_strict_ss.length-1)	str+=", ";						// Add separator
 						}
 					str+="</p>";																// End SUBJECTS
 					str+="<p class='sui-pageLab'>&#xe634&nbsp;&nbsp<b>PLACES</b>:&nbsp;&nbsp;";	// Add places header
 					for (i=0;i<o.kmapid_strict_ss.length;++i) {									// For each item
 						if (!o.kmapid_strict[i].match(/places/i)) continue;						// Only looking for places
-						str+=o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]);;				// Add name and drop
+						str+=o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]);		// Add name and drop
 						if (i < o.kmapid_strict_ss.length-1)	str+=", ";						// Add separator
 						}
 					str+="</p>";																// End PLACES
@@ -107,6 +107,5 @@ class Texts  {
 			}
 		});							
 	}
-
 
 } // Texts class closure

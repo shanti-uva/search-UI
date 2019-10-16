@@ -1,4 +1,4 @@
-/* PLACES
+/* 	PLACES PAGES ****************************************************************************************************************************
 
 	Requires: 	jQuery 												// Almost any version should work
 	Images:		img/basemapicon.gif,
@@ -12,7 +12,7 @@
 
 	opt: 		Bitmapped: 1=Scale | 2=Search| 4=3D | 8=Base | 16=Layers | 32=Legend | 64=Sketch | 128=Bookmarks
 
-*/
+*******************************************************************************************************************************************/
 
 class Places  {																					
 

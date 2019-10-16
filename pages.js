@@ -1,4 +1,9 @@
-/* MANDALA PAGE DISPLAY
+/* 	MANDALA PAGES ****************************************************************************************************************************
+
+	This module has 3 functions:
+		1. It routes to code that draws a page based on a kmap
+		2. It contains helper functions to  that all pages use to draw (.e. headers, footers, reated assets, popovers)
+		2. It contains the funcions to draw the less complex pages (subjects and terms)
 
 	Requires: 	jQuery 												// Almost any version should work
 	Calls:		seachui.js, audiovideo.js, places.js				// Other JS modules that are dynamically loaded (not ued in plain search)
@@ -7,7 +12,8 @@
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		popover.png
 	Globals:	sui													// Declared globally
-*/
+
+8********************************************************************************************************************************************/
 
 class Pages  {																					
 
@@ -324,8 +330,8 @@ class Pages  {
 	}		
 
 	AddPop(id)																				// ADD KMAP POPOVER
-		{
-			return "&nbsp;<img src='popover.png' onmouseenter='sui.pages.ShowPopover(\""+id+"\",event)'>";	// Add image call to show popover
-		}
+	{
+		return "&nbsp;<img src='popover.png' onmouseenter='sui.pages.ShowPopover(\""+id+"\",event)'>";	// Add image call to show popover
+	}
 	
 } // Pages class closure

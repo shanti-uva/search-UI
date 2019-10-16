@@ -1,4 +1,4 @@
-/* AUDIOVIDEO
+/* 	AUDIO VIDEO PAGES ****************************************************************************************************************************
 
 	This module puts up the audio video page based on a kmap from SOLR
 	It uses the Kaltura media player to actually play the video
@@ -9,7 +9,8 @@
 	Kaltura: 	https://cfvod.kaltura.com,	//cdnapi.kaltura.com,	// Kaltura API
 	JSON:		From Drupal site
 	Globals:	Looks for sui and sui.pages
-*/
+
+*************************************************************************************************************************************************/
 
 class AudioVideo  {																					
 

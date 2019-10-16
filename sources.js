@@ -1,13 +1,14 @@
-/* SOURCES
+/* 	SOURCE PAGES ****************************************************************************************************************************
 
-	This module puts up the sources based on a kmap from SOLR
+	This module draws the sources page based on a kmap from SOLR
 
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	JSON:		From Drupal site
 	Globals:	Looks for sui and sui.pages
-*/
+
+*********************************************************************************************************************************************/
 
 class Sources  {																					
 

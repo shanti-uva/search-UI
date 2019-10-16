@@ -1,4 +1,4 @@
-/* VISUALS
+/* 	VISUAL PAGES ****************************************************************************************************************************
 
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
@@ -6,7 +6,7 @@
 	JSON:		From Drupal site
 	Globals:	looks for sui and sui.pages
 
-*/
+********************************************************************************************************************************************/
 
 class Visuals  {																					
 

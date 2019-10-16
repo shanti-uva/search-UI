@@ -1,6 +1,6 @@
-/* IMAGES
+/* 	IMAGE PAGES ****************************************************************************************************************************
 
-	This module puts up the images page based on a kmap from SOLR
+	This module draws the images page based on a kmap from SOLR
 
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
@@ -8,7 +8,7 @@
 	JSON:		From Drupal site
 	Globals:	looks for sui and sui.pages
 
-*/
+**********************************************************************************************************************************************/
 
 class Images  {																					
 
@@ -25,7 +25,7 @@ class Images  {
 		var h=w*asp;
 		for (i=0;i<sui.curResults.length;++i) {	if (o.id == sui.curResults[i].id)	mid=i; }
 
-		var str=`<div class='sui-imagesBox'>
+		var str=`<div class='sui-imagesBox' style='margin:${(sui.ss.mode == "related") ? "-12px 0 0 0" : "-12px -12px 0 -12px"}'>
 		<div id='sui-picEnlarge' style='cursor:pointer;font-size:16px' title='Click to enlarge and pan'>&#xe650</div></p>
 		<div id='sui-imageDiv' style='overflow:hidden;width:50%;height:${h}px;margin-left:auto; margin-right:auto; user-select:none'>
 			<img id='sui-thisPic' src='${o.url_thumb.replace(/200,200/,"2000,2000")}' style='width:100%'> 
@@ -45,7 +45,7 @@ class Images  {
 		
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Load detaill from JSON
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-		sui.pages.DrawRelatedAssets();																// Draw related assets menu if active
+		sui.pages.DrawRelatedAssets();															// Draw related assets menu if active
 		$("#sui-imageGal").scrollLeft($("#sui-pageThumb-"+mid).offset().left-w+25);				// Scroll to center
 
 		var places=[],subjects=[];
@@ -78,7 +78,7 @@ class Images  {
 				try{ str+=d(sui.assets[o.asset_type].g,"CAPTION",o.title[0],"Untitled"); } catch(e){}
 				str+="<hr>";
 				try{ str+=d("&#xe600","CREATOR",o.creator) } catch(e){}
-				try{ str+=d("&#xe62a","TYPE",j.field_image_type.und[0].value.charAt(0).toUpperCase()+j.field_image_type.und[0].value.slice(1)); } catch(e){}
+				try{ str+=d("&#xe66d","TYPE",j.field_image_type.und[0].value.charAt(0).toUpperCase()+j.field_image_type.und[0].value.slice(1)); } catch(e){}
 				try{ str+=d("&#xe665","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
 				str+="<hr>";
 				try{ str+="<p class='sui-pageLab'>";
