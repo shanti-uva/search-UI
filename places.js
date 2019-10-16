@@ -25,7 +25,6 @@ class Places  {
 
 	Draw(kmap)
 	{
-		
 		this.kmap=kmap;
 		sui.LoadingIcon(true,64);																	// Show loading icon
 		var app={ container:"plc-main",																// Holds startup parameters													
@@ -79,14 +78,6 @@ class Places  {
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
 
-		var str="<div style='position:absolute;text-align:center'>";											
-		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
-		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
-			str+="<p style='margin-left:192px'><b>FEATURE TYPE:</b>";								// Add header
-			for (i=0;i<kmap.feature_types_ss.length;++i) str+=" <i>"+kmap.feature_types_ss[i]+" &#xe613</i>";  // Feature types
-			str+="</p>";
-			}
-		$(app.div).html(str.replace(/\t|\n|\r|/g,""));
 		if (!$("#plc-switch-btn").length) {															// If not initted yet
 			var str=`<div id="plc-infoDiv">
 				<input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-switch-btn" value="3D"             title="Change view" />
@@ -180,8 +171,7 @@ class Places  {
 		{
 			var i;
 			str=`<div style='float:left;font-size:18px'>
-				<div id='plc-viewInfoBut' class='sui-resDisplay' title='See more information'>&#xe67f</div>
-				<div id='plc-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div></div>;				
+				<div id='plc-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div></div>				
 				<div style='float:right;font-size:14px;margin-right:16px'>PLACE ID: ${kmap.id}</div>`;
 			$("#sui-footer").html(str);
 			$("#plc-customMap").on("click", ()=> {
@@ -193,25 +183,11 @@ class Places  {
 					}
 				else sui.places.Draw(sui.places.id);
 				});
-	
-			$("#plc-viewInfoBut").on("click", ()=> {
-				$("#plc-viewInfo").remove();
-				str=`<div id='plc-viewInfo' class='sui-infoBottom'>
-				<div id='plc-viewInfoCancel' style='float:right;cursor:pointer;margin-top:12px'>&#xe60f</div>
-				<p style='color:#668eec'><b>IDS</b></p>
-				Place id: ${kmap.id}<br>Geocode Name: THL Extended GB Code<br>Code: gb.ext
-				<p style='color:#668eec'><b>NAMES</b></p><span style=font-size:12px>`;
-				if (kmap.names_txt)	for (i=0;i<kmap.names_txt.length;++i) str+=kmap.names_txt[i]+"<br>";
-				str+=`</span><p style='color:#668eec'><b>LOCATION</b></p><span style=font-size:12px>103.5964, 34.0343</span></div>`;
-				$(app.div).append(str);
-				$("#plc-viewInfo").slideDown();
-				$("#plc-viewInfoCancel").on("click", ()=> { $("#plc-viewInfo").slideUp(); });
-			});
-
 		}
 
-	app.DrawFooter();
-	sui.pages.DrawRelatedAssets(kmap);															// Draw related assets menu
+	app.DrawFooter();																				// Draw footer
+	sui.pages.DrawRelatedAssets(kmap);																// Draw related assets menu
+	this.DrawMetadata();																			// Draw metadata
 		
 		
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -243,5 +219,51 @@ class Places  {
 
 	});	// REQUIRE() CLOSURE
 	}
+
+	DrawMetadata()																				// SHOW PLACES METADATA
+	{
+		let i;
+		let content=["","",""];
+		let str="<div style='position:absolute;text-align:center'>";											
+		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
+		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
+			str+="<div style='margin: 12px 0 6px 192px'><b>FEATURE TYPE:</b>";						// Add header
+			for (i=0;i<kmap.feature_types_ss.length;++i) 											// For each type
+				str+=" <i>"+kmap.feature_types_idfacet[i].split("|")[0]+"</i>"+sui.pages.AddPop(kmap.feature_types_idfacet[i].split("|")[1]);  // Add
+			str+="</div>";
+			}
+		if (kmap.caption) str+="<div class='sui-sourceText' style='margin-left:192px'>"+kmap.caption+"</div>";
+		str+=`</div><br>																
+		<div style='display:inline-block;width:calc(100% - 192px);margin-left:192px'>
+		<div class='sui-textTop' id='sui-textTop' style='border-color:#6faaf1'>
+			<div class='sui-textTab' id='sui-textTab0'>
+				<div style='display:inline-block;padding-top:10px'>NAMES</div></div>
+			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc; border-right:1px solid #ccc'>
+				<div style='display:inline-block;padding-top:10px'>ETYMOLOGY</div></div>
+			<div class='sui-textTab' id='sui-textTab2'>
+				<div style='display:inline-block;padding-top:10px'>LOCATION / GIS</div></div>
+		</div>
+		<div class='sui-textSide' id='sui-textSide'></div></div>`;
+		$(app.div).html(str.replace(/\t|\n|\r|/g,""));
+		showTab(0);
+
+		$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
+			var id=e.currentTarget.id.substring(11);										// Get index of tab	
+				showTab(id);																// Draw it
+			});
+
+		function showTab(which) {
+			$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
+			$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
+			$("#sui-textSide").html(content[which]);										// Set content
+			}
+
+		str="";
+		if (kmap.names_txt)	for (i=0;i<kmap.names_txt.length;++i) str+=kmap.names_txt[i]+"<br>";
+		content[0]=str;											
+		content[1]="TBA";											
+		content[2]="TBA";	
+	}	
+	
 
 } // Places class closure
