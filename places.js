@@ -25,7 +25,8 @@ class Places  {
 
 	Draw(kmap)
 	{
-		this.kmap=kmap;
+		var _this=this;																				// Save context
+		this.kmap=kmap;																				// Save kmap
 		sui.LoadingIcon(true,64);																	// Show loading icon
 		var app={ container:"plc-main",																// Holds startup parameters													
 			map:null, baseMap:"topo-vector", kml:null, 								
@@ -78,7 +79,9 @@ class Places  {
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
 
-		if (!$("#plc-switch-btn").length) {															// If not initted yet
+			_this.DrawMetadata();																		// Draw metadata
+
+			if (!$("#plc-switch-btn").length) {															// If not initted yet
 			var str=`<div id="plc-infoDiv">
 				<input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-switch-btn" value="3D"             title="Change view" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-base-btn"   src="basemapicon.gif"  title="Change base map"/>
@@ -87,7 +90,7 @@ class Places  {
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-sketch-btn" src="sketchicon.gif"   title="Show sketch" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-book-btn"   src="bookmarkicon.gif" title="Show bookmarks" />		
 				</div>`;
-			$("#plc-main").append(str);
+				$("#plc-main").append(str);
 			}
 
 		app.ShowOptions=function() {																// SHOW ACTIVE OPTIONS
@@ -187,8 +190,6 @@ class Places  {
 
 	app.DrawFooter();																				// Draw footer
 	sui.pages.DrawRelatedAssets(kmap);																// Draw related assets menu
-	this.DrawMetadata();																			// Draw metadata
-		
 		
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -226,40 +227,40 @@ class Places  {
 		let content=["","",""];
 		let str="<div style='position:absolute;text-align:center'>";											
 		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
-		if (kmap.feature_types_ss && kmap.feature_types_ss.length) {								// If features
+		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {						// If features
 			str+="<div style='margin: 12px 0 6px 192px'><b>FEATURE TYPE:</b>";						// Add header
-			for (i=0;i<kmap.feature_types_ss.length;++i) 											// For each type
-				str+=" <i>"+kmap.feature_types_idfacet[i].split("|")[0]+"</i>"+sui.pages.AddPop(kmap.feature_types_idfacet[i].split("|")[1]);  // Add
+			for (i=0;i<this.kmap.feature_types_ss.length;++i) 										// For each type
+				str+=" <i>"+this.kmap.feature_types_idfacet[i].split("|")[0]+"</i>"+sui.pages.AddPop(this.kmap.feature_types_idfacet[i].split("|")[1]);  // Add
 			str+="</div>";
 			}
-		if (kmap.caption) str+="<div class='sui-sourceText' style='margin-left:192px'>"+kmap.caption+"</div>";
+		if (this.kmap.caption) str+="<div class='sui-sourceText' style='margin-left:192px'>"+this.kmap.caption+"</div>";
 		str+=`</div><br>																
 		<div style='display:inline-block;width:calc(100% - 192px);margin-left:192px'>
-		<div class='sui-textTop' id='sui-textTop' style='border-color:#6faaf1'>
-			<div class='sui-textTab' id='sui-textTab0'>
-				<div style='display:inline-block;padding-top:10px'>NAMES</div></div>
-			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc; border-right:1px solid #ccc'>
-				<div style='display:inline-block;padding-top:10px'>ETYMOLOGY</div></div>
-			<div class='sui-textTab' id='sui-textTab2'>
-				<div style='display:inline-block;padding-top:10px'>LOCATION / GIS</div></div>
+		<div class='sui-textTop' id='sui-textTop' style='border-top:1px solid #999'>
+			<div class='sui-textTab' id='sui-textTab0' style='color:#fff'>
+				<div style='display:inline-block;padding-top:10px'>NAMES &nbsp;&#xe609</div></div>
+			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff'>
+				<div style='display:inline-block;padding-top:10px'>ETYMOLOGY  &nbsp;&#xe609</div></div>
+			<div class='sui-textTab' id='sui-textTab2' style='color:#fff'>
+				<div style='display:inline-block;padding-top:10px'>LOCATION / GIS  &nbsp;&#xe609</div></div>
 		</div>
-		<div class='sui-textSide' id='sui-textSide'></div></div>`;
-		$(app.div).html(str.replace(/\t|\n|\r|/g,""));
-		showTab(0);
+		<div class='sui-textSide' id='sui-textSide' style='display:none'></div></div>`;
+		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
 
-		$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
-			var id=e.currentTarget.id.substring(11);										// Get index of tab	
-				showTab(id);																// Draw it
+		$("[id^=sui-textTab]").on("click", (e)=> {												// ON TAB CLICK
+			var id=e.currentTarget.id.substring(11);											// Get index of tab	
+				showTab(id);																	// Draw it
 			});
 
 		function showTab(which) {
-			$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
-			$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
-			$("#sui-textSide").html(content[which]);										// Set content
+			$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#999",color:"#fff" });
+			$("#sui-textSide").css({display:"inline-block","background-color":"#f8f8f8"});
+			$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#f8f8f8",color:"#666"});
+			$("#sui-textSide").html(content[which]);											// Set content
 			}
 
 		str="";
-		if (kmap.names_txt)	for (i=0;i<kmap.names_txt.length;++i) str+=kmap.names_txt[i]+"<br>";
+		if (this.kmap.names_txt)	for (i=0;i<this.kmap.names_txt.length;++i) str+=this.kmap.names_txt[i]+"<br>";
 		content[0]=str;											
 		content[1]="TBA";											
 		content[2]="TBA";	
