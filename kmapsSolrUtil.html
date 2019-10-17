@@ -27,10 +27,11 @@
             var state = {
                 "page": 0,																			// Current page being shown
                 "pageSize": 100,
-                "query": { "text": searchstring }
+                "query": { "text": searchstring, "collections": [ { title: "audio-video-3", id: "audio-video-3", bool: "OR"}] }
             };
+            var url = util.createBasicQuery(state);
             // var url = util.createBasicQuery(state, [ "xplaces", "xfeature_types", "beetle" ], [ "xplaces:lha"]);
-            var url = util.createKmapQuery(searchstring,"audio-video",0,15);
+            // var url = util.createKmapQuery(searchstring,"audio-video",0,15);
             $.ajax({
                     url: url, dataType: 'jsonp', jsonp: 'json.wrf',
                     success: function (data) {

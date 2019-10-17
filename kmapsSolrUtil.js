@@ -102,14 +102,17 @@ class KmapsSolrUtil {
             "collection_nid": {
                 "limit": 300,
                 "type": "terms",
-                "field": "collection_nid",
-                "facet": {
-                    "collection_title": {
-                        "limit":1,
-                        "type":"terms",
-                        "field":"collection_title"
-                    }
-                }
+                "field": "collection_nid"
+            },
+            "collection_uid": {
+                "limit": 300,
+                "type": "terms",
+                "field": "collection_uid_s"
+            },
+            "xcollection" : {
+                "limit": 300,
+                "type": "terms",
+                "field": "collection_idfacet"
             },
             "asset_subtype": {
                 "limit": 300,
@@ -271,7 +274,7 @@ class KmapsSolrUtil {
 
         // collections
         if (state.query.collections && state.query.collections.length) {
-            fq_array.push(this.buildFq(state.query.collections, "collection_title", "title"));
+            fq_array.push(this.buildFq(state.query.collections, "collection_uid_s", "id"));
         }
 
         // languages
