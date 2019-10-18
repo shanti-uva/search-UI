@@ -398,6 +398,21 @@ class KmapsSolrUtil {
             );
     }
 
+    createAssetsByCollectionQuery(collection_uid, page, pageSize) {
+        return this.createBasicQuery(
+            {
+                page:page,
+                pageSize:pageSize,
+                query: {
+                    collections: [ { title: collection_uid, id: collection_uid, bool: "OR"}]
+                }
+            }
+        );
+    }
+
+
+    }
+
     buildFq(facets, facet_field, type) {
 
         if (!type) { type = "id"; }
