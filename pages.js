@@ -132,10 +132,10 @@ class Pages  {
 
 	ShowCollection(id)
 	{
-		// GET READ DATA
-		var o=
-		this.DrawHeader(o)																			// DRAW HEADER
-		sui.DrawResults();
+		// GET REAL DATA
+//		this.DrawHeader(o)																		// Draw header
+//		sui.DrawResults();
+//		this.DrawHFooter(o)																		// Draw footer
 		let str="Collection "+id;
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 	}
