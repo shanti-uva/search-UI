@@ -411,8 +411,7 @@ class KmapsSolrUtil {
     }
 
 
-    }
-
+ 
     buildFq(facets, facet_field, type) {
 
         if (!type) { type = "id"; }

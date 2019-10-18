@@ -43,11 +43,11 @@ sui.vis=new Visuals();																	// Alloc Visuals (standalone)
 
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	sui.Draw("related");
-	sui.pages.relatedId="audio-video-2228"
-	sui.pages.relatedType="collections"
-	sui.Query();
+	var url=sui.solrUtil.createAssetsByCollectionQuery("images-330306", 0, 100)
+	$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
+	trace(data)
 	});
+});
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
 	{
