@@ -57,8 +57,8 @@ class Texts  {
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
 				let i,str="";
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
-				try { s="<a onclick='javascript:sui.pages.ShowCollection()'>"+o.collection_title+"</a>";
-					str+=sui.pages.DrawItem("&#xe633","COLLECTION",s+sui.pages.AddPop("collections-"+o.collection_nid),"","sui-pageLab",1); } catch(e) { trace(e)}
+				try { s="<a onclick='javascript:sui.pages.ShowCollection((\""+o.collection_idfacet[0].split("|")[1]+"\")'>"+o.collection_title+"</a>";
+					str+=sui.pages.DrawItem("&#xe633","COLLECTION",s+sui.pages.AddPop("collections-"+o.collection_idfacet[0].split("|")[1]),"","sui-pageLab",1); } catch(e) { trace(e)}
 				try { str+=sui.pages.DrawItem("&#xe600","AUTHOR",d.field_book_author.und,"","sui-pageLab",1); } catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","YEAR PUBLISHED", d.field_dc_date_publication_year.und[0].value.substr(0,4),"","sui-pageLab",1); }		catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","ORIGINAL YEAR PUBLISHED", d.field_dc_date_orginial_year.und[0].value.substr(0,4),"","sui-pageLab",1); }	catch(e) {}

@@ -130,12 +130,15 @@ class Pages  {
 			});
 	}
 
-	ShowCollection(id)
+	ShowCollection(id)																		// SHOW A COLLECTION
 	{
-		// GET REAL DATA
+		let url=sui.solrUtil.createAssetsByCollectionQuery(id,sui.ss.page,sui.ss.pageSize);		// Query for collections
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get assets in collection
 //		this.DrawHeader(o)																		// Draw header
 //		sui.DrawResults();
 //		this.DrawHFooter(o)																		// Draw footer
+		trace(data)
+		});
 		let str="Collection "+id;
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 	}

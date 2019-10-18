@@ -43,7 +43,7 @@ sui.vis=new Visuals();																	// Alloc Visuals (standalone)
 
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	var url=sui.solrUtil.createAssetsByCollectionQuery("images-330306", 0, 100)
+	var url=sui.solrUtil.createAssetsByCollectionQuery( "images-1596", 0, 100)
 	$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
 	trace(data)
 	});
