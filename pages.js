@@ -130,6 +130,16 @@ class Pages  {
 			});
 	}
 
+	ShowCollection(id)
+	{
+		// GET READ DATA
+		var o=
+		this.DrawHeader(o)																			// DRAW HEADER
+		sui.DrawResults();
+		let str="Collection "+id;
+		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
+	}
+	
 	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
 	{
 		var i;
@@ -216,6 +226,10 @@ class Pages  {
 				});
 			});
 	}
+	
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// SUBJECTS / TERMS PAGES
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
 	{

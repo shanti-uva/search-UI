@@ -56,7 +56,9 @@ class AudioVideo  {
 			str+=`</div></div>
 			<div style='display:inline-block;vertical-align:top;width:calc(100% - 270px)'>`;
 				try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
-				try{ if (o.collection_title)str+="<div title='Collection'>&#xe633&nbsp;&nbsp;&nbsp;"+o.collection_title+sui.pages.AddDrop("collections-"+o.collection_nid)+"</div>"; } catch(e) {}
+				try{ if (o.collection_title)	str+="<a onclick='javascript:sui.pages.ShowCollection("+o.collection_nid+")'>"+o.collection_title+"</a>"+sui.pages.AddPop("collections-"+o.collection_nid)+"</div>";
+					 else						str+="None</div>";	
+			} catch(e) {}
 			str+=`</div><hr>
 			<p class='sui-sourceText'>${o.summary ? o.summary : o.caption ? o.caption : ""}</p>
 				<div style='display:inline-block;width:100%'>

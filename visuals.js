@@ -31,7 +31,8 @@ class Visuals  {
 			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></iframe><br>`;	
 	
 			str+="<div class='sui-sources' style='padding-top:0'>";
-			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",o.collection_title+sui.pages.AddPop("collections-"+o.collection_nid),"None")+"</div>";
+			let s=o.collection_title ? ("<a onclick='javascript:sui.pages.ShowCollection("+o.collection_nid+")'>"+o.collection_title+"</a>"+sui.pages.AddPop("collections-"+o.collection_nid)) : "None";
+			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",s)+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
 			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
 			try{ str+=d("&#x65f","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}

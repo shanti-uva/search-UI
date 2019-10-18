@@ -26,8 +26,8 @@ class Texts  {
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
 		$(this.div).html("");																	// Clear page	
-		sui.LoadingIcon(true,64);																// Show loading icon
 
+		sui.LoadingIcon(true,64);																// Show loading icon
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {									// Get json
 			sui.LoadingIcon(false);																// Hide loading icon
 			str+=data+`</div>																
@@ -57,7 +57,8 @@ class Texts  {
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
 				let i,str="";
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
-				try { str+=sui.pages.DrawItem("&#xe633","COLLECTION",o.collection_title+sui.pages.AddPop("collections-"+o.collection_nid),"","sui-pageLab",1); } catch(e) {}
+				try { s="<a onclick='javascript:sui.pages.ShowCollection()'>"+o.collection_title+"</a>";
+					str+=sui.pages.DrawItem("&#xe633","COLLECTION",s+sui.pages.AddPop("collections-"+o.collection_nid),"","sui-pageLab",1); } catch(e) { trace(e)}
 				try { str+=sui.pages.DrawItem("&#xe600","AUTHOR",d.field_book_author.und,"","sui-pageLab",1); } catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","YEAR PUBLISHED", d.field_dc_date_publication_year.und[0].value.substr(0,4),"","sui-pageLab",1); }		catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","ORIGINAL YEAR PUBLISHED", d.field_dc_date_orginial_year.und[0].value.substr(0,4),"","sui-pageLab",1); }	catch(e) {}
