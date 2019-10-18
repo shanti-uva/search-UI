@@ -246,6 +246,7 @@ class SearchUI  {
 	GetFacetData(data)																				// GET FACET DATA
 	{
 		var i,val,buckets;
+		trace(data)
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
 				for (i=0;i<buckets.length;++i) {													// For each bucket
@@ -256,11 +257,13 @@ class SearchUI  {
 					}
 				this.assets.All.n=data.response.numFound;											// All count
 				}	
-			if (data && data.facets && data.facets.collection_nid && data.facets.collection_nid.buckets) {	// If valid
-				buckets=data.facets.collection_nid.buckets;											// Point at buckets
+			if (data && data.facets && data.facets.xcollection && data.facets.xcollection.buckets){ // If valid
+				buckets=data.facets.xcollection.buckets;											// Point at buckets
 				this.facets.collections.data=[];													// Clear
-				for (i=0;i<buckets.length;++i) 														// For each item
-					this.facets.collections.data.push({title:buckets[i].collection_title.buckets[0].val, id:"collections-0"});	// Add to list
+				for (i=0;i<buckets.length;++i) 	{													// For each item
+					val=buckets[i].val.split("(")[0];												// Get just the title
+					this.facets.collections.data.push({title:val, id:"collections-"+buckets[i].val.split("|")[1]});				// Add to list
+					}
 				this.ResetFacetList("collections");													// Fill collections list in adv edit
 				}
 	}
@@ -784,9 +787,8 @@ class SearchUI  {
 		var num=o.length;																			// Facet index to add to												
 		o.push({});																					// Add obj
 		o[num].title=title;																			// Get title
-		o[num].id=id;																				// Id
+		o[num].id=id.replace(/collections-/,"");													// Id (remove collections- prefix)
 		o[num].bool=bool;																			// Bool
-//		$("#sui-advEdit-"+facet).slideUp();															// Close window
 		this.DrawAdvanced();																		// Redraw
 		this.Query();																				// Run query and show results
 	}
