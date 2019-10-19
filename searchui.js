@@ -277,6 +277,7 @@ class SearchUI  {
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
+			this.assets.All.n=data.response.numFound;												// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			});
