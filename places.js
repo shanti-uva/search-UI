@@ -110,7 +110,7 @@ class Places  {
 				option.visible=true;																// Show it's on
 				}
 			}
-		app.map=new Map({ basemap:app.baseMap});													// Make new map
+		app.map=new Map({ basemap:app.baseMap, ground:"world-elevation" });							// Make new map
 		app.sceneView=new SceneView( { 	container:null,	map: app.map });							// 3D view (hidden)
 		app.activeView=app.mapView=new MapView({													// 2D view
 			container: app.container, map: app.map, 												// Primary view
