@@ -59,7 +59,7 @@ class Images  {
 		str=`<table class='sui-imageMid'>
 			<tr class='sui-pageLab' style='font-size:16px;padding-bottom:4px'><td style='width:50%'>MANDALA COLLECTIONS</td><td>CLASSIFICATION</td></tr>
 			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;`;
-			if (o.collection_title)	str+="<a onclick='javascript:sui.pages.ShowCollection(\""+o.collection_idfacet[0].split("|")[1]+"\")'>"+o.collection_title+"</a>"+sui.pages.AddPop("collections-"+o.collection_nid)+"</td><td>";
+			if (o.collection_title)	str+=`<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</td><td>`;
 			else					str+="None</td><td>";	
 			if (subjects.length) {																// If subjects	
 				str+="<span style='color:#cc4c39'>&#xe634</span>&nbsp;&nbsp";					// Add icon

@@ -48,8 +48,8 @@ class Pages  {
 
 	DrawRelatedAssets(o)																	// DRAW RELATED ASSETS MENU
 	{
-		if (sui.ss.mode == "related")	o=this.relatedBase;										// If related, use base
-		else							this.lastMode=sui.ss.mode;								// Save last search mode
+		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
+		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
 		if (!o.asset_type.match(/Places|Subjects|Terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
 		var url=sui.solrUtil.createKmapQuery(o.uid);											// Get query url
@@ -96,7 +96,6 @@ class Pages  {
 				$("#sui-headLeft").html(str);													// Add to div
 				this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;				// Set id
 				sui.Query();																	// Query and show results
-				sui.DrawItems();																// Draw items																
 				sui.DrawFooter();																// Draw footer
 				sui.ss.page=0;																	// Start at beginning
 				}
@@ -108,7 +107,7 @@ class Pages  {
 		var i;
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
 		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); sui.Query()});	// Close handler, release related base
-		if (sui.ss.mode == "related")	return;
+		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
@@ -130,16 +129,15 @@ class Pages  {
 			});
 	}
 
-	ShowCollection(id)																		// SHOW A COLLECTION
+	ShowCollection(kmapId, collectionId)													// SHOW A COLLECTION OF ASSETS
 	{
-		let url=sui.solrUtil.createAssetsByCollectionQuery(id,sui.ss.page,sui.ss.pageSize);		// Query for collections
-		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get assets in collection
-//		this.DrawHeader(o)																		// Draw header
-//		sui.DrawResults();
-//		this.DrawHFooter(o)																		// Draw footer
-		trace(data)
-		});
-		let str="Collection "+id;
+		sui.ss.mode="collections";																// Collections mode
+		sui.GetKmapFromID(kmapId.toLowerCase(), (kmap)=> { this.relatedBase=kmap; });			// Get kmap to return to	
+		this.relatedId=collectionId.split("|")[1].toLowerCase();								// Get collections id 
+		sui.Query();																			// Query and show results
+		sui.DrawItems();																		// Draw items																
+		sui.DrawFooter();																		// Draw footer															
+		let str="&#xe633&nbsp;&nbsp"+collectionId.split("|")[0];								// Icon and title
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 	}
 	

@@ -20,22 +20,23 @@ class Visuals  {
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Gert JSON
 		var url="//visuals.shanti.virginia.edu/sites/all/libraries/SHIVA/go.htm?m=//visuals.shanti.virginia.edu/data/json/";
 		url+=o.id;																				// Full url
-		var d=sui.pages.DrawItem;																	// Point at item drawer
+		var d=sui.pages.DrawItem;																// Point at item drawer
 	
 		function drawDetails(j) {																// Draw details
+			let s;
 			var shivaNode=$.parseJSON(j.shivanode_json.und[0].value);							// Get shiva data
 			var wid=shivaNode.width ? shivaNode.width+"px" : "100%";							// If width set use it 
 			var hgt=shivaNode.height ? shivaNode.height+"px" : "calc(100% - 155px)";			// Height 
 			var src=shivaNode.dataSourceUrl ? shivaNode.dataSourceUrl : "";						// Data source
 			var str=`<iframe id='sui-iframe' frameborder='0' scrolling='no' src='${url}' 
-			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></iframe><br>`;	
-	
+			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></Iframe><br>`;	
 			str+="<div class='sui-sources' style='padding-top:0'>";
-			let s=o.collection_title ? ("<a onclick='javascript:sui.pages.ShowCollection("+o.collection_nid+")'>"+o.collection_title+"</a>"+sui.pages.AddPop("collections-"+o.collection_nid)) : "None";
+			try{ if (o.collection_title)	s=`<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}`;
+			else							s="None</div>"; }  catch(e) {}
 			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",s)+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
 			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
-			try{ str+=d("&#x65f","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
+			try{ str+=d("&#xe65f","TYPE",o.asset_subtype.replace(/:/g," | ")) } catch(e){}
 			try{ str+=d("&#xe60c","DATE",o.node_created.substr(0,10)) } catch(e){}
 			try{ str+="&#xe600&nbsp;&nbsp;<span class='sui-pageLab'>CREATOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>";
 				str+=(o.node_user_full) ? o.node_user_full+"&nbsp;&nbsp" : "" +"";

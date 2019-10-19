@@ -137,10 +137,7 @@ class SearchUI  {
 						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 						<div class='sui-advEdit' id='sui-advEdit-${key}'></div>`;
 						}
-					str+=`<div class='sui-advHeader' id='sui-advOptions-text'>&#xe623&nbsp;&nbsp;SEARCH WORD OPTIONS
-						<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
-						</div>
-					</div>
+				str+=`</div>
 				<div class='sui-advTerm' id='sui-advTerm-text'></div>
 				<div class='sui-advEdit' id='sui-advEdit-text'></div>;
 				</div>
@@ -210,7 +207,7 @@ class SearchUI  {
 
 	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
 	{
-		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select?q=uid:"+id+"&wt=json";
+		var url=this.ss.solrUrl+"?q=uid:"+id+"&wt=json";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
 			data=this.MassageKmapData(data);														// Normalize kmap
 			callback(data.response.docs[0]);														// Return kmap
@@ -246,7 +243,6 @@ class SearchUI  {
 	GetFacetData(data)																				// GET FACET DATA
 	{
 		var i,val,buckets;
-		trace(data)
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
 				for (i=0;i<buckets.length;++i) {													// For each bucket
@@ -273,14 +269,14 @@ class SearchUI  {
 		let url;
 		this.LoadingIcon(true,64);																	// Show loading icon
 		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
-		if (this.ss.mode == "related")	url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
-		else							url=this.solrUtil.buildAssetQuery(this.ss);									// Get assets that match query
+		if (this.ss.mode == "related")			url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
+		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
+		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
 		$("#sui-relatedAssets").remove();															// Remove related assets panel
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
-			if (this.ss.mode == "related") this.assets.All.n=data.response.numFound;				// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			});
@@ -289,17 +285,18 @@ class SearchUI  {
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
-  		var url=this.solrUtil.createBasicQuery(this.ss,["x"+facet]);								// Get query url
-		  $.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
-			this.LoadingIcon(false);                                                                // Hide loading icon
-            var i,o,v;
-			if (data.facets["x"+facet]) {															// If something there
-				o=data.facets["x"+facet].buckets;													// Point at data
-				this.facets[facet].data=[];															// Start fresh
-				for (i=0;i<Math.min(300,o.length);++i)	{											// Get items
-					v=o[i].val.split("|");															// Split into parts
-					this.facets[facet].data.push({ title:v[0], id: v[1], n:o[i].count }); 			// Add to assets data
-					}	
+  		let url=this.solrUtil.createBasicQuery(this.ss,["x"+facet]);								// Get query url
+			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
+				trace(data)
+				let i,o,v;
+				this.LoadingIcon(false);															// Hide loading icon
+				if (data.facets["x"+facet]) {														// If something there
+					o=data.facets["x"+facet].buckets;												// Point at data
+					this.facets[facet].data=[];														// Start fresh
+					for (i=0;i<Math.min(300,o.length);++i)	{										// Get items
+						v=o[i].val.split("|");														// Split into parts
+						this.facets[facet].data.push({ title:v[0], id: v[1], n:o[i].count }); 		// Add to assets data
+						}	
 				}
 			this.ResetFacetList(facet);																// Reset list UI elements
 		});
@@ -342,7 +339,7 @@ class SearchUI  {
 
 	DrawHeader()																				// DRAW RESULTS HEADER
 	{
-		if (this.ss.mode == "related") 	return;														// Advanced search
+		if ((this.ss.mode == "related") || (this.ss.mode == "collections")) 	return;				// Quit for special search modes
 		var s=this.ss.page*this.ss.pageSize+1;														// Starting item number
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
@@ -386,7 +383,8 @@ class SearchUI  {
 	DrawFooter()																				// DRAW RESULTS FOOTER
 	{
 		var lastPage=Math.floor(this.numItems/this.ss.pageSize);									// Calc last page
-		if (this.ss.mode != "related")	$("#sui-footer").css("background-color","#888");			// Set b/g color
+		if ((this.ss.mode != "related") && (this.ss.mode != "collections"))
+			$("#sui-footer").css("background-color","#888");										// Set b/g color
 		var str=`
 		<div style='float:left;font-size:18px'>
 			<div id='sui-viewModeList' class='sui-resDisplay' title='List view'>&#xe61f</div>

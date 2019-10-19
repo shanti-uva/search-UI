@@ -48,15 +48,15 @@ class AudioVideo  {
 				<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
 				}
 			else str+="<img style='width:100%' src='"+o.url_thumb+"'>";
-			str+=`<br><br><div style='display:inline-block;width:250px;margin-left:16px'>
+			str+=`<br><br><div style='display:inline-block;width:300px;margin-left:16px'>
 			<div title='Duration'>&#xe61c&nbsp;&nbsp;&nbsp;${o.duration_s}</div>
 			<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published `;
 			if (d.field_year_published && d.field_year_published.en)	str+=+d.field_year_published.en[0].value;
 			else if (o.node_created) 									str+=sui.pages.FormatDate(o.node_created);
-			try{ if (o.collection_title) str+="<div>&#xe633&nbsp;&nbsp;&nbsp;<a onclick='javascript:sui.pages.ShowCollection(\""+o.collection_idfacet[0].split("|")[1]+"\")'>"+o.collection_title+"</a>"+sui.pages.AddPop("collections-"+o.collection_nid)+"</div>";
-				 else				 	 str+="None</div>";		} catch(e) {}
+			try{ if (o.collection_title)	str+=`<div>&#xe633&nbsp;&nbsp;&nbsp;<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</div>`;
+			else							str+="None</div>"; }  catch(e) {}
 			str+=`</div></div>
-			<div style='display:inline-block;vertical-align:top;width:calc(100% - 270px)'>`;
+			<div style='display:inline-block;vertical-align:top;width:calc(100% - 320px)'>`;
 				try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
 				str+=`</div><hr>
 			<p class='sui-sourceText'>${o.summary ? o.summary : o.caption ? o.caption : ""}</p>
