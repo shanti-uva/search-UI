@@ -29,7 +29,7 @@ class Places  {
 		this.kmap=kmap;																				// Save kmap
 		sui.LoadingIcon(true,64);																	// Show loading icon
 		var app={ container:"plc-main",																// Holds startup parameters													
-			map:null, baseMap:"topo-vector", kml:null, 								
+			map:null, baseMap:"hybrid", kml:null, 								
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
 			  center: [91.1721, 29.6524], zoom:12, tilt:80,
