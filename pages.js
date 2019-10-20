@@ -159,39 +159,6 @@ class Pages  {
 		</div>`;
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 
-		var url=sui.solrUtil.createKmapQuery(id);												// Get query url
-		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
-			let i,n,str="";
-			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
-				let d=data.facets.asset_counts.buckets;											// Point at bucket array
-				for (i=0;i<d.length;++i) {														// For each bucket
-					n=d[i].count;																// Get count													
-					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
-					var f=d[i].val.charAt(0).toUpperCase()+d[i].val.slice(1);					// Match assets list
-					if (f == "Audio-video") f="Audio-Video";									// Handle AV
-					str+=`<p class='sui-popItem' id='sui-pop-${id}-${f}' style='cursor:pointer'>
-					<span style='color:${sui.assets[f].c}'>${sui.assets[f].g}</span>
-					&nbsp;&nbsp;Related ${f} (${n})</p>`;
-					$("#sui-rln-"+d[i].val).html(n);											// Set number
-					}
-				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
-				
-				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
-					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
-					sui.ss.mode="related";														// Related mode
-					this.relatedBase=this.curKmap;												// Set base
-					this.relatedId=v[2]+"-"+v[3];												// Related id
-					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
-					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
-					$("#sui-headLeft").html(str);												// Add to div
-					sui.Query();																// Query and show results
-					sui.DrawItems();															// Draw items																
-					sui.DrawFooter();															// Draw footer															
-					sui.ss.page=0;																// Start at beginning
-					});
-				}
-			});
-
 		sui.GetKmapFromID(id,(o)=>{ 
 			let str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
 			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
@@ -225,6 +192,39 @@ class Pages  {
 				$("#sui-headLeft").html(str);													// Add to div
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				});
+			});
+
+		var url=sui.solrUtil.createKmapQuery(id);												// Get query url
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
+			let i,n,str="";
+			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
+				let d=data.facets.asset_counts.buckets;											// Point at bucket array
+				for (i=0;i<d.length;++i) {														// For each bucket
+					n=d[i].count;																// Get count													
+					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
+					var f=d[i].val.charAt(0).toUpperCase()+d[i].val.slice(1);					// Match assets list
+					if (f == "Audio-video") f="Audio-Video";									// Handle AV
+					str+=`<p class='sui-popItem' id='sui-pop-${id}-${f}' style='cursor:pointer'>
+					<span style='color:${sui.assets[f].c}'>${sui.assets[f].g}</span>
+					&nbsp;&nbsp;Related ${f} (${n})</p>`;
+					$("#sui-rln-"+d[i].val).html(n);											// Set number
+					}
+				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
+				
+				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
+					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
+					sui.ss.mode="related";														// Related mode
+					this.relatedBase=this.curKmap;												// Set base
+					this.relatedId=v[2]+"-"+v[3];												// Related id
+					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
+					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
+					$("#sui-headLeft").html(str);												// Add to div
+					sui.Query();																// Query and show results
+					sui.DrawItems();															// Draw items																
+					sui.DrawFooter();															// Draw footer															
+					sui.ss.page=0;																// Start at beginning
+					});
+				}
 			});
 	}
 	
