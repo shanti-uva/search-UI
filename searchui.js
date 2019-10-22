@@ -61,7 +61,6 @@ class SearchUI  {
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
 		this.state="";																				// Holds page state
-		this.SetState("");																			// Init page state
 		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
 
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
@@ -76,17 +75,25 @@ class SearchUI  {
 		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw
 		}
 
-		PageRouter(hash)
-		{
-			let id;
-			trace(hash)
-			if (id=hash.match(/#p=(.+)/)) {															// If a page
-				id=id[1].toLowerCase();																// Isolate kmap id
-			trace(id)
-				if (this.ss.mode == "input")	this.ss.mode="simple";								// Be sure results screen is up	
-				this.GetKmapFromID(id,(kmap)=>{ this.pages.Draw(kmap); });							// Get kmap and show page
-				}
+
+	SetState(state)																				// SET PAGE STATE
+	{
+		let here=window.location.href.split("#")[0];												// Remove any hashes
+		here="";
+		history.pushState(null,"Mandala "+this.state,here+"/#"+this.state);							// Store last one in history
+		history.replaceState(null,"Mandala "+state,here+"/#"+state);								// Show current one in history
+		this.state=state;																			// Set the new state
 		}
+	
+	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
+	{
+		let id;
+		if ((id=hash.match(/#p=(.+)/))) {															// If a page
+			id=id[1].toLowerCase();																	// Isolate kmap id
+			if (this.ss.mode == "input")	this.ss.mode="simple";									// Be sure results screen is up	
+			this.GetKmapFromID(id,(kmap)=>{ this.pages.Draw(kmap); });								// Get kmap and show page
+			}	
+	}
 
 	SetSearchState(state)																		// SET OR INIT SEARCH STATE
 	{
@@ -959,14 +966,6 @@ class SearchUI  {
 					});
 				}
 			}
-	}
-
-	SetState(state)																				// SET PAGE STATE
-	{
-		const here=window.location.href.split("#")[0];												// Remove any hashes
-		history.pushState(null,document.title,here+"#"+this.state);									// Store current one in history
-		this.state=state;																			// Set the new state
-		history.replaceState(null,document.title,here+"#"+state);									// In the search bar too
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

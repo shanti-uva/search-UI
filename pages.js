@@ -132,10 +132,10 @@ class Pages  {
 
 	ShowCollection(kmapId, collectionId)													// SHOW A COLLECTION OF ASSETS
 	{
-		sui.SetState(`c=${kmapId}+${collectionId}`);											// This is the active page
 		sui.ss.mode="collections";																// Collections mode
 		sui.GetKmapFromID(kmapId.toLowerCase(), (kmap)=> { this.relatedBase=kmap; });			// Get kmap to return to	
 		this.relatedId=collectionId.split("|")[1].toLowerCase();								// Get collections id 
+		sui.SetState(`c=${this.relatedId}`);													// Set current page
 		sui.Query();																			// Query and show results
 		sui.DrawItems();																		// Draw items																
 		sui.DrawFooter();																		// Draw footer															
