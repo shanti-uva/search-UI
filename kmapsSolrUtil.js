@@ -109,7 +109,7 @@ class KmapsSolrUtil {
                 "type": "terms",
                 "field": "collection_uid_s"
             },
-            "xcollection" : {
+            "xcollections" : {
                 "limit": 300,
                 "type": "terms",
                 "field": "collection_idfacet"
