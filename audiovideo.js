@@ -17,6 +17,7 @@ class AudioVideo  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div="#sui-results";																// Div to hold page
+		this.metaContent=["","",""];															// Metadate content
 		this.inPlay=false;																		// If AV is in play
 		this.curTransSeg=-1;																	// Currently active transceipt segment
 		this.transRes=null;																		// Holds transcript resources	
@@ -27,7 +28,7 @@ class AudioVideo  {
 
 	Draw(o)																					// DRAW AUDIO/VIDEO PAGE
 	{
-		var i;
+		const _this=this;																		// Context
 		var partnerId="381832";																	// Kaltura partner id
 		var uiConfId="31832371";																// Kaltura confidential code
 		var entryId="";																			// Media id
@@ -40,6 +41,7 @@ class AudioVideo  {
 		
 		sui.LoadingIcon(true,64);																// Show loading icon
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
+trace(o,d)
 			var str=`<div id='sui-viewerSide' style='display:inline-block;width:${w}px'>`;		// Left side
 			if (d.field_video) {																// If a video field spec'd
 				if (d.field_video.und)			entryId=d.field_video.und[0].entryid;			// If id is in uns
@@ -81,54 +83,84 @@ class AudioVideo  {
 					entry_id:entryId,		 flashvars:{ autoPlay:false},	params:{ "wmode": "transparent"} 
 					});
 				kWidget.addReadyCallback(()=> {													// When ready, add icon callback
-					var kdp=document.getElementById("sui-kplayer");								// Get div
+					let kdp=document.getElementById("sui-kplayer");								// Get div
+					if (!kdp)	return;															// Quit if no player ready yet
 					kdp.kBind("doPlay.test", ()=> {	$("#sui-transTab1").html("&#xe681"); this.inPlay=true; this.PlayAV(); });	// Pause icon
 					kdp.kBind("doPause.test",()=> { $("#sui-transTab1").html("&#xe641"); this.inPlay=false; this.playEnd=0; clearInterval(this.transTimer); });	// Play
 					});
 				});
 				sui.LoadingIcon(false);															// Hide loading icon
 				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
-				var content=["","",""];
-				str="";
-				try{ if (o.collection_title) str+="<p title='Collection'><b>COLLECTION</b>:&nbsp;&nbsp;"+o.collection_title+"</p>"; } catch(e) {}
-				try{ str+="<p><b>SUBCOLLECTION</b>:&nbsp;&nbsp;";
-					 for (i=0;i<d.field_subcollection_new.und.length;++i) {
-					 	str+=d.field_subcollection_new.und[i].header+sui.pages.AddDrop(d.field_subcollection_new.und[i].domain+"-"+d.field_subcollection_new.und[i].id)+"&nbsp;&nbsp; ";
-					 	}
-					str+="</p>"; } catch(e) {}
-				try{ str+="<p><b>SUBJECT</b>:&nbsp;&nbsp;"
-					 for (i=0;i<d.field_subject.und.length;++i) {
-						str+=d.field_subject.und[i].header+sui.pages.AddDrop(d.field_subject.und[i].domain+"-"+d.field_subject.und[i].id)+"&nbsp;&nbsp; ";
-						}
-					str+="</p>"; } catch(e) {}
-				try{ str+="<p><b>RECORDING LOCATION</b>:&nbsp;&nbsp;"+d.field_recording_location_new.und[0].header+sui.pages.AddDrop(d.field_recording_location_new.und[0].domain+"-"+d.field_recording_location_new.und[0].id)+"</p>"; } catch(e) {}
-				try{ str+="<p'><b>LANGUAGE</b>:&nbsp;&nbsp;"+d.field_language_kmap.und[0].header+sui.pages.AddDrop(d.field_language_kmap.und[0].domain+"-"+d.field_language_kmap.und[0].id)+"</p>"; } catch(e) {}
-				try{ str+="<p'><b>TIME PERIOD</b>:&nbsp;&nbsp;"+o.duration_s+"</p>"; } catch(e) {}
-				try{ str+="<p><b>TERMS</b>:&nbsp;&nbsp;"+d.field_terms.und[0].header+"</p>"; } catch(e) {}
-				try{ str+="<p><b>COPYRIGHT OWNER</b>:&nbsp;&nbsp;"+d.field_copyright_owner.en[0].value+"</p>"; } catch(e) {}
-				try{ str+="<p><b>YEAR PUBLISHED</b>:&nbsp;&nbsp;"+d.field_year_published.en[0].value+"</p>"; } catch(e) {}
-				try{ str+="<p><b>RIGHTS SUMMARY</b>:&nbsp;&nbsp;"+d.field_pbcore_rights_summary.en[0].value+"</p>"; } catch(e) {}
-				try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
-				content[0]=str; 
-				str="";
-				try{ str+="<p><b>CREATOR</b>:&nbsp;&nbsp;"+o.creator+"</p>"; } catch(e) {}
-				try{ str+="<p><b>DATA ENTRY</b>:&nbsp;&nbsp;"+o.node_user_full_s+"</p>"; } catch(e) {}
-				content[1]=str; 			
-				showTab(0);
-				sui.pages.DrawRelatedAssets(o);														// Draw related assets menu if active
+				this.DrawMetaData(o,d);															// Draw metadata content
+				showTab(0);																		// Show details tab
+				sui.pages.DrawRelatedAssets(o);													// Draw related assets menu if active
 				
-				$("[id^=sui-textTab]").on("click", (e)=> {											// ON TAB CLICK
-					var id=e.currentTarget.id.substring(11);										// Get index of tab	
-						showTab(id);																// Draw it
+				$("[id^=sui-textTab]").on("click", (e)=> {										// ON TAB CLICK
+					var id=e.currentTarget.id.substring(11);									// Get index of tab	
+						showTab(id);															// Draw it
 					});
-
+			
 				function showTab(which) {
 					$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
 					$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
-					$("#sui-textSide").html(content[which]);										// Set content
+					$("#sui-textSide").html(_this.metaContent[which]);							// Set content
 				}
 			});
-		}
+	}
+
+	DrawMetaData(o,d)																			// DARAW TABBED METADATA
+	{
+		let i,t,v,f,str="";
+		try{ if (o.collection_title) str+="<p title='Collection'><b>COLLECTION</b>:&nbsp;&nbsp;"+o.collection_title+"</p>"; } catch(e) {}
+		try{ str+="<p><b>SUBCOLLECTION</b>:&nbsp;&nbsp;";
+			for (i=0;i<d.field_subcollection_new.und.length;++i) {
+				str+=d.field_subcollection_new.und[i].header+sui.pages.AddPop(d.field_subcollection_new.und[i].domain+"-"+d.field_subcollection_new.und[i].id)+"&nbsp;&nbsp; ";
+				}
+			str+="</p>"; } catch(e) {}
+		try{ str+="<p><b>SUBJECT</b>:&nbsp;&nbsp;"
+			for (i=0;i<d.field_subject.und.length;++i) {
+				str+=d.field_subject.und[i].header+sui.pages.AddPop(d.field_subject.und[i].domain+"-"+d.field_subject.und[i].id)+"&nbsp;&nbsp; ";
+				}
+			str+="</p>"; } catch(e) {}
+		try{ str+="<p><b>RECORDING LOCATION</b>:&nbsp;&nbsp;"+d.field_recording_location_new.und[0].header+sui.pages.AddPop(d.field_recording_location_new.und[0].domain+"-"+d.field_recording_location_new.und[0].id)+"</p>"; } catch(e) {}
+		try{ str+="<p'><b>LANGUAGE</b>:&nbsp;&nbsp;"+d.field_language_kmap.und[0].header+sui.pages.AddPop(d.field_language_kmap.und[0].domain+"-"+d.field_language_kmap.und[0].id)+"</p>"; } catch(e) {}
+		try{ str+="<p><b>TERMS</b>:&nbsp;&nbsp;"+d.field_terms.und[0].header+"</p>"; } catch(e) {}
+		try{ str+="<p><b>COPYRIGHT OWNER</b>:&nbsp;&nbsp;"+d.field_copyright_owner.en[0].value+"</p>"; } catch(e) {}
+		try{ str+="<p><b>YEAR PUBLISHED</b>:&nbsp;&nbsp;"+d.field_year_published.en[0].value+"</p>"; } catch(e) {}
+		try{ str+="<p><b>RIGHTS SUMMARY</b>:&nbsp;&nbsp;"+d.field_pbcore_rights_summary.en[0].value+"</p>"; } catch(e) {}
+		try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
+		this.metaContent[0]=str; 																// Add to tab
+
+		str="";																					// Start fresh
+		if (d.field_pbcore_creator && d.field_pbcore_creator.und && d.field_pbcore_creator.und.length) {	// If creators spec'd	
+			for (i=0;i<d.field_pbcore_creator.und.length;++i) {									// For each creator
+				f=d.field_pbcore_creator.und[i];												// Point at it
+				try{ str+=`<p><b>${f.field_creator_role.und[0].value.toUpperCase()}</b>:&nbsp;&nbsp;${f.field_creator.und[0].value}</p>`;  } catch(e) {}
+				}
+			}
+		if (d.field_pbcore_contributor && d.field_pbcore_contributor.und && d.field_pbcore_contributor.und.length) {	// If creators spec'd	
+			for (i=0;i<d.field_pbcore_contributor.und.length;++i) {								// For each item
+				f=d.field_pbcore_contributor.und[i];											// Point at it
+				try{ str+=`<p><b>CONTRIBUTING ${f.field_contributor_role.und[0].value.toUpperCase()}</b>:&nbsp;&nbsp;${f.field_contributor.und[0].value}</p>`;  } catch(e) {trace(e)}
+				}
+			}
+		try{ str+="<p><b>PUBLISHER</b>:&nbsp;&nbsp;"+d.field_pbcore_publisher.und[0].field_publisher.und[0].value+"</p>"; } catch(e) {}
+		try{ str+="<p><b>DATA ENTRY</b>:&nbsp;&nbsp;"+o.node_user_full_s+"</p>"; } catch(e) {}
+		this.metaContent[1]=str; 																// Add to tab
+
+		str="";																					// Start fresh
+		if (d.field_pbcore_instantiation && d.field_pbcore_instantiation.und && d.field_pbcore_instantiation.und.length) {	// If instantiation spec'd	
+			for (i in d.field_pbcore_instantiation.und[0]) {									// For each item
+				v=d.field_pbcore_instantiation.und[0][i];										// Point at it
+				t=i.replace(/field_/,"").replace(/_/g," ");										// Remove header and spaces
+				try{ str+=`<p><b>${t.toUpperCase()}</b>:&nbsp;&nbsp;${v.und[0].value}</p>`;  } catch(e) {}
+				}
+			}
+		try{ str+="<p><b>FORMAT ID</b>:&nbsp;&nbsp;"+d.field_video.und[0].entryid+"</p>"; } catch(e) {}
+		str+="<p><b>FORMAT ID SOURCE</b>:&nbsp;&nbsp;(Kaltura.com)</p>"; 
+		this.metaContent[2]=str; 																// Add to tab
+	}
+
 
 // TRANSCRIPT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
