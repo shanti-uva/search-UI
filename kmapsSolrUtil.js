@@ -269,6 +269,9 @@ class KmapsSolrUtil {
 
         // features
         if (state.query.features && state.query.features.length) {
+
+            // console.error("FEATURES!");
+            // console.dir(state.query.features);
             fq_array.push(this.buildFq(state.query.features, "feature_types_ss", "title"));
         }
 
@@ -280,6 +283,8 @@ class KmapsSolrUtil {
         // languages
         if (state.query.languages && state.query.languages.length) {
             fq_array.push(this.buildFq(state.query.languages, "node_lang", "title"));
+            // console.error("LANGUAGES!");
+            // console.dir(state.query.languages);
         }
 
         if (state.query.assets && state.query.assets.length) {
@@ -295,6 +300,18 @@ class KmapsSolrUtil {
 
             fq_array.push(this.buildFq(state.query.assets, "asset_type", "id"));
         }
+
+
+        if (state.query.users && state.query.users.length) {
+
+
+            console.error("USERS!");
+            console.dir(state.query.users);
+
+            fq_array.push(this.buildFq(state.query.users, "node_user", "title"));
+
+        }
+
 
 
         var kmapid = "";
@@ -410,8 +427,6 @@ class KmapsSolrUtil {
         );
     }
 
-
- 
     buildFq(facets, facet_field, type) {
 
         if (!type) { type = "id"; }
