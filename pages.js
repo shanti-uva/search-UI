@@ -29,6 +29,7 @@ class Pages  {
 
 	Draw(kmap)																				// DRAW KMAP PAGE
 	{
+		sui.SetState(`p=${kmap.asset_type}-${kmap.id}`);										// This is the active page
 		this.curKmap=kmap;																		// Set active page's map
 		this.DrawHeader(kmap);																	// Draw header
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
@@ -131,6 +132,7 @@ class Pages  {
 
 	ShowCollection(kmapId, collectionId)													// SHOW A COLLECTION OF ASSETS
 	{
+		sui.SetState(`c=${kmapId}+${collectionId}`);											// This is the active page
 		sui.ss.mode="collections";																// Collections mode
 		sui.GetKmapFromID(kmapId.toLowerCase(), (kmap)=> { this.relatedBase=kmap; });			// Get kmap to return to	
 		this.relatedId=collectionId.split("|")[1].toLowerCase();								// Get collections id 

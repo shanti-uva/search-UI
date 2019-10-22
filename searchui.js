@@ -60,6 +60,10 @@ class SearchUI  {
 		this.assets.Subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
+		this.state="";																				// Holds page state
+		this.SetState("");																			// Init page state
+		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
+
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
 		this.SetSearchState(null);																	// Init search state to default
@@ -70,6 +74,18 @@ class SearchUI  {
 		this.AddFrame();																			// Add div framework
 		this.Draw();																				// Draw
 		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw
+		}
+
+		PageRouter(hash)
+		{
+			let id;
+			trace(hash)
+			if (id=hash.match(/#p=(.+)/)) {															// If a page
+				id=id[1].toLowerCase();																// Isolate kmap id
+			trace(id)
+				if (this.ss.mode == "input")	this.ss.mode="simple";								// Be sure results screen is up	
+				this.GetKmapFromID(id,(kmap)=>{ this.pages.Draw(kmap); });							// Get kmap and show page
+				}
 		}
 
 	SetSearchState(state)																		// SET OR INIT SEARCH STATE
@@ -207,8 +223,8 @@ class SearchUI  {
 
 	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
 	{
-		var url=this.ss.solrUrl+"?q=uid:"+id+"&wt=json";
-		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get facets
+		var url=this.ss.solrUrl+"?q=uid:"+id.toLowerCase()+"&wt=json";								// Set query url
+		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			data=this.MassageKmapData(data);														// Normalize kmap
 			callback(data.response.docs[0]);														// Return kmap
 			});
@@ -242,6 +258,7 @@ class SearchUI  {
 
 	GetFacetData(data)																				// GET FACET DATA
 	{
+		trace(data)
 		var i,val,buckets;
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
@@ -286,9 +303,8 @@ class SearchUI  {
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
-  		let url=this.solrUtil.createBasicQuery(this.ss,["x"+facet]);								// Get query url
+  		let url=this.solrUtil.createBasicQuery(this.ss,["x"+(facet == "features") ? "feature_types" : facet]);	// Get query url
 			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
-				trace(data)
 				let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
 				if (data.facets["x"+facet]) {														// If something there
@@ -681,7 +697,7 @@ class SearchUI  {
 
 		$("#sui-advInput-"+facet).on("change",(e)=> {												// ON CHANGE
 			var v=e.target.id.split("-");															// Get ids		
-			this.AddNewFilter($("#sui-advInput-"+facet).val(),facet+"-0","AND");					// Add term to search state
+			this.AddNewFilter($("#sui-advInput-"+facet).val(),facet+"-0","AND", facet);				// Add term to search state
 			});
 	}
 
@@ -702,7 +718,7 @@ class SearchUI  {
 			let items=this.facets[facet].data;														// Point at items
 			if (v[0].match(/ViewListPage/))	this.GetKmapFromID(items[v[1]].id,(kmap)=>{ this.SendMessage("page="+items[v[1]].url,kmap); }); // Get kmap and show page
 			else{																					// Add term
-				this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND");							// Add to search state
+				this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND", facet);					// Add to search state
 				this.QueryFacets(facet);															// Requery the facets
 				}
 			});
@@ -779,11 +795,12 @@ class SearchUI  {
 			});      
 	}
 
-	AddNewFilter(title, id, bool)																	// ADD NEW TERM TO SEARCH STATE
+	AddNewFilter(title, id, bool, facet)														// ADD NEW TERM TO SEARCH STATE
 	{
-		var o=this.ss.query[id.split("-")[0]];														// Point at facet
+		let o=this.ss.query[facet];																	// Point at facet
 		if (o.filter(o => (o.title == title)).length) 	return;										// Don't add if already there											
-		var num=o.length;																			// Facet index to add to												
+		id=id.replace(/languages-|features-/i,"subjects-");											// Languages and feature
+		let num=o.length;																			// Facet index to add to												
 		o.push({});																					// Add obj
 		o[num].title=title;																			// Get title
 		o[num].id=id.replace(/collections-/,"");													// Id (remove collections- prefix)
@@ -858,7 +875,7 @@ class SearchUI  {
 			else{
 				var s=$("#"+e.target.id).text();														// Get term
 				s=s.substr(0,s.length-1);																// Remove viewer icon
-				sui.AddNewFilter(s, sui.curTree+"-"+e.target.id.split("-")[1], "AND");					// Add term to search state and refresh
+				sui.AddNewFilter(s, sui.curTree+"-"+e.target.id.split("-")[1], "AND", facet);			// Add term to search state and refresh
 				}
 		}
 
@@ -942,6 +959,14 @@ class SearchUI  {
 					});
 				}
 			}
+	}
+
+	SetState(state)																				// SET PAGE STATE
+	{
+		const here=window.location.href.split("#")[0];												// Remove any hashes
+		history.pushState(null,document.title,here+"#"+this.state);									// Store current one in history
+		this.state=state;																			// Set the new state
+		history.replaceState(null,document.title,here+"#"+state);									// In the search bar too
 	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
