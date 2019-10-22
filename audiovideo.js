@@ -28,6 +28,7 @@ class AudioVideo  {
 
 	Draw(o)																					// DRAW AUDIO/VIDEO PAGE
 	{
+		let i,f;
 		const _this=this;																		// Context
 		var partnerId="381832";																	// Kaltura partner id
 		var uiConfId="31832371";																// Kaltura confidential code
@@ -57,12 +58,23 @@ trace(o,d)
 			else if (o.node_created) 									str+=sui.pages.FormatDate(o.node_created);
 			try{ if (o.collection_title)	str+=`<div>&#xe633&nbsp;&nbsp;&nbsp;<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</div>`;
 			else							str+="None</div>"; }  catch(e) {}
-			str+=`</div></div>
-			<div style='display:inline-block;vertical-align:top;width:calc(100% - 320px)'>`;
-				try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
-				str+=`</div><hr>
-			<p class='sui-sourceText'>${o.summary ? o.summary : o.caption ? o.caption : ""}</p>
-				<div style='display:inline-block;width:100%'>
+			str+=`</div></div><div style='display:inline-block;vertical-align:top;width:calc(100% - 320px)'>`;
+			try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
+			str+=`</div><hr>
+			<p class='sui-sourceText'>${o.summary ? o.summary : o.caption ? o.caption : ""}</p>`;
+			if (d.field_pbcore_description && d.field_pbcore_description.und && d.field_pbcore_description.und.length > 1) {	
+				str+=`<div id='sui-avmore' style='width:100%;text-align:center'><a style='cursor:pointer;
+				border:1px solid #ccc;border-left:none;border-right:none;font-weight:400'
+				onclick='$("#sui-avlang").toggle();this.text=(this.text == "SHOW MORE") ? "SHOW LESS" : "SHOW MORE"'>
+				SHOW MORE</a></div><br>`;
+				str+="<div id='sui-avlang' style='display:none'>";
+				for (i=0;i<d.field_pbcore_description.und.length;++i) {							// For each new description
+					try{ f=d.field_pbcore_description.und[i];									// Point at it
+					 str+=`<b>${f.field_language.und[0].value.toUpperCase()}</b>:<br>${f.field_description.und[0].value}<br>`;  } catch(e) {trace(e)}
+					}
+				str+="</div>";
+				}
+			str+=`<div style='display:inline-block;width:100%'>
 					<div class='sui-avTop'>
 						<div class='sui-textTab' id='sui-textTab0'>
 							<div style='display:inline-block;padding-top:10px'>DETAILS</div></div>
@@ -73,9 +85,9 @@ trace(o,d)
 					</div>
 				<div class='sui-textSide' id='sui-textSide'></div>
 			</div>`;
-			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player and details
+			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player
+			
 			this.DrawTranscript(o,"#sui-trans");												// Draw transcript in div
-	
 			str=`//cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 
 				kWidget.embed({
@@ -84,7 +96,7 @@ trace(o,d)
 					});
 				kWidget.addReadyCallback(()=> {													// When ready, add icon callback
 					let kdp=document.getElementById("sui-kplayer");								// Get div
-					if (!kdp)	return;															// Quit if no player ready yet
+					if (typeof(kdp) != "object")	return;										// Quit if no player ready yet
 					kdp.kBind("doPlay.test", ()=> {	$("#sui-transTab1").html("&#xe681"); this.inPlay=true; this.PlayAV(); });	// Pause icon
 					kdp.kBind("doPause.test",()=> { $("#sui-transTab1").html("&#xe641"); this.inPlay=false; this.playEnd=0; clearInterval(this.transTimer); });	// Play
 					});
@@ -108,9 +120,10 @@ trace(o,d)
 			});
 	}
 
-	DrawMetaData(o,d)																			// DARAW TABBED METADATA
+	DrawMetaData(o,d)																			// DRAW TABBED METADATA
 	{
-		let i,t,v,f,str="";
+		let i,t,v,f;
+		let	str="";																					// Start fresh on tab 0
 		try{ if (o.collection_title) str+="<p title='Collection'><b>COLLECTION</b>:&nbsp;&nbsp;"+o.collection_title+"</p>"; } catch(e) {}
 		try{ str+="<p><b>SUBCOLLECTION</b>:&nbsp;&nbsp;";
 			for (i=0;i<d.field_subcollection_new.und.length;++i) {
@@ -131,7 +144,7 @@ trace(o,d)
 		try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
 		this.metaContent[0]=str; 																// Add to tab
 
-		str="";																					// Start fresh
+		str="";																					// Start fresh on tab 1
 		if (d.field_pbcore_creator && d.field_pbcore_creator.und && d.field_pbcore_creator.und.length) {	// If creators spec'd	
 			for (i=0;i<d.field_pbcore_creator.und.length;++i) {									// For each creator
 				f=d.field_pbcore_creator.und[i];												// Point at it
@@ -148,7 +161,7 @@ trace(o,d)
 		try{ str+="<p><b>DATA ENTRY</b>:&nbsp;&nbsp;"+o.node_user_full_s+"</p>"; } catch(e) {}
 		this.metaContent[1]=str; 																// Add to tab
 
-		str="";																					// Start fresh
+		str="";																					// Start fresh on tab 2
 		if (d.field_pbcore_instantiation && d.field_pbcore_instantiation.und && d.field_pbcore_instantiation.und.length) {	// If instantiation spec'd	
 			for (i in d.field_pbcore_instantiation.und[0]) {									// For each item
 				v=d.field_pbcore_instantiation.und[0][i];										// Point at it
