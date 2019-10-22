@@ -83,7 +83,7 @@ trace(o,d)
 						<div class='sui-textTab' id='sui-textTab2'>
 							<div style='display:inline-block;padding-top:10px'>TECHNICAL</div></div>
 					</div>
-				<div class='sui-textSide' id='sui-textSide'></div>
+				<div class='sui-textSide' id='sui-textSide' style='padding-top:0'></div>
 			</div>`;
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player
 			
@@ -359,8 +359,7 @@ trace(o,d)
 		element.click();
 		document.body.removeChild(element);
 	}
-	
-	
+
 	DrawTransContent()																		// DRAW TRANSCRIPT CONTENT IN WINDOW
 	{
 		var i,lang,str="";
