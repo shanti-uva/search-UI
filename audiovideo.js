@@ -70,7 +70,7 @@ trace(o,d)
 				str+="<div id='sui-avlang' style='display:none'>";
 				for (i=0;i<d.field_pbcore_description.und.length;++i) {							// For each new description
 					try{ f=d.field_pbcore_description.und[i];									// Point at it
-					 str+=`<b>${f.field_language.und[0].value.toUpperCase()}</b>:<br>${f.field_description.und[0].value}<br>`;  } catch(e) {trace(e)}
+					 str+=`<b>${f.field_language.und[0].value.toUpperCase()}</b>:<br>${f.field_description.und[0].value}<br>`;  } catch(e) {}
 					}
 				str+="</div>";
 				}

@@ -91,7 +91,6 @@ class SearchUI  {
 		let id;
 		if ((id=hash.match(/#p=(.+)/))) {															// If a page
 			id=id[1].toLowerCase();																	// Isolate kmap id
-			trace("SHOW",id)
 			setupPage();
 			this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
 			}	
