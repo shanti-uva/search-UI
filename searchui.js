@@ -64,7 +64,6 @@ class SearchUI  {
 		this.assets.Subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
-		this.state="";																				// Holds page state
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
@@ -81,9 +80,9 @@ class SearchUI  {
 
 	SetState(state)																				// SET PAGE STATE
 	{
-//		trace("STORE",">"+state+"<",state ? "#"+state : "")
-		history.replaceState(null,"Mandala",state ? "#"+state : "/");								// Show current state search bar
-		if (state)	history.pushState(null,"Mandala","/#"+state);									// Store state in history
+		const here=window.location.href.split("#")[0];									// Remove any hashes
+		history.replaceState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
+		if (state)	history.pushState(null,"Mandala",here+"#"+state);								// Store state in history
 		}
 	
 	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
