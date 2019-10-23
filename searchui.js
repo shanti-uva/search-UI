@@ -1,5 +1,6 @@
 /* 	MANDALA SEARCH UI ****************************************************************************************************************************
 
+	USE CASE 1:
 	When allocated, attaches a <div> framework containing a search button in the top white bar of the Mandala app.
 	When clicked, it will expand to cover the entire screen. 
 	An sui=open message is sent to host.
@@ -8,6 +9,9 @@
 	When an item has been selected, a sui=page message is sent to host and the host navigates there.
 	The UI retreats to only the search button.
 	A sui=close message is sent to host.
+
+	USE CASE 2:
+
 
 	Requires: 	jQuery 												// Almost any version should work
 	Calls:		kmapsSolrUtil.js, [places.js, pages.js, tests.js,	// Other JS modules that are dynamically loaded (not used in plain search)
@@ -61,28 +65,25 @@ class SearchUI  {
 		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
 		this.state="";																				// Holds page state
-		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
-
+		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
 		this.SetSearchState(null);																	// Init search state to default
-		$.ajax( { url:"kmapsSolrUtil.js", dataType:"script" }).done(()=> { 							// Dynamically load search class
-				this.solrUtil=new KmapsSolrUtil();													// Alloc
-				this.Query();																		// Get intial data
-			}); 	
 		this.AddFrame();																			// Add div framework
-		this.Draw();																				// Draw
+		if (!location.hash)	{ 																		// Regular startup
+			this.Query();																			// Load search data
+			this.Draw(); 																			// Draw
+			}										
+		else sui.PageRouter(location.hash);															// Go to particular page
 		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw
+		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
 		}
-
 
 	SetState(state)																				// SET PAGE STATE
 	{
-		let here=window.location.href.split("#")[0];												// Remove any hashes
-		here="";
-		history.pushState(null,"Mandala "+this.state,here+"/#"+this.state);							// Store last one in history
-		history.replaceState(null,"Mandala "+state,here+"/#"+state);								// Show current one in history
-		this.state=state;																			// Set the new state
+//		trace("STORE",">"+state+"<",state ? "#"+state : "")
+		history.replaceState(null,"Mandala",state ? "#"+state : "/");								// Show current state search bar
+		if (state)	history.pushState(null,"Mandala","/#"+state);									// Store state in history
 		}
 	
 	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
@@ -90,9 +91,19 @@ class SearchUI  {
 		let id;
 		if ((id=hash.match(/#p=(.+)/))) {															// If a page
 			id=id[1].toLowerCase();																	// Isolate kmap id
-			if (this.ss.mode == "input")	this.ss.mode="simple";									// Be sure results screen is up	
-			this.GetKmapFromID(id,(kmap)=>{ this.pages.Draw(kmap); });								// Get kmap and show page
+			trace("SHOW",id)
+			setupPage();
+			this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
 			}	
+
+		function setupPage() {
+			sui.ss.mode="simple";																	// Simple display mode	
+			$("#sui-typeList").remove();															// Remove type list
+			$("#sui-results").scrollTop(0);																// Scroll to top
+			$("#plc-infoDiv").remove();																	// Remove map buttons
+			$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
+			$("#sui-adv").css({ display:"none"});													// Hide search ui
+			}
 	}
 
 	SetSearchState(state)																		// SET OR INIT SEARCH STATE
@@ -265,7 +276,6 @@ class SearchUI  {
 
 	GetFacetData(data)																				// GET FACET DATA
 	{
-		trace(data)
 		var i,val,buckets;
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
@@ -463,6 +473,7 @@ class SearchUI  {
 	DrawItems()																					// DRAW RESULT ITEMS
 	{
 		var i,str="";
+		this.SetState("");																			// Clear state
 		$("#sui-results").css({ "background-color":(this.ss.view == "List") ? "#fff" : "#ddd" }); 	// White b/g for list only
 		if (this.ss.mode == "related")  $("#sui-results").css({ "padding-left": "204px", width:"calc(100% - 216px"});	// Shrink page
 		else  		 					$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});	// Reset to normal size

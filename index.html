@@ -6,6 +6,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
 	<link href="https://fonts.googleapis.com/css?family=EB+Garamond:400,400i,500%7COpen+Sans:400,400i,600&amp;subset=cyrillic,cyrillic-ext,greek,greek-ext,latin-ext" rel="stylesheet">
 	<script src="searchui.js"></script>
+	<script src="kmapsSolrUtil.js"></script>
 	<script src="pages.js"></script>
 	<script src="places.js"></script>
 	<script src="audiovideo.js"></script>
@@ -40,7 +41,6 @@ sui.img=new Images();																	// Alloc Images (standalone)
 sui.txt=new Texts();																	// Alloc Texts (standalone)
 sui.src=new Sources();																	// Alloc Sources (standalone)
 sui.vis=new Visuals();																	// Alloc Visuals (standalone)
-
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
 	var url=sui.solrUtil.createAssetsByCollectionQuery( "images-1596", 0, 100)

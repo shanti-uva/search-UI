@@ -56,7 +56,7 @@ class Places  {
 		if (app.opt&32)  app.reqs.push("esri/widgets/Legend");										// Legend
 		if (app.opt&64)	 app.reqs.push("esri/widgets/Sketch"),app.reqs.push("esri/layers/GraphicsLayer");	// Sketch
 		if (app.opt&128) app.reqs.push("esri/widgets/Bookmarks");									// Bookmarks 
-	
+
 		require(app.reqs, function() {															// LOAD ArcGIS MODULES
 			var i,key;
 			var Map,WebMap,MapView,SceneView,KMLLayer;
