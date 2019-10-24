@@ -74,37 +74,11 @@ class SearchUI  {
 			this.Draw(); 																			// Draw
 			}										
 		else sui.PageRouter(location.hash);															// Go to particular page
-		window.onresize=()=> {	this.Draw(); };														// On window resize. redraw
+		window.onresize=()=> { if (!(location.hash+" ").match(/audio-video/)) this.Draw(); };		// On window resize. redraw if not an AV
 		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
 		}
 
-	SetState(state)																				// SET PAGE STATE
-	{
-		const here=window.location.href.split("#")[0];									// Remove any hashes
-		history.replaceState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
-		if (state)	history.pushState(null,"Mandala",here+"#"+state);								// Store state in history
-		}
-	
-	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
-	{
-		let id;
-		if ((id=hash.match(/#p=(.+)/))) {															// If a page
-			id=id[1].toLowerCase();																	// Isolate kmap id
-			setupPage();
-			this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
-			}	
-
-		function setupPage() {
-			sui.ss.mode="simple";																	// Simple display mode	
-			$("#sui-typeList").remove();															// Remove type list
-			$("#sui-results").scrollTop(0);																// Scroll to top
-			$("#plc-infoDiv").remove();																	// Remove map buttons
-			$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
-			$("#sui-adv").css({ display:"none"});													// Hide search ui
-			}
-	}
-
-	SetSearchState(state)																		// SET OR INIT SEARCH STATE
+	SetSearchState(state)																		// SET OR INIIALIZE SEARCH STATE
 	{
 		if (!state) {
 			this.ss={};																				// Clear search state
@@ -132,7 +106,7 @@ class SearchUI  {
 			}
 		}
 
-	AddFrame()																					// ADD DIV FRAMEWORK
+	AddFrame()																					// ADD DIV FRAMEWORK FOR APP
 	{
 		var key;
 		var str=`<div id='sui-main' class='sui-main'>
@@ -225,13 +199,52 @@ class SearchUI  {
 		$("#sui-results").on("click",()=>{ $("#sui-popover").remove(); });							// ON CLICK OF RESULTS PAGE 
 		}
 
-	Draw(mode)																					// DRAW SEARCH
+	Draw(mode)																					// DRAW SEARCH COMPONENTS
 	{
 		$("#sui-typeList").remove();																// Remove type list
 		if (mode) this.ss.mode=mode;																// If mode spec'd, use it
 		this.DrawResults();																			// Draw results page if active
 		this.DrawAdvanced();																		// Draw search UI if active
 	}
+
+/*	PAGE STATE  //////////////////////////////////////////////////////////////////////////////////////
+	
+	Controls the forward/back buttons  and the bookmarking for the standlone version.
+	It uses the HTML5 History API. When page is navigated to programatically, SetState() is called.
+	It's state paramete contains information identifying the page via it's kmapId
+	This is added as a hash value to the browser's search bar for bookmarking.
+	It is added to the browser history for the browser's forward/back buttons.
+
+	A listener to the 'hashchanged' event calls PageRouter() with that kmpaId, and
+	thsat page is drawn on the screen.
+
+////////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+SetState(state)																				// SET PAGE STATE
+{
+	const here=window.location.href.split("#")[0];												// Remove any hashes
+	history.replaceState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
+	if (state)	history.pushState(null,"Mandala",here+"#"+state);								// Store state in history
+	}
+
+PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
+{
+	let id;
+	if ((id=hash.match(/#p=(.+)/))) {															// If a page
+		id=id[1].toLowerCase();																	// Isolate kmap id
+		setupPage();																			// Prepare page's <div> environment
+		this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
+		}	
+
+	function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
+		sui.ss.mode="simple";																	// Simple display mode	
+		$("#sui-typeList").remove();															// Remove type list
+		$("#sui-results").scrollTop(0);															// Scroll to top
+		$("#plc-infoDiv").remove();																// Remove map buttons
+		$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
+		$("#sui-adv").css({ display:"none"});													// Hide search ui
+		}
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  QUERY
@@ -332,8 +345,8 @@ class SearchUI  {
 				}
 			this.ResetFacetList(facet);																// Reset list UI elements
 		});
-
-		}
+	}
+	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  RESULTS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

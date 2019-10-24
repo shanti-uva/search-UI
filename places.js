@@ -8,7 +8,7 @@
 				img/bookmarkicon.gif
 
 	ESRI:		https://js.arcgis.com/4.12
-				https://js.arcgis.com/4.12/esri/themes/light/main.css
+				https://js.arcgis.com/4.12/esri/themes/light/main.css (dynamically loaded)
 
 	opt: 		Bitmapped: 1=Scale | 2=Search| 4=3D | 8=Base | 16=Layers | 32=Legend | 64=Sketch | 128=Bookmarks
 
@@ -20,7 +20,6 @@ class Places  {
 	{
 		this.app=null;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
-		$.ajax(		 { url:"https://js.arcgis.com/4.12", dataType: "script"  }); 
 	}
 
 	Draw(kmap)
