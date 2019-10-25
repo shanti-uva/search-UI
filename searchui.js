@@ -14,7 +14,7 @@
 
 
 	Requires: 	jQuery 												// Almost any version should work
-	Calls:		kmapsSolrUtil.js, [places.js, pages.js, tests.js,	// Other JS modules that are dynamically loaded (not used in plain search)
+	Calls:		kmapsSolrUtil.js, [places.js, pages.js, texts.js,	// Other JS modules that are dynamically loaded (not used in plain search)
 				audiovideo.js, visuals.js, sources.js]				
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
@@ -67,7 +67,7 @@ class SearchUI  {
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
-		this.SetSearchState(null);																	// Init search state to default
+		this.InitSearchState();																		// Init search state to default
 		this.AddFrame();																			// Add div framework
 		if (!location.hash)	{ 																		// Regular startup
 			this.Query();																			// Load search data
@@ -76,34 +76,6 @@ class SearchUI  {
 		else sui.PageRouter(location.hash);															// Go to particular page
 		window.onresize=()=> { if (!(location.hash+" ").match(/audio-video/)) this.Draw(); };		// On window resize. redraw if not an AV
 		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
-		}
-
-	SetSearchState(state)																		// SET OR INIIALIZE SEARCH STATE
-	{
-		if (!state) {
-			this.ss={};																				// Clear search state
-			this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR dev url
-//			this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/";		// Production
-			this.ss.mode="input";																	// Current mode - can be input, simple, or advanced
-			this.ss.view="Card";																	// Dispay mode - can be List, Grid, or Card
-			this.ss.sort="Alpha";																	// Sort mode - can be Alpha, Date, or Author
-			this.ss.type="All";																		// Current item types
-			this.ss.page=0;																			// Current page being shown
-			this.ss.pageSize=100;																	// Results per page	
-			this.ss.query={ 																		// Current query
-				text:"",																			// Search word 
-				places:[],																			// Places
-				collections:[],																		// Collections
-				languages:[],																		// Languages
-				features:[],																		// Feature types
-				subjects:[],																		// Subjects
-				terms:[],																			// Terms
-				relationships:[],																	// Relationships
-				users:[],																			// Users
-				assets:[],																			// Assets
-				dateStart:"", dateEnd:""															// Beginning and ending dates
-				};																
-			}
 		}
 
 	AddFrame()																					// ADD DIV FRAMEWORK FOR APP
@@ -207,7 +179,7 @@ class SearchUI  {
 		this.DrawAdvanced();																		// Draw search UI if active
 	}
 
-/*	PAGE STATE  //////////////////////////////////////////////////////////////////////////////////////
+/*	PAGE STATE  ////////////////////////////////////////////////////////////////////////////////////
 	
 	Controls the forward/back buttons  and the bookmarking for the standlone version.
 	It uses the HTML5 History API. When page is navigated to programatically, SetState() is called.
@@ -217,8 +189,12 @@ class SearchUI  {
 
 	A listener to the 'hashchanged' event calls PageRouter() with that kmpaId, and
 	thsat page is drawn on the screen.
+	
+	OPTIONS:
+	#p=kmapId		// Shows page that has kmapid
+	#a=AssetType	// Shows results from current search that match AssetType
 
-////////////////////////////////////////////////////////////////////////////////////////////////////*/
+///////////////////////////////////////////////////////////////////////////////////////////////// */
 
 SetState(state)																				// SET PAGE STATE
 {
@@ -235,9 +211,15 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		setupPage();																			// Prepare page's <div> environment
 		this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
 		}	
-
+	else if ((id=hash.match(/#a=(.+)/))) {														// If showing assets
+		setupPage();																			// Prepare page's <div> environment
+		this.ss.type=id[1];																		// Set asset type
+		this.Query(); 																			// Get new results
+		}	
+	
 	function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
 		sui.ss.mode="simple";																	// Simple display mode	
+		sui.ss.page=0;																			// Start at beginning
 		$("#sui-typeList").remove();															// Remove type list
 		$("#sui-results").scrollTop(0);															// Scroll to top
 		$("#plc-infoDiv").remove();																// Remove map buttons
@@ -246,10 +228,64 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		}
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  QUERY
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*	QUERY TOOLS //////////////////////////////////////////////////////////////////////////////////
 
+	A series of functions that manage the search process. The state of the current search is
+	saved in the ss object. It is initialized using InitSearchState(). The UI modifies the ss 
+	object to the search parameters desired and Query() uses Yuji's query builder to get a query
+	URL for SOLR. The results come in, they are displayed. The lists in the advsnced UI are also 
+	filtered to reflect the current possible options based on that search.
+
+	There are 3 modes of the search. A general qwery, as described above. The standalone version
+	adds search of assets related to a kmapId, and a query to get the kmaps in a given collection.
+
+//////////////////////////////////////////////////////////////////////////////////////////////  */
+
+	InitSearchState()																			// INIIALIZE SEARCH STATE
+	{
+		this.ss={};																					// Clear search state
+		this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR dev url
+//		this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select/";		// Production
+		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
+		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
+		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author
+		this.ss.type="All";																			// Current item types
+		this.ss.page=0;																				// Current page being shown
+		this.ss.pageSize=100;																		// Results per page	
+		this.ss.query={ 																			// Current query
+			text:"",																				// Search word 
+			places:[],																				// Places
+			collections:[],																			// Collections
+			languages:[],																			// Languages
+			features:[],																			// Feature types
+			subjects:[],																			// Subjects
+			terms:[],																				// Terms
+			relationships:[],																		// Relationships
+			users:[],																				// Users
+			assets:[],																				// Assets
+			dateStart:"", dateEnd:""																// Beginning and ending dates
+			};																
+		}
+
+	Query()																						// QUERY AND UPDATE RESULTS
+	{
+		let url;
+		this.LoadingIcon(true,64);																	// Show loading icon
+		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
+		if (this.ss.mode == "related")			url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
+		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
+		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
+		$("#sui-relatedAssets").remove();															// Remove related assets panel
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
+			this.curResults=data.response.docs;														// Save current results
+			this.MassageKmapData(data);																// Normalize for display
+			this.GetFacetData(data);																// Get facet data counts
+			this.assets.All.n=data.response.numFound;												// Set counts
+			this.LoadingIcon(false);																// Hide loading icon
+			this.DrawResults();																		// Draw results page if active
+			});
+	}
+	   
 	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
 	{
 		var url=this.ss.solrUrl+"?q=uid:"+id.toLowerCase()+"&wt=json";								// Set query url
@@ -269,7 +305,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> { callback(data); });					// Get JSON and send to callback
 	}
 
-	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR VIEWING
+	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR DISPLAY
 	{
 		var i,o;
 		for (i=0;i<data.response.docs.length;++i) {													// For each result, massage data
@@ -285,7 +321,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		return data;
 	}
 
-	GetFacetData(data)																				// GET FACET DATA
+	GetFacetData(data)																				// GET FACET COUNTS
 	{
 		var i,val,buckets;
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
@@ -309,25 +345,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				}
 	}
 
-	Query()																						// QUERY AND UPDATE RESULTS
-	{
-		let url;
-		this.LoadingIcon(true,64);																	// Show loading icon
-		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
-		if (this.ss.mode == "related")			url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
-		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
-		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
-		$("#sui-relatedAssets").remove();															// Remove related assets panel
-		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
-			this.curResults=data.response.docs;														// Save current results
-			this.MassageKmapData(data);																// Normalize for display
-			this.GetFacetData(data);																// Get facet data counts
-			this.assets.All.n=data.response.numFound;												// Set counts
-			this.LoadingIcon(false);																// Hide loading icon
-			this.DrawResults();																		// Draw results page if active
-			});
-	}
-    
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
@@ -346,10 +363,10 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			this.ResetFacetList(facet);																// Reset list UI elements
 		});
 	}
-	
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  RESULTS
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*	RESULTS ///////////////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////////  */
 
 	DrawResults()																				// DRAW RESULTS SECTION
 	{
@@ -418,6 +435,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			
 			$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 				this.ss.type=e.currentTarget.id.substring(7);										// Get asset name		
+				this.SetState("a="+this.ss.type);													// Set state
 				$("#sui-typeList").remove();														// Remove type list
 				this.ss.page=0;																		// Start at beginning
 				this.Query(); 																		// Get new results
@@ -674,9 +692,9 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		return str+"</div>";																		// Return items markup
 	}
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  ADVANCED SEARCH
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/*	ADVANCED SEARCH //////////////////////////////////////////////////////////////////////////////
+
+//////////////////////////////////////////////////////////////////////////////////////////////  */
 
 	DrawAdvanced()																				// DRAW SEARCH UI SECTION
 	{
@@ -842,7 +860,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TREE 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 
 	DrawFacetTree(facet, open, searchItem)  													// DRAW FACET TREE
 	{
