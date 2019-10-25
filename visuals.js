@@ -32,7 +32,7 @@ class Visuals  {
 			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></Iframe><br>`;	
 			str+="<div class='sui-sources' style='padding-top:0'>";
 			try{ if (o.collection_title)	s=`<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}`;
-			else							s="None</div>"; }  catch(e) {}
+			else							s="None"; }  catch(e) {}
 			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",s)+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";
 			try{ str+=d("&#xe63b","TITLE",o.title[0],"Untitled"); } catch(e){}
