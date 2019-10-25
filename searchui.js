@@ -244,8 +244,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 	InitSearchState()																			// INIIALIZE SEARCH STATE
 	{
 		this.ss={};																					// Clear search state
-		this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";	// SOLR dev url
-//		this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets/select";		// Production
+		this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";		// SOLR dev url
+//		this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets_stage/select";		// Production
 		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
 		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
 		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author

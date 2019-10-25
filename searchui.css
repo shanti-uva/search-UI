@@ -5,7 +5,8 @@
 					}	.sui-main b { font-weight:600; }				
 .sui-top {			position:absolute; right:182px; top:6px; height:36px; width:auto; user-select:none; pointer-events:initial;
 					}
-.sui-topBar {		height:41px;margin:-8px;padding:0;font-size:24px;font-weight:300
+.sui-topBar {		height:41px; margin:-8px; padding:0; font-size:27px; font-weight:300; color: #404aa9;
+					font-family:"Open Sans","Segoe UI",Tahoma,sans-serif,shanticon; letter-spacing:1.8px;
 					}
 .sui-search1 {		float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:230px; padding: 6px 8px 0 8px;
 					border-radius:16px 0 0 16px; border-left: 1px solid #999; border-top:1px solid #999; border-bottom:1px solid #999;

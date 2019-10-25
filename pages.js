@@ -109,6 +109,7 @@ class Pages  {
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
 		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); sui.Query()});	// Close handler, release related base
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
+//		$("#sui-topBar").html(`<span style='color:${sui.assets[o.asset_type].c}'>${o.asset_type.toUpperCase()}</span>`);
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
