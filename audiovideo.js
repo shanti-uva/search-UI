@@ -28,7 +28,7 @@ class AudioVideo  {
 
 	Draw(o)																					// DRAW AUDIO/VIDEO PAGE
 	{
-		let i,f;
+		let i,f,wid=100;
 		const _this=this;																		// Context
 		var partnerId="381832";																	// Kaltura partner id
 		var uiConfId="31832371";																// Kaltura confidential code
@@ -44,13 +44,20 @@ class AudioVideo  {
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
 trace(o,d)
 			var str=`<div id='sui-viewerSide' style='display:inline-block;width:${w}px'>`;		// Left side
-			if (d.field_video) {																// If a video field spec'd
-				if (d.field_video.und)			entryId=d.field_video.und[0].entryid;			// If id is in uns
-				else if (d.field_video.en)		entryId=d.field_video.en[0].entryid;			// In ens
-				str+=`<div class='sui-vPlayer' style='width:100%;height:${w*0.5625}px' id='sui-kplayer'>
-				<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
+			if (d.field_video && d.field_video.und)												// If video
+				entryId=d.field_video.und[0].entryid;											// Get id
+			else if (d.field_video && d.field_video.en)											// If video (english)
+				entryId=d.field_video.en[0].entryid;											// Get id
+			else if (d.field_audio && d.field_audio.und) {										// Audio
+				entryId=d.field_audio.und[0].entryid;											// Id
+				wid=33;																			// Make smaller
 				}
-			else str+="<img style='width:100%' src='"+o.url_thumb+"'>";
+			else if (d.field_audio && d.field_audio.en) {										// Audio (english)
+				entryId=d.field_audio.en[0].entryid;											// Id
+				wid=50;																			// Make smaller
+				}
+			str+=`<div class='sui-vPlayer' style='width:${wid}%;height:${w*0.5625*wid/100}px' id='sui-kplayer'>
+			<img src="https://cfvod.kaltura.com/p/${partnerId}/sp/${partnerId}00/thumbnail/entry_id/${entryId}/version/100301/width/560/height/0" fill-height"></div>`;
 			str+=`<br><br><div style='display:inline-block;width:300px;margin-left:16px'>
 			<div title='Duration'>&#xe61c&nbsp;&nbsp;&nbsp;${o.duration_s}</div>
 			<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published `;
@@ -154,7 +161,7 @@ trace(o,d)
 		if (d.field_pbcore_contributor && d.field_pbcore_contributor.und && d.field_pbcore_contributor.und.length) {	// If creators spec'd	
 			for (i=0;i<d.field_pbcore_contributor.und.length;++i) {								// For each item
 				f=d.field_pbcore_contributor.und[i];											// Point at it
-				try{ str+=`<p><b>CONTRIBUTING ${f.field_contributor_role.und[0].value.toUpperCase()}</b>:&nbsp;&nbsp;${f.field_contributor.und[0].value}</p>`;  } catch(e) {trace(e)}
+				try{ str+=`<p><b>CONTRIBUTING ${f.field_contributor_role.und[0].value.toUpperCase()}</b>:&nbsp;&nbsp;${f.field_contributor.und[0].value}</p>`;  } catch(e) {}
 				}
 			}
 		try{ str+="<p><b>PUBLISHER</b>:&nbsp;&nbsp;"+d.field_pbcore_publisher.und[0].field_publisher.und[0].value+"</p>"; } catch(e) {}
