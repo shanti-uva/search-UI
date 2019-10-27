@@ -302,7 +302,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		url=url.replace(/images.shanti.virginia.edu/i,"images-dev.shanti.virginia.edu");			// Look in dev			
 		url+="?callback=myfunc";																	// Add callback
 		if (kmap.asset_type == "Audio-Video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
-		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> { callback(data); });					// Get JSON and send to callback
+		$.ajax( { url:url, dataType:'jsonp', error: (xhr)=>{ this.Popup("Access error")}}).done((data)=> { callback(data); });	// Get JSON and send to callback
 	}
 
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR DISPLAY
