@@ -32,10 +32,11 @@ class Pages  {
 		if (!fromHistory)	sui.SetState(`p=${kmap.uid}`);										// This is the active page
 		this.curKmap=kmap;																		// Set active page's map
 		this.DrawHeader(kmap);																	// Draw header
-		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
+		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px", display:"none"});	// Reset to normal size and hide
+		$(this.div).css({ display:"block"});													// Show page
 		if (sui.ss.mode == "related") {															// If browsing related pages
 			if (!kmap.asset_type.match(/Places|Subjects|Terms/))								// Need to add space for these types
-				$("#sui-results").css({ "padding-left": "192px", width:"calc(100% - 216px"});	// Shrink page
+				$(this.div).css({ "padding-left": "192px", width:"calc(100% - 216px"});			// Shrink page
 			}
 		if (kmap.asset_type == "Places")			sui.places.Draw(kmap);						// Show place
 		else if (kmap.asset_type == "Sources") 		sui.src.Draw(kmap);							// Source
@@ -80,7 +81,7 @@ class Pages  {
 			str+=k+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
 		str+="</div></div>";	
-		$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
+		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 

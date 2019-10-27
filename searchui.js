@@ -95,7 +95,8 @@ class SearchUI  {
 				<div id='sui-headRight' class='sui-headRight'></div>
 			</div>
 			<div id='sui-left' class='sui-left'>
-				<div id='sui-results' class='sui-results scrollbar'></div>
+			<div id='sui-pages' class='sui-results scrollbar'></div>
+			<div id='sui-results' class='sui-results scrollbar'></div>
 					<div id='sui-footer' class='sui-footer'></div>
 				<div id='sui-adv' class='sui-adv'>
 					<div class='sui-advTop'>Advanced search
@@ -222,6 +223,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		sui.ss.page=0;																			// Start at beginning
 		$("#sui-typeList").remove();															// Remove type list
 		$("#sui-results").scrollTop(0);															// Scroll to top
+		$("#sui-pages").scrollTop(0);															// Scroll to top
 		$("#plc-infoDiv").remove();																// Remove map buttons
 		$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
 		$("#sui-adv").css({ display:"none"});													// Hide search ui
@@ -372,6 +374,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 	{
 		$("#sui-results").scrollTop(0);																// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
+
 		this.numItems=this.assets[this.ss.type].n;													// Set number of items
 		if (this.ss.mode == "input") {																// Just the search box
 			$("#sui-header").css({ display:"none"});												// Show header
@@ -384,11 +387,15 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			$("#sui-left").css({ width:"100%" });													// Size and show results area
 			$("#sui-adv").css({ display:"none"});													// Hide search ui
 			$("#sui-left").slideDown();																// Slide down
-			}
+			$("#sui-pages").css({ display:"none" });												// Hide pages page	
+			$("#sui-results").css({ display:"block" });												// Show results page	
+		}
 		else if (this.ss.mode == "advanced") {														// Advanced search
 			$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width()-19+"px",display:"inline-block"});	// Size and show results area
-			$("#sui-adv").css({ display:"inline-block" });										// Show search ui
-			}
+			$("#sui-adv").css({ display:"inline-block" });											// Show search ui
+			$("#sui-pages").css({ display:"none" });												// Hide pages page	
+			$("#sui-results").css({ display:"block" });												// Show results page	
+		}
 		$("#sui-headLeft").css({ display:"inline-block" });											// Show left header
 		$("#sui-mode").prop({"title": this.ss.mode == "advanced" ? "Regular search" : "Advanced search" } );	// Set tooltip
 		$("#sui-mode").html(this.ss.mode == "advanced" ? "REGULAR<br>SEARCH" : "ADVANCED<br>SEARCH" );			// Set mode icon	
@@ -412,7 +419,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			`;
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-	
 		str=`
 			SHOW&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
