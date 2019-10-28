@@ -368,7 +368,11 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 /*	RESULTS ///////////////////////////////////////////////////////////////////////////////////////
 
-//////////////////////////////////////////////////////////////////////////////////////////////  */
+	Show results based on the state of the search state object ss. When a Query() is run, 100
+	results are paged at a time and shown in one of 3 display modes. A list mode, a full card mode,
+	and a grid image mode.
+
+///////////////////////////////////////////////////////////////////////////////////////////////  */
 
 	DrawResults()																				// DRAW RESULTS SECTION
 	{
@@ -382,7 +386,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				$("#sui-headLeft").css({ display:"none" });											// Hide left header
 				}
 			else{																					// If standalone
-			$("#sui-left").css({ display:"none" });												// Hide results
+				$("#sui-left").css({ display:"none" });												// Hide results
 				$("#sui-left").css({ width:"100%" });												// Size and show results area
 				$("#sui-adv").css({ display:"none"});												// Hide search ui
 				$("#sui-pages").css({ display:"block",color:"#000" });								// Show pages page	
