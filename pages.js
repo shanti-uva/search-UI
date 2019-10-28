@@ -107,6 +107,7 @@ class Pages  {
 	DrawHeader(o)																			// DRAW HEADER
 	{
 		var i;
+		if (!o) return;																			// Return if not kmap defines
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
 		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); })// Close handler, release related base
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes

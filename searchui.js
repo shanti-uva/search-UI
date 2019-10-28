@@ -374,13 +374,20 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 	{
 		$("#sui-results").scrollTop(0);																// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
-
 		this.numItems=this.assets[this.ss.type].n;													// Set number of items
 		if (this.ss.mode == "input") {																// Just the search box
 			$("#sui-header").css({ display:"none"});												// Show header
-			$("#sui-left").css({ display:"none" });													// Hide results
-			$("#sui-adv").css({ display:"none" });													// Hide search ui
-			$("#sui-headLeft").css({ display:"none" });												// Hide left header
+			if (this.runMode != "standalone") {														// If not standalone															
+				$("#sui-left").css({ display:"none" });												// Hide results
+				$("#sui-headLeft").css({ display:"none" });											// Hide left header
+				}
+			else{																					// If standalone
+				$("#sui-pages").css({ display:"block",color:"#000" });								// Show pages page	
+				$("#sui-results").css({ display:"none" });											// Hide results page	
+				$("#sui-header").css({display:"inline-block"} );									// Show header
+				if (this.pages)	this.pages.DrawHeader(this.pages.curKmap);							// Re-draw header
+				}
+			$("#sui-adv").css({ display:"none" });													// Hide adv search ui
 			return;																					// Quit
 			}
 		else if (this.ss.mode == "simple") {														// Simple search
