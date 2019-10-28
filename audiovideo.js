@@ -8,6 +8,7 @@
 	Requires: 	jQuery 												// Almost any version should work
 	Kaltura: 	https://cfvod.kaltura.com,	//cdnapi.kaltura.com,	// Kaltura API
 	JSON:		From Drupal site
+	Dependents:	pages.js, searchui.js								// JS modules called
 	Globals:	Looks for sui and sui.pages
 
 *************************************************************************************************************************************************/
@@ -16,7 +17,7 @@ class AudioVideo  {
 
 	constructor()   																		// CONSTRUCTOR
 	{
-		this.div="#sui-results";																// Div to hold page
+		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 		this.metaContent=["","",""];															// Metadate content
 		this.inPlay=false;																		// If AV is in play
 		this.curTransSeg=-1;																	// Currently active transceipt segment

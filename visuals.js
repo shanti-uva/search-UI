@@ -5,6 +5,7 @@
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	JSON:		From Drupal site
 	Globals:	looks for sui and sui.pages
+	Dependents:	pages.js, searchui.js								// JS modules called
 
 ********************************************************************************************************************************************/
 
@@ -12,7 +13,7 @@ class Visuals  {
 
 	constructor()   																		// CONSTRUCTOR
 	{
-		this.div="#sui-results";																// Div to hold page
+		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 	}
 
 	Draw(o)																			// DRAW VISUAL PAGE FROM KMAP

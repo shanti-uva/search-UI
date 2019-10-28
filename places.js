@@ -9,7 +9,7 @@
 
 	ESRI:		https://js.arcgis.com/4.12
 				https://js.arcgis.com/4.12/esri/themes/light/main.css (dynamically loaded)
-
+	Dependents:	pages.js, searchui.js								// JS modules called
 	opt: 		Bitmapped: 1=Scale | 2=Search| 4=3D | 8=Base | 16=Layers | 32=Legend | 64=Sketch | 128=Bookmarks
 
 *******************************************************************************************************************************************/
@@ -20,20 +20,21 @@ class Places  {
 	{
 		this.app=null;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
+		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 	}
 
 	Draw(kmap)
 	{
-		var _this=this;																				// Save context
-		this.kmap=kmap;																				// Save kmap
-		sui.LoadingIcon(true,64);																	// Show loading icon
-		var app={ container:"plc-main",																// Holds startup parameters													
+		var _this=this;																			// Save context
+		this.kmap=kmap;																			// Save kmap
+		sui.LoadingIcon(true,64);																// Show loading icon
+		var app={ container:"plc-main",															// Holds startup parameters													
 			map:null, baseMap:"hybrid", kml:null, 								
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
 			  center: [91.1721, 29.6524], zoom:12, tilt:80,
 			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/KMLLayer", "esri/core/watchUtils"],
-			div: "#sui-results"								
+			div: this.div								
 	   		};
 	
 /*		app.kml=`http://www.thlib.org:8080/thdl-geoserver/wms
@@ -48,21 +49,21 @@ class Places  {
 			&REQUEST=GetMap`.replace(/\t|\n|\r|/g,"")
 */		
 		this.app=app;	   
-		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");									// Scalebar if spec'd
-		if (app.opt&2)	 app.reqs.push("esri/widgets/Search");										// Search
-		if (app.opt&8)	 app.reqs.push("esri/widgets/BasemapGallery");								// Basepicker 
-		if (app.opt&16)	 app.reqs.push("esri/widgets/LayerList");									// Layerlist 
-		if (app.opt&32)  app.reqs.push("esri/widgets/Legend");										// Legend
+		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");								// Scalebar if spec'd
+		if (app.opt&2)	 app.reqs.push("esri/widgets/Search");									// Search
+		if (app.opt&8)	 app.reqs.push("esri/widgets/BasemapGallery");							// Basepicker 
+		if (app.opt&16)	 app.reqs.push("esri/widgets/LayerList");								// Layerlist 
+		if (app.opt&32)  app.reqs.push("esri/widgets/Legend");									// Legend
 		if (app.opt&64)	 app.reqs.push("esri/widgets/Sketch"),app.reqs.push("esri/layers/GraphicsLayer");	// Sketch
-		if (app.opt&128) app.reqs.push("esri/widgets/Bookmarks");									// Bookmarks 
+		if (app.opt&128) app.reqs.push("esri/widgets/Bookmarks");								// Bookmarks 
 
-		require(app.reqs, function() {															// LOAD ArcGIS MODULES
+		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
 			var Map,WebMap,MapView,SceneView,KMLLayer;
 			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils;
-			for (i=0;i<app.reqs.length;++i)	{														// For each required module
-				key=app.reqs[i].match(/([^\/]+)$/i)[1];												// Extract variable name
-				if (key == "Map") 					Map=arguments[i];								// Set variable
+			for (i=0;i<app.reqs.length;++i)	{													// For each required module
+				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
+				if (key == "Map") 					Map=arguments[i];							// Set variable
 				else if (key == "WebMap")			WebMap=arguments[i];
 				else if (key == "MapView")			MapView=arguments[i];
 				else if (key == "SceneView")		SceneView=arguments[i];
@@ -78,9 +79,9 @@ class Places  {
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
 
-			_this.DrawMetadata();																		// Draw metadata
+			_this.DrawMetadata();																	// Draw metadata
 
-			if (!$("#plc-switch-btn").length) {															// If not initted yet
+			if (!$("#plc-switch-btn").length) {														// If not initted yet
 			var str=`<div id="plc-infoDiv">
 				<input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-switch-btn" value="3D"             title="Change view" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-base-btn"   src="basemapicon.gif"  title="Change base map"/>
@@ -92,7 +93,7 @@ class Places  {
 				$("#plc-main").append(str);
 			}
 
-		app.ShowOptions=function() {																// SHOW ACTIVE OPTIONS
+		app.ShowOptions=function() {															// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
 			document.getElementById("plc-base-btn").style.display=(app.opt&8) ? "block" : "none";							
 			document.getElementById("plc-layer-btn").style.display=(app.opt&16 && (app.map.portalItem || app.kml)) ? "block" : "none";							

@@ -96,7 +96,7 @@ class SearchUI  {
 			</div>
 			<div id='sui-left' class='sui-left'>
 			<div id='sui-pages' class='sui-results scrollbar'></div>
-			<div id='sui-results' class='sui-results scrollbar'></div>
+			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
 					<div id='sui-footer' class='sui-footer'></div>
 				<div id='sui-adv' class='sui-adv'>
 					<div class='sui-advTop'>Advanced search

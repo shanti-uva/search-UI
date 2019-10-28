@@ -19,7 +19,7 @@ class Pages  {
 
 	constructor()   																		// CONSTRUCTOR
 	{
-		this.div="#sui-results";																// Div to hold page
+		this.div="#sui-pages";																	// Div to hold page
 		this.relatedBase=null;																	// Holds based kmap for related
 		this.relatedType="Home";																// Holds current related category
 		this.relatedId="";																		// Holds current related id
@@ -33,7 +33,7 @@ class Pages  {
 		this.curKmap=kmap;																		// Set active page's map
 		this.DrawHeader(kmap);																	// Draw header
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px", display:"none"});	// Reset to normal size and hide
-		$(this.div).css({ display:"block"});													// Show page
+		$(this.div).css({ display:"block",color:"#000"});										// Show page
 		if (sui.ss.mode == "related") {															// If browsing related pages
 			if (!kmap.asset_type.match(/Places|Subjects|Terms/))								// Need to add space for these types
 				$(this.div).css({ "padding-left": "192px", width:"calc(100% - 216px"});			// Shrink page
@@ -107,8 +107,8 @@ class Pages  {
 	DrawHeader(o)																			// DRAW HEADER
 	{
 		var i;
-		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); sui.Query()});	// Close handler, release related base
+		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
+		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); })// Close handler, release related base
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
 //		$("#sui-topBar").html(`<span style='color:${sui.assets[o.asset_type].c}'>${o.asset_type.toUpperCase()}</span>`);
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
