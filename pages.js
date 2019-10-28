@@ -19,7 +19,7 @@ class Pages  {
 
 	constructor()   																		// CONSTRUCTOR
 	{
-		this.div="#sui-pages";																	// Div to hold page
+		this.div="#sui-results";																// Div to hold page
 		this.relatedBase=null;																	// Holds based kmap for related
 		this.relatedType="Home";																// Holds current related category
 		this.relatedId="";																		// Holds current related id
@@ -109,7 +109,7 @@ class Pages  {
 		var i;
 		if (!o) return;																			// Return if not kmap defines
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=> { this.relatedBase=null; sui.Draw(this.lastMode); })// Close handler, release related base
+		$("#plc-closeBut").on("click", ()=>{ this.relatedBase=null; sui.Draw(this.lastMode); })	// Close handler, release related base
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
 //		$("#sui-topBar").html(`<span style='color:${sui.assets[o.asset_type].c}'>${o.asset_type.toUpperCase()}</span>`);
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;

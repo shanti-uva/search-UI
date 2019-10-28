@@ -382,9 +382,11 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				$("#sui-headLeft").css({ display:"none" });											// Hide left header
 				}
 			else{																					// If standalone
+			$("#sui-left").css({ display:"none" });												// Hide results
+				$("#sui-left").css({ width:"100%" });												// Size and show results area
+				$("#sui-adv").css({ display:"none"});												// Hide search ui
 				$("#sui-pages").css({ display:"block",color:"#000" });								// Show pages page	
 				$("#sui-results").css({ display:"none" });											// Hide results page	
-				$("#sui-header").css({display:"inline-block"} );									// Show header
 				if (this.pages)	this.pages.DrawHeader(this.pages.curKmap);							// Re-draw header
 				}
 			$("#sui-adv").css({ display:"none" });													// Hide adv search ui
@@ -435,7 +437,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			</div>
 			`;
 		$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-		$("#sui-resClose").on("click", ()=> { this.Draw("input"); });								// ON QUIT
+		$("#sui-resClose").on("click", ()=> { this.Draw("input");  });								// ON QUIT
 		$("#sui-typeSet").on("click", ()=> {														// ON CHANGE ASSET BUTTON
 			$("#sui-typeList").remove();															// Remove type list
 			str="<div id='sui-typeList' class='sui-typeList'>";										// Enclosing div for list
