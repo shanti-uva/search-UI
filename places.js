@@ -19,6 +19,9 @@ class Places  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.app=null;
+		this.kmap=null;
+		this.extent=null;
+		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 	}
@@ -27,13 +30,14 @@ class Places  {
 	{
 		var _this=this;																			// Save context
 		this.kmap=kmap;																			// Save kmap
+		this.GeoLocate();																		// Get extent
 		sui.LoadingIcon(true,64);																// Show loading icon
 		var app={ container:"plc-main",															// Holds startup parameters													
 			map:null, baseMap:"hybrid", kml:null, 								
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
 			  center: [91.1721, 29.6524], zoom:12, tilt:80,
-			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/KMLLayer", "esri/core/watchUtils"],
+			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
 	   		};
 	
@@ -47,7 +51,9 @@ class Places  {
 			&BBOX=3159514.209965,-1447629.9642176,20066161.87184,9001617.5490246
 			&WIDTH=864&HEIGHT=53
 			&REQUEST=GetMap`.replace(/\t|\n|\r|/g,"")
-*/		
+			app.kml="https://viseyes.org/visualeyes/projects/test.kml"
+*/	
+
 		this.app=app;	   
 		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");								// Scalebar if spec'd
 		if (app.opt&2)	 app.reqs.push("esri/widgets/Search");									// Search
@@ -59,7 +65,7 @@ class Places  {
 
 		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
-			var Map,WebMap,MapView,SceneView,KMLLayer;
+			var Map,WebMap,MapView,SceneView,KMLLayer,Extent;
 			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils;
 			for (i=0;i<app.reqs.length;++i)	{													// For each required module
 				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
@@ -69,6 +75,7 @@ class Places  {
 				else if (key == "SceneView")		SceneView=arguments[i];
 				else if (key == "KMLLayer")			KMLLayer=arguments[i];
 				else if (key == "watchUtils")		watchUtils=arguments[i];
+				else if (key == "Extent")			Extent=arguments[i];
 				else if (key == "ScaleBar")			ScaleBar=arguments[i];
 				else if (key == "Search")			Search=arguments[i];
 				else if (key == "BasemapGallery")	BasemapGallery=arguments[i];
@@ -113,8 +120,7 @@ class Places  {
 		app.map=new Map({ basemap:app.baseMap, ground:"world-elevation" });							// Make new map
 		app.sceneView=new SceneView( { 	container:null,	map: app.map });							// 3D view (hidden)
 		app.activeView=app.mapView=new MapView({													// 2D view
-			container: app.container, map: app.map, 												// Primary view
-			ground: "world-elevation"
+			container: app.container, map: app.map 													// Primary view
 			});
 		app.ShowOptions();																			// Hide/show options		
 		
@@ -165,9 +171,11 @@ class Places  {
 // POSITION
 
 		app.mapView.when(function() { 																// When 2D map loads
-			if (!app.map.portalItem) app.mapView.goTo({ center:app.center, zoom:app.zoom });		// Center	
+			if (_this.extent)				app.GoToExtent(_this.extent);							// If an extent given			
+			else if (!app.map.portalItem) 	app.mapView.goTo({ center:app.center, zoom:app.zoom });	// Center	
 			sui.LoadingIcon(false);																	// Hide loading icon
-		});
+			_this.showing=true;																		// Been shown	
+			});
 		app.sceneView.when(function() { app.sceneView.goTo({ tilt:80 }); });						// When 3D loads, tilt
 
 		app.DrawFooter=function()																	// DRAW MAP FOOTER
@@ -198,6 +206,11 @@ class Places  {
 			if (option.visible)	app.activeView.ui.remove(option);									// If visible, hide
 			else				app.activeView.ui.add(option,"top-right");							// Else show
 			option.visible=!option.visible;															// Toggle flag (why?)
+		}
+
+		app.GoToExtent=function(extent)															// SET NEW EXTENT
+		{
+			app.mapView.goTo({ extent:new Extent(extent) });										// Set view to extent
 		}
 
 		app.SwitchView=function() 																// SWITCH 2D/3D MODE
@@ -265,6 +278,24 @@ class Places  {
 		content[1]="TBA";											
 		content[2]="TBA";	
 	}	
+
+	GeoLocate()																				// GET EXTENT FROM PLACE PATH TREE IN KMAP
+	{
+		let loc="";
+		this.extent=null;																		// Assume not found
+		var _this=this;																			// Save context
+		try{
+			for (let i=this.kmap.ancestors_txt.length-1;i>0;--i)								// For each ancestor backwards
+			loc+=this.kmap.ancestors_txt[i]+"%20";												// Add name
+			if (this.kmap.ancestors_txt.length == 1) loc=this.kmap.ancestors_txt[0];			// Top level places
+			let url="http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=pjson&SingleLine="+loc;
+			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
+				_this.extent=res.candidates[0].extent;											// Extract extent
+				_this.extent.spatialReference=res.spatialReference.wkid;						// Set ref
+				if (_this.showing) _this.app.GoToExtent(_this.extent);							// If already showing a map, go there
+				});	
+		} catch(e) {trace(e)};	
+	}
 	
 
 } // Places class closure

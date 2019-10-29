@@ -43,7 +43,6 @@ class AudioVideo  {
 		
 		sui.LoadingIcon(true,64);																// Show loading icon
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
-trace(o,d)
 			var str=`<div id='sui-viewerSide' style='display:inline-block;width:${w}px'>`;		// Left side
 			if (d.field_video && d.field_video.und)												// If video
 				entryId=d.field_video.und[0].entryid;											// Get id
@@ -138,7 +137,7 @@ trace(o,d)
 				str+=d.field_subcollection_new.und[i].header+sui.pages.AddPop(d.field_subcollection_new.und[i].domain+"-"+d.field_subcollection_new.und[i].id)+"&nbsp;&nbsp; ";
 				}
 			str+="</p>"; } catch(e) {}
-		try{ str+="<p><b>SUBJECT</b>:&nbsp;&nbsp;"
+		try{ str+="<p><b>SUBJECT</b>:&nbsp;&nbsp;";
 			for (i=0;i<d.field_subject.und.length;++i) {
 				str+=d.field_subject.und[i].header+sui.pages.AddPop(d.field_subject.und[i].domain+"-"+d.field_subject.und[i].id)+"&nbsp;&nbsp; ";
 				}
@@ -223,7 +222,7 @@ trace(o,d)
 			this.transRes=res;																	// Set segs
 			if ($(this.div).width() > 700)														// If mobile
 				$("#sui-viewerSide").width($(this.div).width()*0.5);							// Halve viewer width
-			$("#sui-kplayer").height($(this.div).width()*0.5*.5625);							// Set height based on aspect ratio
+			$("#sui-kplayer").height($(this.div).width()*0.5*0.5625);							// Set height based on aspect ratio
 			this.DrawTranscriptMenu();															// Draw transcripts header	
 			this.DrawTransContent();															// Draw the transcipt content
 		});																						// AJAX closure
@@ -296,7 +295,7 @@ trace(o,d)
 		<div class='sui-transRow' id='sui-transRevR'>- Reversed<span id='sui-transRev' class='sui-transCheck'>&#xe60e</span></div>
 		<div class='sui-transLab'>DOWNLOADS</div>
 		<div class='sui-transRow' id='sui-transStr'->- SRT file<span class='sui-transCheck' style='color:#58aab4'>&#xe616</span></div>`;
-		$("#sui-transOps").html(str.replace(/\t|\n|\r/g,""))
+		$("#sui-transOps").html(str.replace(/\t|\n|\r/g,""));
 
 		$("#sui-transStr").on("click",()=> { this.SaveStrFile(); });						// ON SAVE SRT FILE
 

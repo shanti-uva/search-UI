@@ -106,7 +106,7 @@ class SearchUI  {
 						<input type='text' id='sui-search2' class='sui-search2' placeholder='Enter Search'>
 						<div id='sui-clear' class='sui-search3'>&#xe610</div>
 					</div>
-					<div id='sui-searchgo2' class='sui-search4'>&#xe623</div><br><br>`
+					<div id='sui-searchgo2' class='sui-search4'>&#xe623</div><br><br>`;
 					for (key in this.facets) { 
 						str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
 						${this.facets[key].icon}&nbsp;&nbsp;
@@ -539,7 +539,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
-			})
+			});
 		$("[id^=sui-itemPic-]").on("click",(e)=> { 													// ON ITEM CLICK
 			var num=e.currentTarget.id.substring(12);												// Get index of result	
 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
@@ -997,7 +997,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 						o=res.response.docs[i];														// Point at child
 						re=new RegExp("\/"+o.id.split("-")[1]);										// Id
 						str+="<li";																	// Start row
-						if ((f && f.match(re)) || init)	str+=" class='parent'"						// If has children or is top, add parent class
+						if ((f && f.match(re)) || init)	str+=" class='parent'";						// If has children or is top, add parent class
 						str+="><a id='"+o.id;														// Add id
 						str+="' data-path='"+o.ancestor_id_path+"'>";								// Add path
 						str+=o.header;																// Add label

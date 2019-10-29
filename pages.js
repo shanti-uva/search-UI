@@ -29,6 +29,7 @@ class Pages  {
 
 	Draw(kmap, fromHistory)																	// DRAW KMAP PAGE
 	{
+		if (!kmap)	return;																		// Quit if no kmap
 		if (!fromHistory)	sui.SetState(`p=${kmap.uid}`);										// This is the active page
 		this.curKmap=kmap;																		// Set active page's map
 		this.DrawHeader(kmap);																	// Draw header
@@ -109,7 +110,7 @@ class Pages  {
 		var i;
 		if (!o) return;																			// Return if not kmap defines
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=>{ this.relatedBase=null; sui.Draw(this.lastMode); })	// Close handler, release related base
+		$("#plc-closeBut").on("click", ()=>{ this.relatedBase=null; sui.Draw(this.lastMode); });// Close handler, release related base
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
 //		$("#sui-topBar").html(`<span style='color:${sui.assets[o.asset_type].c}'>${o.asset_type.toUpperCase()}</span>`);
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
@@ -247,7 +248,7 @@ class Pages  {
 		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>`;
 		try{ str+="<p>PHONEME:&nbsp;&nbsp<span class='sui-sourceText'>";						// Add header
 			for (let i=0;i<o.data_phoneme_ss.length;++i) {										// For each item
-				str+=o.data_phoneme_ss[i]+this.AddPop(o.related_uid_ss[i]);					// Add name and drop
+				str+=o.data_phoneme_ss[i]+this.AddPop(o.related_uid_ss[i]);						// Add name and drop
 				if (i < o.data_phoneme_ss.length-1)	str+=", ";									// Add separator
 				}
 			str+="</p>"; } catch(e){}
@@ -264,7 +265,7 @@ class Pages  {
 		var str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
-		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`
+		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`;
 		if (o.caption)	str+="<p>"+o.caption+"</p>";
 		str+="<p style='width:calc(100% - 16px);background-color:#888;color:#fff;padding:8px'><b>NAMES</b></p><table>";
 		if (o.names_txt && o.names_txt.length) {												// If names
@@ -284,39 +285,7 @@ class Pages  {
 // HELPERS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawItem(icon, label, value, def, style, bold)												// DRAW ITEM
-	{
-		let i,str="<p>";
-		if ((value == null) || (value == undefined))	return "";								// Return nothing
-		if (icon)	str+=icon+"&nbsp;&nbsp;";													// Add icon
-		str+="<span class='sui-pageLab'";														// Label head
-		if (bold)	str+=" style='font-weight:600'";											// Bold?
-		str+=">"+label+":&nbsp;&nbsp;</span>";													// Add label
-		str+="<span class='";																	// Add value span
-		str+=(style ? style : "sui-pageVal")+"'>";												// Default, or special style
-		if (typeof(value) == "object") {														// If an array
-			for (i=0;i<value.length;++i)	{													// For each item
-				if (value[i].header)		str+=value[i].header;								// Use .header
-				else if (value[i].value)	str+=value[i].value;								// .value
-				else if (value[i].val)		str+=value[i].val;									// .val
-				else if (value[i].title)	str+=value[i].title;								// .title
-				else 						str+=value[i];										// Plain	
-				if (i != value.length-1)	str+=", ";											// Add separator
-				}
-			}
-		else str+=(value && (!value.match(/undefined/))) ? value : def;							// Add def if bad value or show value
-		return str+"</span></p>";																// Return item
-	}
-
-	FormatDate(date)																		// FRIENDLY FORMAT OF DATE
-	{
-		let m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];		// Array of mos
-		let d=new Date(date);																	// Parse date
-		if (d)	date=d.getDate()+" "+m[d.getMonth()]+ " "+d.getFullYear();						// Remake it
-		return date;
-	}		
-
-	DrawItem(icon, label, value, def, style, bold)												// DRAW ITEM
+	DrawItem(icon, label, value, def, style, bold)											// DRAW ITEM
 	{
 		let i,str="<p>";
 		if ((value == null) || (value == undefined))	return "";								// Return nothing
