@@ -271,8 +271,40 @@
 					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); 
 					}					
 .sui-popItem:hover{ color:#a4baec
+					}	
+/* CAROUSEL */
+
+.sui-caroBox { 		color:#555; font-size:13px; background-color:#fff; padding:28px 24px 6px 24px;
+					max-width:1080px; margin:24px auto 0 auto;  width:calc(100% - 60px); border:1px solid #999;
 					}								
-				
+.sui-caroHeader { 	font-style:italic; font-size:17px; margin:-140px 0 24px 0;
+					}								
+.sui-caroTitle { 	font-size:21px; margin:-12px 0 8px -8px;
+					}
+.sui-caroButL { 	position:relative; left:-46px; top:80px;font-size:26px; color:#fff; border-radius:4px 0 0 4px; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
+					width:30px; cursor:pointer;
+					} .sui-caroButL:hover { opacity: .8 }													
+		
+.sui-caroButR { 	position:relative; left:calc(100% + 12px); top:37px;font-size:26px; color:#fff; border-radius:0 4px 4px 0; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
+					width:30px; cursor:pointer;
+					} .sui-caroButR:hover { opacity: .8 }													
+.sui-caroView {		font-style:italic; font-size:16px;
+					}
+.sui-caroText {		border-left:5px solid #eee; padding-left:24px; font-family:"EB Garamond",serif,shanticon; font-weight:400; 
+					line-height:26px; font-size:18px;
+					}										
+.sui-caroPic {		width:calc(33% - 44px); margin-left:50px; 	
+					}
+.sui-caroLeft {		display:inline-block;width:calc(66% - 4px); vertical-align:top;
+					}
+.sui-caroDots {		display:inline-block; width:calc(66% - 200px); text-align:center; height:8px;
+					}	
+.sui-caroDot {		display:inline-block; opacity:.8; width:8px; height:8px; border-radius:8px; border:1px solid #999; margin-right:16px;
+					} .sui-caroDot:hover {	 background-color:#5d68cc; }				
+.sui-caroRes {		display:inline-block; font-size:14px; font-weight:400;
+					}					
+
+
 /* PSUEDO ELEMENTS */
 
 .sui-main ::-webkit-scrollbar { width: 10px; height:8px } 

@@ -454,7 +454,7 @@ class AudioVideo  {
 		var h=0,m=0;
 		var v=(""+timecode).split(":");															// Split by colons
 		var s=v[0];																				// Add them
-			if (v.length == 2)																	// Just minutes, seconds
+		if (v.length == 2)																		// Just minutes, seconds
 			s=v[1],m=v[0];																		// Add them
 		else if (v.length == 3)																	// Hours, minutes, seconds
 			s=v[2],m=v[1],h=v[0];																// Add them

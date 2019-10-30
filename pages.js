@@ -285,6 +285,40 @@ class Pages  {
 // HELPERS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	DrawLandingPage()
+	{
+		$("#sui-headLeft").html("&#xe633&nbsp;&nbsp;Explore Mandala Collections");				// Set left header
+		$("#sui-headRight").html("");															// Clear right header
+		$("#sui-footer").html("");																// Clear footer
+		$("#sui-footer").css("background-color","#ddd");
+		this.DrawCarousel();
+	}
+
+	DrawCarousel(content)
+	{
+		let i;
+		content=[{},{},{},{},{},{},{}];
+		let str=`<div class='sui-caroBox'>
+		<div class='sui-caroButL' id='sui-caroButL'>&#xe640</div>
+		<div class='sui-caroButR' id='sui-caroButR'>&#xe641</div>
+	
+		<div class='sui-caroHeader'>Featured Resources</div>
+			<div class='sui-caroLeft'>
+				<div class='sui-caroTitle' id='sui-caroTitle'>&#xe633&nbsp;&nbsp;Alexander the Great - His Times and Era</div>
+				<div class='sui-caroText' id='sui-caroText'>
+				Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...
+				</div>
+			</div>
+			<img class='sui-caroPic' id='sui-caroPic' src='https://mms.thlib.org/images/0050/8753/63691_large.jpg'>
+			<a class='sui-caroRes'><i>View Resource</i>&nbsp;&nbsp;&#xe683</a>
+			<div class='sui-caroDots'>
+			<div class='sui-caroDot' id='sui-caroDot-0' style='background-color:#5d68cc'></div>`;
+			for (i=1;i<content.length;++i) 
+				str+=`<div class='sui-caroDot' id='sui-caroDot-${i}'></div>`;
+			str+="</div></div>";
+		$("#sui-pages").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
+		}
+
 	DrawItem(icon, label, value, def, style, bold)											// DRAW ITEM
 	{
 		let i,str="<p>";

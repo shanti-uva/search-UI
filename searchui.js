@@ -386,12 +386,12 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				$("#sui-headLeft").css({ display:"none" });											// Hide left header
 				}
 			else{																					// If standalone
-				$("#sui-left").css({ display:"none" });												// Hide results
-				$("#sui-left").css({ width:"100%" });												// Size and show results area
+				$("#sui-header").css({display:"inline-block","background-color":"#4d59ca"} );		// Show header
+				$("#sui-left").css({ display:"block",width:"100%" });								// Size and show left side
 				$("#sui-adv").css({ display:"none"});												// Hide search ui
 				$("#sui-pages").css({ display:"block",color:"#000" });								// Show pages page	
 				$("#sui-results").css({ display:"none" });											// Hide results page	
-				if (this.pages)	this.pages.DrawHeader(this.pages.curKmap);							// Re-draw header
+				if (this.pages)	this.pages.DrawLandingPage();										// Draw landing page
 				}
 			$("#sui-adv").css({ display:"none" });													// Hide adv search ui
 			return;																					// Quit

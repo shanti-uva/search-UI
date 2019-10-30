@@ -31,7 +31,6 @@
 			<span style='vertical-align:10px' id='sui-topBar'>KMAPS</span>
 			<img src="img/mandalaright.jpg" id='specialK' style='float:right'>
 		<div>
-		<img src="img/mandalaback.jpg" style='width:100%;margin-top:-5px;height:calc(100vh - 55px)'>
 	</div>
 <script>
 
@@ -43,12 +42,10 @@ sui.img=new Images();																	// Alloc Images (standalone)
 sui.txt=new Texts();																	// Alloc Texts (standalone)
 sui.src=new Sources();																	// Alloc Sources (standalone)
 sui.vis=new Visuals();																	// Alloc Visuals (standalone)
+sui.pages.DrawLandingPage();															// Draw landing page
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	var url=sui.solrUtil.createAssetsByCollectionQuery( "images-1596", 0, 100)
-	$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
-	trace(data)
-	});
+	sui.DrawLandingPage()
 });
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 
