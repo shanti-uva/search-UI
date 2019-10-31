@@ -352,7 +352,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
-  		let url=this.solrUtil.createBasicQuery(this.ss,["x"+(facet == "features") ? "feature_types" : facet]);	// Get query url
+  		let url=this.solrUtil.createBasicQuery(this.ss,["x"+(facet == "features") ? "feature_types_ss" : facet]);	// Get query url
 			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
 				let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
