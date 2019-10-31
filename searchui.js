@@ -34,13 +34,14 @@ $=jQuery;																							// For Drupal only
 
 class SearchUI  {																					
 
-	constructor(mode)   																		// CONSTRUCTOR
+	constructor(site, mode)   																	// CONSTRUCTOR
 	{
 		sui=this;																					// Save ref to class as global
 		this.curResults="";																			// Returns results
 		this.numItems=0;																			// Number of items																						
 		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
 		this.ss={};																					// Holds search state
+		this.site=site;																				// Site to use
 		this.runMode=mode;																			// Current mode
 		this.curTree="";																			// Holds current tree open
 		this.facets={};																				
@@ -254,6 +255,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		this.ss.type="All";																			// Current item types
 		this.ss.page=0;																				// Current page being shown
 		this.ss.pageSize=100;																		// Results per page	
+		this.ss.site="Mandala";																		// S
 		this.ss.query={ 																			// Current query
 			text:"",																				// Search word 
 			places:[],																				// Places

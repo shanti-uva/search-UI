@@ -112,7 +112,6 @@ class Pages  {
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
 		$("#plc-closeBut").on("click", ()=>{ this.relatedBase=null; sui.Draw(this.lastMode); });// Close handler, release related base
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
-//		$("#sui-topBar").html(`<span style='color:${sui.assets[o.asset_type].c}'>${o.asset_type.toUpperCase()}</span>`);
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
@@ -287,11 +286,27 @@ class Pages  {
 
 	DrawLandingPage()
 	{
-		$("#sui-headLeft").html("&#xe633&nbsp;&nbsp;Explore Mandala Collections");				// Set left header
+		$("#sui-headLeft").html("<div style='margin-top:8px'>Bhutan Cultural Library</div>");	// Set left header
 		$("#sui-headRight").html("");															// Clear right header
 		$("#sui-footer").html("");																// Clear footer
 		$("#sui-footer").css("background-color","#ddd");
+		$("#sui-pages").html("");
+		$("#sui-pages").css({ "background-image": "url('https://cicada.shanti.virginia.edu/images/mandala/shanti-image-517836/full/!2000,/0/default.jpg')"});
 		this.DrawCarousel();
+		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:12px auto 12px auto'>
+		<div style='color:#4d59ca;font-size:20px;margin-bottom:8px;font-weight:700'>
+		BHUTAN: A LIVING ARCHIVE</div>
+		<div style='font-size:15px'>
+		The Kingdom of Bhutan has vibrant oral and embodied cultures across its mountainous landscape, 
+		which are now under pressure from globalization. 
+		This project aims to carry out an extensive audio-visual documentation to support local communities.<br><br>
+		The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
+		and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
+		The team gratefully acknowledges the generous support offered by Arcadia throughout the project.
+		</div>
+		</div></div>`;
+		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
+
 	}
 
 	DrawCarousel(content)
@@ -316,7 +331,7 @@ class Pages  {
 			for (i=1;i<content.length;++i) 
 				str+=`<div class='sui-caroDot' id='sui-caroDot-${i}'></div>`;
 			str+="</div></div>";
-		$("#sui-pages").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
+		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
 		}
 
 	DrawItem(icon, label, value, def, style, bold)											// DRAW ITEM

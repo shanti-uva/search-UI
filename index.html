@@ -27,14 +27,13 @@
 <body>
 	<div class='sui-topBar'>
 		<div style='white-space:nowrap'>
-			<img src="img/mandalaleft.jpg"><span style='vertical-align:14px;color:#666;font-size:18px;margin-right:4px'>&gt;</span>
-			<span style='vertical-align:10px' id='sui-topBar'>KMAPS</span>
+			<img src="img/bhutanleft.gif">
 			<img src="img/mandalaright.jpg" id='specialK' style='float:right'>
 		<div>
 	</div>
 <script>
 
-var sui=new SearchUI("standalone");														// Alloc new search object
+var sui=new SearchUI("Mandala","standalone");											// Alloc new search object
 sui.pages=new Pages();																	// Alloc pages (standalone only)
 sui.places=new Places();																// Alloc places module (standalone)
 sui.av=new AudioVideo();																// Alloc AV (standalone)
@@ -45,7 +44,6 @@ sui.vis=new Visuals();																	// Alloc Visuals (standalone)
 sui.pages.DrawLandingPage();															// Draw landing page
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	sui.DrawLandingPage()
 });
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 

@@ -274,10 +274,10 @@
 					}	
 /* CAROUSEL */
 
-.sui-caroBox { 		color:#555; font-size:13px; background-color:#fff; padding:28px 24px 6px 24px;
+.sui-caroBox { 		color:#555; font-size:13px; background-color:#fff; padding:28px 24px 6px 24px; border-radius:4px;
 					max-width:1080px; margin:24px auto 0 auto;  width:calc(100% - 60px); border:1px solid #999;
 					}								
-.sui-caroHeader { 	font-style:italic; font-size:17px; margin:-140px 0 24px 0;
+.sui-caroHeader { 	font-style:italic; font-size:17px; margin:-140px 0 24px 0; color:#fff;
 					}								
 .sui-caroTitle { 	font-size:21px; margin:-12px 0 8px -8px;
 					}
