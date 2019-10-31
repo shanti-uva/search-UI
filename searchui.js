@@ -354,10 +354,12 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
   		let url=this.solrUtil.createBasicQuery(this.ss,[facet]);									// Get query url
-			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
-				let i,o,v;
+
+		  $.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
+			trace(data)	
+			let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
-			if (data.facets[facet]) {																// If something there
+				if (data.facets[facet]) {															// If something there
 					o=data.facets[facet].buckets;													// Point at data
 					this.facets[facet].data=[];														// Start fresh
 					for (i=0;i<Math.min(300,o.length);++i)	{										// Get items
