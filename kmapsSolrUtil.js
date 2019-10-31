@@ -45,7 +45,9 @@ class KmapsSolrUtil {
             }
         };
 
-        // facet configs.  Not all are being used.
+        // facet configs.
+
+        // This probably should be a config element.
         this.facetJSON = {
             "asset_counts": {
                 "limit": 100,
@@ -53,39 +55,38 @@ class KmapsSolrUtil {
                 "field": "asset_type",
                 "domain": {"excludeTags": "ast"}
             },
-            // "places": {
-            //     "limit": 300,
-            //     "type": "terms",
-            //     "field": "kmapid",
-            //     "prefix": "places",
-            //     "facet": {
-            //         "title": {
-            //             "limit":1,
-            //             "type":"terms",
-            //             "field":"title"
-            //         }
-            //     }
-            // },
-            "xplaces": {
+
+            "places": {
                 "limit": 300,
                 "type": "terms",
                 "field": "kmapid_places_idfacet"
             },
-            "xsubjects": {
+            "subjects": {
                 "limit": 300,
                 "type": "terms",
                 "field": "kmapid_subjects_idfacet"
             },
-            "xterms": {
+            "terms": {
                 "limit": 300,
                 "type": "terms",
                 "field": "kmapid_terms_idfacet"
             },
-            "xfeature_types": {
+            "features": {
                 "limit": 300,
                 "type": "terms",
                 "field": "feature_types_idfacet"
             },
+            "languages": {
+                "limit": 300,
+                "type": "terms",
+                "field": "node_lang"
+            },
+            "collections" : {
+                "limit": 300,
+                "type": "terms",
+                "field": "collection_idfacet"
+            },
+
             // "subjects": {
             //     "limit": 300,
             //     "type": "terms",
@@ -109,11 +110,6 @@ class KmapsSolrUtil {
                 "type": "terms",
                 "field": "collection_uid_s"
             },
-            "xcollections" : {
-                "limit": 300,
-                "type": "terms",
-                "field": "collection_idfacet"
-            },
             "asset_subtype": {
                 "limit": 300,
                 "type": "terms",
@@ -126,21 +122,22 @@ class KmapsSolrUtil {
                     }
                 }
             },
-            "feature_types_ss": {
-                "limit": 300,
-                "type": "terms",
-                "field": "feature_types_ss"
-            },
             "node_user": {
                 "limit": 300,
                 "type": "terms",
                 "field": "user_name_full_s"
             },
-            "node_lang": {
-                "limit": 300,
-                "type": "terms",
-                "field": "node_lang"
-            },
+            // "feature_types_ss": {
+            //     "limit": 300,
+            //     "type": "terms",
+            //     "field": "feature_types_ss"
+            // },
+
+            // "node_lang": {
+            //     "limit": 300,
+            //     "type": "terms",
+            //     "field": "node_lang"
+            // },
             // "schema_version": {
             //     "limit": -1,
             //     "type": "terms",
@@ -203,7 +200,7 @@ class KmapsSolrUtil {
                 if (fac) {
                     currentFacets[sf] = fac;
                 } else {
-                    console.log("Warning: ignoring unknown facet: " + sf);
+                    console.error("Warning: ignoring unknown facet: " + sf);
                 }
             }
         }
