@@ -274,24 +274,24 @@
 					}	
 /* CAROUSEL */
 
-.sui-caroBox { 		color:#555; font-size:13px; background-color:#fff; padding:28px 24px 6px 24px; border-radius:4px;
-					max-width:1080px; margin:24px auto 0 auto;  width:calc(100% - 60px); border:1px solid #999;
+.sui-caroBox { 		color:#555; font-size:14px; background-color:#fff; padding:28px 24px 6px 24px; border-radius:6px;
+					max-width:900px; margin:24px auto 0 auto;  width:calc(100% - 60px); border:1px solid #999;
 					}								
 .sui-caroHeader { 	font-style:italic; font-size:17px; margin:-140px 0 24px 0; color:#fff;
 					}								
 .sui-caroTitle { 	font-size:21px; margin:-12px 0 8px -8px;
 					}
-.sui-caroButL { 	position:relative; left:-46px; top:80px;font-size:26px; color:#fff; border-radius:4px 0 0 4px; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
+.sui-caroButL { 	position:relative; left:-46px; top:55px;font-size:26px; color:#fff; border-radius:4px 0 0 4px; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
 					width:30px; cursor:pointer;
 					} .sui-caroButL:hover { opacity: .8 }													
 		
-.sui-caroButR { 	position:relative; left:calc(100% + 12px); top:37px;font-size:26px; color:#fff; border-radius:0 4px 4px 0; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
+.sui-caroButR { 	position:relative; left:calc(100% + 12px); top:13px;font-size:26px; color:#fff; border-radius:0 4px 4px 0; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
 					width:30px; cursor:pointer;
 					} .sui-caroButR:hover { opacity: .8 }													
 .sui-caroView {		font-style:italic; font-size:16px;
 					}
 .sui-caroText {		border-left:5px solid #eee; padding-left:24px; font-family:"EB Garamond",serif,shanticon; font-weight:400; 
-					line-height:26px; font-size:18px;
+					line-height:22px; font-size:16px;
 					}										
 .sui-caroPic {		width:calc(33% - 44px); margin-left:50px; 	
 					}

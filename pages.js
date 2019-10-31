@@ -25,10 +25,12 @@ class Pages  {
 		this.relatedId="";																		// Holds current related id
 		this.lastMode=sui.ss.mode;																// Previous search mode
 		this.curKmap=null;																		// Currently active page kmap
+		this.carouselTimer=null;																// Timer to advance carousel
 	}
 
 	Draw(kmap, fromHistory)																	// DRAW KMAP PAGE
 	{
+		clearInterval(this.carouselTimer);														// Kill carousel timer
 		if (!kmap)	return;																		// Quit if no kmap
 		if (!fromHistory)	sui.SetState(`p=${kmap.uid}`);										// This is the active page
 		this.curKmap=kmap;																		// Set active page's map
@@ -284,7 +286,7 @@ class Pages  {
 // HELPERS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawLandingPage()
+	DrawLandingPage()																		// DRAW SITE SPECIFIC LANDING PAGE
 	{
 		$("#sui-headLeft").html("<div style='margin-top:8px'>Bhutan Cultural Library</div>");	// Set left header
 		$("#sui-headRight").html("");															// Clear right header
@@ -305,34 +307,77 @@ class Pages  {
 		The team gratefully acknowledges the generous support offered by Arcadia throughout the project.
 		</div>
 		</div></div>`;
-		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
-
+		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
-	DrawCarousel(content)
+	DrawCarousel(content)																	// DRAW RESOURCE CAROUSEL
 	{
-		let i;
-		content=[{},{},{},{},{},{},{}];
+		let i,curCon=0;
+		content=[
+			{ title:"Alexander the Great - His Times and Era", 
+			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
+			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
+			  { title:"Alexander the Great - Next 2", 
+			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
+			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
+			  { title:"Alexander the Great - Next 3", 
+			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
+			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
+			  { title:"Alexander the Great - Next 4", 
+			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
+			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
+			  { title:"Alexander the Great - Next 5", 
+			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
+			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
+			  { title:"Alexander the Great - Next 6", 
+			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
+			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"}
+		];		
+		
 		let str=`<div class='sui-caroBox'>
 		<div class='sui-caroButL' id='sui-caroButL'>&#xe640</div>
 		<div class='sui-caroButR' id='sui-caroButR'>&#xe641</div>
-	
 		<div class='sui-caroHeader'>Featured Resources</div>
 			<div class='sui-caroLeft'>
-				<div class='sui-caroTitle' id='sui-caroTitle'>&#xe633&nbsp;&nbsp;Alexander the Great - His Times and Era</div>
-				<div class='sui-caroText' id='sui-caroText'>
-				Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...
-				</div>
+				<div class='sui-caroTitle' id='sui-caroTitle'></div>
+				<div class='sui-caroText' id='sui-caroText'></div>
 			</div>
-			<img class='sui-caroPic' id='sui-caroPic' src='https://mms.thlib.org/images/0050/8753/63691_large.jpg'>
+			<img class='sui-caroPic' id='sui-caroPic' src=''>
 			<a class='sui-caroRes'><i>View Resource</i>&nbsp;&nbsp;&#xe683</a>
-			<div class='sui-caroDots'>
-			<div class='sui-caroDot' id='sui-caroDot-0' style='background-color:#5d68cc'></div>`;
-			for (i=1;i<content.length;++i) 
-				str+=`<div class='sui-caroDot' id='sui-caroDot-${i}'></div>`;
-			str+="</div></div>";
-		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
-		}
+			<div class='sui-caroDots'>`;
+				for (i=0;i<content.length;++i) 													// For each panel
+					str+=`<div class='sui-caroDot' id='sui-caroDot-${i}'></div>`;				// Add dot
+		str+="</div></div>";
+		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		clearInterval(this.carouselTimer);														// Kill timer
+		this.carouselTimer=setInterval(()=> { $("#sui-caroButR").trigger("click"); },8000);		// Change panel every 8 secs
+		setPanel(curCon);																		// Set 1st pane;
+			
+		function setPanel(num) {																// SET PANEL CONTENTS															
+			$("#sui-caroTitle").html("&#xe633&nbsp;&nbsp;"+content[num].title);					// Set title
+			$("#sui-caroText").html(content[num].text);											// Set text
+			$("#sui-caroPic").prop("src",content[num].pic);										// Set pic
+			$("[id^=sui-caroDot-]").css({"background-color":"#fff"});							// Reset dot
+			$("#sui-caroDot-"+num).css({"background-color":"#5d68cc"});							// Highlight current
+			}
+	
+		$("#sui-caroButL").on("click", (e)=>{													// ON BACK CLICK
+			curCon=curCon ? curCon-1 : content.length-1;										// Go back or wrap
+			setPanel(curCon);																	// Draw panel
+			});
+
+		$("#sui-caroButR").on("click", (e)=>{													// ON FORWARD CLICK
+			curCon=(curCon == content.length-1) ? 0 : curCon+1;									// Go forward or wrap
+			setPanel(curCon);																	// Draw panel
+			});
+		
+		$("[id^=sui-caroDot-]").on("click", (e)=>{												// ON DOT CLICK
+			curCon=e.target.id.substring(12);													// Get number
+			curCon=Math.min(content.length-1,Math.max(curCon,0));								// Cap
+			setPanel(curCon);																	// Draw panel
+			});
+
+	}
 
 	DrawItem(icon, label, value, def, style, bold)											// DRAW ITEM
 	{
