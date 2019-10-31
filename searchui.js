@@ -354,9 +354,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
   		let url=this.solrUtil.createBasicQuery(this.ss,[facet]);									// Get query url
-
-		  $.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
-			trace(data)	
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
 			let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
 				if (data.facets[facet]) {															// If something there
@@ -985,7 +983,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		{
 			var path;
 			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
-				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
+				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";	// Base url
 				if (init) 	path=""+init;															// Force path as string
 				else 		path=""+row.data().path;												// Get path	as string										
 				var lvla=Math.max(path.split("/").length+1,2);										// Set level
