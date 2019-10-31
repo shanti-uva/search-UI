@@ -43,14 +43,14 @@ class AudioVideo  {
 		
 		sui.LoadingIcon(true,64);																// Show loading icon
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
-			var str=`<div id='sui-viewerSide' style='display:inline-block;width:${w}px'>`;		// Left side
+			var str=`<div id='sui-viewerSide' style='display:inline-block;width:${w}px;max-width:1100px'>`;		// Left side
 			if (d.field_video && d.field_video.und)												// If video
 				entryId=d.field_video.und[0].entryid;											// Get id
 			else if (d.field_video && d.field_video.en)											// If video (english)
 				entryId=d.field_video.en[0].entryid;											// Get id
 			else if (d.field_audio && d.field_audio.und) {										// Audio
 				entryId=d.field_audio.und[0].entryid;											// Id
-				wid=33;																			// Make smaller
+				wid=50;																			// Make smaller
 				}
 			else if (d.field_audio && d.field_audio.en) {										// Audio (english)
 				entryId=d.field_audio.en[0].entryid;											// Id

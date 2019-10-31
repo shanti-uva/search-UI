@@ -314,26 +314,26 @@ class Pages  {
 	{
 		let i,curCon=0;
 		content=[
-			{ title:"Alexander the Great - His Times and Era", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 2", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 3", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 4", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 5", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 6", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"}
-		];		
-		
+			{ title:"The Shinjé Yapyum Cham is performed", 
+			text:"One of the most common sacred masked dances performed during religious festivals in Bhutan is the Shinjé Yapyum Cham. The dance is often performed early during a festival’s program as it is believed to subdue negative spirits and harmful influences. Although known as the Shinjé Yapyum Cham, or the Dance of the Male and Female Lords of Death, it represents the male and female Yamāntaka is the Destroyer of Death...",
+		  	pic:"https://cicada.shanti.virginia.edu/images/mandala/shanti-image-550401/full/!600,/0/default.jpg", id:"images-stage_shanti_virginia_edu-1187696"},
+			{ title:"A Song Called Ja legmo Tsering", 
+			text:"Unlike today, meeting a person was extremely difficult in the past. The lyrics of this song say that meeting someone was considered as an act of fate. People would meet even if they had never thought of meeting that person. The composer wishes for two people who have met through fate, to stay together for their entire life...",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_xvwn4fvx/version/100021/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-22741"},
+			{ title:"Collecting Resources for Buli Chöpa", 
+			text:"People of Buli Gewog (county) in Zhemgang Dzongkhag (district), celebrate their annual offering called Chodpa, which happens on the 10th month of the year in the Bhutanese calendar. This festival is said to be conducted for three days and all the mess and rations are managed by the villagers themselves. The origin of this practice is not known yet people practice it without fail. The day before the offering...",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_b01k91gk/version/100031/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-24241"},
+			{ title:"Seven Limbs of Practice: Chöpa", 
+			text:"Most Bhutanese Buddhist rituals contain the set of seven practices known as yoen lak duen pa (ཡན་ལག་བདུན་པ་). The seven practices prostration (ཕྱག་), offering (མཆོད་པ་), confession (བཤགས་པ་), rejoicing (རྗེས་སུ་ཡི་རང་བ་), request to live long (བཞུགས་པར་གསོལ་བ་འདེབས་པ་), request to turn the wheel of Dharma (ཆོས་ཀྱི་འཁོར་ལོ་སྐོསྐོར་བར་བསྐུལ་བ་) and to dedicate the merits (བསྔོ་བ་).This piece was initially published in Bhutan’s national newspaper Kuensel..",
+			pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg", id:"texts-stage_shanti_virginia_edu-38836"},
+			{ title:"A Story of a Rich and a Poor Girl", 
+			text:"Ap Tempo of Karna Gewog, Dagana narrates a story of a poor girl who is straight forward and faithful. Her rich friend was always insecure. The poor girl gets rewarded by a deity for her kind heart and good attitude; she suddenly becomes rich, and her rich friend became insecure about her. She tries to achieve what the poor girl has achieved, but gets punished due to her jealousy and greediness.",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_607tfowl/version/100031/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-24651"},
+			{ title:"An Exchange of Tsangmo Poems", 
+			text:"Tsangmo is a type of song used to express individual's emotions, conveying their inner warmth and affection to another person, through numerious lyrical tunes. Tsangmo can be sung to express love, hatred and any other feelings. While it is sung, the Tsangmo songs are never sung with dance, as it is a poetry song for a singing expression without a dance. It is usually a composition limited to a verse of four lines for an expression.",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_zk9hsnff/version/100011/609/600/height/0", id:"audio-video-stage_shanti_virginia_edu-22596"},
+			];		
+				
 		let str=`<div class='sui-caroBox'>
 		<div class='sui-caroButL' id='sui-caroButL'>&#xe640</div>
 		<div class='sui-caroButR' id='sui-caroButR'>&#xe641</div>
@@ -342,8 +342,9 @@ class Pages  {
 				<div class='sui-caroTitle' id='sui-caroTitle'></div>
 				<div class='sui-caroText' id='sui-caroText'></div>
 			</div>
-			<img class='sui-caroPic' id='sui-caroPic' src=''>
-			<a class='sui-caroRes'><i>View Resource</i>&nbsp;&nbsp;&#xe683</a>
+			<img class='sui-caroPic' id='sui-caroPic' src=''><br>
+			<a class='sui-caroRes' id='sui-caroRes')'>
+			<i>View Resource</i>&nbsp;&nbsp;&#xe683</a>
 			<div class='sui-caroDots'>`;
 				for (i=0;i<content.length;++i) 													// For each panel
 					str+=`<div class='sui-caroDot' id='sui-caroDot-${i}'></div>`;				// Add dot
@@ -361,6 +362,10 @@ class Pages  {
 			$("#sui-caroDot-"+num).css({"background-color":"#5d68cc"});							// Highlight current
 			}
 	
+		$("#sui-caroRes").on("click", (e)=>{													// ON SEE RESOURCE CLICK
+			sui.GetKmapFromID(content[curCon].id,(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
+			});
+
 		$("#sui-caroButL").on("click", (e)=>{													// ON BACK CLICK
 			curCon=curCon ? curCon-1 : content.length-1;										// Go back or wrap
 			setPanel(curCon);																	// Draw panel

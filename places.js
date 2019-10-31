@@ -294,7 +294,7 @@ class Places  {
 				_this.extent.spatialReference=res.spatialReference.wkid;						// Set ref
 				if (_this.showing) _this.app.GoToExtent(_this.extent);							// If already showing a map, go there
 				});	
-		} catch(e) {trace(e)};	
+		} catch(e) {};	
 	}
 	
 
