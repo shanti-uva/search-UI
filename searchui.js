@@ -219,6 +219,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		this.Query(); 																			// Get new results
 		}	
 	
+		
 	function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
 		sui.ss.mode="simple";																	// Simple display mode	
 		sui.ss.page=0;																			// Start at beginning
@@ -352,10 +353,14 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
+<<<<<<< HEAD
   
 		let f=(facet == "features") ? "feature_types_ss" : "x"+facet;
 		trace(f)
 		let url=this.solrUtil.createBasicQuery(this.ss,[f]);										// Get query url
+=======
+  		let url=this.solrUtil.createBasicQuery(this.ss,["x"+(facet == "features") ? "feature_types_ss" : facet]);	// Get query url
+>>>>>>> 914ff5cbe8cb8ba01d239d7dff802c35094d9b27
 			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
 				let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
