@@ -353,19 +353,12 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
 		this.LoadingIcon(true,64); 																	// Show loading icon
-<<<<<<< HEAD
-  
-		let f=(facet == "features") ? "feature_types_ss" : "x"+facet;
-		trace(f)
-		let url=this.solrUtil.createBasicQuery(this.ss,[f]);										// Get query url
-=======
-  		let url=this.solrUtil.createBasicQuery(this.ss,["x"+(facet == "features") ? "feature_types_ss" : facet]);	// Get query url
->>>>>>> 914ff5cbe8cb8ba01d239d7dff802c35094d9b27
+  		let url=this.solrUtil.createBasicQuery(this.ss,[facet]);									// Get query url
 			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
 				let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
-				if (data.facets["x"+facet]) {														// If something there
-					o=data.facets["x"+facet].buckets;												// Point at data
+			if (data.facets[facet]) {																// If something there
+					o=data.facets[facet].buckets;													// Point at data
 					this.facets[facet].data=[];														// Start fresh
 					for (i=0;i<Math.min(300,o.length);++i)	{										// Get items
 						v=o[i].val.split("|");														// Split into parts
