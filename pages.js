@@ -88,13 +88,13 @@ class Pages  {
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-			this.relatedType=e.currentTarget.id.substring(7);								// Get asset type		
-			if (this.relatedType == "Home")	{												// Home asset
+			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
+			if (this.relatedType == "Home")	{													// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				this.baseMap=null;																// No base and set to home
 				this.Draw(this.relatedBase);													// Show
 				}
-			else{
+			else{																				// Related asset browsing
 				sui.ss.mode="related";															// Go to related mode
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
 				str=sui.assets[k].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
@@ -112,14 +112,18 @@ class Pages  {
 		var i;
 		if (!o) return;																			// Return if not kmap defines
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=>{ this.relatedBase=null; sui.Draw(this.lastMode); });// Close handler, release related base
+		$("#plc-closeBut").on("click", ()=> { 													// ON CLOSE BUT CLICK
+			this.relatedBase=null;  															// Release related base
+			if (!sui.curResults ||!sui.curResults.length)	sui.Draw("input");					// If no results, put up landing page 
+			else { sui.Draw(this.lastMode); sui.Query(); }										// Show last search results
+			});
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
 			str+="<br><div class='sui-breadCrumbs'>";											// Holds bread crumbs
 			for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
-				str+=`<span class='sui-crumb' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
+				str+=`<span class='sui-crumb' id='sui-crumb-${o.uid.split("-")[0]}-${o.ancestor_ids_is[i+1]}'>				
 				${o.ancestors_txt[i]}</span>`;											
 				if (i < o.ancestors_txt.length-2)	str+=" > ";									// Add separator
 				}
@@ -298,14 +302,15 @@ class Pages  {
 		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:12px auto 12px auto'>
 		<div style='color:#4d59ca;font-size:20px;margin-bottom:8px;font-weight:700'>
 		BHUTAN: A LIVING ARCHIVE</div>
-		<div style='font-size:15px'>
-		The Kingdom of Bhutan has vibrant oral and embodied cultures across its mountainous landscape, 
-		which are now under pressure from globalization. 
-		This project aims to carry out an extensive audio-visual documentation to support local communities.<br><br>
-		The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
-		and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
-		The team gratefully acknowledges the generous support offered by Arcadia throughout the project.
-		</div>
+		<div style='font-size:20px;font-family:"EB Garamond",serif,shanticon; font-weight:400'>
+			The Kingdom of Bhutan has vibrant oral and embodied cultures across its mountainous landscape, 
+			which are now under pressure from globalization. 
+			This project aims to carry out an extensive audio-visual documentation to support local communities.<br><br>
+		</div><div style='font-size:13px'>	
+			The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
+			and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
+			The team gratefully acknowledges the generous support offered by Arcadia throughout the project.
+		</div></div>
 		</div></div>`;
 		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
@@ -320,9 +325,9 @@ class Pages  {
 			{ title:"A Song Called Ja legmo Tsering", 
 			text:"Unlike today, meeting a person was extremely difficult in the past. The lyrics of this song say that meeting someone was considered as an act of fate. People would meet even if they had never thought of meeting that person. The composer wishes for two people who have met through fate, to stay together for their entire life...",
 			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_xvwn4fvx/version/100021/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-22741"},
-			{ title:"Collecting Resources for Buli Chöpa", 
-			text:"People of Buli Gewog (county) in Zhemgang Dzongkhag (district), celebrate their annual offering called Chodpa, which happens on the 10th month of the year in the Bhutanese calendar. This festival is said to be conducted for three days and all the mess and rations are managed by the villagers themselves. The origin of this practice is not known yet people practice it without fail. The day before the offering...",
-			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_b01k91gk/version/100031/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-24241"},
+			{ title:"Tongue Twister in the Kheng Language", 
+			text:"In the past, parents taught their kids tongue twisters as a way to practice pronunciation. Rinchen Drakpa from Sharigang presents two tongue twisters in his local language, Khengkha. Rinchen Drakpa says that in his childhood he witnessed villagers competing to be the one who could say the tongue twisters with the most perfect pronunciation.",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/0_ou7n6lp9/version/100021/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-3806"},
 			{ title:"Seven Limbs of Practice: Chöpa", 
 			text:"Most Bhutanese Buddhist rituals contain the set of seven practices known as yoen lak duen pa (ཡན་ལག་བདུན་པ་). The seven practices prostration (ཕྱག་), offering (མཆོད་པ་), confession (བཤགས་པ་), rejoicing (རྗེས་སུ་ཡི་རང་བ་), request to live long (བཞུགས་པར་གསོལ་བ་འདེབས་པ་), request to turn the wheel of Dharma (ཆོས་ཀྱི་འཁོར་ལོ་སྐོསྐོར་བར་བསྐུལ་བ་) and to dedicate the merits (བསྔོ་བ་).This piece was initially published in Bhutan’s national newspaper Kuensel..",
 			pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg", id:"texts-stage_shanti_virginia_edu-38836"},

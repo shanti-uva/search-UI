@@ -78,7 +78,7 @@ class Images  {
 		function drawDetails(j) {	
 			str+="<div class='sui-images'>";
 			str+="<div style='width:calc(49% - 24px);display:inline-block;margin-right:16px;vertical-align:top;height:100%;'>";
-				try{ str+=d(sui.assets[o.asset_type].g,"CAPTION",o.title[0],"Untitled"); } catch(e){}
+				try{ str+=d(sui.assets[o.asset_type].g,"CAPTION",o.caption,"Untitled"); } catch(e){}
 				str+="<hr>";
 				try{ str+=d("&#xe600","CREATOR",o.creator) } catch(e){}
 				try{ str+=d("&#xe66d","TYPE",j.field_image_type.und[0].value.charAt(0).toUpperCase()+j.field_image_type.und[0].value.slice(1)); } catch(e){}

@@ -381,7 +381,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 	{
 		$("#sui-results").scrollTop(0);																// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
-		this.numItems=this.assets[this.ss.type].n;													// Set number of items
+		if (this.ss.mode == "related")		this.numItems=this.assets[this.pages.relatedType].n;	// Set number of items based on related type
+		else								this.numItems=this.assets[this.ss.type].n;				// Set number of items based on current asset being shown
 		if (this.ss.mode == "input") {																// Just the search box
 			$("#sui-header").css({ display:"none"});												// Show header
 			if (this.runMode != "standalone") {														// If not standalone															
@@ -504,7 +505,25 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		$("#sui-viewSort"+this.ss.sort).css("color","#fff");										// Highlight current mode
 		$("[id^=sui-viewSort]").on("click",(e)=> { 													// ON SORT CLICK
 			this.ss.sort=e.currentTarget.id.substring(12);											// Get/set mode name		
-			this.DrawResults(); 																	// Redraw
+			if (this.ss.sort == "Alpha")															// Alpha sort
+				this.curResults.sort(function(a, b) {												// Sort by title									
+					if (a.title[0] > b.title[0]) 		return 1;									// Higher
+					else if (a.title[0] < b.title[0]) 	return -1;									// Lower
+					else								return 0;									// The same
+					});
+			else if (this.ss.sort == "Date")														// Date sort
+				this.curResults.sort(function(a, b) {												// Sort by date									
+					if (a.timestamp > b.timestamp) 		return 1;									// Higher
+					else if (a.timestamp < b.timestamp) return -1;									// Lower
+					else								return 0;									// The same
+					});
+			else if (this.ss.sort == "Author")														// User sort
+				this.curResults.sort(function(a, b) {												// Sort by user								
+					if (a.node_user > b.node_user) 		return 1;									// Higher
+					else if (a.node_user < b.node_user) return -1;									// Lower
+					else								return 0;									// The same
+					});
+				this.DrawResults(); 																// Redraw
 			});		
 			
 		$("[id^=sui-page]").css("color","#fff");													// Reset pagers
