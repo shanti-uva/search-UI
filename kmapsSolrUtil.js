@@ -264,6 +264,11 @@ class KmapsSolrUtil {
             fq_array.push(this.buildFq(state.query.subjects, "kmapid"));
         }
 
+        // terms
+        if (state.query.terms && state.query.terms.length) {
+            fq_array.push(this.buildFq(state.query.terms, "kmapid"));
+        }
+
         // features
         if (state.query.features && state.query.features.length) {
 
