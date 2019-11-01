@@ -281,9 +281,9 @@ class Pages  {
 					str+="<tr><td></td><td>> "+o.names_txt[i]+"</td></tr>";						// Add it
 				}
 			}	
-		str+="</table></div>";
+		str+="</table></div>";																	// Fisih table
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-		this.DrawRelatedAssets(o);																// Draw related assets menu
+		this.DrawRelatedAssets(o);																// Draw related assets men
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
