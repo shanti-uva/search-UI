@@ -299,7 +299,7 @@ class Pages  {
 		$("#sui-pages").html("");
 		$("#sui-pages").css({ "background-image": "url('https://cicada.shanti.virginia.edu/images/mandala/shanti-image-517836/full/!2000,/0/default.jpg')"});
 		this.DrawCarousel();
-		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:12px auto 12px auto'>
+		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:24px auto 12px auto'>
 		<div style='color:#4d59ca;font-size:20px;margin-bottom:8px;font-weight:700'>
 		BHUTAN: A LIVING ARCHIVE</div>
 		<div style='font-size:20px;font-family:"EB Garamond",serif,shanticon; font-weight:400'>
@@ -307,9 +307,9 @@ class Pages  {
 			which are now under pressure from globalization. 
 			This project aims to carry out an extensive audio-visual documentation to support local communities.<br><br>
 		</div><div style='font-size:13px'>	
-			The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
+			<i>The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
 			and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
-			The team gratefully acknowledges the generous support offered by Arcadia throughout the project.
+			The team gratefully acknowledges the generous support offered by Arcadia throughout the project.</i>
 		</div></div>
 		</div></div>`;
 		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
