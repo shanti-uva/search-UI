@@ -88,13 +88,13 @@ class Pages  {
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-			this.relatedType=e.currentTarget.id.substring(7);								// Get asset type		
-			if (this.relatedType == "Home")	{												// Home asset
+			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
+			if (this.relatedType == "Home")	{													// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				this.baseMap=null;																// No base and set to home
 				this.Draw(this.relatedBase);													// Show
 				}
-			else{
+			else{																				// Related asset browsing
 				sui.ss.mode="related";															// Go to related mode
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
 				str=sui.assets[k].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
@@ -112,14 +112,18 @@ class Pages  {
 		var i;
 		if (!o) return;																			// Return if not kmap defines
 		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=>{ this.relatedBase=null; sui.Draw(this.lastMode); });// Close handler, release related base
+		$("#plc-closeBut").on("click", ()=> { 													// ON CLOSE BUT CLICK
+			this.relatedBase=null;  															// Release related base
+			if (!sui.curResults ||!sui.curResults.length)	sui.Draw("input");					// If no results, put up landing page 
+			else { sui.Draw(this.lastMode); sui.Query(); }										// Show last search results
+			});
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
 			str+="<br><div class='sui-breadCrumbs'>";											// Holds bread crumbs
 			for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
-				str+=`<span class='sui-crumb' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
+				str+=`<span class='sui-crumb' id='sui-crumb-${o.uid.split("-")[0]}-${o.ancestor_ids_is[i+1]}'>				
 				${o.ancestors_txt[i]}</span>`;											
 				if (i < o.ancestors_txt.length-2)	str+=" > ";									// Add separator
 				}
@@ -295,17 +299,18 @@ class Pages  {
 		$("#sui-pages").html("");
 		$("#sui-pages").css({ "background-image": "url('https://cicada.shanti.virginia.edu/images/mandala/shanti-image-517836/full/!2000,/0/default.jpg')"});
 		this.DrawCarousel();
-		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:12px auto 12px auto'>
+		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:24px auto 12px auto'>
 		<div style='color:#4d59ca;font-size:20px;margin-bottom:8px;font-weight:700'>
 		BHUTAN: A LIVING ARCHIVE</div>
-		<div style='font-size:15px'>
-		The Kingdom of Bhutan has vibrant oral and embodied cultures across its mountainous landscape, 
-		which are now under pressure from globalization. 
-		This project aims to carry out an extensive audio-visual documentation to support local communities.<br><br>
-		The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
-		and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
-		The team gratefully acknowledges the generous support offered by Arcadia throughout the project.
-		</div>
+		<div style='font-size:20px;font-family:"EB Garamond",serif,shanticon; font-weight:400'>
+			The Kingdom of Bhutan has vibrant oral and embodied cultures across its mountainous landscape, 
+			which are now under pressure from globalization. 
+			This project aims to carry out an extensive audio-visual documentation to support local communities.<br><br>
+		</div><div style='font-size:13px'>	
+			<i>The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
+			and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
+			The team gratefully acknowledges the generous support offered by Arcadia throughout the project.</i>
+		</div></div>
 		</div></div>`;
 		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
@@ -314,26 +319,26 @@ class Pages  {
 	{
 		let i,curCon=0;
 		content=[
-			{ title:"Alexander the Great - His Times and Era", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 2", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 3", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 4", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 5", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"},
-			  { title:"Alexander the Great - Next 6", 
-			  text:"Conqueror and king of Macedonia, Alexander the Great was born on July 20, 356 B.C., in Pella, in the Ancient Greek kingdom of Macedonia. During his leadership, from 336 to 323 B.C., he united the Greek city-states and led the Corinthian League. He also became the king of Persia, Babylon and Asia, and created Macedonian colonies in the region. While he had a short, albeit eventful, life, he wide-ranging conquests served to spread Greek culture throughout Eastern Europe, the Middle East, Northern...",
-			  pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg"}
-		];		
-		
+			{ title:"The Shinjé Yapyum Cham is performed", 
+			text:"One of the most common sacred masked dances performed during religious festivals in Bhutan is the Shinjé Yapyum Cham. The dance is often performed early during a festival’s program as it is believed to subdue negative spirits and harmful influences. Although known as the Shinjé Yapyum Cham, or the Dance of the Male and Female Lords of Death, it represents the male and female Yamāntaka is the Destroyer of Death...",
+		  	pic:"https://cicada.shanti.virginia.edu/images/mandala/shanti-image-550401/full/!600,/0/default.jpg", id:"images-stage_shanti_virginia_edu-1187696"},
+			{ title:"A Song Called Ja legmo Tsering", 
+			text:"Unlike today, meeting a person was extremely difficult in the past. The lyrics of this song say that meeting someone was considered as an act of fate. People would meet even if they had never thought of meeting that person. The composer wishes for two people who have met through fate, to stay together for their entire life...",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_xvwn4fvx/version/100021/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-22741"},
+			{ title:"Tongue Twister in the Kheng Language", 
+			text:"In the past, parents taught their kids tongue twisters as a way to practice pronunciation. Rinchen Drakpa from Sharigang presents two tongue twisters in his local language, Khengkha. Rinchen Drakpa says that in his childhood he witnessed villagers competing to be the one who could say the tongue twisters with the most perfect pronunciation.",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/0_ou7n6lp9/version/100021/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-3806"},
+			{ title:"Seven Limbs of Practice: Chöpa", 
+			text:"Most Bhutanese Buddhist rituals contain the set of seven practices known as yoen lak duen pa (ཡན་ལག་བདུན་པ་). The seven practices prostration (ཕྱག་), offering (མཆོད་པ་), confession (བཤགས་པ་), rejoicing (རྗེས་སུ་ཡི་རང་བ་), request to live long (བཞུགས་པར་གསོལ་བ་འདེབས་པ་), request to turn the wheel of Dharma (ཆོས་ཀྱི་འཁོར་ལོ་སྐོསྐོར་བར་བསྐུལ་བ་) and to dedicate the merits (བསྔོ་བ་).This piece was initially published in Bhutan’s national newspaper Kuensel..",
+			pic:"https://mms.thlib.org/images/0050/8753/63691_large.jpg", id:"texts-stage_shanti_virginia_edu-38836"},
+			{ title:"A Story of a Rich and a Poor Girl", 
+			text:"Ap Tempo of Karna Gewog, Dagana narrates a story of a poor girl who is straight forward and faithful. Her rich friend was always insecure. The poor girl gets rewarded by a deity for her kind heart and good attitude; she suddenly becomes rich, and her rich friend became insecure about her. She tries to achieve what the poor girl has achieved, but gets punished due to her jealousy and greediness.",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_607tfowl/version/100031/600/600/height/0", id:"audio-video-stage_shanti_virginia_edu-24651"},
+			{ title:"An Exchange of Tsangmo Poems", 
+			text:"Tsangmo is a type of song used to express individual's emotions, conveying their inner warmth and affection to another person, through numerious lyrical tunes. Tsangmo can be sung to express love, hatred and any other feelings. While it is sung, the Tsangmo songs are never sung with dance, as it is a poetry song for a singing expression without a dance. It is usually a composition limited to a verse of four lines for an expression.",
+			pic:"https://cfvod.kaltura.com/p/381832/sp/38183200/thumbnail/entry_id/1_zk9hsnff/version/100011/609/600/height/0", id:"audio-video-stage_shanti_virginia_edu-22596"},
+			];		
+				
 		let str=`<div class='sui-caroBox'>
 		<div class='sui-caroButL' id='sui-caroButL'>&#xe640</div>
 		<div class='sui-caroButR' id='sui-caroButR'>&#xe641</div>
@@ -342,8 +347,9 @@ class Pages  {
 				<div class='sui-caroTitle' id='sui-caroTitle'></div>
 				<div class='sui-caroText' id='sui-caroText'></div>
 			</div>
-			<img class='sui-caroPic' id='sui-caroPic' src=''>
-			<a class='sui-caroRes'><i>View Resource</i>&nbsp;&nbsp;&#xe683</a>
+			<img class='sui-caroPic' id='sui-caroPic' src=''><br>
+			<a class='sui-caroRes' id='sui-caroRes')'>
+			<i>View Resource</i>&nbsp;&nbsp;&#xe683</a>
 			<div class='sui-caroDots'>`;
 				for (i=0;i<content.length;++i) 													// For each panel
 					str+=`<div class='sui-caroDot' id='sui-caroDot-${i}'></div>`;				// Add dot
@@ -361,6 +367,10 @@ class Pages  {
 			$("#sui-caroDot-"+num).css({"background-color":"#5d68cc"});							// Highlight current
 			}
 	
+		$("#sui-caroRes").on("click", (e)=>{													// ON SEE RESOURCE CLICK
+			sui.GetKmapFromID(content[curCon].id,(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
+			});
+
 		$("#sui-caroButL").on("click", (e)=>{													// ON BACK CLICK
 			curCon=curCon ? curCon-1 : content.length-1;										// Go back or wrap
 			setPanel(curCon);																	// Draw panel

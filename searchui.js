@@ -45,14 +45,14 @@ class SearchUI  {
 		this.runMode=mode;																			// Current mode
 		this.curTree="";																			// Holds current tree open
 		this.facets={};																				
-		this.facets.places=			{ type:"tree",  icon:"&#xe62b", data:[] };						// Places 
-		this.facets.collections=	{ type:"list",  icon:"&#xe633", data:[] };						// Collections 
-		this.facets.languages=		{ type:"tree",  icon:"&#xe670", data:[] };						// Languages 
-		this.facets.features=		{ type:"tree",  icon:"&#xe638", data:[] };						// Features 
-		this.facets.subjects=		{ type:"tree",  icon:"&#xe634", data:[] };						// Subjects 
-		this.facets.terms=			{ type:"tree",  icon:"&#xe635", data:[] };						// Terms 
-		this.facets.users=			{ type:"input", icon:"&#xe600", data:[] };						// Terms 
-		this.facets.relationships=	{ type:"list",  icon:"&#xe638", data:[] };						// Relationships
+		this.facets.places=			{ type:"tree",  icon:"&#xe62b", mode:null, data:[] };			// Places 
+		this.facets.collections=	{ type:"list",  icon:"&#xe633", mode:null, data:[] };			// Collections 
+		this.facets.languages=		{ type:"tree",  icon:"&#xe670", mode:null, data:[] };			// Languages 
+		this.facets.features=		{ type:"tree",  icon:"&#xe638", mode:null, data:[] };			// Features 
+		this.facets.subjects=		{ type:"tree",  icon:"&#xe634", mode:null, data:[] };			// Subjects 
+		this.facets.terms=			{ type:"tree",  icon:"&#xe635", mode:null, data:[] };			// Terms 
+		this.facets.users=			{ type:"input", icon:"&#xe600", mode:null, data:[] };			// Terms 
+		this.facets.relationships=	{ type:"list",  icon:"&#xe638", mode:null, data:[] };			// Relationships
 	
 		this.assets={};
 		this.assets.All=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
@@ -110,20 +110,16 @@ class SearchUI  {
 					<div id='sui-searchgo2' class='sui-search4'>&#xe623</div><br><br>`;
 					for (key in this.facets) { 
 						str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
-						${this.facets[key].icon}&nbsp;&nbsp;
-						${key.toUpperCase()}
-						<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
+							${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
+							<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
 						</div>
 						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
-						<div class='sui-advEdit' id='sui-advEdit-${key}'></div>`;
+						<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
 						}
 				str+=`</div>
-				<div class='sui-advTerm' id='sui-advTerm-text'></div>
-				<div class='sui-advEdit' id='sui-advEdit-text'></div>;
 				</div>
 			</div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
-
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
 		$("#sui-clear, sui-clear2").on("mouseout", function() { $(this).html("&#xe610"); });		// Normal						
 		$("#sui-clear, sui-clear2").on("click",()=> { 												// ON ERASE
@@ -164,10 +160,7 @@ class SearchUI  {
 			for (var key in this.facets)															// For each facet
 				if (this.facets[key] == "list")														// If a list
 					$("#sui-advEdit-"+key).html("");												// Erase contents
-
-			if (this.facets[id].type == "input")		this.DrawInput(id);							// Draw input editor			
-			else if (this.facets[id].type == "tree")	this.DrawFacetTree(id);						// Open tree editor				
-			else										this.DrawFacetList(id);						// Draw list editor
+			this.DrawFacetItems(id);																// Draw appropriate tree, list, or input
 			});
 
 		$("#sui-results").on("click",()=>{ $("#sui-popover").remove(); });							// ON CLICK OF RESULTS PAGE 
@@ -218,7 +211,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		this.ss.type=id[1];																		// Set asset type
 		this.Query(); 																			// Get new results
 		}	
-	
 		
 	function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
 		sui.ss.mode="simple";																	// Simple display mode	
@@ -288,6 +280,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			this.assets.All.n=data.response.numFound;												// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
+			this.DrawAdvanced();																	// Draw advanced search if active
 			});
 	}
 	   
@@ -339,24 +332,14 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 					}
 				this.assets.All.n=data.response.numFound;											// All count
 				}	
-			if (data && data.facets && data.facets.xcollection && data.facets.xcollection.buckets){ // If valid
-				buckets=data.facets.xcollection.buckets;											// Point at buckets
-				this.facets.collections.data=[];													// Clear
-				for (i=0;i<buckets.length;++i) 	{													// For each item
-					val=buckets[i].val.split("(")[0];												// Get just the title
-					this.facets.collections.data.push({title:val, id:"collections-"+buckets[i].val.split("|")[1]});				// Add to list
-					}
-				this.ResetFacetList("collections");													// Fill collections list in adv edit
-				}
 	}
 
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
+		if ((facet == "users") || (facet == "relationships"))	return;								// No facets for these 
 		this.LoadingIcon(true,64); 																	// Show loading icon
   		let url=this.solrUtil.createBasicQuery(this.ss,[facet]);									// Get query url
-
-		  $.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get facets
-			trace(data)	
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
 			let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
 				if (data.facets[facet]) {															// If something there
@@ -383,7 +366,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 	{
 		$("#sui-results").scrollTop(0);																// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
-		this.numItems=this.assets[this.ss.type].n;													// Set number of items
+		if (this.ss.mode == "related")		this.numItems=this.assets[this.pages.relatedType].n;	// Set number of items based on related type
+		else								this.numItems=this.assets[this.ss.type].n;				// Set number of items based on current asset being shown
 		if (this.ss.mode == "input") {																// Just the search box
 			$("#sui-header").css({ display:"none"});												// Show header
 			if (this.runMode != "standalone") {														// If not standalone															
@@ -506,7 +490,25 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		$("#sui-viewSort"+this.ss.sort).css("color","#fff");										// Highlight current mode
 		$("[id^=sui-viewSort]").on("click",(e)=> { 													// ON SORT CLICK
 			this.ss.sort=e.currentTarget.id.substring(12);											// Get/set mode name		
-			this.DrawResults(); 																	// Redraw
+			if (this.ss.sort == "Alpha")															// Alpha sort
+				this.curResults.sort(function(a, b) {												// Sort by title									
+					if (a.title[0] > b.title[0]) 		return 1;									// Higher
+					else if (a.title[0] < b.title[0]) 	return -1;									// Lower
+					else								return 0;									// The same
+					});
+			else if (this.ss.sort == "Date")														// Date sort
+				this.curResults.sort(function(a, b) {												// Sort by date									
+					if (a.timestamp > b.timestamp) 		return 1;									// Higher
+					else if (a.timestamp < b.timestamp) return -1;									// Lower
+					else								return 0;									// The same
+					});
+			else if (this.ss.sort == "Author")														// User sort
+				this.curResults.sort(function(a, b) {												// Sort by user								
+					if (a.node_user > b.node_user) 		return 1;									// Higher
+					else if (a.node_user < b.node_user) return -1;									// Lower
+					else								return 0;									// The same
+					});
+				this.DrawResults(); 																// Redraw
 			});		
 			
 		$("[id^=sui-page]").css("color","#fff");													// Reset pagers
@@ -722,21 +724,26 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 	DrawAdvanced()																				// DRAW SEARCH UI SECTION
 	{
-		var i,j,str;
-		for (var key in this.facets) {																// For each facet
+		let i,o,str;
+		for (let key in this.facets) {																// For each facet
+			if ($("#sui-advEdit-"+key).css("display") == "block") {									// Refresh list results
+				if ((this.facets[key].mode == "tree") && (this.ss.query[key.toLowerCase()].length)) // If still a tree and some seach active
+					this.DrawFacetList(key,true);													// Draw as a list and keep it open
+				this.QueryFacets(key);			
+				}
 			$("#sui-advTerm-"+key).empty();															// Clear list
-			for (j=0;j<this.ss.query[key].length;++j) {												// For each term in facet	
-				var o=sui.ss.query[key][j];															// Point at facet to add to div
-				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${j}'>&#xe60f</div>
-					<div class='sui-advEditBool' id='sui-advBool-${key}-${j}' title='Change boolean method'>${this[o.bool]}</div>
+			for (i=0;i<this.ss.query[key].length;++i) {												// For each term in facet	
+				o=sui.ss.query[key][i];																// Point at facet to add to div
+				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
+					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}</div>
 					<i> ${o.title}</i></div>`;
 				$("#sui-advTerm-"+key).append(str);
 				}
 			}
 	
 		$("[id^=sui-advBool-]").on("click",(e)=> {
-			var v=e.currentTarget.id.split("-");													// Get ids
-			var b=this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
+			let v=e.currentTarget.id.split("-");													// Get ids
+			let b=this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
 			if (b == "AND")	 		b="OR"; 														// Toggle through options
 			else if (b == "OR") 	b="NOT";												
 			else 				  	b="AND";															
@@ -745,13 +752,23 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			this.Query();																			// Run query and show results
 			});
 			
-		$("[id^=sui-advKill-]").on("click",(e)=> {
-			var v=e.currentTarget.id.split("-");													// Get ids
+		$("[id^=sui-advKill-]").on("click",(e)=> {													// REMOVE ITEM FROM QUERY
+			let v=e.currentTarget.id.split("-");													// Get ids
 			this.ss.query[v[2]].splice(v[3],1);														// Remove
 			this.DrawAdvanced();																	// Redraw
 			this.Query();																			// Run query and show results
 			});
 		}
+
+	DrawFacetItems(facet)																		// DRAW FACETS ITEMS
+	{
+		if (this.facets[facet].type == "input") 			this.DrawInput(facet);					// Draw input editor			
+		else if (this.facets[facet].type == "tree") {												// If base type is a tree
+			if (this.ss.query[facet.toLowerCase()].length)	this.DrawFacetList(facet);				// If an active search, draw tree as a list	
+			else 											this.DrawFacetTree(facet);				// Draw tree as a tree 	
+			}			
+		else 												this.DrawFacetList(facet);				// Draw list editor
+	}
 
 	DrawInput(facet)																			// DRAW INPUT FACET PICKER
 	{
@@ -760,6 +777,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			return;																			
 			}
 		var tot=934;
+		this.facets[facet].mode="input";															// Input mode active
 		var str=`<input id='sui-advInput-${facet}' placeholder='Type here'  
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>
 		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${facet}s</div>`;
@@ -804,6 +822,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			return;																			
 			}
 		this.QueryFacets(facet);																	// Get initial list	
+		this.facets[facet].mode="list";																// List mode active
 		var str=`<input id='sui-advEditFilter-${facet}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>`;
 		if (this.facets[facet].type == "tree")
@@ -870,16 +889,15 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 	{
 		let o=this.ss.query[facet];																	// Point at facet
 		if (o.filter(o => (o.title == title)).length) 	return;										// Don't add if already there											
-		id=id.replace(/languages-|features-/i,"subjects-");											// Languages and feature
+		if (id) id=id.replace(/languages-|features-/i,"subjects-");									// Languages and feature
 		let num=o.length;																			// Facet index to add to												
 		o.push({});																					// Add obj
 		o[num].title=title;																			// Get title
-		o[num].id=id.replace(/collections-/,"");													// Id (remove collections- prefix)
+		o[num].id=id ? id.replace(/collections-/,"") : "";											// Id (remove collections- prefix)
 		o[num].bool=bool;																			// Bool
 		this.DrawAdvanced();																		// Redraw
 		this.Query();																				// Run query and show results
 	}
-
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // TREE 
@@ -891,7 +909,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
 			}
-		this.curTree=facet;
+		this.facets[facet].mode="tree";																// Tree mode active
+		this.curTree=facet;																			// Set which facer to add items to
 		var div="#sui-tree"+facet;																	// Tree div
 		if (!$(div).length) {																		// If doesn't exist
 			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
@@ -985,7 +1004,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		{
 			var path;
 			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
-				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod";		// Base url
+				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";	// Base url
 				if (init) 	path=""+init;															// Force path as string
 				else 		path=""+row.data().path;												// Get path	as string										
 				var lvla=Math.max(path.split("/").length+1,2);										// Set level
