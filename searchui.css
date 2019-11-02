@@ -177,9 +177,6 @@
 
 /* PAGES */
 
-.sui-xtree {		max-width:900px; margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
-					border-radius:6px; padding:24px 50px 12px 50px; font-weight:400; color:#000; margin:8px 0px 0 192px;
-					}
 .sui-breadCrumbs {  display:inline-block; font-size:13px; margin-left:24x; cursor:pointer;
 					}
 .sui-crumb:hover { 	text-decoration:underline;

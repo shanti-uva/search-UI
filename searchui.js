@@ -919,10 +919,10 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			<hr style='border: .5px solid #a4baec'>
 			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
 			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));								// Add tree frame to div
-			if (facet == "places") 		 	LazyLoad(null,facet,13735);								// Embedded top layer for places
-			else if (facet == "features") 	LazyLoad(null,facet,20);								// Features
-			else if (facet == "languages") 	LazyLoad(null,facet,301);								// Languages
-			else 							GetTopRow(facet);										// Constructed top layers
+			if (facet == "places") 		 	this.LazyLoad(div,null,facet,13735);					// Embedded top layer for places
+			else if (facet == "features") 	this.LazyLoad(div,null,facet,20);						// Features
+			else if (facet == "languages") 	this.LazyLoad(div,null,facet,301);						// Languages
+			else 							this.GetTopRow("#sui-tree",facet);						// Constructed top layers
 			
 			$('.sui-tree li').each( function() {                                					// For each element
 				if ($(this).children('ul').length > 0)                       						// If has children 
@@ -949,106 +949,122 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			}
 	
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
-			
-		function handleClick(row, e)																// HANDLE NODE CLICK
-		{
-			var off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
+	}
+
+	GetTopRow(div, facet)																			// GET TOP-MOST TREE LEVEL
+	{
+		var _this=this;																					// Save context
+		var id,k,tops=[],str="<ul>";
+		if (facet == "terms") {
+			tops.ka=1;			tops.kha=14263;		tops.ga=24465;		tops.nga=45101;	tops.ca=51638;		tops.cha=55178;		
+			tops.ja=62496;		tops.nya=66477;		tops.ta=73101;		tops.tha=80697;	tops.da=87969;		tops.na=105631;	
+			tops.pa=114065;		tops.pha=120048;	tops.ba=127869;		tops.ma=142667;	tops.tsa=154251;	tops.tsha=158451;	
+			tops.dza=164453;	tops.wa=166888;		tops.zha=167094;	tops.za=172249;	tops["'a"]=177092;	tops.ya=178454;
+			tops.ra=185531;		tops.la=193509;		tops.sha=199252;	tops.sa=204036;	tops.ha=215681;		tops.a=219022;
+			}
+		else if (facet == "subjects") {
+			tops["Administration"]=5550;		tops["Architecture"]=6669;			tops["Collections"]=2823;		tops["Community Services Project Types"]=5553;
+			tops["Contemplation"]=5806;			tops["Cultural Landscapes"]=8868;	tops["Cultural Regions"]=305;	tops["Event"]=2743;
+			tops["General"]=6793;				tops["Geographical Features"]=20;	tops["Grammars"]=5812;			tops["Higher Education Digital Tools"]=6404;
+			tops["Historical Periods"]=5807;	tops["Human Relationships"]=306;	tops["Language Tree"]=301;		tops["Literary Genres"]=5809;
+			tops["Material Objects"]=2693;		tops["Mesoamerican Studies"]=6664;	tops["Oral Genres"]=5808;		tops["Organizations and Organizational Units"]=2688;
+			tops["Politics"]=7174;				tops["Profession"]=6670;			tops["Religious Sects"]=302;	tops["Religious Systems"]=5810;
+			tops["Ritual"]=5805;				tops["Scripts"]=192;				tops["Teaching Resources"]=6844; tops["Text Typologies"]=4833;
+			tops["Tibet and Himalayas"]=6403;	tops["Zoologies (Biological and Spiritual)"]=5813;
+			}
+		for (k in tops) {																				// For each top row
+			id=facet+"-"+tops[k];																		// id
+			str+="<li class='parent'><a id='"+id+"'";													// Start row
+			str+="' data-path='"+tops[k]+"'>"+k;														// Add path/header
+			str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
+			str+="</a></li>";																			// Add label
+			}
+		$(div+facet).html(str+"</ul>");																	// If initing 1st level
+		$('.sui-tree li > a').off();																	// Clear handlers
+		$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 						// Restore handler
+
+		function handleClick(row, e) {																	// HANDLE NODE CLICK
+			let off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
 			if (e.offsetX < off) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
-					LazyLoad(row,facet);																// Lazy load from SOLR
+					_this.LazyLoad(div,row,facet);														// Lazy load from SOLR
 				else{																					// Open or close
 					row.parent().toggleClass('active');                         						// Toggle active class on or off
 					row.parent().children('ul').slideToggle('fast');            						// Slide into place
 					}
 				}
 			else{
-				var s=$("#"+e.target.id).text();														// Get term
-				s=s.substr(0,s.length-1);																// Remove viewer icon
+				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
 				sui.AddNewFilter(s, sui.curTree+"-"+e.target.id.split("-")[1], "AND", facet);			// Add term to search state and refresh
 				}
 		}
 
-		function GetTopRow(facet)																	// GET TOP-MOST TREE LEVEL
-		{
-			var id,k,tops=[],str="<ul>";
-			if (facet == "terms") {
-				tops.ka=1;			tops.kha=14263;		tops.ga=24465;		tops.nga=45101;	tops.ca=51638;		tops.cha=55178;		
-				tops.ja=62496;		tops.nya=66477;		tops.ta=73101;		tops.tha=80697;	tops.da=87969;		tops.na=105631;	
-				tops.pa=114065;		tops.pha=120048;	tops.ba=127869;		tops.ma=142667;	tops.tsa=154251;	tops.tsha=158451;	
-				tops.dza=164453;	tops.wa=166888;		tops.zha=167094;	tops.za=172249;	tops["'a"]=177092;	tops.ya=178454;
-				tops.ra=185531;		tops.la=193509;		tops.sha=199252;	tops.sa=204036;	tops.ha=215681;		tops.a=219022;
-				}
-			else if (facet == "subjects") {
-				tops["Administration"]=5550;		tops["Architecture"]=6669;			tops["Collections"]=2823;		tops["Community Services Project Types"]=5553;
-				tops["Contemplation"]=5806;			tops["Cultural Landscapes"]=8868;	tops["Cultural Regions"]=305;	tops["Event"]=2743;
-				tops["General"]=6793;				tops["Geographical Features"]=20;	tops["Grammars"]=5812;			tops["Higher Education Digital Tools"]=6404;
-				tops["Historical Periods"]=5807;	tops["Human Relationships"]=306;	tops["Language Tree"]=301;		tops["Literary Genres"]=5809;
-				tops["Material Objects"]=2693;		tops["Mesoamerican Studies"]=6664;	tops["Oral Genres"]=5808;		tops["Organizations and Organizational Units"]=2688;
-				tops["Politics"]=7174;				tops["Profession"]=6670;			tops["Religious Sects"]=302;	tops["Religious Systems"]=5810;
-				tops["Ritual"]=5805;				tops["Scripts"]=192;				tops["Teaching Resources"]=6844; tops["Text Typologies"]=4833;
-				tops["Tibet and Himalayas"]=6403;	tops["Zoologies (Biological and Spiritual)"]=5813;
-				}
-			for (k in tops) {																			// For each top row
-				id=facet+"-"+tops[k];																	// id
-				str+="<li class='parent'><a id='"+id+"'";												// Start row
-				str+="' data-path='"+tops[k]+"'>"+k;													// Add path/header
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
-				str+="</a></li>";																		// Add label
-				}
-			$("#sui-tree"+facet).html(str+"</ul>");														// If initing 1st level
-			$('.sui-tree li > a').off();																// Clear handlers
-			$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 					// Restore handler
-		}
+	}
 	
-		function LazyLoad(row, facet, init) 													// ADD NEW NODES TO TREE
-		{
-			var path;
-			if (init || row.parent().children().length == 1) {										// If no children, lazy load 
-				var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";	// Base url
-				if (init) 	path=""+init;															// Force path as string
-				else 		path=""+row.data().path;												// Get path	as string										
-				var lvla=Math.max(path.split("/").length+1,2);										// Set level
-				var type=facet;																		// Set type
-				if ((type == "features") ||  (type == "languages")) type="subjects";				// Features and languages are in subjects
-				var url=sui.solrUtil.buildQuery(base,type,path,lvla,lvla);							// Build query using Yuji's builder
-				$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
-					var o,i,re,f="";
-					var str="<ul>";																	// Wrapper, show if not initting
-					if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
-						f=res.facet_counts.facet_fields.ancestor_id_path.join();					// Get list of facets
-					res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); // Sort
-					for (i=0;i<res.response.docs.length;++i) {										// For each child
-						o=res.response.docs[i];														// Point at child
-						re=new RegExp("\/"+o.id.split("-")[1]);										// Id
-						str+="<li";																	// Start row
-						if ((f && f.match(re)) || init)	str+=" class='parent'";						// If has children or is top, add parent class
-						str+="><a id='"+o.id;														// Add id
-						str+="' data-path='"+o.ancestor_id_path+"'>";								// Add path
-						str+=o.header;																// Add label
-						str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+o.id+"' title='View page'>&#xe67c</div>";					
-						str+="</a></li>";															// Add label
+	LazyLoad(div, row, facet, init) 																		// ADD NEW NODES TO TREE
+	{
+		var path;
+		var _this=this;																					// Save context
+		if (init || row.parent().children().length == 1) {												// If no children, lazy load 
+			var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";			// Base url
+			if (init) 	path=""+init;																	// Force path as string
+			else 		path=""+row.data().path;														// Get path	as string										
+			var lvla=Math.max(path.split("/").length+1,2);												// Set level
+			var type=facet;																				// Set type
+			if ((type == "features") ||  (type == "languages")) type="subjects";						// Features and languages are in subjects
+			var url=sui.solrUtil.buildQuery(base,type,path,lvla,lvla);									// Build query using Yuji's builder
+			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {								// Run query
+				var o,i,re,f="";
+				var str="<ul>";																			// Wrapper, show if not initting
+				if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
+					f=res.facet_counts.facet_fields.ancestor_id_path.join();							// Get list of facets
+				res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); 		// Sort
+				for (i=0;i<res.response.docs.length;++i) {												// For each child
+					o=res.response.docs[i];																// Point at child
+					re=new RegExp("\/"+o.id.split("-")[1]);												// Id
+					str+="<li";																			// Start row
+					if ((f && f.match(re)) || init)	str+=" class='parent'";								// If has children or is top, add parent class
+					str+="><a id='"+o.id;																// Add id
+					str+="' data-path='"+o.ancestor_id_path+"'>";										// Add path
+					str+=o.header;																		// Add label
+					str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+o.id+"' title='View page'>&#xe67c</div>";					
+					str+="</a></li>";																	// Add label
+					}
+				if (res.response.docs.length) {
+					if (init)	$("#sui-tree"+facet).html(str+"</ul>");									// If initing 1st level
+					else{																				// Adding a level to a branch
+						row.after(str+"</ul>");															// Add children to tree
+						row.parent().toggleClass('active');                         					// Toggle active class on or off
+						row.parent().children('ul').slideToggle('fast');            					// Slide into place
 						}
-					if (res.response.docs.length) {
-						if (init)	$("#sui-tree"+facet).html(str+"</ul>");							// If initing 1st level
-						else{																		// Adding a level to a branch
-							row.after(str+"</ul>");													// Add children to tree
-							row.parent().toggleClass('active');                         			// Toggle active class on or off
-							row.parent().children('ul').slideToggle('fast');            			// Slide into place
-							}
-						$('.sui-tree li > a').off();												// Clear handlers
-						$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 	// Restore handler
-						}
-					$('.sui-advViewTreePage').off("click");											// Kill old handlers
-					$('.sui-advViewTreePage').on("click", (e)=> {									// ON CLICK VIEW BUTTON
-						var v=e.target.id.split("-");												// Get id
-						sui.GetKmapFromID(v[1]+"-"+v[2],(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
-						e.stopPropagation();														// Stop propagation
-						});      
-			
-					});
+					$('.sui-tree li > a').off();														// Clear handlers
+					$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 			// Restore handler
+					}
+				$('.sui-advViewTreePage').off("click");													// Kill old handlers
+				$('.sui-advViewTreePage').on("click", (e)=> {											// ON CLICK VIEW BUTTON
+					var v=e.target.id.split("-");														// Get id
+					sui.GetKmapFromID(v[1]+"-"+v[2],(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+					e.stopPropagation();																// Stop propagation
+					});      
+				});
+			}
+
+		function handleClick(row, e) {																	// HANDLE NODE CLICK
+			let off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
+			if (e.offsetX < off) {                                         				  				// In icon
+				if (row.parent().children().length == 1) 												// If no children
+					_this.LazyLoad(div,row,facet);														// Lazy load from SOLR
+				else{																					// Open or close
+					row.parent().toggleClass('active');                         						// Toggle active class on or off
+					row.parent().children('ul').slideToggle('fast');            						// Slide into place
+					}
+				}
+			else{
+				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
+				sui.AddNewFilter(s, sui.curTree+"-"+e.target.id.split("-")[1], "AND", facet);			// Add term to search state and refresh
 				}
 			}
-	}
+		}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS
