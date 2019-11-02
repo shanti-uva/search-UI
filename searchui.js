@@ -43,7 +43,6 @@ class SearchUI  {
 		this.ss={};																					// Holds search state
 		this.site=site;																				// Site to use
 		this.runMode=mode;																			// Current mode
-		this.curTree="";																			// Holds current tree open
 		this.facets={};																				
 		this.facets.places=			{ type:"tree",  icon:"&#xe62b", mode:null, data:[] };			// Places 
 		this.facets.collections=	{ type:"list",  icon:"&#xe633", mode:null, data:[] };			// Collections 
@@ -910,7 +909,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			return;																			
 			}
 		this.facets[facet].mode="tree";																// Tree mode active
-		this.curTree=facet;																			// Set which facer to add items to
+		this.curTree=facet;
 		var div="#sui-tree"+facet;																	// Tree div
 		if (!$(div).length) {																		// If doesn't exist
 			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
@@ -922,7 +921,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			if (facet == "places") 		 	this.LazyLoad(div,null,facet,13735);					// Embedded top layer for places
 			else if (facet == "features") 	this.LazyLoad(div,null,facet,20);						// Features
 			else if (facet == "languages") 	this.LazyLoad(div,null,facet,301);						// Languages
-			else 							this.GetTopRow("#sui-tree",facet);						// Constructed top layers
+			else 							this.GetTopRow(div,facet);								// Constructed top layers
 			
 			$('.sui-tree li').each( function() {                                					// For each element
 				if ($(this).children('ul').length > 0)                       						// If has children 
@@ -979,7 +978,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
 			str+="</a></li>";																			// Add label
 			}
-		$(div+facet).html(str+"</ul>");																	// If initing 1st level
+		$(div).html(str+"</ul>");																		// If initing 1st level
 		$('.sui-tree li > a').off();																	// Clear handlers
 		$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 						// Restore handler
 
@@ -987,7 +986,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			let off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
 			if (e.offsetX < off) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
-					_this.LazyLoad(div,row,facet);														// Lazy load from SOLR
+					_this.LazyLoad(div,row,_this.curTree);												// Lazy load from SOLR
 				else{																					// Open or close
 					row.parent().toggleClass('active');                         						// Toggle active class on or off
 					row.parent().children('ul').slideToggle('fast');            						// Slide into place
@@ -995,7 +994,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				}
 			else{
 				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
-				sui.AddNewFilter(s, sui.curTree+"-"+e.target.id.split("-")[1], "AND", facet);			// Add term to search state and refresh
+				sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND", _this.curTree);	// Add term to search state and refresh
 				}
 		}
 
@@ -1053,7 +1052,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			let off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
 			if (e.offsetX < off) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
-					_this.LazyLoad(div,row,facet);														// Lazy load from SOLR
+					_this.LazyLoad(div,row,_this.curTree);												// Lazy load from SOLR
 				else{																					// Open or close
 					row.parent().toggleClass('active');                         						// Toggle active class on or off
 					row.parent().children('ul').slideToggle('fast');            						// Slide into place
@@ -1061,7 +1060,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				}
 			else{
 				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
-				sui.AddNewFilter(s, sui.curTree+"-"+e.target.id.split("-")[1], "AND", facet);			// Add term to search state and refresh
+				sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree);	// Add term to search state and refresh
 				}
 			}
 		}

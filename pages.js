@@ -83,10 +83,10 @@ class Pages  {
 			str+="<div class='sui-relatedItem' id='sui-rl-"+k+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
 			str+=k+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
-//		str+="</div><br>BROWSE<hr style='margin-right:12px'><br>";
-//		str+="<div id='sui-advEdit-x-"+o.asset_type.toLowerCase()+"'></div>";					// Add browsing tree div
+		str+="</div><br>BROWSE<hr style='margin-right:12px'><br>";
+		str+="<div id='sui-btree-"+o.asset_type+"'></div>";										// Add browsing tree div
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-//		sui.DrawFacetTree("x-"+o.asset_type.toLowerCase(),1);									// Add tree
+		this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type.toLowerCase());					// Add tree
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
@@ -427,12 +427,10 @@ class Pages  {
 		return "&nbsp;<img src='popover.png' onmouseenter='sui.pages.ShowPopover(\""+id+"\",event)'>";	// Add image call to show popover
 	}
 
-	DrawTree(facet, div)  																		// DRAW FACET TREE
+	DrawTree(div, facet)  																		// DRAW FACET TREE
 	{
-		let str=`<div id='sui-browseTree' class='sui-tree'></div>`;		
-		$("#"+div).html(str.replace(/\t|\n|\r/g,""));											// Add tree frame to div
-		if (facet == "places") 		 	sui.LazyLoad("#sui-btree",facet,13735);					// Embedded top layer for places
-		else 							sui.GetTopRow("#sui-btree",facet);						// Constructed top layers
+		if (facet == "places") 		 	sui.LazyLoad(div,null,facet,13735);						// Embedded top layer for places
+		else 							sui.GetTopRow(div,facet);								// Constructed top layers
 		
 		$('.sui-tree li').each( function() {                                					// For each element
 			if ($(this).children('ul').length > 0)                       						// If has children 
