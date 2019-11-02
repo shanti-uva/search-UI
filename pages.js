@@ -83,8 +83,8 @@ class Pages  {
 			str+="<div class='sui-relatedItem' id='sui-rl-"+k+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
 			str+=k+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
-		str+="</div><br>BROWSE<hr style='margin-right:12px'><br>";
-		str+="<div id='sui-btree-"+o.asset_type+"'></div>";										// Add browsing tree div
+		str+="</div><p>BROWSE</p>";
+		str+="<div class='sui-tree' id='sui-btree-"+o.asset_type+"'></div>";					// Add browsing tree div
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type.toLowerCase());					// Add tree
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
@@ -387,7 +387,6 @@ class Pages  {
 			curCon=Math.min(content.length-1,Math.max(curCon,0));								// Cap
 			setPanel(curCon);																	// Draw panel
 			});
-
 	}
 
 	DrawItem(icon, label, value, def, style, bold)											// DRAW ITEM

@@ -923,11 +923,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			else if (facet == "languages") 	this.LazyLoad(div,null,facet,301);						// Languages
 			else 							this.GetTopRow(div,facet);								// Constructed top layers
 			
-			$('.sui-tree li').each( function() {                                					// For each element
-				if ($(this).children('ul').length > 0)                       						// If has children 
-					$(this).addClass('parent');                              						// Make parent class
-				});
-
 			$("[id^=sui-advTreeMap-]").off("click");												// KILL OLD HANDLER
 			$("#sui-advTreeMap-"+facet).on("click", ()=> {											// ON CLICK LIST BUTTON
 				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
@@ -1030,7 +1025,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 					str+="</a></li>";																	// Add label
 					}
 				if (res.response.docs.length) {
-					if (init)	$("#sui-tree"+facet).html(str+"</ul>");									// If initing 1st level
+					if (init)	$(div).html(str+"</ul>");												// If initing 1st level
 					else{																				// Adding a level to a branch
 						row.after(str+"</ul>");															// Add children to tree
 						row.parent().toggleClass('active');                         					// Toggle active class on or off
@@ -1050,6 +1045,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 		function handleClick(row, e) {																	// HANDLE NODE CLICK
 			let off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
+			trace(row,e,off)
 			if (e.offsetX < off) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
 					_this.LazyLoad(div,row,_this.curTree);												// Lazy load from SOLR
