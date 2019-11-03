@@ -970,7 +970,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			id=facet+"-"+tops[k];																		// id
 			str+="<li class='parent'><a id='"+id+"'";													// Start row
 			str+="' data-path='"+tops[k]+"'>"+k;														// Add path/header
-			str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
+			if (!div.match(/sui-btree-/))																// If in advanced search
+				str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
 			str+="</a></li>";																			// Add label
 			}
 		$(div).html(str+"</ul>");																		// If initing 1st level
@@ -989,7 +990,10 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				}
 			else{
 				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
-				sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND", _this.curTree);	// Add term to search state and refresh
+				if (!div.match(/sui-btree-/))															// If in advanced search
+					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND", _this.curTree);// Add term to search state and refresh
+				else					
+					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 				}
 		}
 
@@ -1021,7 +1025,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 					str+="><a id='"+o.id;																// Add id
 					str+="' data-path='"+o.ancestor_id_path+"'>";										// Add path
 					str+=o.header;																		// Add label
-					str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+o.id+"' title='View page'>&#xe67c</div>";					
+					if (!div.match(/sui-btree-/))														// If in advanced search
+						str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+o.id+"' title='View page'>&#xe67c</div>";					
 					str+="</a></li>";																	// Add label
 					}
 				if (res.response.docs.length) {
@@ -1045,7 +1050,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 		function handleClick(row, e) {																	// HANDLE NODE CLICK
 			let off=$(row.parent()).hasClass("parent") ? 20 : 0;										// Adjust for icon
-			trace(row,e,off)
 			if (e.offsetX < off) {                                         				  				// In icon
 				if (row.parent().children().length == 1) 												// If no children
 					_this.LazyLoad(div,row,_this.curTree);												// Lazy load from SOLR
@@ -1056,10 +1060,13 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				}
 			else{
 				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
-				sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree);	// Add term to search state and refresh
+				if (!div.match(/sui-btree-/))															// If in advanced search
+					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree); // Add term to search state and refresh
+				else	
+					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 				}
 			}
-		}
+	}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS

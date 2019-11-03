@@ -67,9 +67,11 @@ class Pages  {
 					tot+=n;																		// Add to total
 					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
 					$("#sui-rln-"+d[i].val).html(n);											// Set number
+					$("#sui-rl-"+d[i].val).css({display:"block"});								// Show it				
 					}
 				if (tot > 1000)	tot=Math.floor(tot/1000)+"K";									// Shorten
-				$("#sui-rln-all").html(tot);													// Set number
+				$("#sui-rln-all").html(tot);													// Set total number
+				$("#sui-rl-all").css({display:"block"});										// Show total
 				}
 			});
 
@@ -80,10 +82,10 @@ class Pages  {
 		if (sui.ss.mode == "related")
 			str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
-			str+="<div class='sui-relatedItem' id='sui-rl-"+k+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
+			str+="<div class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase()+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
 			str+=k+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
-		str+="</div><p>BROWSE</p>";
+		str+="</div><br>BROWSE<hr style='margin-right:12px'>";
 		str+="<div class='sui-tree' id='sui-btree-"+o.asset_type+"'></div>";					// Add browsing tree div
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type.toLowerCase());					// Add tree
@@ -428,13 +430,10 @@ class Pages  {
 
 	DrawTree(div, facet)  																		// DRAW FACET TREE
 	{
+		sui.curTree=facet;																		// Save current facet
 		if (facet == "places") 		 	sui.LazyLoad(div,null,facet,13735);						// Embedded top layer for places
 		else 							sui.GetTopRow(div,facet);								// Constructed top layers
-		
-		$('.sui-tree li').each( function() {                                					// For each element
-			if ($(this).children('ul').length > 0)                       						// If has children 
-				$(this).addClass('parent');                              						// Make parent class
-			});
+
 	}
 
 	

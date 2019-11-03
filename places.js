@@ -23,7 +23,7 @@ class Places  {
 		this.extent=null;
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
-		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
+		this.div=sui.pages.div;	
 	}
 
 	Draw(kmap)
@@ -52,7 +52,7 @@ class Places  {
 			&WIDTH=864&HEIGHT=53
 			&REQUEST=GetMap`.replace(/\t|\n|\r|/g,"")
 			app.kml="https://viseyes.org/visualeyes/projects/test.kml"
-*/	
+*/
 
 		this.app=app;	   
 		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");								// Scalebar if spec'd
@@ -197,24 +197,20 @@ class Places  {
 		}
 
 	app.DrawFooter();																				// Draw footer
-	sui.pages.DrawRelatedAssets(kmap);																// Draw related assets menu
 		
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		app.ToggleOption=function(option)														// HIDE/SHOW WIDGET OPTION
-		{
+		app.ToggleOption=function(option) {															// HIDE/SHOW WIDGET OPTION
 			if (option.visible)	app.activeView.ui.remove(option);									// If visible, hide
 			else				app.activeView.ui.add(option,"top-right");							// Else show
 			option.visible=!option.visible;															// Toggle flag (why?)
-		}
+			};
 
-		app.GoToExtent=function(extent)															// SET NEW EXTENT
-		{
+		app.GoToExtent=function(extent) {															// SET NEW EXTENT
 			app.mapView.goTo({ extent:new Extent(extent) });										// Set view to extent
-		}
+			};
 
-		app.SwitchView=function() 																// SWITCH 2D/3D MODE
-		{
+		app.SwitchView=function() { 																// SWITCH 2D/3D MODE
 			var is3D=app.activeView.type === "3d";													// Current mode												
 			var activeViewpoint=app.activeView.viewpoint.clone();									// Clone viewport
 			app.activeView.container=null;															// Hide current one
@@ -229,10 +225,10 @@ class Places  {
 				}
 			app.activeView.viewpoint=activeViewpoint;												// Set viewport
 			app.activeView.container=app.container;													// Set container
-		}		
+			};		
 
-	});	// REQUIRE() CLOSURE
-	}
+		});																							// Require closure
+	}																								// End Draw()
 
 	DrawMetadata()																				// SHOW PLACES METADATA
 	{
@@ -259,6 +255,7 @@ class Places  {
 		</div>
 		<div class='sui-textSide' id='sui-textSide' style='display:none'></div></div>`;
 		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
+		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
 
 		$("[id^=sui-textTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(11);											// Get index of tab	
