@@ -21,7 +21,7 @@ class Pages  {
 	{
 		this.div="#sui-results";																// Div to hold page
 		this.relatedBase=null;																	// Holds based kmap for related
-		this.relatedType="Home";																// Holds current related category
+		this.relatedType="home";																// Holds current related category
 		this.relatedId="";																		// Holds current related id
 		this.lastMode=sui.ss.mode;																// Previous search mode
 		this.curKmap=null;																		// Currently active page kmap
@@ -38,17 +38,17 @@ class Pages  {
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px", display:"none"});	// Reset to normal size and hide
 		$(this.div).css({ display:"block",color:"#000"});										// Show page
 		if (sui.ss.mode == "related") {															// If browsing related pages
-			if (!kmap.asset_type.match(/Places|Subjects|Terms/))								// Need to add space for these types
+			if (!kmap.asset_type.match(/places|subjects|terms/))								// Need to add space for these types
 				$(this.div).css({ "padding-left": "192px", width:"calc(100% - 216px"});			// Shrink page
 			}
-		if (kmap.asset_type == "Places")			sui.places.Draw(kmap);						// Show place
-		else if (kmap.asset_type == "Sources") 		sui.src.Draw(kmap);							// Source
-		else if (kmap.asset_type == "Terms") 		this.DrawTerm(kmap);						// Term
-		else if (kmap.asset_type == "Subjects") 	this.DrawSubject(kmap);						// Subject
-		else if (kmap.asset_type == "Images") 		sui.img.Draw(kmap);							// Image
-		else if (kmap.asset_type == "Audio-Video") 	sui.av.Draw(kmap);							// AV
-		else if (kmap.asset_type == "Texts") 		sui.txt.Draw(kmap);							// Text
-		else if (kmap.asset_type == "Visuals") 		sui.vis.Draw(kmap);							// Visual
+		if (kmap.asset_type == "places")			sui.places.Draw(kmap);						// Show place
+		else if (kmap.asset_type == "sources") 		sui.src.Draw(kmap);							// Source
+		else if (kmap.asset_type == "terms") 		this.DrawTerm(kmap);						// Term
+		else if (kmap.asset_type == "subjects") 	this.DrawSubject(kmap);						// Subject
+		else if (kmap.asset_type == "images") 		sui.img.Draw(kmap);							// Image
+		else if (kmap.asset_type == "audio-video") 	sui.av.Draw(kmap);							// AV
+		else if (kmap.asset_type == "texts") 		sui.txt.Draw(kmap);							// Text
+		else if (kmap.asset_type == "visuals") 		sui.vis.Draw(kmap);							// Visual
 	}
 
 	DrawRelatedAssets(o)																	// DRAW RELATED ASSETS MENU
@@ -56,7 +56,7 @@ class Pages  {
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
-		if (!o.asset_type.match(/Places|Subjects|Terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
+		if (!o.asset_type.match(/places|subjects|terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
 		var url=sui.solrUtil.createKmapQuery(o.uid);											// Get query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
 			var i,n,tot=0;
@@ -75,7 +75,7 @@ class Pages  {
 				}
 			});
 
-		var k=o.asset_type;																		// Get this asset type																	
+		let k=o.asset_type;																		// Get this asset type																	
 		var str=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"}'>`;														
 		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";
 		str+="<div class='sui-relatedList'>";
@@ -83,16 +83,15 @@ class Pages  {
 			str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
 			str+="<div class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase()+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
-			str+=k+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
+			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
 		str+="</div><br>BROWSE<hr style='margin-right:12px'>";
 		str+="<div class='sui-tree' id='sui-btree-"+o.asset_type+"'></div>";					// Add browsing tree div
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-		this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type.toLowerCase());					// Add tree
+		this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type);									// Add tree
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
-			this.relatedType=this.relatedType.charAt(0).toUpperCase()+this.relatedType.substr(1);	// UC 1st
 			if (this.relatedType == "Home")	{													// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				this.baseMap=null;																// No base and set to home
@@ -216,11 +215,9 @@ class Pages  {
 				for (i=0;i<d.length;++i) {														// For each bucket
 					n=d[i].count;																// Get count													
 					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
-					var f=d[i].val.charAt(0).toUpperCase()+d[i].val.slice(1);					// Match assets list
-					if (f == "Audio-video") f="Audio-Video";									// Handle AV
-					str+=`<p class='sui-popItem' id='sui-pop-${id}-${f}' style='cursor:pointer'>
-					<span style='color:${sui.assets[f].c}'>${sui.assets[f].g}</span>
-					&nbsp;&nbsp;Related ${f} (${n})</p>`;
+					str+=`<p class='sui-popItem' id='sui-pop-${id}-${d[i].val}' style='cursor:pointer'>
+					<span style='color:${sui.assets[d[i].val].c}'>${sui.assets[d[i].val].g}</span>
+					&nbsp;&nbsp;Related ${d[i].val} (${n})</p>`;
 					$("#sui-rln-"+d[i].val).html(n);											// Set number
 					}
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
@@ -231,7 +228,6 @@ class Pages  {
 					this.relatedBase=this.curKmap;												// Set base
 					this.relatedId=v[2]+"-"+v[3];												// Related id
 					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
-					this.relatedType=this.relatedType.charAt(0).toUpperCase()+this.relatedType.substr(1);	// UC 1st
 					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
 					$("#sui-headLeft").html(str);												// Add to div
 					sui.Query();																// Query and show results

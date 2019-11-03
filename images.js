@@ -36,11 +36,11 @@ class Images  {
 		<div class='sui-imageGal'id='sui-imageGal'>`;
 				
 		for (i=mid-1;i>=0;--i) 
-			if (sui.curResults[i].asset_type == "Images")
+			if (sui.curResults[i].asset_type == "images")
 				str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
 		str+=`<div class='sui-pageThumb' style=' border-color:#fff'><img id='sui-pageThumb-${mid}' src='${o.url_thumb}' style='height:100%'></div>`;	
 			for (i=mid+1;i<sui.curResults.length;++i) 
-				if (sui.curResults[i].asset_type == "Images")
+				if (sui.curResults[i].asset_type == "images")
 					str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
 		str+="</div></div>";
 		

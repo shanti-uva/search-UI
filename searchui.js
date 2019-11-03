@@ -54,15 +54,15 @@ class SearchUI  {
 		this.facets.relationships=	{ type:"list",  icon:"&#xe638", mode:null, data:[] };			// Relationships
 	
 		this.assets={};
-		this.assets.All=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
-		this.assets.Places=	 		{ c:"#6faaf1", g:"&#xe62b" };									// Places
-		this.assets["Audio-Video"]=	{ c:"#58aab4", g:"&#xe648" };									// AV
-		this.assets.Images=	 		{ c:"#b49c59", g:"&#xe62a" };									// Images
-		this.assets.Sources= 		{ c:"#5a57ad", g:"&#xe631" };									// Sources
-		this.assets.Texts=	 		{ c:"#8b5aa1", g:"&#xe636" };									// Texts
-		this.assets.Visuals= 		{ c:"#6e9456", g:"&#xe63b" };									// Visuals
-		this.assets.Subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
-		this.assets.Terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
+		this.assets.all=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
+		this.assets.places=	 		{ c:"#6faaf1", g:"&#xe62b" };									// Places
+		this.assets["audio-video"]=	{ c:"#58aab4", g:"&#xe648" };									// AV
+		this.assets.images=	 		{ c:"#b49c59", g:"&#xe62a" };									// Images
+		this.assets.sources= 		{ c:"#5a57ad", g:"&#xe631" };									// Sources
+		this.assets.texts=	 		{ c:"#8b5aa1", g:"&#xe636" };									// Texts
+		this.assets.visuals= 		{ c:"#6e9456", g:"&#xe63b" };									// Visuals
+		this.assets.subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
+		this.assets.terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 	
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
@@ -244,7 +244,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
 		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
 		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author
-		this.ss.type="All";																			// Current item types
+		this.ss.type="all";																			// Current item types
 		this.ss.page=0;																				// Current page being shown
 		this.ss.pageSize=100;																		// Results per page	
 		this.ss.site="Mandala";																		// S
@@ -276,7 +276,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
-			this.assets.All.n=data.response.numFound;												// Set counts
+			this.assets.all.n=data.response.numFound;												// Set counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			this.DrawAdvanced();																	// Draw advanced search if active
@@ -298,7 +298,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		if (!url) return;																			// No asset type
 		url=url.replace(/images.shanti.virginia.edu/i,"images-dev.shanti.virginia.edu");			// Look in dev			
 		url+="?callback=myfunc";																	// Add callback
-		if (kmap.asset_type == "Audio-Video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
+		if (kmap.asset_type == "audio-video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
 		$.ajax( { url:url, dataType:'jsonp', error: (xhr)=>{ this.Popup("Access error")}}).done((data)=> { callback(data); });	// Get JSON and send to callback
 	}
 
@@ -307,11 +307,9 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		var i,o;
 		for (i=0;i<data.response.docs.length;++i) {													// For each result, massage data
 			o=data.response.docs[i];																// Point at item
-			o.asset_type=o.asset_type.charAt(0).toUpperCase()+o.asset_type.slice(1);				// UC 1st char
 			if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
 			if (o.ancestors_txt && o.ancestors_txt.length)	o.ancestors_txt.splice(0,1);			// Remove 1st ancestor from trail
-			if (o.asset_type == "Audio-video") 				o.asset_type="Audio-Video";				// Handle AV
-			if (o.asset_type == "Texts")					o.url_thumb="gradient.jpg";				// Use gradient for texts
+			if (o.asset_type == "texts")					o.url_thumb="gradient.jpg";				// Use gradient for texts
 			else if (!o.url_thumb)							o.url_thumb="gradient.jpg";				// Use gradient for generic
 			if (o.display_label) 							o.title=o.display_label;				// Get title form display
 			}
@@ -325,11 +323,9 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
 				for (i=0;i<buckets.length;++i) {													// For each bucket
 					val=buckets[i].val;																// Get name
-					val=val.charAt(0).toUpperCase()+val.slice(1);									// UC
-					if (val == "Audio-video") val="Audio-Video";									// Handle AV
 					this.assets[val].n=buckets[i].count;											// Set count
 					}
-				this.assets.All.n=data.response.numFound;											// All count
+				this.assets.all.n=data.response.numFound;											// All count
 				}	
 	}
 
@@ -424,7 +420,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			SHOW&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
 			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
-			${this.assets[this.ss.type].g}</div>${this.ss.type} (${n}) 
+			${this.assets[this.ss.type].g}</div>${this.ss.type.charAt(0).toUpperCase()+this.ss.type.substr(1)} (${n}) 
 			<div id='sui-typeSet' class='sui-typeSet'>&#xe609</div>
 			</div>
 			`;
@@ -436,12 +432,14 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			for (var k in this.assets) {															// For each asset type														
 				n=this.assets[k].n;																	// Get number of items
 				if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
-				str+="<div class='sui-typeItem' id='sui-tl-"+k+"'><span style='font-size:18px; line-height: 24px; vertical-align:-3px; color:"+this.assets[k].c+"'>"+this.assets[k].g+" </span> "+k+" ("+n+")</div>";
+				str+="<div class='sui-typeItem' id='sui-tl-"+k+"'>";								// Item head
+				str+="<span style='font-size:18px; line-height: 24px; vertical-align:-3px; color:"+this.assets[k].c+"'>";
+				str+=this.assets[k].g+" </span> "+k.charAt(0).toUpperCase()+k.substr(1)+" ("+n+")</div>";
 				}
 			$("#sui-main").append(str);																// Add to main div
 			
 			$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-				this.ss.type=e.currentTarget.id.substring(7);										// Get asset name		
+				this.ss.type=e.currentTarget.id.substring(7).toLowerCase();							// Get asset name		
 				this.SetState("a="+this.ss.type);													// Set state
 				$("#sui-typeList").remove();														// Remove type list
 				this.ss.page=0;																		// Start at beginning
@@ -599,7 +597,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			str+="<div class='sui-itemTrail'>";														// Holds trail
 			for (i=0;i<o.ancestors_txt.length;++i) {												// For each trail member
 				str+="<span class='sui-itemAncestor' onclick='sui.SendMessage(\"page=";				// Add ancestor
-				str+="https://mandala.shanti.virginia.edu/"+o.asset_type.toLowerCase()+"/";			// URL stem
+				str+="https://mandala.shanti.virginia.edu/"+o.asset_type+"/";						// URL stem
 				str+=o.ancestor_ids_is[i+1]+"/overview/nojs#search\,"+this.curResults[num]+")'>";	// URL end
 				str+=o.ancestors_txt[i]+"</span>";													// Finish ancestor link
 				if (i < o.ancestors_txt.length-1)	str+=" > ";										// Add separator
@@ -639,8 +637,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				if (o.kmapid_strict[j].match(/subjects/i))		subjects.push(j);					// Add to subjects
 				else if (o.kmapid_strict[j].match(/places/i))	places.push(j);						// Add to places
 				}
-			str+="<div style='float:left;min-width:200px;'><span style='color:"+this.assets.Places.c+"'>";
-			str+="<br><b>"+this.assets.Places.g+"</b></span>&nbsp;RELATED PLACES";					// Add header
+			str+="<div style='float:left;min-width:200px;'><span style='color:"+this.assets.places.c+"'>";
+			str+="<br><b>"+this.assets.places.g+"</b></span>&nbsp;RELATED PLACES";					// Add header
 			if (places.length) {																	// If any places
 				for (j=0;j<places.length;++j) {														// For each place
 					str+="<br>";
@@ -651,8 +649,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				}
 			str+="</div>";																			// End places div
 			
-			str+="<div><span style='display:inline-block;color:"+this.assets.Subjects.c+"'>";
-			str+="<br><b>"+this.assets.Subjects.g+"</b></span>&nbsp;RELATED SUBJECTS";				// Add header
+			str+="<div><span style='display:inline-block;color:"+this.assets.subjects.c+"'>";
+			str+="<br><b>"+this.assets.subjects.g+"</b></span>&nbsp;RELATED SUBJECTS";				// Add header
 			if (subjects.length) {																	// If any subjects
 				for (j=0;j<subjects.length;++j) {													// For each subject
 					str+="<br>";
