@@ -92,6 +92,7 @@ class Pages  {
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
+			this.relatedType=this.relatedType.charAt(0).toUpperCase()+this.relatedType.substr(1);	// UC 1st
 			if (this.relatedType == "Home")	{													// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				this.baseMap=null;																// No base and set to home
@@ -230,6 +231,7 @@ class Pages  {
 					this.relatedBase=this.curKmap;												// Set base
 					this.relatedId=v[2]+"-"+v[3];												// Related id
 					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
+					this.relatedType=this.relatedType.charAt(0).toUpperCase()+this.relatedType.substr(1);	// UC 1st
 					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
 					$("#sui-headLeft").html(str);												// Add to div
 					sui.Query();																// Query and show results
