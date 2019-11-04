@@ -118,14 +118,14 @@ class Pages  {
 	{
 		var i;
 		if (!o) return;																			// Return if not kmap defines
-		$("#sui-headRight").html("<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
+/*		$("#sui-headRight").html(<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
 		$("#plc-closeBut").on("click", ()=> { 													// ON CLOSE BUT CLICK
 			this.relatedBase=null;  															// Release related base
 			if (!sui.curResults ||!sui.curResults.length)	sui.Draw("input");					// If no results, put up landing page 
 			else { sui.Draw(this.lastMode); sui.Query(); }										// Show last search results
 			});
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
-		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
+*/		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
 			str+="<br><div class='sui-breadCrumbs'>";											// Holds bread crumbs
@@ -297,26 +297,31 @@ class Pages  {
 
 	DrawLandingPage()																		// DRAW SITE SPECIFIC LANDING PAGE
 	{
+		$("#sui-pages").css({ display:"block" });												// Hide results page	
+		$("#sui-results").css({ display:"none" });												// Hide results page	
 		$("#sui-headLeft").html("<div style='margin-top:8px'>Bhutan Cultural Library</div>");	// Set left header
 		$("#sui-headRight").html("");															// Clear right header
 		$("#sui-footer").html("");																// Clear footer
-		$("#sui-footer").css("background-color","#ddd");
-		$("#sui-pages").html("");
-		$("#sui-pages").css({ "background-image": "url('https://cicada.shanti.virginia.edu/images/mandala/shanti-image-517836/full/!2000,/0/default.jpg')"});
-		this.DrawCarousel();
-		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:24px auto 12px auto'>
-		<div style='color:#4d59ca;font-size:20px;margin-bottom:8px;font-weight:700'>
+		$("#sui-footer").css("background-color","#ddd");										// Gray
+		$("#sui-header").css("background-color","#4d59ca");										// Blue
+		$("#sui-pages").html("");																// Clear pages
+		$("#sui-pages").css({"background-size":"100% auto", "background-repeat":"no-repeat", "background-image": "url('https://cicada.shanti.virginia.edu/images/mandala/shanti-image-517836/full/!3000,/0/default.jpg')"});
+		let str=`<div style='text-align:center;width:66%;max-width:800px;margin:12px auto 12px auto'>
+		<div style='color:#fff;font-size:24px;margin-bottom:8px;font-weight:700'>
 		BHUTAN: A LIVING ARCHIVE</div>
-		<div style='font-size:20px;font-family:"EB Garamond",serif,shanticon; font-weight:400'>
+		<div style='font-size:20px;font-family:"EB Garamond",serif,shanticon; font-weight:400;color:#fff'>
 			The Kingdom of Bhutan has vibrant oral and embodied cultures across its mountainous landscape, 
 			which are now under pressure from globalization. 
-			This project aims to carry out an extensive audio-visual documentation to support local communities.<br><br>
-		</div><div style='font-size:13px'>	
-			<i>The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
-			and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
-			The team gratefully acknowledges the generous support offered by Arcadia throughout the project.</i>
-		</div></div>
+			This project aims to carry out an extensive audio-visual documentation to support local communities.
 		</div></div>`;
+		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		this.DrawCarousel();
+		str=`<div style='position:absolute;top:calc(100% - 100px); width:66%;max-width:800px;margin:24px auto 12px auto;color:#fff'>	
+				<i>The Bhutan Cultural Library is made possible through the contributions and efforts of local individuals 
+				and communities in Bhutan in collaboration with Loden Foundation (formerly Shejun Agency) and the University of Virginia. 
+				The team gratefully acknowledges the generous support offered by Arcadia throughout the project.</i>
+				</div>
+			</div>`;
 		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 	}
 
@@ -347,7 +352,7 @@ class Pages  {
 		let str=`<div class='sui-caroBox'>
 		<div class='sui-caroButL' id='sui-caroButL'>&#xe640</div>
 		<div class='sui-caroButR' id='sui-caroButR'>&#xe641</div>
-		<div class='sui-caroHeader'>Featured Resources</div>
+		<div class='sui-caroHeader'>&nbsp;</div>
 			<div class='sui-caroLeft'>
 				<div class='sui-caroTitle' id='sui-caroTitle'></div>
 				<div class='sui-caroText' id='sui-caroText'></div>

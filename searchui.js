@@ -375,7 +375,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 				$("#sui-adv").css({ display:"none"});												// Hide search ui
 				$("#sui-pages").css({ display:"block",color:"#000" });								// Show pages page	
 				$("#sui-results").css({ display:"none" });											// Hide results page	
-				if (this.pages)	this.pages.DrawLandingPage();										// Draw landing page
+//				if (this.pages)	this.pages.DrawLandingPage();										// Draw landing page
 				}
 			$("#sui-adv").css({ display:"none" });													// Hide adv search ui
 			return;																					// Quit
@@ -410,10 +410,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
 		if (n >= 1000)	n=Math.floor(n/1000)+"K";													// Shorten if need be
-		var str=`
-			<span id='sui-resClose' class='sui-resClose'>&#xe60f</span>
-			Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}
-			`;
+		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
 		str=`
@@ -425,7 +422,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			</div>
 			`;
 		$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-		$("#sui-resClose").on("click", ()=> { this.Draw("input");  });								// ON QUIT
 		$("#sui-typeSet").on("click", ()=> {														// ON CHANGE ASSET BUTTON
 			$("#sui-typeList").remove();															// Remove type list
 			str="<div id='sui-typeList' class='sui-typeList'>";										// Enclosing div for list
@@ -1082,7 +1078,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			}
 		var str="<img src='loading.gif' width='"+size+"' ";											// Img
 		str+="id='sui-loadingIcon' style='position:absolute;top:calc(50% - "+size/2+"px);left:calc(50% - "+size/2+"px);z-index:5000'>";	
-		$("#sui-results").append(str);																// Add icon to results
+		$("body").append(str);																// Add icon to results
 	}
 
 	SendMessage(msg, kmap)																		// SEND MESSAGE TO HOST
