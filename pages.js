@@ -118,14 +118,7 @@ class Pages  {
 	{
 		var i;
 		if (!o) return;																			// Return if not kmap defines
-/*		$("#sui-headRight").html(<span id='plc-closeBut' class='sui-resClose' title='Back to results'>&#xe60f</span>");
-		$("#plc-closeBut").on("click", ()=> { 													// ON CLOSE BUT CLICK
-			this.relatedBase=null;  															// Release related base
-			if (!sui.curResults ||!sui.curResults.length)	sui.Draw("input");					// If no results, put up landing page 
-			else { sui.Draw(this.lastMode); sui.Query(); }										// Show last search results
-			});
-		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections"))	return;				// Not in special modes
-*/		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
+		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
 			str+="<br><div class='sui-breadCrumbs'>";											// Holds bread crumbs
@@ -196,15 +189,11 @@ class Pages  {
 
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
-				sui.ss.mode="related";															// Related mode
-				this.relatedBase=this.curKmap;													// Set base
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				});
 			
 			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
 				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
-				sui.ss.mode="related";															// Related mode
-				this.relatedBase=this.curKmap;													// Set base
 				str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
 				$("#sui-headLeft").html(str);													// Add to div
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
@@ -229,8 +218,6 @@ class Pages  {
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					sui.ss.mode="related";														// Related mode
-					this.relatedBase=this.curKmap;												// Set base
-					this.relatedId=v[2]+"-"+v[3];												// Related id
 					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
 					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
 					$("#sui-headLeft").html(str);												// Add to div
