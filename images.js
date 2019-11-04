@@ -108,7 +108,7 @@ class Images  {
 				
 				let asp=o.img_height_s/o.img_width_s;
 				str+=`<p class='sui-pageLab' style='cursor:pointer' onclick='$("#sui-dlOps").toggle()'>
-				&#xe616&nbsp;&nbsp;<a>CLICK TO DOWNLOAD IMAGE</a>
+				&#xe616&nbsp;&nbsp;<a>DOWNLOAD IMAGE</a>
 					<div id='sui-dlOps' style='display:none;margin-left:24px;font-size:12px'>			
 					<a target='_blank' href='${o.url_thumb.replace(/200,200/,o.img_width_s+","+o.img_width_s)}'
 					style='display:inline-block;cursor:pointer'>Original (${o.img_width_s}x${o.img_height_s})</a><br>

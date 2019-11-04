@@ -179,11 +179,11 @@ class Pages  {
 		sui.GetKmapFromID(id,(o)=>{ 
 			let str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
 			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
-			<span style='font-size:12px;'>
-				For more information about this ${o.asset_type.toLowerCase().slice(0,-1)}, see Full Entry below.<br>
+			<span style='font-size:12px;text-transform:capitalize'>
+				For more information about this ${o.asset_type.slice(0,-1)}, see Full Entry below.<br>
 				<b><p>${o.asset_type}: </b>`;
 				for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
-					str+=`<span class='sui-crumb' style='color:#000099' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
+					str+=`<span class='sui-crumb' style='color:#000099;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
 					${o.ancestors_txt[i]}</span>`;											
 					if (i < o.ancestors_txt.length-2)	str+=" / ";									// Add separator
 					}
@@ -219,7 +219,7 @@ class Pages  {
 				for (i=0;i<d.length;++i) {														// For each bucket
 					n=d[i].count;																// Get count													
 					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
-					str+=`<p class='sui-popItem' id='sui-pop-${id}-${d[i].val}' style='cursor:pointer'>
+					str+=`<p class='sui-popItem' id='sui-pop-${id}-${d[i].val}' style='cursor:pointer;text-transform:capitalize'>
 					<span style='color:${sui.assets[d[i].val].c}'>${sui.assets[d[i].val].g}</span>
 					&nbsp;&nbsp;Related ${d[i].val} (${n})</p>`;
 					$("#sui-rln-"+d[i].val).html(n);											// Set number
