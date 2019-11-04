@@ -63,7 +63,8 @@ class SearchUI  {
 		this.assets.visuals= 		{ c:"#6e9456", g:"&#xe63b" };									// Visuals
 		this.assets.subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
 		this.assets.terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
-	
+		this.searches=[];																			// Saves recent searches
+
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
@@ -115,7 +116,13 @@ class SearchUI  {
 						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 						<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
 						}
-				str+=`</div>
+					str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>
+						&#xe62e&nbsp;&nbsp;RECENT SEARCHES
+						<span id='sui-advPlus-recent' style='float:right'>&#xe669</span>
+						<div class='sui-advTerm'></div>
+						<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div>
+						</div>`;
+					str+=`</div>
 				</div>
 			</div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
@@ -130,13 +137,13 @@ class SearchUI  {
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			$("#sui-search2").val(this.ss.query.text);												// Set adv search
-			if (this.ss.mode == "input") this.ss.mode="simple";										// Toggle simple mode
+			if ((this.ss.mode == "input") || (this.ss.mode == "related")) this.ss.mode="simple";	// Toggle simple mode
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
 
 		$("#sui-searchgo, #sui-searchgo2").on("click", (e)=> { 										// ON SEARCH BUTTON CLCK
-			if (this.ss.mode == "input") this.ss.mode="simple";										// Toggle simple mode
+			if ((this.ss.mode == "input") || (this.ss.mode == "related")) this.ss.mode="simple";	// Toggle simple mode
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
@@ -272,6 +279,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
 		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
 		$("#sui-relatedAssets").remove();															// Remove related assets panel
+		this.searches.push(JSON.parse(JSON.stringify(this.ss.query)));								// Add to recent searches
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
@@ -756,15 +764,16 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 	DrawFacetItems(facet)																		// DRAW FACETS ITEMS
 	{
 		let key,activeSearch=false;																	// Assume no active search happening
-		if (this.ss.query.text.length) 		activeSearch=true;										// Flag if something set in text
+		if (this.ss.query.text.length) 					activeSearch=true;							// Flag if something set in text
 		for (key in this.facets) 																	// For each facet
-			if (this.ss.query[key].length) 	activeSearch=true;										// Flag if something set
-		if (this.facets[facet].type == "input") 			this.DrawInput(facet);					// Draw input editor			
+			if (this.ss.query[key].length) 				activeSearch=true;							// Flag if something set
+		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			
+		else if (this.facets[facet].type == "input") 	this.DrawInput(facet);						// Draw input editor			
 		else if (this.facets[facet].type == "tree") {												// If base type is a tree
-			if (activeSearch)								this.DrawFacetList(facet);				// If an active search, draw tree as a list	
-			else 											this.DrawFacetTree(facet);				// Draw tree as a tree 	
+			if (activeSearch)							this.DrawFacetList(facet);					// If an active search, draw tree as a list	
+			else 										this.DrawFacetTree(facet);					// Draw tree as a tree 	
 			}			
-		else 												this.DrawFacetList(facet);				// Draw list editor
+		else 											this.DrawFacetList(facet);					// Draw list editor
 	}
 
 	DrawInput(facet)																			// DRAW INPUT FACET PICKER
@@ -785,6 +794,23 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			var v=e.target.id.split("-");															// Get ids		
 			this.AddNewFilter($("#sui-advInput-"+facet).val(),facet+"-0","AND", facet);				// Add term to search state
 			});
+	}
+
+	RecentSearches()																			// SHOW RECENT SEARCHES
+	{
+		if ($("#sui-advEdit-recent").css("display") != "none") {									// If open
+			$("#sui-advEdit-recent").slideUp();														// Close it 
+			return;																			
+			}
+		let i,f,str="<div>";																		// Enclosing div
+		for (i=0;i<this.searches.length;++i) {														// For each search
+			str+=`<span class='sui-advEditLine' style='width:100%' id='sui-recSrc-${i}'>${this.searches[i].text} `;	// Add text item, if any
+			for (f in this.facets) 	if (this.searches[i][f].length) str+=this.facets[f].icon+" ";	// Add facets icons
+			str+="</span><br>";
+			str+="</div>";
+			}
+		$("#sui-advEdit-recent").html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
+		$("#sui-advEdit-recent").slideDown();														// Show it
 	}
 
 	ResetFacetList(facet)																		// RESET FACET LIST UI
