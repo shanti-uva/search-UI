@@ -34,14 +34,13 @@ class Images  {
 		<div><span style='font-size:14px;vertical-align:-2px;color:#ccc'>&#xe62a</span>&nbsp;&nbsp;${o.title[0]}</div>
 		<div style='color:#ccc;margin-bottom:24px'>${o.creator}&nbsp;&nbsp;|&nbsp;&nbsp;${o.img_width_s} x ${o.img_height_s} px</div>
 		<div class='sui-imageGal'id='sui-imageGal'>`;
-				
-		for (i=mid-1;i>=0;--i) 
+		for (i=0;i<mid;++i) 																	// For each image up mid point
 			if (sui.curResults[i].asset_type == "images")
 				str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
 		str+=`<div class='sui-pageThumb' style=' border-color:#fff'><img id='sui-pageThumb-${mid}' src='${o.url_thumb}' style='height:100%'></div>`;	
-			for (i=mid+1;i<sui.curResults.length;++i) 
-				if (sui.curResults[i].asset_type == "images")
-					str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
+		for (i=mid+1;i<sui.curResults.length;++i) 												// For each after mid point
+			if (sui.curResults[i].asset_type == "images")
+				str+=`<div class='sui-pageThumb'><img id='sui-pageThumb-${i}' src='${sui.curResults[i].url_thumb}' style='height:100%'></div>`;	
 		str+="</div></div>";
 		
 		sui.GetJSONFromKmap(o, (d)=> { drawDetails(d); });										// Load detaill from JSON
@@ -132,7 +131,7 @@ class Images  {
 
 		$("#sui-picEnlarge").on("click",()=> {														// ON RESIZE PIC
 			var sx,sy,px,py;
-			var pic=$("#sui-thisPic")[0];															// Point at image
+			var pic=$("#sui-results")[0];															// Point at image
 			$("#sui-imageDiv").css("width","100%");													// Go full screen
 			if ($("#sui-picEnlarge").html().match(/Zoom/)) {										// If zoomed already
 				$("#sui-picEnlarge").html("&#xe650");												// Restore icon
