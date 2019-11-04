@@ -704,7 +704,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		str+="<div style='border-top:.5px solid "+c+";height:1px;width:100%;margin:6px 0 6px 0'></div>";	// Dividing line
 		if (o.feature_types_ss) str+="&#xe62b&nbsp;&nbsp;"+o.feature_types_ss.join(", ")+"<br>";	// Add feature, if a place
 		if (o.data_phoneme_ss)  str+="&#xe635&nbsp;&nbsp;"+o.data_phoneme_ss.join(", ")+"<br>";		// Add phoneme if a term
-		if (o.node_user)  		str+="&#xe600&nbsp;&nbsp;"+o.node_user+"<br>";						// Or user 
+		if (o.creator)  		str+="&#xe600&nbsp;&nbsp;"+o.creator[0]+"<br>";						// Add creator 
 		if (o.duration_s) 		str+="&#xe61c&nbsp;&nbsp;"+o.duration_s+"<br>";						// Add duration
 		if (o.timestamp) 		str+="&#xe60c&nbsp;&nbsp;"+o.timestamp.substr(0,10)+"<br>";			// Add timestamp
 		if (o.name_tibt)  		str+="=&nbsp;&nbsp;"+o.name_tibt+"<br>";							// Add Tibettan name
@@ -759,9 +759,13 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 	DrawFacetItems(facet)																		// DRAW FACETS ITEMS
 	{
+		let key,activeSearch=false;																	// Assume no active search happening
+		if (this.ss.query.text.length) 		activeSearch=true;										// Flag if something set in text
+		for (key in this.facets) 																	// For each facet
+			if (this.ss.query[key].length) 	activeSearch=true;										// Flag if something set
 		if (this.facets[facet].type == "input") 			this.DrawInput(facet);					// Draw input editor			
 		else if (this.facets[facet].type == "tree") {												// If base type is a tree
-			if (this.ss.query[facet.toLowerCase()].length)	this.DrawFacetList(facet);				// If an active search, draw tree as a list	
+			if (activeSearch)								this.DrawFacetList(facet);				// If an active search, draw tree as a list	
 			else 											this.DrawFacetTree(facet);				// Draw tree as a tree 	
 			}			
 		else 												this.DrawFacetList(facet);				// Draw list editor

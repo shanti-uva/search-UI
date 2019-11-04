@@ -133,10 +133,12 @@ class Images  {
 		$("#sui-picEnlarge").on("click",()=> {														// ON RESIZE PIC
 			var sx,sy,px,py;
 			var pic=$("#sui-thisPic")[0];															// Point at image
-			if ($("#sui-picEnlarge").html().match(/Zoom/)) {										// If zoomed alraady
+			$("#sui-imageDiv").css("width","100%");													// Go full screen
+			if ($("#sui-picEnlarge").html().match(/Zoom/)) {										// If zoomed already
 				$("#sui-picEnlarge").html("&#xe650");												// Restore icon
 				$("#sui-thisPic").css("width","100%");												// Fit in window
 				$("#sui-thisPic").offset($("#sui-imageDiv").offset());								// Restore offset
+				$("#sui-imageDiv").css("width","50%");												// Back to half screen
 				pic.onmousedown=null;																// Remove handler
 				return;																				// Quit
 				}

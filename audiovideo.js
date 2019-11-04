@@ -69,7 +69,7 @@ class AudioVideo  {
 			try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
 			str+=`</div><hr>
 			<p class='sui-sourceText'>${o.summary ? o.summary : o.caption ? o.caption : ""}</p>`;
-			if (d.field_pbcore_description && d.field_pbcore_description.und && d.field_pbcore_description.und.length > 1) {	
+			if (d.field_pbcore_description && d.field_pbcore_description.und && d.field_pbcore_description.und.length) {	
 				str+=`<div id='sui-avmore' style='width:100%;text-align:center'><a style='cursor:pointer;
 				border:1px solid #ccc;border-left:none;border-right:none;font-weight:400'
 				onclick='$("#sui-avlang").toggle();this.text=(this.text == "SHOW MORE") ? "SHOW LESS" : "SHOW MORE"'>
@@ -478,4 +478,3 @@ class AudioVideo  {
 
 	
 } // AudioVideo class closure
-	

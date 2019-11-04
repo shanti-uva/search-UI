@@ -53,6 +53,8 @@ class Pages  {
 
 	DrawRelatedAssets(o)																	// DRAW RELATED ASSETS MENU
 	{
+		let browse=true;
+		if (o)	browse=o.asset_type.match(/places|subjects|terms/);								// Add browsing to this menu?	
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
@@ -85,10 +87,12 @@ class Pages  {
 			str+="<div class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase()+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
 			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
-		str+="</div><br>BROWSE<hr style='margin-right:12px'>";
-		str+="<div class='sui-tree' id='sui-btree-"+o.asset_type+"'></div>";					// Add browsing tree div
+		if (browse) {																			// If browsing
+			str+="</div><br>BROWSE<hr style='margin-right:12px'>";								// Add label
+			str+="<div class='sui-tree' id='sui-btree-"+o.asset_type+"'></div>";				// Add browsing tree div
+			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-		this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type);									// Add tree
+		if (browse) this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type);						// If browsing, add tree
 		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
