@@ -88,7 +88,7 @@ class Pages  {
 			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
 		if (browse) {																			// If browsing
-			str+="</div><br>BROWSE<hr style='margin-right:12px'>";								// Add label
+			str+="</div><br>BROWSE "+o.asset_type.toUpperCase()+"<hr style='margin-right:12px'>";	// Add label
 			str+="<div class='sui-tree' id='sui-btree-"+o.asset_type+"'></div>";				// Add browsing tree div
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
