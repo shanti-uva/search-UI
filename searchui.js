@@ -432,6 +432,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			`;
 		$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-typeSet").on("click", ()=> {														// ON CHANGE ASSET BUTTON
+			if ($("#sui-typeList").length) { $("#sui-typeList").remove(); return; }					// Quit if open
 			$("#sui-typeList").remove();															// Remove type list
 			str="<div id='sui-typeList' class='sui-typeList'>";										// Enclosing div for list
 			for (var k in this.assets) {															// For each asset type														
@@ -1043,7 +1044,6 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 				}
 		}
-
 	}
 	
 	LazyLoad(div, row, facet, init) 																		// ADD NEW NODES TO TREE
