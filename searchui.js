@@ -279,7 +279,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
 		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
 		$("#sui-relatedAssets").remove();															// Remove related assets panel
-		this.searches.push(JSON.parse(JSON.stringify(this.ss.query)));								// Add to recent searches
+		if (this.ActiveSearch())																	// If an active search
+			this.searches.push(JSON.parse(JSON.stringify(this.ss.query)));							// Add to recent searches
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
@@ -763,17 +764,22 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 	DrawFacetItems(facet)																		// DRAW FACETS ITEMS
 	{
+		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			
+		else if (this.facets[facet].type == "input") 	this.DrawInput(facet);						// Draw input editor			
+		else if (this.facets[facet].type == "tree") {												// If base type is a tree
+			if (this.ActiveSearch())					this.DrawFacetList(facet);					// If an active search, draw tree as a list	
+			else 										this.DrawFacetTree(facet);					// Draw tree as a tree 	
+			}			
+		else 											this.DrawFacetList(facet);					// Draw list editor
+	}
+
+	ActiveSearch()
+	{
 		let key,activeSearch=false;																	// Assume no active search happening
 		if (this.ss.query.text.length) 					activeSearch=true;							// Flag if something set in text
 		for (key in this.facets) 																	// For each facet
 			if (this.ss.query[key].length) 				activeSearch=true;							// Flag if something set
-		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			
-		else if (this.facets[facet].type == "input") 	this.DrawInput(facet);						// Draw input editor			
-		else if (this.facets[facet].type == "tree") {												// If base type is a tree
-			if (activeSearch)							this.DrawFacetList(facet);					// If an active search, draw tree as a list	
-			else 										this.DrawFacetTree(facet);					// Draw tree as a tree 	
-			}			
-		else 											this.DrawFacetList(facet);					// Draw list editor
+		return activeSearch;
 	}
 
 	DrawInput(facet)																			// DRAW INPUT FACET PICKER
@@ -802,14 +808,29 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			$("#sui-advEdit-recent").slideUp();														// Close it 
 			return;																			
 			}
-		let i,f,str="<div>";																		// Enclosing div
-		for (i=0;i<this.searches.length;++i) {														// For each search
-			str+=`<span class='sui-advEditLine' style='width:100%' id='sui-recSrc-${i}'>${this.searches[i].text} `;	// Add text item, if any
-			for (f in this.facets) 	if (this.searches[i][f].length) str+=this.facets[f].icon+" ";	// Add facets icons
-			str+="</span><br>";
+		let i,j,f,str="<i>Click below to recall a previous search</i><hr><div class='sui-advEditList'>"; // Enclosing div
+		for (i=this.searches.length-1;i>=0;i--) {													// For each search, last first
+			str+=`<div class='sui-advEditLine' style='width:100%' id='sui-recSrc-${i}' `;			// Add text item, if any
+			str+= "title='"+this.searches[i].text;													// Add tooltip to show entire search
+			for (f in this.facets) {																// For each facet
+				if (this.searches[i][f].length)														// If something there
+					for (j=0;j<this.searches[i][f].length;++j)										// For each one of them
+						str+=" "+this.searches[i][f][j].bool+" "+this.searches[i][f][j].title;		// Add to tooltip
+					}
+			str+="'>"+this.searches[i].text;														// End title and add text item
+			for (f in this.facets) 	if (this.searches[i][f].length) str+=" + "+this.facets[f].icon; // Add facets icons
 			str+="</div>";
 			}
 		$("#sui-advEdit-recent").html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
+		$("[id^=sui-recSrc-]").off("click");														// KILL OLD HANDLERS
+		$("[id^=sui-recSrc-]").on("click",(e)=> {													// ON ITEM CLICK
+			let id=e.target.id.substr(11);															// Get which
+			this.ss.query=(JSON.parse(JSON.stringify(this.searches[id])));							// Add to recent searches
+			$("#sui-search").val(this.ss.query.text);												// Set top search
+			$("#sui-search2").val(this.ss.query.text);												// Set adv search
+			this.DrawAdvanced();																	// Draw advanced 
+			this.Query();																			// Rerun search	
+			});
 		$("#sui-advEdit-recent").slideDown();														// Show it
 	}
 
@@ -827,6 +848,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		$("[id^=sui-advEditLine-]").off("click");													// KILL OLD HANDLERS
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			let v=e.target.id.split("-");															// Get ids		
+	
 			let items=this.facets[facet].data;														// Point at items
 			if (v[0].match(/ViewListPage/))	this.GetKmapFromID(items[v[1]].id,(kmap)=>{ this.SendMessage("page="+items[v[1]].url,kmap); }); // Get kmap and show page
 			else{																					// Add term
