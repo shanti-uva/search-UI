@@ -12,7 +12,6 @@
 
 	USE CASE 2:
 
-
 	Requires: 	jQuery 												// Almost any version should work
 	Calls:		kmapsSolrUtil.js, [places.js, pages.js, texts.js,	// Other JS modules that are dynamically loaded (not used in plain search)
 				audiovideo.js, visuals.js, sources.js]				
@@ -327,7 +326,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 	GetFacetData(data)																				// GET FACET COUNTS
 	{
-		var i,val,buckets;
+		var i,f,val,buckets;
+		for (f in this.assets)	this.assets[f].n=0;													// Zero them out
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
 				for (i=0;i<buckets.length;++i) {													// For each bucket
@@ -836,19 +836,20 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 
 	ResetFacetList(facet)																		// RESET FACET LIST UI
 	{
-		var i,str="";
+		var i,k,str="";
 		let n=Math.min(300,this.facets[facet].data.length);											// Cap at 300
 		$("[id^=sui-advEditLine-]").remove();														// Remove old members, in all facets
 		for (i=0;i<n;++i) {																			// Add items
-			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
-			str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
-			str+=`${this.facets[facet].data[i].title}</div>`;										// Add item to list
+			k=this.facets[facet].data[i].n;															// Number of assets
+			if (k > 1000)	k=Math.floor(k/1000)+"K";												// Shorten
+			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'> 
+			<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
+			str+=`${this.facets[facet].data[i].title} (${k}) </div>`;								// Add item to list
 			}
 		$("#sui-advEditList-"+facet).html("</div>"+str.replace(/\t|\n|\r/g,""));					// Add to div
 		$("[id^=sui-advEditLine-]").off("click");													// KILL OLD HANDLERS
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			let v=e.target.id.split("-");															// Get ids		
-	
 			let items=this.facets[facet].data;														// Point at items
 			if (v[0].match(/ViewListPage/))	this.GetKmapFromID(items[v[1]].id,(kmap)=>{ this.SendMessage("page="+items[v[1]].url,kmap); }); // Get kmap and show page
 			else{																					// Add term
