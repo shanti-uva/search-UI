@@ -422,6 +422,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
+		
 		str=`
 			SHOW&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
