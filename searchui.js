@@ -322,7 +322,10 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		for (i=0;i<data.response.docs.length;++i) {													// For each result, massage data
 			o=data.response.docs[i];																// Point at item
 			if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
-			if (o.ancestors_txt && o.ancestors_txt.length)	o.ancestors_txt.splice(0,1);			// Remove 1st ancestor from trail
+			if (o.asset_type =="places") {															// If places
+				if (o.ancestors_txt && o.ancestors_txt.length)		o.ancestors_txt.splice(0,1);	// Remove "Earth" from trail
+				if (o.ancestor_ids_is && o.ancestor_ids_is.length)	o.ancestor_ids_is.splice(0,1);	// And it's id
+				}
 			if (o.asset_type == "texts")					o.url_thumb="gradient.jpg";				// Use gradient for texts
 			else if (!o.url_thumb)							o.url_thumb="gradient.jpg";				// Use gradient for generic
 			if (o.display_label) 							o.title=o.display_label;				// Get title form display

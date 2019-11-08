@@ -123,7 +123,7 @@ class Pages  {
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
 			str+="<br><div class='sui-breadCrumbs'>";											// Holds bread crumbs
 			for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
-				str+=`<span class='sui-crumb' id='sui-crumb-${o.uid.split("-")[0]}-${o.ancestor_ids_is[i+1]}'>				
+				str+=`<span class='sui-crumb' id='sui-crumb-${o.uid.split("-")[0]}-${o.ancestor_ids_is[i]}'>				
 				${o.ancestors_txt[i]}</span>`;											
 				if (i < o.ancestors_txt.length-2)	str+=" > ";									// Add separator
 				}
