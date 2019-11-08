@@ -253,7 +253,8 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		this.ss.type="all";																			// Current item types
 		this.ss.page=0;																				// Current page being shown
 		this.ss.pageSize=100;																		// Results per page	
-		this.ss.site="Mandala";																		// S
+		this.ss.site="Mandala";																		// Site
+		this.ss.numResults=0;																		// Number of resulrts found																							
 		this.ss.query={ 																			// Current query
 			text:"",																				// Search word 
 			places:[],																				// Places
@@ -278,13 +279,18 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
 		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
 		$("#sui-relatedAssets").remove();															// Remove related assets panel
-		if (this.ActiveSearch())																	// If an active search
-			this.searches.push(JSON.parse(JSON.stringify(this.ss.query)));							// Add to recent searches
+		if (this.ActiveSearch()) {																	// If an active search
+			this.searches.filter( (s,i)=> {															// Check to see if it already exists in list
+				if (JSON.stringify(s.query) === JSON.stringify(this.ss.query)) 						// It does
+					this.searches.splice(i,1);														// Remove old one
+				});
+			this.searches.push(JSON.parse(JSON.stringify(this.ss)));								// Add to recent searches
+			}
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
-			this.assets.all.n=data.response.numFound;												// Set counts
+			this.ss.numResults=this.assets.all.n=data.response.numFound;							// Set total count
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			this.DrawAdvanced();																	// Draw advanced search if active
@@ -813,21 +819,23 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 		let i,j,f,str="<i>Click below to recall a previous search</i><hr><div class='sui-advEditList'>"; // Enclosing div
 		for (i=this.searches.length-1;i>=0;i--) {													// For each search, last first
 			str+=`<div class='sui-advEditLine' style='width:100%' id='sui-recSrc-${i}' `;			// Add text item, if any
-			str+= "title='"+this.searches[i].text;													// Add tooltip to show entire search
+			str+= "title='"+this.searches[i].query.text;											// Add tooltip to show entire search
 			for (f in this.facets) {																// For each facet
-				if (this.searches[i][f].length)														// If something there
-					for (j=0;j<this.searches[i][f].length;++j)										// For each one of them
-						str+=" "+this.searches[i][f][j].bool+" "+this.searches[i][f][j].title;		// Add to tooltip
+				if (this.searches[i].query[f].length)												// If something there
+					for (j=0;j<this.searches[i].query[f].length;++j)								// For each one of them
+						str+=" "+this.searches[i].query[f][j].bool+" "+this.searches[i].query[f][j].title;	// Add to tooltip
 					}
-			str+="'>"+this.searches[i].text;														// End title and add text item
-			for (f in this.facets) 	if (this.searches[i][f].length) str+=" + "+this.facets[f].icon; // Add facets icons
+			f=this.searches[i].query.assets[0].id;													// Point at asset id
+			str+=`'><span style='color:${this.assets[f].c}'>${this.assets[f].g} </span>`; 		// Add asset type
+			str+=this.searches[i].query.text;														// End title and add text item
+			for (f in this.facets) 	if (this.searches[i].query[f].length) str+=" + "+this.facets[f].icon; // Add facets icons
 			str+="</div>";
 			}
 		$("#sui-advEdit-recent").html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
 		$("[id^=sui-recSrc-]").off("click");														// KILL OLD HANDLERS
 		$("[id^=sui-recSrc-]").on("click",(e)=> {													// ON ITEM CLICK
 			let id=e.target.id.substr(11);															// Get which
-			this.ss.query=(JSON.parse(JSON.stringify(this.searches[id])));							// Add to recent searches
+			this.ss.query=(JSON.parse(JSON.stringify(this.searches[id].query)));					// Restore search query only
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			$("#sui-search2").val(this.ss.query.text);												// Set adv search
 			this.DrawAdvanced();																	// Draw advanced 
