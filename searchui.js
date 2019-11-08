@@ -196,38 +196,73 @@ class SearchUI  {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////// */
 
-SetState(state)																				// SET PAGE STATE
-{
-	const here=window.location.href.split("#")[0];												// Remove any hashes
-	history.replaceState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
-	if (state)	history.pushState(null,"Mandala",here+"#"+state);								// Store state in history
+	SetState(state)																				// SET PAGE STATE
+	{
+		const here=window.location.href.split("#")[0];												// Remove any hashes
+		history.replaceState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
+		if (state)	history.pushState(null,"Mandala",here+"#"+state);								// Store state in history
+		}
+
+	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
+	{
+		let id;
+		if ((id=hash.match(/#p=(.+)/))) {															// If a page
+			id=id[1].toLowerCase();																	// Isolate kmap id
+			setupPage();																			// Prepare page's <div> environment
+			this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
+			}	
+		else if ((id=hash.match(/#a=(.+)/))) {														// If showing assets
+			setupPage();																			// Prepare page's <div> environment
+			this.ss.type=id[1];																		// Set asset type
+			this.Query(); 																			// Get new results
+			}	
+			
+		function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
+			sui.ss.mode="simple";																	// Simple display mode	
+			sui.ss.page=0;																			// Start at beginning
+			$("#sui-typeList").remove();															// Remove type list
+			$("#sui-results").scrollTop(0);															// Scroll to top
+			$("#sui-pages").scrollTop(0);															// Scroll to top
+			$("#plc-infoDiv").remove();																// Remove map buttons
+			$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
+			$("#sui-adv").css({ display:"none"});													// Hide search ui
+			}
 	}
 
-PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
-{
-	let id;
-	if ((id=hash.match(/#p=(.+)/))) {															// If a page
-		id=id[1].toLowerCase();																	// Isolate kmap id
-		setupPage();																			// Prepare page's <div> environment
-		this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
-		}	
-	else if ((id=hash.match(/#a=(.+)/))) {														// If showing assets
-		setupPage();																			// Prepare page's <div> environment
-		this.ss.type=id[1];																		// Set asset type
-		this.Query(); 																			// Get new results
-		}	
-		
-	function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
-		sui.ss.mode="simple";																	// Simple display mode	
-		sui.ss.page=0;																			// Start at beginning
-		$("#sui-typeList").remove();															// Remove type list
-		$("#sui-results").scrollTop(0);															// Scroll to top
-		$("#sui-pages").scrollTop(0);															// Scroll to top
-		$("#plc-infoDiv").remove();																// Remove map buttons
-		$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
-		$("#sui-adv").css({ display:"none"});													// Hide search ui
-		}
-}
+	SerializeQuery(q)																			// SERIALZE QUERY INTO STRING
+	{
+		let i,f,str="";
+		for (f in q.query) {																		// For each facet type
+			if ((f == "text") && q.query[f])														// If text spec'd
+				str+=`${f}:${q.query[f]}+`;															// Add it
+			else
+				for (i=0;i<q.query[f].length;++i)													// For each item
+					str+=`${f}:${q.query[f][i].title}:${q.query[f][i].id}:${q.query[f][i].bool}+`;	// Add it
+			}
+		str=str.slice(0,-1);																		// Remove last +
+
+		trace(str)
+		this.ParseQuery(str)
+	
+	}
+
+	ParseQuery(qString)																				// PARSE QUERY FROM STRING
+	{
+		let ss={}
+		let i,v,o;
+		let fs=qString.split("+");																		// Split parts
+		for (i=0;i<fs.length;++i) {
+			if (fs[i].match(/^text/))	ss.text=fs[i].substr(5);										// Get text
+			else{																						// Get all other facets
+				v=fs[i].split(":");																		// Get parts
+				if (!ss[v[0]])	ss[v[0]]=[];															// Init item array
+				o={ title:v[1], id:v[2], bool:v[3] };													// Make search item
+				ss[v[0]].push(o);																		// Add	
+				}
+			}			
+		trace(ss)		
+	}
+
 
 /*	QUERY TOOLS //////////////////////////////////////////////////////////////////////////////////
 
