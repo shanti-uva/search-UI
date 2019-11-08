@@ -838,6 +838,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 			this.ss.query=(JSON.parse(JSON.stringify(this.searches[id].query)));					// Restore search query only
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			$("#sui-search2").val(this.ss.query.text);												// Set adv search
+			this.ss.type=this.ss.query.assets[0].id;												// Set type
 			this.DrawAdvanced();																	// Draw advanced 
 			this.Query();																			// Rerun search	
 			});
