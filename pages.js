@@ -194,8 +194,6 @@ class Pages  {
 			
 			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
 				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
-				str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
-				$("#sui-headLeft").html(str);													// Add to div
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				});
 			});
@@ -219,8 +217,6 @@ class Pages  {
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					sui.ss.mode="related";														// Related mode
 					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
-					str=sui.assets[this.curKmap.asset_type].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
-					$("#sui-headLeft").html(str);												// Add to div
 					sui.Query();																// Query and show results
 					sui.DrawItems();															// Draw items																
 					sui.DrawFooter();															// Draw footer															
