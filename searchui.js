@@ -1107,7 +1107,7 @@ PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUT
 					}
 				}
 			else{
-				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
+				let s=$("#"+e.target.id).text().slice(0,-1);											// Get ter
 				if (!div.match(/sui-btree-/))															// If in advanced search
 					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree); // Add term to search state and refresh
 				else	
