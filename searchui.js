@@ -198,8 +198,8 @@ class SearchUI  {
 	SetState(state)																				// SET PAGE STATE
 	{
 		const here=window.location.href.split("#")[0];												// Remove any hashes
-		history.replaceState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
-		}
+		history.pushState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
+	}
 
 	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
 	{
@@ -360,7 +360,7 @@ class SearchUI  {
 	{
 		var url=kmap.url_json;																		// Get json
 		if (!url) return;																			// No asset type
-		url=url.replace(/images.shanti.virginia.edu/i,"images-dev.shanti.virginia.edu");			// Look in dev			
+		url=url.replace(/images.shanti.virginia.edu/i,"images-stage.shanti.virginia.edu");			// Look in stage			
 		url+="?callback=myfunc";																	// Add callback
 		if (kmap.asset_type == "audio-video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
 		$.ajax( { url:url, dataType:'jsonp', error: (xhr)=>{ this.Popup("Access error")}}).done((data)=> { callback(data); });	// Get JSON and send to callback
