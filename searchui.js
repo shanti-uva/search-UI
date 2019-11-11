@@ -73,7 +73,6 @@ class SearchUI  {
 			this.Query();																			// Load search data
 			this.Draw(); 																			// Draw
 			}										
-		else sui.PageRouter(location.hash);															// Go to particular page
 		window.onresize=()=> { if (!(location.hash+" ").match(/audio-video/)) this.Draw(); };		// On window resize. redraw if not an AV
 		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
 		}
@@ -200,7 +199,6 @@ class SearchUI  {
 	{
 		const here=window.location.href.split("#")[0];												// Remove any hashes
 		history.replaceState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
-		if (state)	history.pushState(null,"Mandala",here+"#"+state);								// Store state in history
 		}
 
 	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
@@ -216,7 +214,25 @@ class SearchUI  {
 			this.ss.type=id[1];																		// Set asset type
 			this.Query(); 																			// Get new results
 			}	
-			
+		else if ((id=hash.match(/#c=(.+)/))) {														// If showing collections
+			setupPage();																			// Prepare page's <div> environment
+			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
+			this.pages.ShowCollection(v[0],v[1]);													// Show collection
+			}
+		else if ((id=hash.match(/#r=(.+)/))) {														// If showing related results
+			setupPage();																			// Prepare page's <div> environment
+			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
+			sui.pages.relatedId=v[0]; 	sui.pages.relatedType=v[2];									// Set factors
+			this.GetKmapFromID(v[3],(kmap)=>{  sui.pages.relatedBase=kmap; this.pages.DrawRelatedResults(kmap); });		// Get kmap and show page
+			}
+		else if ((id=hash.match(/#s=(.+)/))) {														// If showing search results
+			setupPage();																			// Prepare page's <div> environment
+			id=id[1].replace(/\%20/g," ");															// Get ids	
+			this.ParseQuery(id);																	// Get query
+			$("#sui-search").val(this.ss.query.text);												// Set top search
+			$("#sui-search2").val(this.ss.query.text);												// Set adv search
+			this.Query();		
+			}	
 		function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
 			sui.ss.mode="simple";																	// Simple display mode	
 			sui.ss.page=0;																			// Start at beginning
@@ -226,6 +242,7 @@ class SearchUI  {
 			$("#plc-infoDiv").remove();																// Remove map buttons
 			$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
 			$("#sui-adv").css({ display:"none"});													// Hide search ui
+			$("#sui-results").css({ display:"block"});												// Show page
 			}
 	}
 
@@ -234,33 +251,27 @@ class SearchUI  {
 		let i,f,str="";
 		for (f in q.query) {																		// For each facet type
 			if ((f == "text") && q.query[f])														// If text spec'd
-				str+=`${f}:${q.query[f]}+`;															// Add it
-			else
+				str+=`${f}:${q.query[f]}=`;															// Add it
+			else																					// All other facets
 				for (i=0;i<q.query[f].length;++i)													// For each item
-					str+=`${f}:${q.query[f][i].title}:${q.query[f][i].id}:${q.query[f][i].bool}+`;	// Add it
+					str+=`${f}:${q.query[f][i].title}:${q.query[f][i].id}:${q.query[f][i].bool}=`;	// Add it
 			}
-		str=str.slice(0,-1);																		// Remove last +
-
-		trace(str)
-		this.ParseQuery(str)
-	
+		return str.slice(0,-1);																		// Remove last '+'
 	}
 
-	ParseQuery(qString)																				// PARSE QUERY FROM STRING
+	ParseQuery(qString)																			// PARSE QUERY FROM STRING
 	{
-		let ss={}
 		let i,v,o;
-		let fs=qString.split("+");																		// Split parts
-		for (i=0;i<fs.length;++i) {
-			if (fs[i].match(/^text/))	ss.text=fs[i].substr(5);										// Get text
-			else{																						// Get all other facets
-				v=fs[i].split(":");																		// Get parts
-				if (!ss[v[0]])	ss[v[0]]=[];															// Init item array
-				o={ title:v[1], id:v[2], bool:v[3] };													// Make search item
-				ss[v[0]].push(o);																		// Add	
+		let fs=qString.split("=");																	// Split parts
+		this.ClearQuery();																			// Clear search query
+		for (i=0;i<fs.length;++i) {																	// For each term
+			if (fs[i].match(/^text/))	this.ss.query.text=fs[i].substr(5);							// Get text
+			else{																					// Get all other facets
+				v=fs[i].split(":");																	// Get parts
+				o={ title:v[1], id:v[2], bool:v[3] };												// Make search item
+				this.ss.query[v[0]].push(o);														// Add	
 				}
 			}			
-		trace(ss)		
 	}
 
 
@@ -290,6 +301,11 @@ class SearchUI  {
 		this.ss.pageSize=100;																		// Results per page	
 		this.ss.site="Mandala";																		// Site
 		this.ss.numResults=0;																		// Number of resulrts found																							
+		this.ClearQuery();																			// Cleae our all search elements in query
+		}
+
+	ClearQuery()																				// CLEAR SEARCH QUERY STATE TO START
+	{
 		this.ss.query={ 																			// Current query
 			text:"",																				// Search word 
 			places:[],																				// Places
@@ -301,9 +317,8 @@ class SearchUI  {
 			relationships:[],																		// Relationships
 			users:[],																				// Users
 			assets:[],																				// Assets
-			dateStart:"", dateEnd:""																// Beginning and ending dates
 			};																
-		}
+	}
 
 	Query()																						// QUERY AND UPDATE RESULTS
 	{
@@ -388,7 +403,7 @@ class SearchUI  {
 		this.LoadingIcon(true,64); 																	// Show loading icon
   		let url=this.solrUtil.createBasicQuery(this.ss,[facet]);									// Get query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
-			let i,o,v;
+				let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
 				if (data.facets[facet]) {															// If something there
 					o=data.facets[facet].buckets;													// Point at data
@@ -491,7 +506,6 @@ class SearchUI  {
 			
 			$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 				this.ss.type=e.currentTarget.id.substring(7).toLowerCase();							// Get asset name		
-				this.SetState("a="+this.ss.type);													// Set state
 				$("#sui-typeList").remove();														// Remove type list
 				this.ss.page=0;																		// Start at beginning
 				this.Query(); 																		// Get new results
@@ -576,7 +590,8 @@ class SearchUI  {
 	DrawItems()																					// DRAW RESULT ITEMS
 	{
 		var i,str="";
-		this.SetState("");																			// Clear state
+		if ((this.ss.mode != "collections") && (this.ss.mode != "related")) 						// These set their own states
+			this.SetState("s="+this.SerializeQuery(this.ss));										// Save search state	
 		$("#sui-results").css({ "background-color":(this.ss.view == "List") ? "#fff" : "#ddd" }); 	// White b/g for list only
 		if (this.ss.mode == "related")  $("#sui-results").css({ "padding-left": "204px", width:"calc(100% - 216px"});	// Shrink page
 		else  		 					$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});	// Reset to normal size

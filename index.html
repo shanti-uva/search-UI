@@ -42,6 +42,7 @@ sui.txt=new Texts();																	// Alloc Texts (standalone)
 sui.src=new Sources();																	// Alloc Sources (standalone)
 sui.vis=new Visuals();																	// Alloc Visuals (standalone)
 sui.pages.DrawLandingPage();															// Draw landing page
+if (location.hash) sui.PageRouter(location.hash);										// Go to particular page
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
 	sui.SerializeQuery(sui.ss)

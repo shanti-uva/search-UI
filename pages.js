@@ -101,17 +101,23 @@ class Pages  {
 				this.baseMap=null;																// No base and set to home
 				this.Draw(this.relatedBase);													// Show
 				}
-			else{																				// Related asset browsing
-				sui.ss.mode="related";															// Go to related mode
-				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
-				str=sui.assets[k].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
-				$("#sui-headLeft").html(str);													// Add to div
-				this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;				// Set id
-				sui.Query();																	// Query and show results
-				sui.DrawFooter();																// Draw footer
-				sui.ss.page=0;																	// Start at beginning
+			else{
+				this.DrawRelatedResults(o);														// Related asset browsing
+				sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state
 				}
 			});							
+	}
+
+	DrawRelatedResults(o)																	// SHOW RELATED ASSETS
+	{
+		sui.ss.mode="related";																	// Go to related mode
+		if (!this.relatedBase)	 this.relatedBase=o;											// If starting fresh
+		let str=sui.assets[this.relatedType].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
+		$("#sui-headLeft").html(str);															// Add to div
+		this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;						// Set id
+		sui.Query();																			// Query and show results
+		sui.DrawFooter();																		// Draw footer
+		sui.ss.page=0;																			// Start at beginning
 	}
 
 	DrawHeader(o)																			// DRAW HEADER
@@ -144,13 +150,14 @@ class Pages  {
 		sui.ss.mode="collections";																// Collections mode
 		sui.GetKmapFromID(kmapId.toLowerCase(), (kmap)=> { this.relatedBase=kmap; });			// Get kmap to return to	
 		this.relatedId=collectionId.split("|")[1].toLowerCase();								// Get collections id 
+		sui.SetState(`c=${kmapId}=${collectionId}`);											// This is the active page
 		sui.Query();																			// Query and show results
 		sui.DrawItems();																		// Draw items																
 		sui.DrawFooter();																		// Draw footer															
 		let str="&#xe633&nbsp;&nbsp"+collectionId.split("|")[0];								// Icon and title
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 	}
-	
+
 	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
 	{
 		var i;
