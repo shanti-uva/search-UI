@@ -126,7 +126,7 @@ class Images  {
 	
 		$("[id^=sui-pageThumb-]").on("click",(e)=> {												// ON THUMBNAIL CLICK
 			var id=e.currentTarget.id.split("-")[2];												// Get id
-			this.Draw(sui.curResults[id]);															// Show image
+			sui.pages.Draw(sui.curResults[id]);														// Show image
 			});
 
 		$("#sui-picEnlarge").on("click",()=> {														// ON RESIZE PIC

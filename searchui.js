@@ -70,11 +70,11 @@ class SearchUI  {
 		this.InitSearchState();																		// Init search state to default
 		this.AddFrame();																			// Add div framework
 		if (!location.hash)	{ 																		// Regular startup
-			this.Query();																			// Load search data
+			this.Query(true);																		// Load search data
 			this.Draw(); 																			// Draw
 			}										
 		window.onresize=()=> { if (!(location.hash+" ").match(/audio-video/)) this.Draw(); };		// On window resize. redraw if not an AV
-		window.addEventListener("hashchange", (h)=> { this.PageRouter(h.newURL); });				// Route if hash change
+		window.addEventListener("popstate", (h)=> { this.PageRouter(h.state); });					// Route if hash change
 		}
 
 	AddFrame()																					// ADD DIV FRAMEWORK FOR APP
@@ -198,11 +198,12 @@ class SearchUI  {
 	SetState(state)																				// SET PAGE STATE
 	{
 		const here=window.location.href.split("#")[0];												// Remove any hashes
-		history.pushState(null,"Mandala",here+(state ? "#"+state : ""));							// Show current state search bar
+		history.pushState("#"+state,"Mandala",here+(state ? "#"+state : ""));						// Show current state search bar
 	}
 
 	PageRouter(hash)																			// ROUTE PAGE BASED ON QUERY HASH OR BACK BUTTON													
 	{
+		const here=window.location.href.split("#")[0];												// Remove any hashes
 		let id;
 		if ((id=hash.match(/#p=(.+)/))) {															// If a page
 			id=id[1].toLowerCase();																	// Isolate kmap id
@@ -217,13 +218,13 @@ class SearchUI  {
 		else if ((id=hash.match(/#c=(.+)/))) {														// If showing collections
 			setupPage();																			// Prepare page's <div> environment
 			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
-			this.pages.ShowCollection(v[0],v[1]);													// Show collection
+			this.pages.ShowCollection(v[0],v[1],true);												// Show collection
 			}
 		else if ((id=hash.match(/#r=(.+)/))) {														// If showing related results
 			setupPage();																			// Prepare page's <div> environment
 			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
 			sui.pages.relatedId=v[0]; 	sui.pages.relatedType=v[2];									// Set factors
-			this.GetKmapFromID(v[3],(kmap)=>{  sui.pages.relatedBase=kmap; this.pages.DrawRelatedResults(kmap); });		// Get kmap and show page
+			this.GetKmapFromID(v[3],(kmap)=>{  sui.pages.relatedBase=kmap; this.pages.DrawRelatedResults(kmap,true); });		// Get kmap and show page
 			}
 		else if ((id=hash.match(/#s=(.+)/))) {														// If showing search results
 			setupPage();																			// Prepare page's <div> environment
@@ -231,7 +232,7 @@ class SearchUI  {
 			this.ParseQuery(id);																	// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			$("#sui-search2").val(this.ss.query.text);												// Set adv search
-			this.Query();		
+			this.Query(true);																		// Run query
 			}	
 		function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
 			sui.ss.mode="simple";																	// Simple display mode	
@@ -320,7 +321,7 @@ class SearchUI  {
 			};																
 	}
 
-	Query()																						// QUERY AND UPDATE RESULTS
+	Query(fromHistory)																			// QUERY AND UPDATE RESULTS
 	{
 		let url;
 		this.LoadingIcon(true,64);																	// Show loading icon
@@ -328,6 +329,8 @@ class SearchUI  {
 		if (this.ss.mode == "related")			url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
 		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
 		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
+		if ((this.ss.mode != "collections") && (this.ss.mode != "related") && !fromHistory) 		// These set their own states and not from history API
+			this.SetState("s="+this.SerializeQuery(this.ss));										// Save search state	
 		$("#sui-relatedAssets").remove();															// Remove related assets panel
 		if (this.ActiveSearch()) {																	// If an active search
 			this.searches.filter( (s,i)=> {															// Check to see if it already exists in list
@@ -590,8 +593,6 @@ class SearchUI  {
 	DrawItems()																					// DRAW RESULT ITEMS
 	{
 		var i,str="";
-		if ((this.ss.mode != "collections") && (this.ss.mode != "related")) 						// These set their own states
-			this.SetState("s="+this.SerializeQuery(this.ss));										// Save search state	
 		$("#sui-results").css({ "background-color":(this.ss.view == "List") ? "#fff" : "#ddd" }); 	// White b/g for list only
 		if (this.ss.mode == "related")  $("#sui-results").css({ "padding-left": "204px", width:"calc(100% - 216px"});	// Shrink page
 		else  		 					$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});	// Reset to normal size

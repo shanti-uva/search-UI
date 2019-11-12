@@ -202,7 +202,7 @@ class AudioVideo  {
 		l.ts_content_und="Unknown";		l.ts_content_gloss="Morpheme glossing";
 		
 		var res={ languages:{}, speakers:{}, segs:[], layout:"Normal", rev:0, speaker:"" };		// Final data								
-		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/av_dev/select?indent=on&q=is_trid:"+kmap.trid_i+"&wt=json&start=0&rows=1000";
+		var url="https://ss251856-us-east-1-aws.measuredsearch.com/solr/av_test/select?indent=on&q=is_trid:"+kmap.trid_i+"&wt=json&start=0&rows=1000";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {				// Get transcript data
 			data.response.docs.sort(function(a,b) { return (a.fts_start > b.fts_start) ? 1 : -1; }); // Sort
 			for (i=0;i<data.response.docs.length;++i) {											// For each seg in doc

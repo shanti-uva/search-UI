@@ -51,7 +51,7 @@ class Pages  {
 		else if (kmap.asset_type == "visuals") 		sui.vis.Draw(kmap);							// Visual
 	}
 
-	DrawRelatedAssets(o)																	// DRAW RELATED ASSETS MENU
+	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
 	{
 		let browse=true;
 		if (o)	browse=o.asset_type.match(/places|subjects|terms/);								// Add browsing to this menu?	
@@ -103,7 +103,8 @@ class Pages  {
 				}
 			else{
 				this.DrawRelatedResults(o);														// Related asset browsing
-				sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state
+				if (!fromHistory)																// If not from history API
+					sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state
 				}
 			});							
 	}
@@ -145,12 +146,12 @@ class Pages  {
 			});
 	}
 
-	ShowCollection(kmapId, collectionId)													// SHOW A COLLECTION OF ASSETS
+	ShowCollection(kmapId, collectionId, fromHistory)										// SHOW A COLLECTION OF ASSETS
 	{
 		sui.ss.mode="collections";																// Collections mode
 		sui.GetKmapFromID(kmapId.toLowerCase(), (kmap)=> { this.relatedBase=kmap; });			// Get kmap to return to	
 		this.relatedId=collectionId.split("|")[1].toLowerCase();								// Get collections id 
-		sui.SetState(`c=${kmapId}=${collectionId}`);											// This is the active page
+		if (!fromHistory)	sui.SetState(`c=${kmapId}=${collectionId}`);						// Set the active page, unless recalling from history API
 		sui.Query();																			// Query and show results
 		sui.DrawItems();																		// Draw items																
 		sui.DrawFooter();																		// Draw footer															
