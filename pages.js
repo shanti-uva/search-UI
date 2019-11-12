@@ -54,7 +54,7 @@ class Pages  {
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
 	{
 		let browse=true;
-		if (o)	browse=o.asset_type.match(/places|terms/);										// Add browsing to this menu?	
+		if (o)	browse=o.asset_type.match(/places|subjects|terms/);								// Add browsing to this menu?	
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show

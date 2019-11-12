@@ -16,11 +16,12 @@ class Subjects  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
+		this.content=["","...loading"];															// Content pages
 	}
 
 	Draw(o)																					// DRAW SOURCE PAGE FROM KMAP
 	{
-		let content=["","",""];
+		let _this=this;																			// Save context
 		let str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
@@ -49,21 +50,34 @@ class Subjects  {
 
 		$("[id^=sui-textTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(11);											// Get index of tab	
-				showTab(id);																	// Draw it
+			showTab(id);																		// Draw it
 			});
-
-		function showTab(which) {
-			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });
-			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});
-			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});
-			$("#sui-textSide").html(content[which]);											// Set content
+			
+		function showTab(which) {																// SHOW TAB
+			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
+			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
+			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});				// Active tab
+			$("#sui-textSide").html(_this.content[which]);										// Set content
 			if (which == 0)	 sui.pages.DrawTree("#sui-btree-subjects","subjects");				// If relationships, add tree
 			}
 
-		content[0]="<div class='sui-tree' id='sui-btree-subjects'></div>";						// Add browsing tree div
-		content[1]="Summary goes here";	
-		content[2]=str;																			// Add names
+		this.content[0]="<div class='sui-tree' id='sui-btree-subjects'></div>";					// Add browsing tree div
+		this.GetSummary(o);																		// Get summary tab content	
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets men
 	}
+
+	GetSummary(o)																			// SHOW SUMMARY TAB
+	{
+		sui.GetRelatedFromID(o.uid,(d)=> { 														// Load data
+			trace(d); 
+			let n=d._childDocuments_.length-1;													// Get number of subjects
+			let str=`<b>${o.title[0]}</b> has ${n} other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+			See the relationships tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+			<p><a>Expand all</a> / <a>Collapse all</a></p>
+			`;
+			this.content[1]=str;	
+			});
+	}
+
 
 } // CLASS CLOSURE
