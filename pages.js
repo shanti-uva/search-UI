@@ -44,7 +44,7 @@ class Pages  {
 		if (kmap.asset_type == "places")			sui.places.Draw(kmap);						// Show place
 		else if (kmap.asset_type == "sources") 		sui.src.Draw(kmap);							// Source
 		else if (kmap.asset_type == "terms") 		this.DrawTerm(kmap);						// Term
-		else if (kmap.asset_type == "subjects") 	this.DrawSubject(kmap);						// Subject
+		else if (kmap.asset_type == "subjects") 	sui.sub.Draw(kmap);							// Subject
 		else if (kmap.asset_type == "images") 		sui.img.Draw(kmap);							// Image
 		else if (kmap.asset_type == "audio-video") 	sui.av.Draw(kmap);							// AV
 		else if (kmap.asset_type == "texts") 		sui.txt.Draw(kmap);							// Text
@@ -54,7 +54,7 @@ class Pages  {
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
 	{
 		let browse=true;
-		if (o)	browse=o.asset_type.match(/places|subjects|terms/);								// Add browsing to this menu?	
+		if (o)	browse=o.asset_type.match(/places|terms/);										// Add browsing to this menu?	
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
@@ -235,7 +235,7 @@ class Pages  {
 	}
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-// SUBJECTS / TERMS PAGES
+// TERMS PAGES
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
@@ -259,27 +259,6 @@ class Pages  {
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 		this.DrawRelatedAssets(o);																// Draw related assets menu
-	}
-
-	DrawSubject(o)																			// DRAW SUBJECT PAGE FROM KMAP
-	{
-		var str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
-		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
-		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
-		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`;
-		if (o.caption)	str+="<p>"+o.caption+"</p>";
-		str+="<p style='width:calc(100% - 16px);background-color:#888;color:#fff;padding:8px'><b>NAMES</b></p><table>";
-		if (o.names_txt && o.names_txt.length) {												// If names
-			for (var i=0;i<o.names_txt.length;++i) {											// For each name
-				if (o.names_txt[i].match(/lang="bo"/i))											// Language id - bo
-					str+="<tr><td style='color:#000099;font-size:20px'>"+o.names_txt[i]+"&nbsp;&nbsp;&nbsp;</td><td><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
-				else 
-					str+="<tr><td></td><td>> "+o.names_txt[i]+"</td></tr>";						// Add it
-				}
-			}	
-		str+="</table></div>";																	// Fisih table
-		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-		this.DrawRelatedAssets(o);																// Draw related assets men
 	}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -14,7 +14,7 @@
 
 	Requires: 	jQuery 												// Almost any version should work
 	Calls:		kmapsSolrUtil.js, [places.js, pages.js, texts.js,	// Other JS modules that are dynamically loaded (not used in plain search)
-				audiovideo.js, visuals.js, sources.js]				
+				audiovideo.js, visuals.js, sources.js, subjects.js]				
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		loading.gif, gradient.jpg, treebuts.png
