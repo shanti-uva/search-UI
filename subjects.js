@@ -54,28 +54,56 @@ class Subjects  {
 			});
 			
 		function showTab(which) {																// SHOW TAB
+			$("[id^=sui-subItem-]").off("click");												// Kill handler
 			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
 			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
 			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});				// Active tab
 			$("#sui-textSide").html(_this.content[which]);										// Set content
-			if (which == 0)	 sui.pages.DrawTree("#sui-btree-subjects","subjects");				// If relationships, add tree
+			if (which == 1)	{																	// If summary, add events
+				$("[id^=sui-subItem-]").on("click", (e)=> {										// ON ITEM CLICK
+					let id=e.currentTarget.id.substring(12);									// Get kmap id
+					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+					});
+				}
 			}
 
 		this.content[0]="<div class='sui-tree' id='sui-btree-subjects'></div>";					// Add browsing tree div
-		this.GetSummary(o);																		// Get summary tab content	
+		this.GetTabData(o);																		// Get relationship/summary tab content	
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets men
 	}
 
-	GetSummary(o)																			// SHOW SUMMARY TAB
+	GetTabData(o)																			// GET TAB TATA FOR RELATIONSHIPS / SUMMARY
 	{
-		sui.GetRelatedFromID(o.uid,(d)=> { 														// Load data
-			trace(d); 
-			let n=d._childDocuments_.length-1;													// Get number of subjects
-			let str=`<b>${o.title[0]}</b> has ${n} other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
+			trace(data); 
+			let f,i,s=[];
+			let c=data._childDocuments_;														// Point at child docs
+			let n=c.length;																		// Get number of subjects
+			for (i=0;i<n;++i) {																	// For each subject get data as 's=[category[{title,id}]]' 
+				if (c[i].block_child_type != "related_subjects") continue;						// Add only related subjects
+				if (!s[c[i].related_subjects_relation_label_s])									// If first one of this category 
+					s[c[i].related_subjects_relation_label_s]=[];								// Alloc category array
+				s[c[i].related_subjects_relation_label_s].push({								// Add subject to category 
+					title:c[i].related_subjects_header_s,										// Add title
+					id:c[i].related_uid_s });													// Add id
+				 }											
+			let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];	// Find category with most elements	 
+			let str=`<b>${o.title[0]}</b> has <n>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
 			See the relationships tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
-			<p><a>Expand all</a> / <a>Collapse all</a></p>
-			`;
-			this.content[1]=str;	
+			<p><a>Expand all</a> / <a>Collapse all</a></p><table style='width:100%'><tr><td>`;
+			str+=drawCat(biggest)+"</td></tr><tr><td>";											// Add biggest	 
+			for (f in s) if (f != biggest)	str+=drawCat(f);									// For each other category, draw it
+			str+="</td></tr></table>";
+			this.content[1]=str;																// Set summary tab
+	
+			function drawCat(f) {																// DRAW CATEGORY
+				s[f]=s[f].sort((a,b)=>{ return a.title > b.title ? -1 : 1;});					// Sort
+				let str="<div class='sui-subCat'>"+o.title+" "+f+"</div><ul style='width:40%' id='sui-subCat"+f+"'>";// Add category header
+				for (i=0;i<s[f].length;++i)														// For each item
+					str+="<li><a id='sui-subItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+				return str+"</ul>";																// Close category
+				}
+
 			});
 	}
 
