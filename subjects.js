@@ -44,7 +44,7 @@ class Subjects  {
 			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:50%'>
 				<div style='display:inline-block;padding-top:10px'>SUMMARY &nbsp;&#xe609</div></div>
 		</div>
-		<div class='sui-textSide' id='sui-textSide' style='display:none;'></div>
+		<div class='sui-textSide' id='sui-textSide' style='display:none;max-height:none'></div>
 		</div></div>`;
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 
@@ -91,36 +91,56 @@ class Subjects  {
 	GetTabData(o)																			// GET TAB TATA FOR RELATIONSHIPS / SUMMARY
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
-			trace(data); 
-			let f,i,s=[];
 			let c=data._childDocuments_;														// Point at child docs
-			let n=c.length;																		// Get number of subjects
-			for (i=0;i<n;++i) {																	// For each subject get data as 's=[category[{title,id}]]' 
-				if (c[i].block_child_type != "related_subjects") continue;						// Add only related subjects
-				if (!s[c[i].related_subjects_relation_label_s])									// If first one of this category 
-					s[c[i].related_subjects_relation_label_s]=[];								// Alloc category array
-				s[c[i].related_subjects_relation_label_s].push({								// Add subject to category 
-					title:c[i].related_subjects_header_s,										// Add title
-					id:c[i].related_uid_s });													// Add id
-				 }											
-			let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];	// Find category with most elements	 
-			let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-			See the relationships tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
-			<p><a id='sui-togCatA'>Expand all</a> / <a id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
-			str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
-			for (f in s) if (f != biggest)	str+=drawCat(f);									// For each other category, draw it in 2nd column
-			str+="</div></div>";
-			this.content[1]=str;																// Set summary tab
-	
-			function drawCat(f) {																// DRAW CATEGORY
-				s[f]=s[f].sort((a,b)=>{ return a.title > b.title ? -1 : 1;});					// Sort
-				let str="<div id='sui-subCat-"+f.replace(/ /g,"_")+"' class='sui-subCat'>"+o.title+" "+f+"</div><ul id='sui-subCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
-				for (i=0;i<s[f].length;++i)														// For each item
-					str+="<li><a id='sui-subItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
-				return str+"</ul>";																// Close category
-				}
+			this.GetSummary(o,c);																// Get summary html
+			this.GetRelationships(o,data);														// Get relatioships html
+		});
+	}
 
-			});
+	GetSummary(o,c)																			// GET SUMMARY TAB CONTENTS 	
+	{	
+		let f,i,s=[];
+		let n=c.length;																		// Get number of subjects
+		for (i=0;i<n;++i) {																	// For each subject get data as 's=[category[{title,id}]]' 
+			if (c[i].block_child_type != "related_subjects") continue;						// Add only related subjects
+			if (!s[c[i].related_subjects_relation_label_s])									// If first one of this category 
+				s[c[i].related_subjects_relation_label_s]=[];								// Alloc category array
+			s[c[i].related_subjects_relation_label_s].push({								// Add subject to category 
+				title:c[i].related_subjects_header_s,										// Add title
+				id:c[i].related_uid_s });													// Add id
+			}											
+		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];	// Find category with most elements	 
+		let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		See the relationships tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		<p><a id='sui-togCatA'>Expand all</a> / <a id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
+		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
+		for (f in s) if (f != biggest)	str+=drawCat(f);									// For each other category, draw it in 2nd column
+		str+="</div></div>";
+		this.content[1]=str;																// Set summary tab
+
+		function drawCat(f) {																// DRAW CATEGORY
+			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});					// Sort
+			let str="<div id='sui-subCat-"+f.replace(/ /g,"_")+"' class='sui-subCat'>"+o.title+" "+f+"</div><ul id='sui-subCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
+			for (i=0;i<s[f].length;++i)														// For each item
+				str+="<li><a id='sui-subItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+			return str+"</ul>";																// Close category
+			}
+	}
+
+	GetRelationships(o,d)																// GET RELATIONSHIPS TAB CONTENTS 	
+	{	
+		trace(d); 
+		let i,n=1,x=0;
+		let str=`<b>${o.title[0]}</b> has <b>${n} </b>subordinate subject. 
+		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
+		See the summary tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>`;
+		for (i=0;i<d.ancestors.length;++i) {													// For each ancestor
+			str+=`<div style='margin-left:${x}px'><div class='sui-subRelDot' id='sui-subRelDot-${i}'>-</div>
+			<a id=sui-subRelDot-${d.ancestor_uids_gen[i]}'>${d.ancestors[i]}</a></div>`;
+			x+=8;
+			}
+		this.content[0]=str.replace(/\t|\n|\r/g,"");										// Set relationships tab
+
 	}
 
 

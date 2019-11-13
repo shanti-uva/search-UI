@@ -362,7 +362,7 @@ class SearchUI  {
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
 	{
 		let url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod2/query";		// Base url
-		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent]";					// Add query url
+		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]";		// Add query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs[0]);														// Return data
 			});
