@@ -74,7 +74,11 @@ class SearchUI  {
 			this.Draw(); 																			// Draw
 			}										
 		window.onresize=()=> { if (!(location.hash+" ").match(/audio-video/)) this.Draw(); };		// On window resize. redraw if not an AV
-		window.addEventListener("popstate", (h)=> { this.PageRouter(h.state); });					// Route if hash change
+		window.addEventListener("popstate", (h)=> { 												// Route if hash change
+			let state=h.state;																		// Get state
+			if (!state)	state=location.hash;														// If no state, get directly from hash
+			this.PageRouter(state); 																// Route on state
+			});					
 		}
 
 	AddFrame()																					// ADD DIV FRAMEWORK FOR APP
@@ -367,6 +371,15 @@ class SearchUI  {
 			callback(data.response.docs[0]);														// Return data
 			});
 		}
+	
+	GetTreeChildren(facet, path, callback)
+	{
+		let base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";			// Base url
+		let lvla=Math.max(path.split("/").length+1,2);												// Set level
+		if ((facet == "features") ||  (facet == "languages")) facet="subjects";						// Features and languages are in subjects
+		var url=sui.solrUtil.buildQuery(base,facet,path,lvla,lvla);									// Build query using Yuji's builder
+		$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) { callback(res); });			// Run query
+	}
 	
 	GetJSONFromKmap(kmap, callback)																// GET JSON FROM KMAP
 	{
@@ -1124,14 +1137,9 @@ class SearchUI  {
 		var path;
 		var _this=this;																					// Save context
 		if (init || row.parent().children().length == 1) {												// If no children, lazy load 
-			var base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";			// Base url
 			if (init) 	path=""+init;																	// Force path as string
 			else 		path=""+row.data().path;														// Get path	as string										
-			var lvla=Math.max(path.split("/").length+1,2);												// Set level
-			var type=facet;																				// Set type
-			if ((type == "features") ||  (type == "languages")) type="subjects";						// Features and languages are in subjects
-			var url=sui.solrUtil.buildQuery(base,type,path,lvla,lvla);									// Build query using Yuji's builder
-			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {								// Run query
+			this.GetTreeChildren(facet, path, (res)=> {													// Get children
 				var o,i,re,f="";
 				var str="<ul>";																			// Wrapper, show if not initting
 				if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid

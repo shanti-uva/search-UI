@@ -16,17 +16,18 @@ class Subjects  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
-		this.content=["TBD","...loading"];														// Content pages
+		this.content=["","...loading"];															// Content pages
 	}
 
 	Draw(o)																					// DRAW SOURCE PAGE FROM KMAP
 	{
 		let _this=this;																			// Save context
 		let str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
-		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
+		<img id='sui-spImg'>
+		<div><span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`;
-		if (o.caption)	str+="<p>"+o.caption+"</p>";
+		if (o.caption)	str+="<p id='sui-spCap'>"+o.caption+"</p></div>";
 		str+="<table>";
 		if (o.names_txt && o.names_txt.length) {												// If names
 			for (var i=0;i<o.names_txt.length;++i) {											// For each name
@@ -54,32 +55,48 @@ class Subjects  {
 			});
 			
 		function showTab(which) {																// SHOW TAB
-			$("[id^=sui-subItem-]").off("click");												// Kill handler
+			$("[id^=sui-spLab-]").off("click");													// Kill handler
+			$("[id^=sui-spDot-]").off("click");													// Kill handler
+			$("[id^=sui-spItem-]").off("click");												// Kill handler
 			$("[id^=sui-togCat-]").off("click");												// Kill handler
-			$("[id^=sui-subCatUL-]").off("click");												// Kill handler
+			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
 			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
 			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
 			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});				// Active tab
 			$("#sui-textSide").html(_this.content[which]);										// Set content
-			if (which == 1)	{																	// If summary, add events
-				$("[id^=sui-subCatUL-]").slideDown();											// All down
-				$("[id^=sui-subCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
+			if (which == 0)	{																	// If summary, add events
+				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
 					let id=e.currentTarget.id.substring(10);									// Get id
-					if ($("#sui-subCatUL"+id).css("display") == "none")							// If hidden
-						$("#sui-subCatUL"+id).slideDown();										// Show
+					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+					});
+				$("[id^=sui-spDot-]").on("click", (e)=> {										// ON RELATIONSHIP TREE DOT CLICK
+					let id=e.currentTarget.id.substring(10);									// Get index of this one
+					$("#sui-spRows li").each(function(index) {									// For each line
+						if (index > id)															// If past clicked node
+							if ($(this).css("display") == "none")	$(this).slideDown();		// If hidden, pull down
+							else									$(this).slideUp();			// Roll up
+						});					
+					});
+				}
+			else if (which == 1) {																// If summary, add events
+				$("[id^=sui-spCatUL-]").slideDown();											// All down
+				$("[id^=sui-spCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
+					let id=e.currentTarget.id.substring(9);										// Get id
+					if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
+						$("#sui-spCatUL"+id).slideDown();										// Show
 					else																		// If showing
-						$("#sui-subCatUL"+id).slideUp();										// Hide
-				});
-				
-				$("[id^=sui-subItem-]").on("click", (e)=> {										// ON ITEM CLICK
-					let id=e.currentTarget.id.substring(12);									// Get id
+						$("#sui-spCatUL"+id).slideUp();											// Hide
+					});
+
+				$("[id^=sui-spItem-]").on("click", (e)=> {										// ON SUMMARY ITEM CLICK
+					let id=e.currentTarget.id.substring(11);									// Get id
 					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
 					});
 				$("#sui-togCatA").on("click", ()=> {											// ON EXPAND ALL
-					$("[id^=sui-subCatUL-]").slideDown();										// All down
+					$("[id^=sui-spCatUL-]").slideDown();										// All down
 					});
 				$("#sui-togCatN").on("click", ()=> {											// ON COLLAPSE ALL
-					$("[id^=sui-subCatUL-]").slideUp();											// All down
+					$("[id^=sui-spCatUL-]").slideUp();											// All down
 					});
 				}
 			}
@@ -91,57 +108,76 @@ class Subjects  {
 	GetTabData(o)																			// GET TAB TATA FOR RELATIONSHIPS / SUMMARY
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
-			let c=data._childDocuments_;														// Point at child docs
-			this.GetSummary(o,c);																// Get summary html
-			this.GetRelationships(o,data);														// Get relatioships html
+			if (data.illustration_mms_url && data.illustration_mms_url[0]) {					// If an image spec'd
+				$("#sui-spImg").addClass("sui-spImg");											// Set style
+				$("#sui-spImg").prop("src",data.illustration_mms_url[0]);						// Show it
+				}
+			if (data.summary_eng && data.summary_eng[0]) 										// If an summary spec'd
+				$("#sui-spCap").html(data.summary_eng[0]);										// Replace caption
+			this.ShowSummary(o,data._childDocuments_);											// Show summary html
+			this.ShowRelationships(o,data);														// Show relatioships html
 		});
 	}
 
-	GetSummary(o,c)																			// GET SUMMARY TAB CONTENTS 	
+	ShowSummary(o,c)																		// SHOW SUMMARY TAB CONTENTS 	
 	{	
 		let f,i,s=[];
-		let n=c.length;																		// Get number of subjects
-		for (i=0;i<n;++i) {																	// For each subject get data as 's=[category[{title,id}]]' 
-			if (c[i].block_child_type != "related_subjects") continue;						// Add only related subjects
-			if (!s[c[i].related_subjects_relation_label_s])									// If first one of this category 
-				s[c[i].related_subjects_relation_label_s]=[];								// Alloc category array
-			s[c[i].related_subjects_relation_label_s].push({								// Add subject to category 
-				title:c[i].related_subjects_header_s,										// Add title
-				id:c[i].related_uid_s });													// Add id
+		let n=c.length;																			// Get number of subjects
+		for (i=0;i<n;++i) {																		// For each subject get data as 's=[category[{title,id}]]' 
+			if (c[i].block_child_type != "related_subjects") continue;							// Add only related subjects
+			if (!s[c[i].related_subjects_relation_label_s])										// If first one of this category 
+				s[c[i].related_subjects_relation_label_s]=[];									// Alloc category array
+			s[c[i].related_subjects_relation_label_s].push({									// Add subject to category 
+				title:c[i].related_subjects_header_s,											// Add title
+				id:c[i].related_uid_s });														// Add id
 			}											
-		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];	// Find category with most elements	 
+		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
 		let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-		See the relationships tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		See the RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a id='sui-togCatA'>Expand all</a> / <a id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
-		for (f in s) if (f != biggest)	str+=drawCat(f);									// For each other category, draw it in 2nd column
+		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
-		this.content[1]=str;																// Set summary tab
+		this.content[1]=str;																	// Set summary tab
 
-		function drawCat(f) {																// DRAW CATEGORY
-			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});					// Sort
-			let str="<div id='sui-subCat-"+f.replace(/ /g,"_")+"' class='sui-subCat'>"+o.title+" "+f+"</div><ul id='sui-subCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
-			for (i=0;i<s[f].length;++i)														// For each item
-				str+="<li><a id='sui-subItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
-			return str+"</ul>";																// Close category
+		function drawCat(f) {																	// DRAW CATEGORY
+			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
+			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
+			for (i=0;i<s[f].length;++i)															// For each item
+				str+="<li><a id='sui-spItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+			return str+"</ul>";																	// Close category
 			}
 	}
 
-	GetRelationships(o,d)																// GET RELATIONSHIPS TAB CONTENTS 	
+	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
 	{	
-		trace(d); 
-		let i,n=1,x=0;
-		let str=`<b>${o.title[0]}</b> has <b>${n} </b>subordinate subject. 
+		let i,n=0,x=0;
+		let str=`<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
-		See the summary tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>`;
-		for (i=0;i<d.ancestors.length;++i) {													// For each ancestor
-			str+=`<div style='margin-left:${x}px'><div class='sui-subRelDot' id='sui-subRelDot-${i}'>-</div>
-			<a id=sui-subRelDot-${d.ancestor_uids_gen[i]}'>${d.ancestors[i]}</a></div>`;
-			x+=8;
+		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
+		<ul class='sui-spLin' id='sui-spRows'>`;
+
+		for (n=0;n<d.ancestors.length;++n) {													// For each ancestor
+			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],x,"&ndash;",n);					// Add it
+			x+=8;																				// Shift over
 			}
-		this.content[0]=str.replace(/\t|\n|\r/g,"");										// Set relationships tab
-
+	
+		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
+			res=res.response.docs;																// Point at docs
+			for (i=0;i<res.length;++i)															// For each child
+				str+=addLine(res[i].header,res[i].id,res[i].level_i*8,null,n+i);				// Add it
+			str=str.replace(/~~/,n+res.length);													// Set total count
+			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set relationships tab
+			});
+	
+		function addLine(lab, id, x, mode, num) {												// ADD LINE TO TREE
+			let s=`<li id='sui-spLine-${num}' style='margin-left:${x}px'>`;						// Header
+			if (mode)	s+=`<div class='sui-spDot' id='sui-spDot-${num}'>${mode}</div>`;		// If a dot, add it
+			else		s+="<b>&ndash;&nbsp;</b> ";												// Add -
+			s+=`<a id='sui-spLab-${id}'>${lab}</a></li>`;										// Add name
+			return s;																			// Return line
+			}
 	}
-
+	
 
 } // CLASS CLOSURE

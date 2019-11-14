@@ -88,8 +88,8 @@ class Pages  {
 			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
 		if (browse) {																			// If browsing
-			str+="</div><br>BROWSE "+o.asset_type.toUpperCase()+"<hr style='margin-right:12px'>";	// Add label
-			str+="<div class='sui-tree' id='sui-btree-"+o.asset_type+"'></div>";				// Add browsing tree div
+			str+="</div><br>BROWSE "+o.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
+			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+o.asset_type+"'></div>";				// Add browsing tree div
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		if (browse) this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type);						// If browsing, add tree
@@ -127,12 +127,12 @@ class Pages  {
 		if (!o) return;																			// Return if not kmap defines
 		var str=`${sui.assets[o.asset_type].g}&nbsp;&nbsp`;
 		str+=o.title[0];																		// Add title
-		if (o.ancestors_txt && o.ancestors_txt.length > 1) {									// If has an ancestors trail
-			str+="<br><div class='sui-breadCrumbs'>";											// Holds bread crumbs
-			for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
+		if (o.ancestors_txt && o.ancestors_txt.length) {										// If has an ancestors trail
+			str+="<br><div class='sui-breadCrumbs'>"+o.asset_type.toUpperCase()+":&nbsp; ";		// Header
+			for (i=0;i<o.ancestors_txt.length;++i) {											// For each trail member
 				str+=`<span class='sui-crumb' id='sui-crumb-${o.uid.split("-")[0]}-${o.ancestor_ids_is[i]}'>				
 				${o.ancestors_txt[i]}</span>`;											
-				if (i < o.ancestors_txt.length-2)	str+=" > ";									// Add separator
+				if (i < o.ancestors_txt.length-1)	str+=" > ";									// Add separator
 				}
 			}
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div

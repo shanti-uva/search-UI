@@ -267,18 +267,27 @@
 					padding:2px 0 0 4px; background-color:#bbb; margin: 6px 44px 0 0; }
 					.sui-transPlay:hover { background-color: #999;
 					}
-.sui-subCat {		background-color:#cc4c39;width:calc(100% - 12px);color:#fff; padding:2px 0; text-align:center; text-transform: capitalize;
-					font-weight:600; cursor:pointer; margin:0 8px; }
-					.sui-subCat:hover {  background-color:#a53d2d;
-					}
-.sui-subRelDot {	display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:14px;
-					font-weight:bold; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin:6px;
-					}
+
+.sui-popItem:hover{ color:#a4baec
+					}	
 .sui-popover {		position:absolute; width:300px; min-height: 100px; padding:12px; font-size:13px; border-radius: 4px;
 					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); 
 					}					
-.sui-popItem:hover{ color:#a4baec
-					}	
+					
+/* SUBJECTS & PLACES RELATED */
+
+.sui-spCat {		background-color:#cc4c39;width:calc(100% - 12px);color:#fff; padding:2px 0; text-align:center; text-transform: capitalize;
+					font-weight:600; cursor:pointer; margin:0 8px; }
+					.sui-spCat:hover {  background-color:#a53d2d;
+					}
+.sui-spDot {		display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:13px;
+					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin:0 8px 6px 0;
+					}
+.sui-spLin { 		margin:4px 0; list-style-type:none;
+					}
+.sui-spImg {		float:left; width:160px; margin:0 16px 16px 4px; border-radius:2px; outline:1px solid #999; outline-offset:4px;
+					}
+
 /* CAROUSEL */
 
 .sui-caroBox { 		color:#555; font-size:14px; background-color:#fff; padding:28px 24px 0 24px; border-radius:6px;
