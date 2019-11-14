@@ -209,6 +209,7 @@ class SearchUI  {
 	{
 		const here=window.location.href.split("#")[0];												// Remove any hashes
 		let id;
+		if (hash)	hash=hash.replace(/dev_shanti_/,"stage_shanti_");								// Not dev!
 		if ((id=hash.match(/#p=(.+)/))) {															// If a page
 			id=id[1].toLowerCase();																	// Isolate kmap id
 			setupPage();																			// Prepare page's <div> environment

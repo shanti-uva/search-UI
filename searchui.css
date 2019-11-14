@@ -280,7 +280,7 @@
 					font-weight:600; cursor:pointer; margin:0 8px; }
 					.sui-spCat:hover {  background-color:#a53d2d;
 					}
-.sui-spDot {		display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:13px;
+.sui-spDot {		display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:14px;
 					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin:0 8px 6px 0;
 					}
 .sui-spLin { 		margin:4px 0; list-style-type:none;

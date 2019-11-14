@@ -69,8 +69,9 @@ class Subjects  {
 					let id=e.currentTarget.id.substring(10);									// Get id
 					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
 					});
-				$("[id^=sui-spDot-]").on("click", (e)=> {										// ON RELATIONSHIP TREE DOT CLICK
+				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
 					let id=e.currentTarget.id.substring(10);									// Get index of this one
+					$("#sui-spDot-"+id).html($("#sui-spLine-"+(id-0+1)).css("display") == "none" ? "&ndash;" : "+");		// Change label
 					$("#sui-spRows li").each(function(index) {									// For each line
 						if (index > id)															// If past clicked node
 							if ($(this).css("display") == "none")	$(this).slideDown();		// If hidden, pull down
@@ -151,7 +152,7 @@ class Subjects  {
 
 	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
 	{	
-		let i,n=0,x=0;
+		let i,n=0,x=0,m;
 		let str=`<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
@@ -163,10 +164,13 @@ class Subjects  {
 			}
 	
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
+			let counts=res.facet_counts.facet_fields.ancestor_id_path;
 			res=res.response.docs;																// Point at docs
 			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],x,res.length ? "&ndash;" : null,n);	// Add it
-			for (i=0;i<res.length;++i)															// For each child
-				str+=addLine(res[i].header,res[i].id,res[i].level_i*8,null,n+i);				// Add it
+			for (i=0;i<res.length;++i) {														// For each child
+				m=null;																			// Assume a loner												
+				str+=addLine(res[i].header,res[i].id,res[i].level_i*8,m,n+i); 					// Add it
+				}
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set relationships tab
 			});
