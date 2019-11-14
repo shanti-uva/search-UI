@@ -157,13 +157,14 @@ class Subjects  {
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 
-		for (n=0;n<d.ancestors.length;++n) {													// For each ancestor
+		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor
 			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],x,"&ndash;",n);					// Add it
 			x+=8;																				// Shift over
 			}
 	
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
 			res=res.response.docs;																// Point at docs
+			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],x,res.length ? "&ndash;" : null,n);	// Add it
 			for (i=0;i<res.length;++i)															// For each child
 				str+=addLine(res[i].header,res[i].id,res[i].level_i*8,null,n+i);				// Add it
 			str=str.replace(/~~/,n+res.length);													// Set total count
