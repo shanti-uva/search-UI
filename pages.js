@@ -258,6 +258,7 @@ class Pages  {
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+//		sui.GetAudioFromID(o.id, (d)=>{trace(d)});												// Get audio info
 		this.DrawRelatedAssets(o);																// Draw related assets menu
 	}
 
