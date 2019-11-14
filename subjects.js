@@ -164,7 +164,14 @@ class Subjects  {
 			}
 	
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
-			let counts=res.facet_counts.facet_fields.ancestor_id_path;
+			let v,counts=res.facet_counts.facet_fields.ancestor_id_path;						// Get child counts
+			for (i=0;i<counts.length;i=2) { 													// For each pair
+				if (!counts[i])	continue;														// Ignore blanks
+				v=counts[i].split("/");															// Split into ids
+				counts[i]=v[length-1];															// Get only last one	
+				}
+			trace(counts)
+
 			res=res.response.docs;																// Point at docs
 			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],x,res.length ? "&ndash;" : null,n);	// Add it
 			for (i=0;i<res.length;++i) {														// For each child
