@@ -240,6 +240,7 @@ class Pages  {
 
 	DrawTerm(o)																				// DRAW TERM PAGE FROM KMAP
 	{
+		let audioURL="//viseyes.org/visualeyes/ding.mp3";
 		var latin=(typeof(o.name_latin) == "string" ) ? o.name_latin : o.name_latin.join(", ");
 		var str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
@@ -253,12 +254,19 @@ class Pages  {
 				if (i < o.data_phoneme_ss.length-1)	str+=", ";									// Add separator
 				}
 			str+="</p>"; } catch(e){}
-		str+=`<p><span style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
+		str+=`<p><span id='sui-termPly' style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
 		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-//		sui.GetAudioFromID(o.id, (d)=>{trace(d)});												// Get audio info
+
+		$("#sui-termPly").on("click", (e)=>{													// ON TERM PLAY
+			let snd=new Audio();																// Init audio object
+			snd=new Audio(audioURL);															// Load it				
+			snd.play();																			// Play it
+			});
+
+		sui.GetAudioFromID(o.id, (d)=>{trace(d);});												// Get audio info
 		this.DrawRelatedAssets(o);																// Draw related assets menu
 	}
 
