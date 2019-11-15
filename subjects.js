@@ -16,7 +16,7 @@ class Subjects  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
-		this.content=["","...loading"];															// Content pages
+		this.content=["...loading","...loading"];												// Content pages
 	}
 
 	Draw(o)																					// DRAW SOURCE PAGE FROM KMAP
@@ -33,7 +33,7 @@ class Subjects  {
 			for (var i=0;i<o.names_txt.length;++i) {											// For each name
 				if (o.names_txt[i].match(/lang="bo"/i))											// Language id - bo
 					str+="<tr><td style='color:#000099;font-size:20px'>"+o.names_txt[i]+"&nbsp;&nbsp;&nbsp;</td><td><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
-				else 
+				else 																			// Unknown
 					str+="<tr><td></td><td>> "+o.names_txt[i]+"</td></tr>";						// Add it
 					}
 				}
@@ -70,8 +70,9 @@ class Subjects  {
 					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
 					});
 				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
-					let id=e.currentTarget.id.substring(10);									// Get index of this one
-					let firstChild=$(this).parent().find("li")[0];								// Get first child
+					let firstChild=$(this).parent().find("ul")[0];								// Get first child
+					let path=e.currentTarget.id.substring(10);									// Get id
+					if (path != "null") _this.AddBranch(o.asset_type,path,$(this));				// Lazy load branch
 					$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 	// Change label
 					$(this).parent().find('ul').slideToggle();            						// Slide into place
 					});
@@ -149,44 +150,71 @@ class Subjects  {
 
 	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
 	{	
-		let i,n=0;
+		let i,n=0,path=123;
 		let str=`<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
-
-		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor
-			str+="<ul style='list-style-type:none' id='sui-spUL-"+n+"'>";						// Add header
-			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],"&ndash;",n);					// Add it
+		for (n=0;n<d.ancestors.length;++n) {													// For each ancestor
+			str+="<ul style='list-style-type:none'>";						// Add header
+			str+=this.AddTreeLine(d.ancestors[n],d.ancestor_uids_gen[n],"&ndash;",null);		// Add it 
 			}
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
-			let re,m,ids="";
+			let i,j,re,m,path;
 			let counts=[];
-			try { counts=res.facets.child_counts.buckets; } catch(e){}							// Get child counts
-			for (i=0;i<counts.length;i++)  if (counts[i].val) ids+="~"+counts[i].val;			// Make id hash to search on
+			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
 			res=res.response.docs;																// Point at docs
-			str+="<ul style='list-style-type:none' id='sui-spUL-"+n+"'>";						// Add header
-			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],res.length ? "&ndash;" : null,n); // Add it
 			for (i=0;i<res.length;++i) {														// For each child
-				m=null;																			// Assume a loner												
-				re=new RegExp(res[i].id.split("-")[1]);											// Get id to fearch on
-				if ((ids && ids.match(re))) m="+";												// Has children
+				path="";	m=null;																// Assume a loner												
+				re=new RegExp(res[i].id.split("-")[1]);											// Get id to search on
+				for (j=0;j<counts.length;++j) {													// For each count
+					if (counts[j].val.match(re)) {												// In this one
+						m="+";																	// Got kids
+						path=counts[j].val;														// Add path
+						}
+					}												
 				str+="<ul style='list-style-type:none'>";										// Header
-				str+=addLine(res[i].header,res[i].id,m,n+i+1)+"</li></ul>"; 					// Add it
+				str+=this.AddTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
 				}
+			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
 			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set relationships tab
 			});
-	
-		function addLine(lab, id, mode, num) {												// ADD LINE TO TREE
-			let s=`<li id='sui-spLine-${num}' style='margin-left:${-32}px'>`;	// Header
-			if (mode)	s+=`<div class='sui-spDot' id='sui-spDot-${num}'>${mode}</div>`;		// If a dot, add it
-			else		s+="<b>&ndash;&nbsp;</b> ";												// Add -
-			s+=`<a id='sui-spLab-${id}'>${lab}</a>`;											// Add name
-			return s;																			// Return line
-			}
 	}
-	
+
+	AddTreeLine(lab, id, marker, path) 														// ADD LINE TO TREE
+	{	
+		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
+		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
+		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>-</b></div>";	// Add '-' if a loner
+		s+=`<a id='sui-spLab-${id}'>${lab}</a>`;												// Add name
+		return s;																				// Return line
+	}
+
+	AddBranch(facet, path, dot)																// LAZY LOAD BRANCH
+	{
+		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
+			let str="";
+			let i,j,re,m,path;
+			let counts=[];
+			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
+			res=res.response.docs;																// Point at docs
+			for (i=0;i<res.length;++i) {														// For each child
+				path="";	m=null;																// Assume a loner												
+				re=new RegExp(res[i].id.split("-")[1]);											// Get id to search on
+				for (j=0;j<counts.length;++j) {													// For each count
+					if (counts[j].val.match(re)) {												// In this one
+						m="+";																	// Got kids
+						path=counts[j].val;														// Add path
+						}
+					}												
+				str+="<ul style='list-style-type:none'>";										// Header
+				str+=this.AddTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
+				}
+			$(dot).prop("id","sui-spDot-null");													// Inhibit reloading
+			dot.parent().append(str);															// Append branch
+			});
+		}
 
 } // CLASS CLOSURE
