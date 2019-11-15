@@ -71,12 +71,9 @@ class Subjects  {
 					});
 				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
 					let id=e.currentTarget.id.substring(10);									// Get index of this one
-					$("#sui-spDot-"+id).html($("#sui-spLine-"+(id-0+1)).css("display") == "none" ? "&ndash;" : "+");		// Change label
-					$("#sui-spRows li").each(function(index) {									// For each line
-						if (index > id)															// If past clicked node
-							if ($(this).css("display") == "none")	$(this).slideDown();		// If hidden, pull down
-							else									$(this).slideUp();			// Roll up
-						});					
+					let firstChild=$(this).parent().find("li")[0];								// Get first child
+					$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 	// Change label
+					$(this).parent().find('ul').slideToggle();            						// Slide into place
 					});
 				}
 			else if (which == 1) {																// If summary, add events
@@ -152,41 +149,41 @@ class Subjects  {
 
 	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
 	{	
-		let i,n=0,x=0,m;
+		let i,n=0;
 		let str=`<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 
 		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor
-			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],x,"&ndash;",n);					// Add it
-			x+=8;																				// Shift over
+			str+="<ul style='list-style-type:none' id='sui-spUL-"+n+"'>";						// Add header
+			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],"&ndash;",n);					// Add it
 			}
-	
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
-			let v,counts=res.facet_counts.facet_fields.ancestor_id_path;						// Get child counts
-			for (i=0;i<counts.length;i=2) { 													// For each pair
-				if (!counts[i])	continue;														// Ignore blanks
-				v=counts[i].split("/");															// Split into ids
-				counts[i]=v[length-1];															// Get only last one	
-				}
-			trace(counts)
-
+			let re,m,ids="";
+			let counts=[];
+			try { counts=res.facets.child_counts.buckets; } catch(e){}							// Get child counts
+			for (i=0;i<counts.length;i++)  if (counts[i].val) ids+="~"+counts[i].val;			// Make id hash to search on
 			res=res.response.docs;																// Point at docs
-			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],x,res.length ? "&ndash;" : null,n);	// Add it
+			str+="<ul style='list-style-type:none' id='sui-spUL-"+n+"'>";						// Add header
+			str+=addLine(d.ancestors[n],d.ancestor_uids_gen[n],res.length ? "&ndash;" : null,n); // Add it
 			for (i=0;i<res.length;++i) {														// For each child
 				m=null;																			// Assume a loner												
-				str+=addLine(res[i].header,res[i].id,res[i].level_i*8,m,n+i); 					// Add it
+				re=new RegExp(res[i].id.split("-")[1]);											// Get id to fearch on
+				if ((ids && ids.match(re))) m="+";												// Has children
+				str+="<ul style='list-style-type:none'>";										// Header
+				str+=addLine(res[i].header,res[i].id,m,n+i+1)+"</li></ul>"; 					// Add it
 				}
 			str=str.replace(/~~/,n+res.length);													// Set total count
+			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
 			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set relationships tab
 			});
 	
-		function addLine(lab, id, x, mode, num) {												// ADD LINE TO TREE
-			let s=`<li id='sui-spLine-${num}' style='margin-left:${x}px'>`;						// Header
+		function addLine(lab, id, mode, num) {												// ADD LINE TO TREE
+			let s=`<li id='sui-spLine-${num}' style='margin-left:${-32}px'>`;	// Header
 			if (mode)	s+=`<div class='sui-spDot' id='sui-spDot-${num}'>${mode}</div>`;		// If a dot, add it
 			else		s+="<b>&ndash;&nbsp;</b> ";												// Add -
-			s+=`<a id='sui-spLab-${id}'>${lab}</a></li>`;										// Add name
+			s+=`<a id='sui-spLab-${id}'>${lab}</a>`;											// Add name
 			return s;																			// Return line
 			}
 	}

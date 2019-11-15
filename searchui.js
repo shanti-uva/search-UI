@@ -384,8 +384,10 @@ class SearchUI  {
 	
 	GetAudioFromID(id, callback)																// GET AUDIO FILE FROM ID
 	{
-		let url="https://terms.kmaps.virginia.edu/features/"+id+"/recordings?callback=myfunc";		// URL
-		$.ajax( { url:url, dataType:'jsonp' }).done((data)=> { callback(data); });					// Return audio info in callback
+	id=4;
+		$.getJSON("http://terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {				// Get info
+			try{  callback(d.recordings[0].audio_file); } 	catch(e){}								// Return audio file url
+			});
 	}
 
 	GetJSONFromKmap(kmap, callback)																// GET JSON FROM KMAP

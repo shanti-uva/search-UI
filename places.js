@@ -233,7 +233,7 @@ class Places  {
 	DrawMetadata()																				// SHOW PLACES METADATA
 	{
 		let i;
-		let content=["","",""];
+		let content=["TBD","","TBD","TBD"];
 		let str="<div style='position:absolute;text-align:center'>";											
 		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {						// If features
@@ -246,11 +246,13 @@ class Places  {
 		str+=`</div><br>																
 		<div style='display:inline-block;width:calc(100% - 192px);margin-left:192px'>
 		<div class='sui-textTop' id='sui-textTop' style='border-top:1px solid #999'>
-			<div class='sui-textTab' id='sui-textTab0' style='color:#fff'>
+			<div class='sui-textTab' id='sui-textTab0' style='color:#fff;width:25%'>
+				<div style='display:inline-block;padding-top:10px'>CONTEXT &nbsp;&#xe609</div></div>
+			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:25%'>
 				<div style='display:inline-block;padding-top:10px'>NAMES &nbsp;&#xe609</div></div>
-			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff'>
+			<div class='sui-textTab' id='sui-textTab2' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:25%'>
 				<div style='display:inline-block;padding-top:10px'>ETYMOLOGY  &nbsp;&#xe609</div></div>
-			<div class='sui-textTab' id='sui-textTab2' style='color:#fff'>
+			<div class='sui-textTab' id='sui-textTab3' style='color:#fff;width:25%'>
 				<div style='display:inline-block;padding-top:10px'>LOCATION / GIS  &nbsp;&#xe609</div></div>
 		</div>
 		<div class='sui-textSide' id='sui-textSide' style='display:none'></div></div>`;
@@ -271,9 +273,7 @@ class Places  {
 
 		str="";
 		if (this.kmap.names_txt)	for (i=0;i<this.kmap.names_txt.length;++i) str+=this.kmap.names_txt[i]+"<br>";
-		content[0]=str;											
-		content[1]="TBA";											
-		content[2]="TBA";	
+		content[1]=str;											
 	}	
 
 	GeoLocate()																				// GET EXTENT FROM PLACE PATH TREE IN KMAP
