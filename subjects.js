@@ -67,6 +67,7 @@ class Subjects  {
 			if (which == 0)	{																	// If summary, add events
 				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
 					let id=e.currentTarget.id.substring(10);									// Get id
+					trace(id)
 					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
 					});
 				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
@@ -76,6 +77,7 @@ class Subjects  {
 					$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 	// Change label
 					$(this).parent().find('ul').slideToggle();            						// Slide into place
 					});
+				$("#sui-spLab-"+o.uid).css({ "border-bottom":"1px solid #999" });				// Highlight current one	
 				}
 			else if (which == 1) {																// If summary, add events
 				$("[id^=sui-spCatUL-]").slideDown();											// All down
@@ -194,6 +196,7 @@ class Subjects  {
 
 	AddBranch(facet, path, dot)																// LAZY LOAD BRANCH
 	{
+		let _this=this;
 		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
 			let str="";
 			let i,j,re,m,path;
@@ -214,7 +217,21 @@ class Subjects  {
 				}
 			$(dot).prop("id","sui-spDot-null");													// Inhibit reloading
 			dot.parent().append(str);															// Append branch
-			});
+
+			$("[id^=sui-spLab-]").off("click");													// Kill handler
+			$("[id^=sui-spDot-]").off("click");													// Kill handler
+			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
+				let id=e.currentTarget.id.substring(10);										// Get id
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				});
+			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
+				let firstChild=$(this).parent().find("ul")[0];									// Get first child
+				let path=e.currentTarget.id.substring(10);										// Get id
+				if (path != "null") _this.AddBranch(facet,path,$(this));						// Lazy load branch
+				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+				$(this).parent().find('ul').slideToggle();            							// Slide into place
+				});
+		});
 		}
 
 } // CLASS CLOSURE
