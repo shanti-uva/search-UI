@@ -341,9 +341,9 @@ class Places  {
 		}
 
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
-			if (data.illustration_mms_url && data.illustration_mms_url[0]) {					// If an image spec'd
-				$("#sui-spImg").addClass("sui-spImg");											// Set style
-				$("#sui-spImg").prop("src",data.illustration_mms_url[0]);						// Show it
+			if (data.illustration_external_url && data.illustration_external_url[0]) {			// If an image spec'd
+				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
+				$("#sui-relatedImg").prop("src",data.illustration_external_url[0]);				// Show it
 				}
 			this.ShowSummary(this.kmap,data._childDocuments_);									// Show summary html
 			this.ShowRelationships(this.kmap,data);												// Show relatioships html

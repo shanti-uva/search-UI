@@ -184,6 +184,8 @@
 .sui-related {		position:absolute; top:0; left:0; width:168px; background-color:#ddd;
 					border-left:12px solid transparent; padding:18px 0 0 12px; color:#000;
 					}
+.sui-relatedImg {	width:150px; margin:12px 0 12px 0; outline:1px solid #999; outline-offset:4px;
+					}
 .sui-relatedList {	font-size:14px; color:#222; padding:0;
 					}
 .sui-relatedItem {  cursor:pointer; padding: 6px 3px 3px 6px; border-radius:4px; } 	.sui-relatedItem:hover { background-color: #f7f7f7;

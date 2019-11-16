@@ -88,7 +88,8 @@ class Pages  {
 			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
 			}
 		if (browse) {																			// If browsing
-			str+="</div><br>BROWSE "+o.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
+			str+="<img id='sui-relatedImg'>";													// Image, if available
+			str+="</div>BROWSE "+o.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
 			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+o.asset_type+"'></div>";				// Add browsing tree div
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
@@ -259,6 +260,10 @@ class Pages  {
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+
+		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
+			trace(data)
+			});
 
 		$("#sui-termPly").on("click", (e)=>{													// ON TERM PLAY
 			let snd=new Audio();																// Init audio object

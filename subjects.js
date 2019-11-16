@@ -23,7 +23,6 @@ class Subjects  {
 	{
 		let _this=this;																			// Save context
 		let str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
-		<img id='sui-spImg'>
 		<div><span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
 		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`;
@@ -110,8 +109,8 @@ class Subjects  {
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
 			if (data.illustration_mms_url && data.illustration_mms_url[0]) {					// If an image spec'd
-				$("#sui-spImg").addClass("sui-spImg");											// Set style
-				$("#sui-spImg").prop("src",data.illustration_mms_url[0]);						// Show it
+				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
+				$("#sui-relatedImg").prop("src",data.illustration_mms_url[0]);					// Show it
 				}
 			if (data.summary_eng && data.summary_eng[0]) 										// If an summary spec'd
 				$("#sui-spCap").html(data.summary_eng[0]);										// Replace caption
