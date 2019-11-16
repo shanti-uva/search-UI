@@ -24,6 +24,7 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
+		this.content=["...loading","...loading","TBD","TBD"];
 	}
 
 	Draw(kmap)
@@ -233,7 +234,7 @@ class Places  {
 	DrawMetadata()																				// SHOW PLACES METADATA
 	{
 		let i;
-		let content=["TBD","","TBD","TBD"];
+		let _this=this;
 		let str="<div style='position:absolute;text-align:center'>";											
 		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {						// If features
@@ -249,11 +250,11 @@ class Places  {
 			<div class='sui-textTab' id='sui-textTab0' style='color:#fff;width:25%'>
 				<div style='display:inline-block;padding-top:10px'>CONTEXT &nbsp;&#xe609</div></div>
 			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:25%'>
-				<div style='display:inline-block;padding-top:10px'>NAMES &nbsp;&#xe609</div></div>
+				<div style='display:inline-block;padding-top:10px'>SUMMARY &nbsp;&#xe609</div></div>
 			<div class='sui-textTab' id='sui-textTab2' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:25%'>
-				<div style='display:inline-block;padding-top:10px'>ETYMOLOGY  &nbsp;&#xe609</div></div>
+				<div style='display:inline-block;padding-top:10px'>NAMES  &nbsp;&#xe609</div></div>
 			<div class='sui-textTab' id='sui-textTab3' style='color:#fff;width:25%'>
-				<div style='display:inline-block;padding-top:10px'>LOCATION / GIS  &nbsp;&#xe609</div></div>
+				<div style='display:inline-block;padding-top:10px'>LOCATION &nbsp;&#xe609</div></div>
 		</div>
 		<div class='sui-textSide' id='sui-textSide' style='display:none'></div></div>`;
 		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
@@ -268,12 +269,72 @@ class Places  {
 			$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#999",color:"#fff" });
 			$("#sui-textSide").css({display:"inline-block","background-color":"#f8f8f8"});
 			$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#f8f8f8",color:"#666"});
-			$("#sui-textSide").html(content[which]);											// Set content
-			}
+			$("#sui-textSide").html(_this.content[which]);										// Set content
+			
+			$("[id^=sui-spLab-]").off("click");													// Kill handler
+			$("[id^=sui-spDot-]").off("click");													// Kill handler
+			$("[id^=sui-spItem-]").off("click");												// Kill handler
+			$("[id^=sui-togCat-]").off("click");												// Kill handler
+			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
+			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
+			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
+			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});				// Active tab
+			$("#sui-textSide").html(_this.content[which]);										// Set content
+			if (which == 0)	{																	// If summary, add events
+				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
+					let id=e.currentTarget.id.substring(10);									// Get id
+					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+					});
+				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
+					let firstChild=$(this).parent().find("ul")[0];								// Get first child
+					let path=e.currentTarget.id.substring(10);									// Get id
+					if (path != "null") _this.AddBranch(_this.kmap.asset_type,path,$(this));	// Lazy load branch
+					$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 	// Change label
+					$(this).parent().find('ul').slideToggle();            						// Slide into place
+					});
+				$("#sui-spLab-"+_this.kmap.uid).css({ "border-bottom":"1px solid #999" });		// Highlight current one	
+				}
+			else if (which == 1) {																// If summary, add events
+				$("[id^=sui-spCatUL-]").slideDown();											// All down
+				$("[id^=sui-spCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
+					let id=e.currentTarget.id.substring(9);										// Get id
+					if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
+						$("#sui-spCatUL"+id).slideDown();										// Show
+					else																		// If showing
+						$("#sui-spCatUL"+id).slideUp();											// Hide
+					});
 
-		str="";
+				$("[id^=sui-spItem-]").on("click", (e)=> {										// ON SUMMARY ITEM CLICK
+					let id=e.currentTarget.id.substring(11);									// Get id
+					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+					});
+				$("#sui-togCatA").on("click", ()=> {											// ON EXPAND ALL
+					$("[id^=sui-spCatUL-]").slideDown();										// All down
+					});
+				$("#sui-togCatN").on("click", ()=> {											// ON COLLAPSE ALL
+					$("[id^=sui-spCatUL-]").slideUp();											// All down
+					});
+				}
+		}
+
+		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
+			trace(data)
+			if (data.illustration_mms_url && data.illustration_mms_url[0]) {					// If an image spec'd
+				$("#sui-spImg").addClass("sui-spImg");											// Set style
+				$("#sui-spImg").prop("src",data.illustration_mms_url[0]);						// Show it
+				}
+			this.ShowSummary(this.kmap,data._childDocuments_);									// Show summary html
+			this.ShowRelationships(this.kmap,data);												// Show relatioships html
+			});
+		
+		str=`<div style='display:inline-block;width:50%'>
+		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>NAMES</div>`;
 		if (this.kmap.names_txt)	for (i=0;i<this.kmap.names_txt.length;++i) str+=this.kmap.names_txt[i]+"<br>";
-		content[1]=str;											
+		str+=`</div><div style='display:inline-block;width:calc(50% - 24px);vertical-align:top;border-left:1px solid #ccc; padding-left:12px'>
+		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
+		...to be added
+		</div>`;
+		this.content[2]=str;											
 	}	
 
 	GeoLocate()																				// GET EXTENT FROM PLACE PATH TREE IN KMAP
@@ -294,5 +355,127 @@ class Places  {
 		} catch(e) {};	
 	}
 	
+	ShowSummary(o,c)																		// SHOW SUMMARY TAB CONTENTS 	
+	{	
+		let f,i,s=[];
+		let n=c.length;																			// Get number of places
+		for (i=0;i<n;++i) {																		// For each subject get data as 's=[category[{title,id}]]' 
+			if (c[i].block_child_type != "related_places") continue;							// Add only related places
+			if (c[i].related_places_header_s == "Earth")   continue;							// Skip earth
+			if (!s[c[i].related_places_relation_label_s])										// If first one of this category 
+					s[c[i].related_places_relation_label_s]=[];									// Alloc category array
+			s[c[i].related_places_relation_label_s].push({										// Add subject to category 
+				title:c[i].related_places_header_s,												// Add title
+				sub:c[i].related_places_feature_type_s,											// Sub category
+				id:c[i].related_uid_s });														// Add id
+			}											
+		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
+		let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		See the RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		<p><a id='sui-togCatA'>Expand all</a> / <a id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
+		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
+		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
+		str+="</div></div>";
+		this.content[1]=str;																	// Set summary tab
+
+		function drawCat(f) {																	// DRAW CATEGORY
+			let sub="";
+			s[f]=s[f].sort((a,b)=>{ return a.sub < b.sub ? -1 : 1;});							// Sort by sub category
+			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat' style='background-color:#6faaf1'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' >";// Add category header
+			str+="<ul style='list-style-type:none'>";
+			for (i=0;i<s[f].length;++i)	{														// For each item
+				if (sub != s[f][i].sub) {														// A new sub category
+					sub=s[f][i].sub;															// New sub
+					str+="</ul><ul style='list-style-type:none;margin-left:-60px'><div class='sui-spDot' id='sui-spSub"+s[f][i].id+"'>&ndash;</div><b><u>"+sub+"</b></u>";
+					}
+				str+="<li><a id='sui-spItem-"+s[f][i].id+"' style='margin-left:22px'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+				}
+			return str+"</ul>";																	// Close category
+			}
+	}
+
+	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
+	{	
+		let i,n=0,path=123;
+		let str=`<b>${o.title[0]}</b> has <b> ~~ </b> immediate subordinate places. 
+		You can browse this subordinate places as well as its superordinate categories with the tree below. 
+		See the SUMMARY tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as placess non-hierarchically related to it.<br><br>
+		<ul class='sui-spLin' id='sui-spRows'>`;
+		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor (skipping Earth)
+			str+="<ul style='list-style-type:none'>";											// Add header
+			str+=this.AddTreeLine(d.ancestors[n+1],d.ancestor_uids_generic[n+1],"&ndash;",null); // Add it 
+			}
+		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
+			let i,j,re,m,path;
+			let counts=[];
+			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
+			res=res.response.docs;																// Point at docs
+			for (i=0;i<res.length;++i) {														// For each child
+				path="";	m=null;																// Assume a loner												
+				re=new RegExp(res[i].id.split("-")[1]);											// Get id to search on
+				for (j=0;j<counts.length;++j) {													// For each count
+					if (counts[j].val.match(re)) {												// In this one
+						m="+";																	// Got kids
+						path=counts[j].val;														// Add path
+						}
+					}												
+				str+="<ul style='list-style-type:none'>";										// Header
+				str+=this.AddTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
+				}
+			
+			str=str.replace(/~~/,n+res.length);													// Set total count
+			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
+			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set relationships tab
+			});
+	}
+
+	AddTreeLine(lab, id, marker, path) 														// ADD LINE TO TREE
+	{	
+		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
+		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
+		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>-</b></div>";	// Add '-' if a loner
+		s+=`<a id='sui-spLab-${id}'>${lab}</a>`;												// Add name
+		return s;																				// Return line
+	}
+
+	AddBranch(facet, path, dot)																// LAZY LOAD BRANCH
+	{
+		let _this=this;
+		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
+			let str="";
+			let i,j,re,m,path;
+			let counts=[];
+			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
+			res=res.response.docs;																// Point at docs
+			for (i=0;i<res.length;++i) {														// For each child
+				path="";	m=null;																// Assume a loner												
+				re=new RegExp(res[i].id.split("-")[1]);											// Get id to search on
+				for (j=0;j<counts.length;++j) {													// For each count
+					if (counts[j].val.match(re)) {												// In this one
+						m="+";																	// Got kids
+						path=counts[j].val;														// Add path
+						}
+					}												
+				str+="<ul style='list-style-type:none'>";										// Header
+				str+=this.AddTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
+				}
+			$(dot).prop("id","sui-spDot-null");													// Inhibit reloading
+			dot.parent().append(str);															// Append branch
+
+			$("[id^=sui-spLab-]").off("click");													// Kill handler
+			$("[id^=sui-spDot-]").off("click");													// Kill handler
+			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
+				let id=e.currentTarget.id.substring(10);										// Get id
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				});
+			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
+				let firstChild=$(this).parent().find("ul")[0];									// Get first child
+				let path=e.currentTarget.id.substring(10);										// Get id
+				if (path != "null") _this.AddBranch(facet,path,$(this));						// Lazy load branch
+				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+				$(this).parent().find('ul').slideToggle();            							// Slide into place
+				});
+		});
+		}
 
 } // Places class closure

@@ -287,6 +287,10 @@
 					}
 .sui-spImg {		float:left; width:160px; margin:0 16px 16px 4px; border-radius:2px; outline:1px solid #999; outline-offset:4px;
 					}
+.sui-spSub {		background-color:#ddd; padding:0 8px; width:120px; font-weight:600; cursor:pointer; border-radius:16px; 
+					border:1px solid #aaa; margin:4px 0 4px -32px; }
+					.sui-spSub:hover {  border-color:#333;
+					}
 
 /* CAROUSEL */
 
