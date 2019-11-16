@@ -231,6 +231,28 @@ class Places  {
 		});																							// Require closure
 	}																								// End Draw()
 
+	GeoLocate()																				// GET EXTENT FROM PLACE PATH TREE IN KMAP
+	{
+		let loc="";
+		this.extent=null;																		// Assume not found
+		var _this=this;																			// Save context
+		try{
+			for (let i=this.kmap.ancestors_txt.length-1;i>0;--i)								// For each ancestor backwards
+			loc+=this.kmap.ancestors_txt[i]+"%20";												// Add name
+			if (this.kmap.ancestors_txt.length == 1) loc=this.kmap.ancestors_txt[0];			// Top level places
+			let url="http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=pjson&SingleLine="+loc;
+			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
+				_this.extent=res.candidates[0].extent;											// Extract extent
+				_this.extent.spatialReference=res.spatialReference.wkid;						// Set ref
+				if (_this.showing) _this.app.GoToExtent(_this.extent);							// If already showing a map, go there
+				});	
+		} catch(e) {};	
+	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////
+// META DATA
+/////////////////////////////////////////////////////////////////////////////////////////////////
+
 	DrawMetadata()																				// SHOW PLACES METADATA
 	{
 		let i;
@@ -266,9 +288,9 @@ class Places  {
 			});
 
 		function showTab(which) {
-			$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#999",color:"#fff" });
+			$("[id^=sui-textTab]").css({ "background-color":"#999",color:"#fff" });
 			$("#sui-textSide").css({display:"inline-block","background-color":"#f8f8f8"});
-			$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#f8f8f8",color:"#666"});
+			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});
 			$("#sui-textSide").html(_this.content[which]);										// Set content
 			
 			$("[id^=sui-spLab-]").off("click");													// Kill handler
@@ -297,7 +319,8 @@ class Places  {
 			else if (which == 1) {																// If summary, add events
 				$("[id^=sui-spCatUL-]").slideDown();											// All down
 				$("[id^=sui-spCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
-					let id=e.currentTarget.id.substring(9);										// Get id
+					let id=e.currentTarget.id.substring(9);									// Get id
+					trace($("#sui-spCatUL"+id).css("display"))
 					if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
 						$("#sui-spCatUL"+id).slideDown();										// Show
 					else																		// If showing
@@ -318,7 +341,6 @@ class Places  {
 		}
 
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
-			trace(data)
 			if (data.illustration_mms_url && data.illustration_mms_url[0]) {					// If an image spec'd
 				$("#sui-spImg").addClass("sui-spImg");											// Set style
 				$("#sui-spImg").prop("src",data.illustration_mms_url[0]);						// Show it
@@ -336,24 +358,6 @@ class Places  {
 		</div>`;
 		this.content[2]=str;											
 	}	
-
-	GeoLocate()																				// GET EXTENT FROM PLACE PATH TREE IN KMAP
-	{
-		let loc="";
-		this.extent=null;																		// Assume not found
-		var _this=this;																			// Save context
-		try{
-			for (let i=this.kmap.ancestors_txt.length-1;i>0;--i)								// For each ancestor backwards
-			loc+=this.kmap.ancestors_txt[i]+"%20";												// Add name
-			if (this.kmap.ancestors_txt.length == 1) loc=this.kmap.ancestors_txt[0];			// Top level places
-			let url="http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=pjson&SingleLine="+loc;
-			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
-				_this.extent=res.candidates[0].extent;											// Extract extent
-				_this.extent.spatialReference=res.spatialReference.wkid;						// Set ref
-				if (_this.showing) _this.app.GoToExtent(_this.extent);							// If already showing a map, go there
-				});	
-		} catch(e) {};	
-	}
 	
 	ShowSummary(o,c)																		// SHOW SUMMARY TAB CONTENTS 	
 	{	
@@ -371,7 +375,7 @@ class Places  {
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
 		let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-		See the RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a id='sui-togCatA'>Expand all</a> / <a id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
@@ -379,16 +383,17 @@ class Places  {
 		this.content[1]=str;																	// Set summary tab
 
 		function drawCat(f) {																	// DRAW CATEGORY
-			let sub="";
+			let sub="xxx";
 			s[f]=s[f].sort((a,b)=>{ return a.sub < b.sub ? -1 : 1;});							// Sort by sub category
-			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat' style='background-color:#6faaf1'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' >";// Add category header
-			str+="<ul style='list-style-type:none'>";
+			let str=`<div id='sui-spCat-${f.replace(/ /g,"_")}' 
+			class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px;'>	${o.title} ${f}</div>
+			<ul id='sui-spCatUL-${f.replace(/ /g,"_")}' >`;
 			for (i=0;i<s[f].length;++i)	{														// For each item
 				if (sub != s[f][i].sub) {														// A new sub category
 					sub=s[f][i].sub;															// New sub
-					str+="</ul><ul style='list-style-type:none;margin-left:-60px'><div class='sui-spDot' id='sui-spSub"+s[f][i].id+"'>&ndash;</div><b><u>"+sub+"</b></u>";
+					str+="<li style='list-style-type:none;margin-left:-24px'><div class='sui-spDot' id='sui-spSub"+s[f][i].id+"'>&ndash;</div><b><u>"+sub+"</b></u></li>";
 					}
-				str+="<li><a id='sui-spItem-"+s[f][i].id+"' style='margin-left:22px'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+				str+="<li style='list-style-type:none'><a id='sui-spItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
 				}
 			return str+"</ul>";																	// Close category
 			}
@@ -396,7 +401,7 @@ class Places  {
 
 	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
 	{	
-		let i,n=0,path=123;
+		let n=0;
 		let str=`<b>${o.title[0]}</b> has <b> ~~ </b> immediate subordinate places. 
 		You can browse this subordinate places as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as placess non-hierarchically related to it.<br><br>
@@ -433,7 +438,7 @@ class Places  {
 	{	
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
-		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>-</b></div>";	// Add '-' if a loner
+		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>&bull;</b></div>";	// If a loner
 		s+=`<a id='sui-spLab-${id}'>${lab}</a>`;												// Add name
 		return s;																				// Return line
 	}

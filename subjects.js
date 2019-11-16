@@ -189,7 +189,7 @@ class Subjects  {
 	{	
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
-		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>-</b></div>";	// Add '-' if a loner
+		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>&bull;</b></div>";	// If a loner
 		s+=`<a id='sui-spLab-${id}'>${lab}</a>`;												// Add name
 		return s;																				// Return line
 	}
