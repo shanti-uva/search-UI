@@ -139,13 +139,13 @@ class SearchUI  {
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			$("#sui-search2").val(this.ss.query.text);												// Set adv search
-			if ((this.ss.mode == "input") || (this.ss.mode == "related")) this.ss.mode="simple";	// Toggle simple mode
+			if ((this.ss.mode == "input") || (this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode="simple";	// Toggle simple mode
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
 
 		$("#sui-searchgo, #sui-searchgo2").on("click", (e)=> { 										// ON SEARCH BUTTON CLCK
-			if ((this.ss.mode == "input") || (this.ss.mode == "related")) this.ss.mode="simple";	// Toggle simple mode
+			if ((this.ss.mode == "input") || (this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode="simple";	// Toggle simple mode
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
@@ -542,6 +542,7 @@ class SearchUI  {
 				this.ss.type=e.currentTarget.id.substring(7).toLowerCase();							// Get asset name		
 				$("#sui-typeList").remove();														// Remove type list
 				this.ss.page=0;																		// Start at beginning
+				if ((this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode=this.ss.lastMode;	// Get back to regular search mode
 				this.Query(); 																		// Get new results
 				});							
 			});

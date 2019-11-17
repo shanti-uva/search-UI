@@ -300,7 +300,7 @@ class Places  {
 			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
 			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
 			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
-			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});				// Active tab
+			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
 			$("#sui-textSide").html(_this.content[which]);										// Set content
 			if (which == 0)	{																	// If summary, add events
 				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
@@ -319,12 +319,18 @@ class Places  {
 			else if (which == 1) {																// If summary, add events
 				$("[id^=sui-spCatUL-]").slideDown();											// All down
 				$("[id^=sui-spCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
-					let id=e.currentTarget.id.substring(9);									// Get id
-					trace($("#sui-spCatUL"+id).css("display"))
-					if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
+					let id=e.currentTarget.id.substring(9);										// Get id
+						if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
 						$("#sui-spCatUL"+id).slideDown();										// Show
 					else																		// If showing
 						$("#sui-spCatUL"+id).slideUp();											// Hide
+					});
+				$("[id^=sui-spSub-]").on("click", (e)=> {										// ON SUB-CATEGORY CLICK
+					let id=e.currentTarget.id.substring(9);										// Get id
+					if ($("#sui-spSubUL"+id).css("display") == "none")							// If hidden
+						$("#sui-spSubUL"+id).slideDown();										// Show
+					else																		// If showing
+						$("#sui-spSubUL"+id).slideUp();											// Hide
 					});
 
 				$("[id^=sui-spItem-]").on("click", (e)=> {										// ON SUMMARY ITEM CLICK
@@ -345,8 +351,12 @@ class Places  {
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
 				$("#sui-relatedImg").prop("src",data.illustration_external_url[0]);				// Show it
 				}
-			this.ShowSummary(this.kmap,data._childDocuments_);									// Show summary html
-			this.ShowRelationships(this.kmap,data);												// Show relatioships html
+			else if (data.illustration_mms_url && data.illustration_mms_url[0]) {				// If an image spec'd
+				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
+				$("#sui-relatedImg").prop("src",data.illustration_mms_url[0]);					// Show it
+				}
+			this.AddSummary(this.kmap,data._childDocuments_);									// Add summary html
+			this.AddContext(this.kmap,data);													// Add context html
 			});
 		
 		str=`<div style='display:inline-block;width:50%'>
@@ -359,13 +369,13 @@ class Places  {
 		this.content[2]=str;											
 	}	
 	
-	ShowSummary(o,c)																		// SHOW SUMMARY TAB CONTENTS 	
+	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
 	{	
-		let f,i,s=[];
-		let n=c.length;																			// Get number of places
-		for (i=0;i<n;++i) {																		// For each subject get data as 's=[category[{title,id}]]' 
+		let f,i,s=[],n=0;
+		for (i=0;i<c.length;++i) {																// For each subject get data as 's=[category[{title,id}]]' 
 			if (c[i].block_child_type != "related_places") continue;							// Add only related places
 			if (c[i].related_places_header_s == "Earth")   continue;							// Skip earth
+			++n;																				// Add to count
 			if (!s[c[i].related_places_relation_label_s])										// If first one of this category 
 					s[c[i].related_places_relation_label_s]=[];									// Alloc category array
 			s[c[i].related_places_relation_label_s].push({										// Add subject to category 
@@ -374,7 +384,7 @@ class Places  {
 				id:c[i].related_uid_s });														// Add id
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
-		let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		let str=`<b>${o.title[0]}</b> has <b>${n}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
 		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a id='sui-togCatA'>Expand all</a> / <a id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
@@ -386,20 +396,23 @@ class Places  {
 			let sub="xxx";
 			s[f]=s[f].sort((a,b)=>{ return a.sub < b.sub ? -1 : 1;});							// Sort by sub category
 			let str=`<div id='sui-spCat-${f.replace(/ /g,"_")}' 
-			class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px;'>	${o.title} ${f}</div>
-			<ul id='sui-spCatUL-${f.replace(/ /g,"_")}' >`;
+			class='sui-spCat' style='background-color:#6faaf1;margin:0 0 4px 32px'> ${o.title} ${f}</div>
+			<ul id='sui-spCatUL-${f.replace(/ /g,"_")}'><ul>`;
 			for (i=0;i<s[f].length;++i)	{														// For each item
 				if (sub != s[f][i].sub) {														// A new sub category
 					sub=s[f][i].sub;															// New sub
-					str+="<li style='list-style-type:none;margin-left:-24px'><div class='sui-spDot' id='sui-spSub"+s[f][i].id+"'>&ndash;</div><b><u>"+sub+"</b></u></li>";
+					str+="</ul><div class='sui-spSubCat'>";										// End last sub container ul, add sub container div
+					str+="<div style='background-color:#999' class='sui-spDot' id='sui-spSub-"+s[f][i].id+"'>&ndash;</div>";	// Add folding dot
+					str+="<b>"+sub+"</b></div>";												// Add sub title
+					str+="<ul id='sui-spSubUL-"+s[f][i].id+"' style='list-style-type:none'>";	// Add new container ul
 					}
 				str+="<li style='list-style-type:none'><a id='sui-spItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
 				}
-			return str+"</ul>";																	// Close category
+			return str+"</ul></ul>";															// Close category and sub container ul
 			}
 	}
 
-	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
+	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
 		let n=0;
 		let str=`<b>${o.title[0]}</b> has <b> ~~ </b> immediate subordinate places. 
@@ -430,7 +443,7 @@ class Places  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set relationships tab
+			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set context tab
 			});
 	}
 
@@ -438,7 +451,7 @@ class Places  {
 	{	
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
-		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>&bull;</b></div>";	// If a loner
+		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
 		s+=`<a id='sui-spLab-${id}'>${lab}</a>`;												// Add name
 		return s;																				// Return line
 	}

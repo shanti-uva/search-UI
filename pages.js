@@ -178,16 +178,17 @@ class Pages  {
 		</div>`;
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 
-		sui.GetKmapFromID(id,(o)=>{ 
+		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
+			if (!o)  { $("#sui-popover").remove(); return; }									// Quit if nothing
 			let str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
 			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
 			<span style='font-size:12px;text-transform:capitalize'>
 				For more information about this ${o.asset_type.slice(0,-1)}, see Full Entry below.<br>
 				<b><p>${o.asset_type}: </b>`;
-				for (i=0;i<o.ancestors_txt.length-1;++i) {											// For each trail member
+				for (i=0;i<o.ancestors_txt.length-1;++i) {										// For each trail member
 					str+=`<span class='sui-crumb' style='color:#000099;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
 					${o.ancestors_txt[i]}</span>`;											
-					if (i < o.ancestors_txt.length-2)	str+=" / ";									// Add separator
+					if (i < o.ancestors_txt.length-2)	str+=" / ";								// Add separator
 					}
 				str+=`</p></span><br>
 				<div id='sui-popbot' style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;

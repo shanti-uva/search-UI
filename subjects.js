@@ -40,7 +40,7 @@ class Subjects  {
 		str+=`<br><div style='display:inline-block;width:100%'>
 		<div class='sui-textTop' id='sui-textTop' style='border-top:1px solid #999'>
 			<div class='sui-textTab' id='sui-textTab0' style='color:#fff;width:50%'>
-				<div style='display:inline-block;padding-top:10px'>RELATIONSHIPS &nbsp;&#xe609</div></div>
+				<div style='display:inline-block;padding-top:10px'>CONTEXT &nbsp;&#xe609</div></div>
 			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:50%'>
 				<div style='display:inline-block;padding-top:10px'>SUMMARY &nbsp;&#xe609</div></div>
 		</div>
@@ -61,7 +61,7 @@ class Subjects  {
 			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
 			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
 			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
-			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});				// Active tab
+			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
 			$("#sui-textSide").html(_this.content[which]);										// Set content
 			if (which == 0)	{																	// If summary, add events
 				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
@@ -105,21 +105,25 @@ class Subjects  {
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets men
 	}
 
-	GetTabData(o)																			// GET TAB TATA FOR RELATIONSHIPS / SUMMARY
+	GetTabData(o)																			// GET TAB DATA FOR CONTEXT / SUMMARY
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
-			if (data.illustration_mms_url && data.illustration_mms_url[0]) {					// If an image spec'd
+			if (data.illustration_external_url && data.illustration_external_url[0]) {			// If an image spec'd
+				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
+				$("#sui-relatedImg").prop("src",data.illustration_external_url[0]);				// Show it
+				}
+			else if (data.illustration_mms_url && data.illustration_mms_url[0]) {				// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
 				$("#sui-relatedImg").prop("src",data.illustration_mms_url[0]);					// Show it
 				}
 			if (data.summary_eng && data.summary_eng[0]) 										// If an summary spec'd
 				$("#sui-spCap").html(data.summary_eng[0]);										// Replace caption
-			this.ShowSummary(o,data._childDocuments_);											// Show summary html
-			this.ShowRelationships(o,data);														// Show relatioships html
+			this.AddSummary(o,data._childDocuments_);											// Add summary html
+			this.AddContext(o,data);															// Add context html
 		});
 	}
 
-	ShowSummary(o,c)																		// SHOW SUMMARY TAB CONTENTS 	
+	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
 	{	
 		let f,i,s=[];
 		let n=c.length;																			// Get number of subjects
@@ -133,7 +137,7 @@ class Subjects  {
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
 		let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-		See the RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a id='sui-togCatA'>Expand all</a> / <a id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
@@ -149,7 +153,7 @@ class Subjects  {
 			}
 	}
 
-	ShowRelationships(o,d)																	// SHOW RELATIONSHIPS TAB CONTENTS 	
+	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
 		let i,n=0,path=123;
 		let str=`<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
@@ -180,7 +184,7 @@ class Subjects  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set relationships tab
+			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set context tab
 			});
 	}
 
@@ -188,7 +192,7 @@ class Subjects  {
 	{	
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
-		else		s+="<div class='sui-spDot' style='background:none;color:#333'><b>&bull;</b></div>";	// If a loner
+		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
 		s+=`<a id='sui-spLab-${id}'>${lab}</a>`;												// Add name
 		return s;																				// Return line
 	}

@@ -276,14 +276,17 @@
 					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); 
 					}					
 					
-/* SUBJECTS & PLACES RELATED */
+/* SUBJECTS & PLACES TAB MENUS */
 
 .sui-spCat {		background-color:#cc4c39;width:calc(100% - 12px);color:#fff; padding:2px 0; text-align:center; text-transform: capitalize;
 					font-weight:600; cursor:pointer; margin:0 8px; }
 					.sui-spCat:hover {  background-color:#a53d2d;
 					}
+.sui-spSubCat {		color:#5b66cb; text-transform:uppercase; font-size:15px;
+					}
 .sui-spDot {		display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:14px;
-					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin-right:6px;
+					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin-right:6px; }
+					.sui-spDot:hover {  opacity: .66;
 					}
 .sui-spLin { 		margin:4px 0; list-style-type:none; padding:0;
 					}
