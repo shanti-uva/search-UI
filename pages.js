@@ -208,7 +208,7 @@ class Pages  {
 				});
 			});
 
-		var url=sui.solrUtil.createKmapQuery(id);												// Get query url
+		var url=sui.solrUtil.createKmapQuery(id,null,null,300);									// Get query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
 			let i,n,str="";
 			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
@@ -225,12 +225,15 @@ class Pages  {
 				
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
-					sui.ss.mode="related";														// Related mode
-					this.relatedType=(v[4] == "audio") ? "audio-video" : v[4];					// Set type
-					sui.Query();																// Query and show results
-					sui.DrawItems();															// Draw items																
-					sui.DrawFooter();															// Draw footer															
-					sui.ss.page=0;																// Start at beginning
+					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
+					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url
+					$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=>{ // Get related places
+						sui.MassageKmapData(data);												// Normalize for display
+						sui.curResults=data.response.docs;										// Save current results
+						sui.DrawItems();														// Draw items																
+						sui.DrawFooter();														// Draw footer															
+						sui.ss.page=0;															// Start at beginning
+						});
 					});
 				}
 			});
@@ -262,7 +265,7 @@ class Pages  {
 		<p>OTHER DICTIONARIES:&nbsp;&nbsp;</div>`;
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 
-		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
+		sui.GetChildDataFromID("terms",o.id,(data)=> { 											// Load data
 			trace(data)
 			});
 

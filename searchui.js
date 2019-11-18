@@ -249,7 +249,8 @@ class SearchUI  {
 			$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
 			$("#sui-adv").css({ display:"none"});													// Hide search ui
 			$("#sui-results").css({ display:"block"});												// Show page
-			}
+			sui.DrawHeader(true);		sui.DrawFooter();											// Redraw header and footer
+		}
 	}
 
 	SerializeQuery(q)																			// SERIALZE QUERY INTO STRING
@@ -373,6 +374,14 @@ class SearchUI  {
 			});
 		}
 	
+	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
+	{
+		let url=`https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json`;
+		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
+			callback(data.response.docs);															// Return data
+			});
+	}
+
 	GetTreeChildren(facet, path, callback)
 	{
 		let base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";			// Base url
@@ -515,12 +524,11 @@ class SearchUI  {
 		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-		
 		str=`
 			SHOW&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
 			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
-			${this.assets[this.ss.type].g}</div>${this.ss.type.charAt(0).toUpperCase()+this.ss.type.substr(1)} (${n}) 
+			${this.assets[this.ss.type].g}</div>${this.ss.type.charAt(0).toUpperCase()+this.ss.type.substr(1)} ${(n != undefined) ? "("+n+")" : "" } 
 			<div id='sui-typeSet' class='sui-typeSet'>&#xe609</div>
 			</div>
 			`;
@@ -534,7 +542,8 @@ class SearchUI  {
 				if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
 				str+="<div class='sui-typeItem' id='sui-tl-"+k+"'>";								// Item head
 				str+="<span style='font-size:18px; line-height: 24px; vertical-align:-3px; color:"+this.assets[k].c+"'>";
-				str+=this.assets[k].g+" </span> "+k.charAt(0).toUpperCase()+k.substr(1)+" ("+n+")</div>";
+				str+=this.assets[k].g+" </span> "+k.charAt(0).toUpperCase()+k.substr(1);			// Asset name
+				if (n != undefined) str+=" ("+n+")</div>";											// Counts
 				}
 			$("#sui-main").append(str);																// Add to main div
 			

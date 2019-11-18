@@ -86,22 +86,27 @@ class Images  {
 				try{ str+="<p class='sui-pageLab'>";
 					for (i=0;i<j.field_image_descriptions.und.length;++i) 							// For each note
 						str+=j.field_image_descriptions.und[i].title+"<br>";						// Add it
-					str+="</p>";  } catch(e){}
+					str+="</p>";  
+					} catch(e){}
+					try{ str+=d("&#xe600",j.field_image_agents.und[0].field_agent_role.und[0].value.toUpperCase(),
+						 j.field_image_agents.und[0].title+" ("+sui.pages.FormatDate(j.field_image_agents.und[0].field_agent_dates.und[0].value)+")"
+						); } 	catch(e) {trace(e)}
+					try{ str+="<p>";																	// A sub description
+					str+=j.field_image_descriptions.und[0].field_description.und[0].value+"<br>";	// Add it
+					str+="</p>";  } catch(e){trace(e)}
+				str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>ONLY DIGITAL</span>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
 					 str+="&nbsp;&nbsp;<span class='sui-pageLab'>COLOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"+"</span>"; } catch(e){}
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>QUALITY</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_quality.und[0].value+"</span>&nbsp;&nbsp;<span class='sui-pageLab'>ROTATION</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_rotation.und[0].value+"&deg;</span></p>"; } catch(e){}
 				try{ str+=d("&#xe665","PHYSICAL SIZE",j.field_physical_size.und[0].value); } 	catch(e){}
 				try{ str+=d("&#xe659","CAPURE DEVICE",j.field_image_capture_device.und[0].value); } 	catch(e){}
 				try{ str+=d("&#xe65f","MATERIALS",j.field_image_materials.und[0].value); } 				catch(e){}
-				str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
 				try{ str+=d("&#xe66c","ENHANCEMENT",j.field_image_enhancement.und[0].value); } 			catch(e){}
 				try{ str+="<p>&#xe62B&nbsp;&nbsp;<span class='sui-pageLab'>LOCATION</span>:&nbsp;&nbsp;"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;";
 				  	 str+=j.field_latitude.und[0].value+"</p>"; } catch(e){}
-				try{ str+=d("&#xe634","SUBJECT",j.field_keywords.und[0].value); } 						catch(e){}
 				try{ str+=d("&copy;","COPYRIGHT HOLDER",j.field_copyright_holder.und[0].value); } 		catch(e){}
 				try{ str+=d("&copy;","COPYRIGHT STATEMENT",j.field_copyright_statement.und[0].value); } catch(e){}
 				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } 	catch(e){}
-				try{ str+=d("&#xe678","IMAGE&nbsp;NOTES",j.field_image_descriptions.und[0].title); } 	catch(e){}
 				try{ str+=d("&#xe678","TECHNICAL&nbsp;NOTES",j.field_technical_notes.und[0].value); } 	catch(e){}
 				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } catch(e){}
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>LICENSE</span>:&nbsp;&nbsp;<span class='sui-pageVal'><a style='font-weight:400' target='_blank' href='"+j.field_license_url.und[0].value+"'>"+j.field_license_url.und[0].value+"</a>" } catch(e){} 
