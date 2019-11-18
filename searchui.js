@@ -376,7 +376,7 @@ class SearchUI  {
 	
 	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
 	{
-		let url=`https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json`;
+		let url=`https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
 			});
