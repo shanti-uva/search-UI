@@ -254,6 +254,20 @@ class Pages  {
 // HELPERS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	DrawTabMenu(tabs)																		// DRAW TAB MENU
+	{
+		let i;
+		let str="<div class='sui-tabTop'>";														// Top bar
+		for (i=0;i<tabs.length;++i) {															// For each tab	
+			str+=`<div class='sui-tabTab' id='sui-tabTab${i}' 
+				style='width:calc(${100/tabs.length}% - 2px)'>
+				${tabs[i]}&nbsp;&#xe609
+				</div>`;
+			}
+		str+="</div><div class='sui-tabContent' id='sui-tabContent'></div></div>";
+		return str.replace(/\t|\n|\r|/g,"");													// Return tab markup
+	}
+
 	DrawLandingPage()																		// DRAW SITE SPECIFIC LANDING PAGE
 	{
 		$("#sui-pages").css({ display:"block" });												// Hide results page	

@@ -193,14 +193,16 @@
 .sui-sources {		max-width:900px; margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
 					border-radius:6px; padding:50px; font-weight:400; color:#000;
 					}
+/* TERMS PAGE */
+
 .sui-sourceText	{	font-family:"EB Garamond",serif,shanticon; font-weight:400; line-height:24px; font-size:17px; 
 					}
 .sui-termSpeak {	border-radius:16px; background-color:#f8f8f8; border:1px-solid #999; padding:4px; color:#000;
 					}
-.sui-termBar {		background-color:#a2733f; width:calc(100% - 32px); color:#fff; padding:3px 16px;
+.sui-termOther { 	font-size:16px; padding: 8px 0;
 					}
-.sui-otherTitle {	font-size:16px; margin: 12px 0;
-					}
+/* IMAGES PAGE */
+
 .sui-imagesBox {	background-color:#000; width:calc(100% + 24px); padding: 60px 0 12px 0; color:#eee; text-align:center; 
 					border-bottom:10px solid #b49c59; user-select:none; margin:-12px -12px 0 -12px; 
 					letter-spacing: 1.5px; font-size:12px; line-height:22px;
@@ -228,7 +230,7 @@
  					border-left:1px solid #999; border-right:1px solid #999; font-weight:500; font-size:13px; color:#555; user-select:none;
 					}
 .sui-textTab {		display:inline-block; background-color: #999; height:36px; width: 34%; text-align:center; user-select:none;
-					font-weight:500; font-size:12px; color:#888; cursor:pointer;  
+					font-weight:500; font-size:12px; color:#888; cursor:pointer; overflow-x: hidden;
 					}
 .sui-texts {		display:inline-block; width:66%; margin:0; padding:0; overflow:hidden; height:100vh; max-height:calc(100vh - 154px);
 					}
@@ -300,7 +302,15 @@
 					border:1px solid #aaa; margin:4px 0 4px -32px; }
 					.sui-spSub:hover {  border-color:#333;
 					}
+/* TABS */
 
+.sui-tabTop {		background-color: #eee; width:100%; white-space:nowrap;	font-weight:500; font-size:13px; user-select:none;  
+					}
+.sui-tabTab {		display:inline-block; background-color: #999; text-align:center; user-select:none; overflow-x:hidden; padding-top:10px;
+					font-weight:500; font-size:12px; color:#fff; cursor:pointer; border-left:1px solid #eee; border-right:1px solid #eee; height:26px;
+					}
+.sui-tabContent {	background-color: #eee; width:calc(100% - 50px); color:#333; padding:0 24px; line-height:22px;
+					} 
 /* CAROUSEL */
 
 .sui-caroBox { 		color:#555; font-size:14px; background-color:#fff; padding:28px 24px 0 24px; border-radius:6px;
