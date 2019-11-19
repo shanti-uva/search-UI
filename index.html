@@ -16,6 +16,7 @@
 	<script src="texts.js"></script>
 	<script src="sources.js"></script>
 	<script src="visuals.js"></script>
+	<script src="terms.js"></script>
 	<link REL="SHORTCUT ICON" HREF="img/shanti.ico">
 	<title>Mandala Search UI</title>
 </head>
@@ -36,15 +37,6 @@
 
 var sui=new SearchUI("Mandala","standalone");											// Alloc new search object
 sui.pages=new Pages();																	// Alloc pages (standalone only)
-sui.places=new Places();																// Alloc places module (standalone)
-sui.av=new AudioVideo();																// Alloc AV (standalone)
-sui.sub=new Subjects();																	// Alloc Subjects (standalone)
-sui.img=new Images();																	// Alloc Images (standalone)
-sui.txt=new Texts();																	// Alloc Texts (standalone)
-sui.src=new Sources();																	// Alloc Sources (standalone)
-sui.vis=new Visuals();																	// Alloc Visuals (standalone)
-sui.pages.DrawLandingPage();															// Draw landing page
-if (location.hash) sui.PageRouter(location.hash);										// Go to particular page
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
 	sui.SerializeQuery(sui.ss)
