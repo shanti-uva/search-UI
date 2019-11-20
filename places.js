@@ -345,8 +345,8 @@ class Places  {
 		str=`<div style='display:inline-block;width:50%'><br>
 		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>NAMES</div>`;
 		if (this.kmap.names_txt)	for (i=0;i<this.kmap.names_txt.length;++i) str+=this.kmap.names_txt[i]+"<br>";
-		str+=`</div><div style='display:inline-block;width:calc(50% - 24px);vertical-align:top;border-left:1px solid #ccc; padding-left:12px'>
-		<br><div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
+		str+=`<br></div><div style='display:inline-block;width:calc(50% - 24px);vertical-align:top;border-left:1px solid #ccc; padding-left:12px;margin-top:22px'>
+		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
 		...to be added
 		</div><br>`;
 		this.content[2]=str;											
