@@ -24,7 +24,7 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
-		this.content=["...loading","...loading","TBD","TBD"];
+		this.content=["...loading","...loading","...loading","<br>...loading"];
 	}
 
 	Draw(kmap)
@@ -265,43 +265,26 @@ class Places  {
 				str+=" <i>"+this.kmap.feature_types_idfacet[i].split("|")[0]+"</i>"+sui.pages.AddPop(this.kmap.feature_types_idfacet[i].split("|")[1]);  // Add
 			str+="</div>";
 			}
-		if (this.kmap.caption) str+="<div class='sui-sourceText' style='margin-left:192px'>"+this.kmap.caption+"</div>";
-		str+=`</div><br>																
-		<div style='display:inline-block;width:calc(100% - 192px);margin-left:192px'>
-		<div class='sui-textTop' id='sui-textTop' style='border-top:1px solid #999'>
-			<div class='sui-textTab' id='sui-textTab0' style='color:#fff;width:25%'>
-				<div style='display:inline-block;padding-top:10px'>CONTEXT &nbsp;&#xe609</div></div>
-			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:25%'>
-				<div style='display:inline-block;padding-top:10px'>SUMMARY &nbsp;&#xe609</div></div>
-			<div class='sui-textTab' id='sui-textTab2' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:25%'>
-				<div style='display:inline-block;padding-top:10px'>NAMES  &nbsp;&#xe609</div></div>
-			<div class='sui-textTab' id='sui-textTab3' style='color:#fff;width:25%'>
-				<div style='display:inline-block;padding-top:10px'>LOCATION &nbsp;&#xe609</div></div>
-		</div>
-		<div class='sui-textSide' id='sui-textSide' style='display:none'></div></div>`;
+		if (this.kmap.caption) str+="<div class='sui-sourceText' style='margin-left:192px'>"+this.kmap.caption+"</div></div><br>";
+		str+="<div style='margin-left:192px'>";
+		str+=sui.pages.DrawTabMenu(["CONTEXT","SUMMARY","NAMES","LOCATION"])+"</div></div>";	// Add tab menu
 		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
 
-		$("[id^=sui-textTab]").on("click", (e)=> {												// ON TAB CLICK
-			var id=e.currentTarget.id.substring(11);											// Get index of tab	
-				showTab(id);																	// Draw it
+		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
+			showTab(e.currentTarget.id.substring(10));											// Get index of tab	and draw it
 			});
 
 		function showTab(which) {
-			$("[id^=sui-textTab]").css({ "background-color":"#999",color:"#fff" });
-			$("#sui-textSide").css({display:"inline-block","background-color":"#f8f8f8"});
-			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#666"});
-			$("#sui-textSide").html(_this.content[which]);										// Set content
-			
 			$("[id^=sui-spLab-]").off("click");													// Kill handler
 			$("[id^=sui-spDot-]").off("click");													// Kill handler
 			$("[id^=sui-spItem-]").off("click");												// Kill handler
 			$("[id^=sui-togCat-]").off("click");												// Kill handler
 			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
-			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
-			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
-			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
-			$("#sui-textSide").html(_this.content[which]);										// Set content
+			$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
+			$("#sui-tabContent").css({display:"block","background-color":"#eee"});				// Show content
+			$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
+			$("#sui-tabContent").html(_this.content[which]);									// Set content
 			if (which == 0)	{																	// If summary, add events
 				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
 					let id=e.currentTarget.id.substring(10);									// Get id
@@ -359,13 +342,13 @@ class Places  {
 			this.AddContext(this.kmap,data);													// Add context html
 			});
 		
-		str=`<div style='display:inline-block;width:50%'>
+		str=`<div style='display:inline-block;width:50%'><br>
 		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>NAMES</div>`;
 		if (this.kmap.names_txt)	for (i=0;i<this.kmap.names_txt.length;++i) str+=this.kmap.names_txt[i]+"<br>";
 		str+=`</div><div style='display:inline-block;width:calc(50% - 24px);vertical-align:top;border-left:1px solid #ccc; padding-left:12px'>
-		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
+		<br><div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
 		...to be added
-		</div>`;
+		</div><br>`;
 		this.content[2]=str;											
 	}	
 	
@@ -384,7 +367,7 @@ class Places  {
 				id:c[i].related_uid_s });														// Add id
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
-		let str=`<b>${o.title[0]}</b> has <b>${n}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		let str=`<br><b>${o.title[0]}</b> has <b>${n}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
 		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
@@ -415,7 +398,7 @@ class Places  {
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
 		let n=0;
-		let str=`<b>${o.title[0]}</b> has <b> ~~ </b> immediate subordinate places. 
+		let str=`<br><b>${o.title[0]}</b> has <b> ~~ </b> immediate subordinate places. 
 		You can browse this subordinate places as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as placess non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
@@ -443,7 +426,7 @@ class Places  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set context tab
+			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
 			});
 	}
 

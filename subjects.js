@@ -36,20 +36,12 @@ class Subjects  {
 					str+="<tr><td></td><td>> "+o.names_txt[i]+"</td></tr>";						// Add it
 					}
 				}
-		str+="</table>";		
-		str+=`<br><div style='display:inline-block;width:100%'>
-		<div class='sui-textTop' id='sui-textTop' style='border-top:1px solid #999'>
-			<div class='sui-textTab' id='sui-textTab0' style='color:#fff;width:50%'>
-				<div style='display:inline-block;padding-top:10px'>CONTEXT &nbsp;&#xe609</div></div>
-			<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc;color:#fff;width:50%'>
-				<div style='display:inline-block;padding-top:10px'>SUMMARY &nbsp;&#xe609</div></div>
-		</div>
-		<div class='sui-textSide' id='sui-textSide' style='display:none;max-height:none'></div>
-		</div></div>`;
+		str+="</table><br>";		
+		str+=sui.pages.DrawTabMenu(["CONTEXT","SUMMARY"])+"</div>";								// Add tab menu
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 
-		$("[id^=sui-textTab]").on("click", (e)=> {												// ON TAB CLICK
-			var id=e.currentTarget.id.substring(11);											// Get index of tab	
+		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
+			var id=e.currentTarget.id.substring(10);											// Get index of tab	
 			showTab(id);																		// Draw it
 			});
 			
@@ -59,10 +51,10 @@ class Subjects  {
 			$("[id^=sui-spItem-]").off("click");												// Kill handler
 			$("[id^=sui-togCat-]").off("click");												// Kill handler
 			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
-			$("[id^=sui-textTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
-			$("#sui-textSide").css({display:"inline-block","background-color":"#eee"});			// Show text
-			$("#sui-textTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
-			$("#sui-textSide").html(_this.content[which]);										// Set content
+			$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
+			$("#sui-tabContent").css({display:"block","background-color":"#eee"});				// Show content
+			$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
+			$("#sui-tabContent").html(_this.content[which]);									// Set content
 			if (which == 0)	{																	// If summary, add events
 				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
 					let id=e.currentTarget.id.substring(10);									// Get id
@@ -161,7 +153,7 @@ class Subjects  {
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		for (n=0;n<d.ancestors.length;++n) {													// For each ancestor
-			str+="<ul style='list-style-type:none'>";						// Add header
+			str+="<ul style='list-style-type:none'>";											// Add header
 			str+=this.AddTreeLine(d.ancestors[n],d.ancestor_uids_gen[n],"&ndash;",null);		// Add it 
 			}
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
@@ -184,7 +176,7 @@ class Subjects  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul>";								// Set context tab
+			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
 			});
 	}
 

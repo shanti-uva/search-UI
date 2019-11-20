@@ -154,6 +154,7 @@ class Pages  {
 	
 		$("[id^=sui-crumb-]").on("click",(e)=> {												// ON BREAD CRUMB CLICK
 			var id=e.currentTarget.id.substring(10).toLowerCase();								// Get id
+			if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=sui.ss.lastMode;	// Get back to regular search mode
 			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
 			});
 	}
@@ -264,7 +265,7 @@ class Pages  {
 				${tabs[i]}&nbsp;&#xe609
 				</div>`;
 			}
-		str+="</div><div class='sui-tabContent' id='sui-tabContent'></div></div>";
+		str+="</div><div class='sui-tabContent' id='sui-tabContent'></div></div>";				// Tab contents
 		return str.replace(/\t|\n|\r|/g,"");													// Return tab markup
 	}
 

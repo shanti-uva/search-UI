@@ -18,7 +18,6 @@ class Terms  {
 		sui.trm=this;																			// Save context
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 		this.content=["...loading","...loadingr","...loading"];									// Content pages
-		this.tabs=["DEFINITIONS","OTHER DICTIONARIES","DETAILS"];								// Tabs
 	}
 
 	Draw(o)																					// DRAW TERM PAGE FROM KMAP
@@ -34,7 +33,7 @@ class Terms  {
 		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>`;
 		str+=`<p><span id='sui-termPly' style='font-size:20px;vertical-align:-4px;color:${sui.assets[o.asset_type].c}'><b>&#xe60a</b></span>&nbsp;&nbsp;&nbsp;
 		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>`;
-		str+=sui.pages.DrawTabMenu(this.tabs)+"</div>";											// Add tab menu
+		str+=sui.pages.DrawTabMenu(["DEFINITIONS","DETAILS","OTHER DICTIONARIES"])+"</div>";	// Add tab menu
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
@@ -77,7 +76,7 @@ class Terms  {
 							str2+="<div style='font-size:12px;text-align:right;width:100%;color:#a2733f'>";
 							if (data[i].related_definitions_author_s) str2+="AUTHOR: "+data[i].related_definitions_author_s+" | ";						
 							if (data[i].related_definitions_tense_s)  str2+="TENSE: "+data[i].related_definitions_tense_s+" | ";						
-							str2+=" LANGUAGE: "+data[i].related_definitions_language_s;		// Add language
+							str2+=" LANGUAGE: "+data[i].related_definitions_language_s;			// Add language
 							str2+="</div><hr style='border-top: 1px solid #a2733f'>";			// End rule
 							}
 						}
@@ -106,8 +105,8 @@ class Terms  {
 			addSubjects("TOPICS",o.data_tibet_and_himalayas_ss);											
 				
 			this.content[0]=str2.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
-			this.content[1]=str.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
-			this.content[2]=str3.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
+			this.content[1]=str3.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
+			this.content[2]=str.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
 			showTab(0);																			// Open definitions tab
 			});
 
