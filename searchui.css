@@ -136,7 +136,7 @@
 .sui-advTermRem { 	display:inline-block; cursor:pointer; margin-right: 4px; } .sui-advValueRem:hover { color: #668eec;
 					}
 .sui-advTerm { 		padding:6px 0 6px 20px; font-size:11px; line-height:15px;
-					}						
+					}
 .sui-advEdit {		display:none; border:1px solid #ccc; margin-bottom:8px; width:calc(100% - 44px); background-color:#fff; text-align:left;
 					border-radius:5px;  padding:8px; font-size:12px; color:#666; margin-left:12px;
 					}
@@ -190,19 +190,22 @@
 					}
 .sui-relatedItem {  cursor:pointer; padding: 6px 3px 3px 6px; border-radius:4px; } 	.sui-relatedItem:hover { background-color: #f7f7f7;
 					}
-.sui-sources {		max-width:900px; margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
-					border-radius:6px; padding:50px; font-weight:400; color:#000;
-					}
+/* SOURCES PAGE */
+.sui-sources 	 {	max-width:900px; margin:8px auto 8px 192px; background-color: #f7f7f7; border:1px solid #999;border-radius:6px; padding:50px; font-weight:400; color:#000; }
+.sui-sourceText	 {	font-family:"EB Garamond",serif,shanticon; font-weight:400; line-height:24px; font-size:17px; }
+.sui-sourceTitle {	font-family:"EB Garamond",serif; font-weight:500; line-height:24px; font-size:20px; }
+.sui-sourceSec   {	font-size:18px; font-weight:400; }
+
 /* TERMS PAGE */
+.sui-terms 		{	max-width:900px; margin:8px auto 8px 192px; background-color: #f7f7f7; border:1px solid #999; border-radius:6px; padding:50px; color:#000; }
+.sui-termTitle	{	font-family:"EB Garamond",serif; font-weight:500; line-height:24px; font-size:20px; }
+.sui-termSpeak  {	border-radius:16px; background-color:#f8f8f8; border:1px-solid #999; padding:4px; color:#000; }
+.sui-termOther  { 	font-size:16px; padding: 8px 0;	}
+.sui-termData   {	font-size:12px; text-align:right; width:100%; color:#a2733f; }
+.sui-termPlay   {	font-size:20px; vertical-align:-4px; color:#a2733f; font-weight:bold; margin-right:12px; cursor:pointer; }
+.sui-termIcon   {	font-size:24px; color:#a2733f; vertical-align:-4px; margin-right:12px; }
 
-.sui-sourceText	{	font-family:"EB Garamond",serif,shanticon; font-weight:400; line-height:24px; font-size:17px; 
-					}
-.sui-termSpeak {	border-radius:16px; background-color:#f8f8f8; border:1px-solid #999; padding:4px; color:#000;
-					}
-.sui-termOther { 	font-size:16px; padding: 8px 0;
-					}
 /* IMAGES PAGE */
-
 .sui-imagesBox {	background-color:#000; width:calc(100% + 24px); padding: 60px 0 12px 0; color:#eee; text-align:center; 
 					border-bottom:10px solid #b49c59; user-select:none; margin:-12px -12px 0 -12px; 
 					letter-spacing: 1.5px; font-size:12px; line-height:22px;
@@ -223,58 +226,41 @@
 .sui-images {		max-width:900px;margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
 					padding:50px; font-weight:400; padding-top:0; border-top:4px solid #b49c59; border-bottom:4px solid #b49c59;
 					}
-.sui-textSide {		background-color: #fff; width:calc(100% - 44px); overflow-y:auto; max-height:calc(100vh - 241px); color:#666;
-					padding:22px; border-bottom:1px solid #999; border-left:1px solid #999; border-right:1px solid #999; line-height:22px;
-					} .sui-textSide a { color:#333; }
-.sui-textTop {		background-color: #fff; border-top:2px solid #8b5aa1; width:100%; overflow-x:hidden; white-space:nowrap;
- 					border-left:1px solid #999; border-right:1px solid #999; font-weight:500; font-size:13px; color:#555; user-select:none;
+/* TEXT PAGE*/
+.sui-texts 		 {	display:inline-block; width:66%; margin:0; padding:0; overflow:hidden; height:100vh; max-height:calc(100vh - 154px); }
+.sui-textContent {	background-color: #fff; width:calc(100% - 46px); overflow-y:auto; max-height:calc(100vh - 241px); color:#666; 
+					padding:22px; border-bottom:1px solid #999; border-left:1px solid #999; border-right:1px solid #999; line-height:22px; }
+.sui-textTop 	 {	background-color: #fff; width:100%; overflow-x:hidden; white-space:nowrap; user-select:none; }
+.sui-textTab 	 {	display:inline-block; height:26px; width:calc(33.33% - 2px); text-align:center; user-select:none; padding-top:10px; 
+					font-weight:500; font-size:12px; color:#888; cursor:pointer; border:1px solid #999; border-bottom:none;
 					}
-.sui-textTab {		display:inline-block; background-color: #999; height:36px; width: 34%; text-align:center; user-select:none;
-					font-weight:500; font-size:12px; color:#888; cursor:pointer; overflow-x: hidden;
-					}
-.sui-texts {		display:inline-block; width:66%; margin:0; padding:0; overflow:hidden; height:100vh; max-height:calc(100vh - 154px);
-					}
-.sui-vPlayer {		display:inline-block;margin:0; padding:0;
-					}
-.sui-avTop {		background-color: #fff; border-top:1px solid #999; width:100%; overflow-x:hidden; white-space:nowrap;
-					border-left:1px solid #999; border-right:1px solid #999; font-weight:500; font-size:13px; color:#555;
-					}					
-.sui-trans {		display:inline-block; background-color: #fefefe; overflow-y:auto; max-height:calc(100vh - 208px); 
-					border-right: 1px solid #999; width:calc(100% - 2px); font-size:15px; 
-					}
-.sui-transTab {		display:inline-block; background-color: #555; height:43px; width:calc(16.6667% - 1px); text-align:center;
+/* AV PAGE */
+.sui-vPlayer 	 {	display:inline-block;margin:0; padding:0; }
+.sui-avTop 		 {	background-color: #fff; border-top:1px solid #999; width:100%; overflow-x:hidden; white-space:nowrap;
+					border-left:1px solid #999; border-right:1px solid #999; font-weight:500; font-size:13px; color:#555; }	
+.sui-avMore1	 {	width:100%; text-align:center; }
+.sui-avMore2	 {	cursor:pointer;	border:1px solid #ccc; border-left:none; border-right:none; font-weight:400;	}			
+.sui-trans 		 {	display:inline-block; background-color: #fefefe; overflow-y:auto; max-height:calc(100vh - 208px); 
+					border-right: 1px solid #999; width:calc(100% - 2px); font-size:15px; }
+.sui-transTab	 {	display:inline-block; background-color: #555; height:43px; width:calc(16.6667% - 1px); text-align:center;
 					font-weight:500; font-size:25px; color:#fff; cursor:pointer; padding-top:12px; border-right:1px solid #fefefe; }
-					.sui-transTab:hover { background-color: #444; 
-					}
-.sui-transOps {		position:absolute; background-color:#f7f7f7; border:1px solid #999; border-radius: 0 0 6px 6px; 
-					display:none; width:180px; font-size: 13px; 
-					}
-.sui-transSrc {		background-color:#999; display:none; height:55px; width:calc(100% - 1px);
-					}
-.sui-transRow {		padding:5px 12px 5px 24px; cursor:pointer; }	.sui-transRow:hover{ background-color:#eee;
-					}	
-.sui-transLab {		padding:5px 12px 5px 12px; background-color:#e8e8e8; color:#333; font-weight:600; font-style:italic;
-					}	
-.sui-transCheck	{	float:right; color: #ccc;
-					}
-.sui-transMinSeg {	background-color:#fff; padding:0 0 0 8px; width:calc(100% - 12px); margin:6px 0 6px 0; 
-					border-left:4px solid #fff; min-height:70px;
-					}
-.sui-transMinBox {	width:calc(100% - 174px); margin:0 0 0 150px; border-left:1px solid #eee; padding: 0 12px 6px 8px
-					}
-.sui-transMinPlay {	float:right;color:#ccc; font-size:20px; cursor:pointer; border-radius:16px; 
+					.sui-transTab:hover { background-color: #444; 					}
+.sui-transOps 	 {	position:absolute; background-color:#f7f7f7; border:1px solid #999; border-radius: 0 0 6px 6px; 
+					display:none; width:180px; font-size: 13px; }
+.sui-transSrc    {	background-color:#999; display:none; height:55px; width:calc(100% - 1px); }
+.sui-transRow 	 {	padding:5px 12px 5px 24px; cursor:pointer; }	.sui-transRow:hover{ background-color:#eee;	}	
+.sui-transLab 	 {	padding:5px 12px 5px 12px; background-color:#e8e8e8; color:#333; font-weight:600; font-style:italic; }	
+.sui-transCheck	 {	float:right; color: #ccc; }
+.sui-transMinSeg {	background-color:#fff; padding:0 0 0 8px; width:calc(100% - 12px); margin:6px 0 6px 0; border-left:4px solid #fff; min-height:70px; }
+.sui-transMinBox {	width:calc(100% - 174px); margin:0 0 0 150px; border-left:1px solid #eee; padding: 0 12px 6px 8px }
+.sui-transMinPlay{	float:right;color:#ccc; font-size:20px; cursor:pointer; border-radius:16px; 
 					width:25px; padding:2px 0 0 4px; margin: 6px 44px 0 0;  }
-					.sui-transMinPlay:hover { background-color: #999; color: #fff;
-					}					
-.sui-transSeg	{	background-color:#ddd; border-radius: 6px 6px 0 0; padding-bottom:2px; padding:8px; width:calc(100% - 16px); 
-					margin:4px 0 4px 0; min-height:80px;
-					}
-.sui-transBox	{	margin:0 0 0 150px; background-color:#fff; border-radius:6px; padding:12px; width:calc(100% - 174px);
-					}
-.sui-transPlay {	color:#fff; font-size:20px; cursor:pointer; border-radius:6px; width:90px; height:26px;
+					.sui-transMinPlay:hover { background-color: #999; color: #fff; }					
+.sui-transSeg	{	background-color:#ddd; border-radius: 6px 6px 0 0; padding-bottom:2px; padding:8px; width:calc(100% - 16px); margin:4px 0 4px 0; min-height:80px; }
+.sui-transBox	{	margin:0 0 0 150px; background-color:#fff; border-radius:6px; padding:12px; width:calc(100% - 174px); }
+.sui-transPlay 	{	color:#fff; font-size:20px; cursor:pointer; border-radius:6px; width:90px; height:26px;
 					padding:2px 0 0 4px; background-color:#bbb; margin: 6px 44px 0 0; }
-					.sui-transPlay:hover { background-color: #999;
-					}
+					.sui-transPlay:hover { background-color: #999;	}
 
 .sui-popItem:hover{ color:#a4baec
 					}	
@@ -303,46 +289,26 @@
 					.sui-spSub:hover {  border-color:#333;
 					}
 /* TABS */
-
-.sui-tabTop {		background-color: #eee; width:100%; white-space:nowrap;	font-weight:500; font-size:13px; user-select:none;  
-					}
-.sui-tabTab {		display:inline-block; background-color: #999; text-align:center; user-select:none; overflow-x:hidden; padding-top:10px;
-					font-weight:500; font-size:12px; color:#fff; cursor:pointer; border-left:1px solid #eee; border-right:1px solid #eee; height:26px;
-					}
-.sui-tabContent {	background-color: #eee; width:calc(100% - 50px); color:#333; padding:0 24px; line-height:22px;
-					} 
+.sui-tabTab 	{	display:inline-block; background-color:#999; text-align:center; user-select:none; padding-top:10px; font-weight:500; font-size:12px; color:#fff; cursor:pointer; border-left:1px solid #eee; border-right:1px solid #eee; height:26px; }
+.sui-tabContent {	background-color: #eee; width:calc(100% - 50px); color:#333; padding:0 24px; line-height:22px;	}
+ 
 /* CAROUSEL */
-
-.sui-caroBox { 		color:#555; font-size:14px; background-color:#fff; padding:28px 24px 0 24px; border-radius:6px;
-					max-width:900px; margin:24px auto 0 auto; width:calc(100% - 60px); border:1px solid #999; min-height:190px;
-					}								
-.sui-caroHeader { 	font-style:italic; font-size:17px; margin:-140px 0 24px 0; color:#fff;
-					}								
-.sui-caroTitle { 	font-size:21px; margin:-12px 0 8px -8px;
-					}
-.sui-caroButL { 	position:relative; left:-46px; top:55px;font-size:26px; color:#fff; border-radius:4px 0 0 4px; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
-					width:30px; cursor:pointer;
-					} .sui-caroButL:hover { opacity: .8 }													
-		
-.sui-caroButR { 	position:relative; left:calc(100% + 12px); top:13px;font-size:26px; color:#fff; border-radius:0 4px 4px 0; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
-					width:30px; cursor:pointer;
-					} .sui-caroButR:hover { opacity: .8 }													
-.sui-caroView {		font-style:italic; font-size:16px;
-					}
-.sui-caroText {		border-left:5px solid #eee; padding-left:24px; font-family:"EB Garamond",serif,shanticon; font-weight:400; 
-					line-height:22px; font-size:16px;
-					}										
-.sui-caroPic {		max-width:320px; height:172px;
-					}
-.sui-caroLeft {		display:inline-block; width:calc(100% - 330px); vertical-align:top; margin-right:24px;
-					}
-.sui-caroRes {		display:inline-block; font-size:14px; font-weight:400; margin-top:8px;
-					}					
-.sui-caroDots {		display:inline-block; width:calc(66% - 200px); text-align:center; min-width:200px;
-					}	
-.sui-caroDot {		display:inline-block; opacity:.8; width:8px; height:8px; border-radius:8px; border:1px solid #999; margin-right:16px;
+.sui-caroBox 	{ 	color:#555; font-size:14px; background-color:#fff; padding:28px 24px 0 24px; border-radius:6px;
+					max-width:900px; margin:24px auto 0 auto; width:calc(100% - 60px); border:1px solid #999; min-height:190px;	}								
+.sui-caroHeader { 	font-style:italic; font-size:17px; margin:-140px 0 24px 0; color:#fff;	}								
+.sui-caroTitle 	{ 	font-size:21px; margin:-12px 0 8px -8px; }
+.sui-caroButL 	{ 	position:relative; left:-46px; top:55px;font-size:26px; color:#fff; border-radius:4px 0 0 4px; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
+					width:30px; cursor:pointer;	} .sui-caroButL:hover { opacity: .8 }													
+.sui-caroButR 	{ 	position:relative; left:calc(100% + 12px); top:13px;font-size:26px; color:#fff; border-radius:0 4px 4px 0; opacity:.5; color:#ddd; background-color:#5d68cc; padding:4px; 
+					width:30px; cursor:pointer;	} .sui-caroButR:hover { opacity: .8 }													
+.sui-caroView 	{	font-style:italic; font-size:16px; }
+.sui-caroText 	{	border-left:5px solid #eee; padding-left:24px; font-family:"EB Garamond",serif,shanticon; font-weight:400; line-height:22px; font-size:16px; }										
+.sui-caroPic 	{	max-width:320px; height:172px; }
+.sui-caroLeft 	{	display:inline-block; width:calc(100% - 330px); vertical-align:top; margin-right:24px;	}
+.sui-caroRes 	{	display:inline-block; font-size:14px; font-weight:400; margin-top:8px; }					
+.sui-caroDots 	{	display:inline-block; width:calc(66% - 200px); text-align:center; min-width:200px;	}	
+.sui-caroDot 	{	display:inline-block; opacity:.8; width:8px; height:8px; border-radius:8px; border:1px solid #999; margin-right:16px;
 					} .sui-caroDot:hover {	 background-color:#5d68cc; }				
-
 
 /* PSUEDO ELEMENTS */
 

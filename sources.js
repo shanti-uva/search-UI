@@ -23,9 +23,9 @@ class Sources  {
 		var i;
 		var str=`<div class='sui-sources' id='sui-sources'>
 		<span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
-		&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
-		<hr style='border-top: 1px solid #aaa'>
-		<div id='sui-srcSec' style='font-size:18px;font-weight:400'></div><br>`;
+		&nbsp;&nbsp;<span class='sui-sourceTitle'>${o.title[0]}</span>
+		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
+		<div class='sui-sourceSec' id='sui-srcSec'></div><br>`;
 		if (o.creator && o.creator.length) {
 			str+=`<span class='sui-pageLab' style='color:${sui.assets[o.asset_type].c}'>&#xe600</span>
 			&nbsp;&nbsp;${o.creator.join(", ")}<br><br>`;

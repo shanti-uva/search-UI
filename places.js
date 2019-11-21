@@ -315,7 +315,6 @@ class Places  {
 					else																		// If showing
 						$("#sui-spSubUL"+id).slideUp();											// Hide
 					});
-
 				$("[id^=sui-spItem-]").on("click", (e)=> {										// ON SUMMARY ITEM CLICK
 					let id=e.currentTarget.id.substring(11);									// Get id
 					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page

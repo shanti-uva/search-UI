@@ -257,15 +257,10 @@ class Pages  {
 
 	DrawTabMenu(tabs)																		// DRAW TAB MENU
 	{
-		let i;
-		let str="<div class='sui-tabTop'>";														// Top bar
-		for (i=0;i<tabs.length;++i) {															// For each tab	
-			str+=`<div class='sui-tabTab' id='sui-tabTab${i}' 
-				style='width:calc(${100/tabs.length}% - 2px)'>
-				${tabs[i]}&nbsp;&#xe609
-				</div>`;
-			}
-		str+="</div><div class='sui-tabContent' id='sui-tabContent'></div></div>";				// Tab contents
+		let i, str="";														
+		for (i=0;i<tabs.length;++i) 															// For each tab	
+			str+=`<div class='sui-tabTab' id='sui-tabTab${i}' style='width:calc(${100/tabs.length}% - 2px)'>${tabs[i]}&nbsp;&#xe609</div>`;
+		str+="<div class='sui-tabContent' id='sui-tabContent'></div>";							// Tab contents
 		return str.replace(/\t|\n|\r|/g,"");													// Return tab markup
 	}
 

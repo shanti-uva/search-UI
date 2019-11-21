@@ -147,7 +147,7 @@ class Subjects  {
 
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
-		let i,n=0,path=123;
+		let n=0;
 		let str=`<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>

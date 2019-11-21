@@ -17,11 +17,12 @@ class Texts  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
+		this.content=["...loading","...loading","...loading"];									// Content pages
 	}
 
 	Draw(o)																					// DRAW TEXTS PAGE FROM KMAP
 	{
-		var content=["","",""];
+		let _this=this;
 		var str="<div class='sui-texts'>";
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
@@ -34,18 +35,15 @@ class Texts  {
 			str+=data+`</div>																
 			<div style='display:inline-block;width:calc(34% + 3px);margin-left:-8px;vertical-align:top'>
 			<div class='sui-textTop' id='sui-textTop'>
-				<div class='sui-textTab' id='sui-textTab0'>
-					<div style='display:inline-block;padding-top:10px'>CONTENTS</div></div>
-				<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc; border-right:1px solid #ccc'>
-					<div style='display:inline-block;padding-top:10px'>DESCRIPTION</div></div>
-				<div class='sui-textTab' id='sui-textTab2'>
-					<div style='display:inline-block;padding-top:10px'>VIEWS</div></div>
+				<div class='sui-textTab' id='sui-textTab0'>CONTENTS</div>
+				<div class='sui-textTab' id='sui-textTab1'>DESCRIPTION</div>
+				<div class='sui-textTab' id='sui-textTab2'>VIEWS</div>
 			</div>
-			<div class='sui-textSide' id='sui-textSide'></div></div>`;
+			<div class='sui-textContent' id='sui-textContent'></div></div>`;
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
 			sui.pages.DrawRelatedAssets(o);														// Draw related assets menu if active
 
-			content[0]=$("#shanti-texts-toc").html();											// Save toc
+			this.content[0]=$("#shanti-texts-toc").html();										// Save toc
 			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
 			showTab(0);
 	
@@ -53,7 +51,7 @@ class Texts  {
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/book_pubreader/${o.id}'>&#xe678&nbsp;&nbsp;View in PubReader</a></p>
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/voyant/${o.id}'>&#xe678&nbsp;&nbsp;View in Voyant</a></p>
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/node_ajax_text/${o.id}'>&#xe678&nbsp;&nbsp;View as raw text</a></p>`;
-			content[2]=s.replace(/\t|\n|\r/g,"");												// Set view content
+			this.content[2]=s.replace(/\t|\n|\r/g,"");											// Set view content
 
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
 				let i,str="";
@@ -92,7 +90,7 @@ class Texts  {
 				try { str+=sui.pages.DrawItem("&#xe674","TRANSLATOR",d.field_book_translator.und,"","sui-pageLab",1); }		catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe670","LANGUAGE",d.field_dc_language_original.und,"","sui-pageLab",1); }	catch(e) {}
 				try { str+=sui.pages.DrawItem("&copy;","RIGHTS", d.field_dc_rights_general.und,"","sui-pageLab",1); }		catch(e) {}
-				content[1]=str.replace(/\t|\n|\r/g,"");												// Set view content
+				this.content[1]=str.replace(/\t|\n|\r/g,"");												// Set view content
 				try{ content[2]+="<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='"+d.field_pdf_version.und[0].url+"'>&#xe678&nbsp;&nbsp;View as PDF</a></p>"; } catch(e) {}
 			});
 			
@@ -102,10 +100,10 @@ class Texts  {
 				});
 	
 			function showTab(which) {
-				$("#sui-textSide").html("<div class='sui-sourceText' style='font-size:18px;color:#000'>"+o.title+"<div><hr>");	// Set title
-				$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
-				$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
-				$("#sui-textSide").append(content[which]);										// Set content
+				$("#sui-textContent").html("<div class='sui-sourceText' style='font-size:18px;color:#000'>"+o.title+"<div><hr>");	// Set title
+				$("[id^=sui-textTab]").css({"background-color":"#eee"});
+				$("#sui-textTab"+which).css({"background-color":"#fff"});
+				$("#sui-textContent").append(_this.content[which]);								// Set content
 			}
 		});							
 	}

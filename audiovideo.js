@@ -18,7 +18,7 @@ class AudioVideo  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
-		this.metaContent=["","",""];															// Metadate content
+		this.content=["...loading","...loading","...loading"];								// Content pages
 		this.inPlay=false;																		// If AV is in play
 		this.curTransSeg=-1;																	// Currently active transceipt segment
 		this.transRes=null;																		// Holds transcript resources	
@@ -70,9 +70,7 @@ class AudioVideo  {
 			str+=`</div><hr>
 			<p class='sui-sourceText'>${o.summary ? o.summary : o.caption ? o.caption : ""}</p>`;
 			if (d.field_pbcore_description && d.field_pbcore_description.und && d.field_pbcore_description.und.length) {	
-				str+=`<div id='sui-avmore' style='width:100%;text-align:center'><a style='cursor:pointer;
-				border:1px solid #ccc;border-left:none;border-right:none;font-weight:400'
-				onclick='$("#sui-avlang").toggle();this.text=(this.text == "SHOW MORE") ? "SHOW LESS" : "SHOW MORE"'>
+				str+=`<div class='sui-avMore1'><a class='sui-avMore2' onclick='$("#sui-avlang").toggle();this.text=(this.text == "SHOW MORE") ? "SHOW LESS" : "SHOW MORE"'>
 				SHOW MORE</a></div><br>`;
 				str+="<div id='sui-avlang' style='display:none'>";
 				for (i=0;i<d.field_pbcore_description.und.length;++i) {							// For each new description
@@ -81,17 +79,7 @@ class AudioVideo  {
 					}
 				str+="</div>";
 				}
-			str+=`<div style='display:inline-block;width:100%'>
-					<div class='sui-avTop'>
-						<div class='sui-textTab' id='sui-textTab0'>
-							<div style='display:inline-block;padding-top:10px'>DETAILS</div></div>
-						<div class='sui-textTab' id='sui-textTab1' style='border-left:1px solid #ccc;border-right:1px solid #ccc'>
-							<div style='display:inline-block;padding-top:10px'>PEOPLE</div></div>
-						<div class='sui-textTab' id='sui-textTab2'>
-							<div style='display:inline-block;padding-top:10px'>TECHNICAL</div></div>
-					</div>
-				<div class='sui-textSide' id='sui-textSide' style='padding-top:0'></div>
-			</div>`;
+			str+=sui.pages.DrawTabMenu(["DETAILS","PEOPLE","TECHNICAL"]);						// Add tab menu
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player
 			
 			this.DrawTranscript(o,"#sui-trans");												// Draw transcript in div
@@ -111,19 +99,19 @@ class AudioVideo  {
 				sui.LoadingIcon(false);															// Hide loading icon
 				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
 				this.DrawMetaData(o,d);															// Draw metadata content
-				showTab(0);																		// Show details tab
 				sui.pages.DrawRelatedAssets(o);													// Draw related assets menu if active
 				
-				$("[id^=sui-textTab]").on("click", (e)=> {										// ON TAB CLICK
-					var id=e.currentTarget.id.substring(11);									// Get index of tab	
+				$("[id^=sui-tabTab]").on("click", (e)=> {										// ON TAB CLICK
+					var id=e.currentTarget.id.substring(10);									// Get index of tab	
 						showTab(id);															// Draw it
 					});
 			
 				function showTab(which) {
-					$("[id^=sui-textTab]").css({"border-bottom":"1px solid #ccc","background-color":"#f8f8f8" });
-					$("#sui-textTab"+which).css({"border-bottom":"","background-color":"#fff"});
-					$("#sui-textSide").html(_this.metaContent[which]);							// Set content
-				}
+					$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });		// Reset all tabs
+					$("#sui-tabContent").css({display:"block","background-color":"#fff"});		// Show content
+					$("#sui-tabTab"+which).css({"background-color":"#fff",color:"#000"});		// Active tab
+					$("#sui-tabContent").html(_this.content[which]);							// Set content
+					}
 			});
 	}
 
@@ -149,7 +137,7 @@ class AudioVideo  {
 		try{ str+="<p><b>YEAR PUBLISHED</b>:&nbsp;&nbsp;"+d.field_year_published.en[0].value+"</p>"; } catch(e) {}
 		try{ str+="<p><b>RIGHTS SUMMARY</b>:&nbsp;&nbsp;"+d.field_pbcore_rights_summary.en[0].value+"</p>"; } catch(e) {}
 		try{ str+="<p><b>UPLOADED</b>:&nbsp;&nbsp;"+o.timestamp.substr(0,10)+" by "+o.node_user_full_s+"</p>"; } catch(e) {}
-		this.metaContent[0]=str; 																// Add to tab
+		this.content[0]="<div style='height:2px'/>"+str+"<br>"; 								// Add to tab
 
 		str="";																					// Start fresh on tab 1
 		if (d.field_pbcore_creator && d.field_pbcore_creator.und && d.field_pbcore_creator.und.length) {	// If creators spec'd	
@@ -166,7 +154,7 @@ class AudioVideo  {
 			}
 		try{ str+="<p><b>PUBLISHER</b>:&nbsp;&nbsp;"+d.field_pbcore_publisher.und[0].field_publisher.und[0].value+"</p>"; } catch(e) {}
 		try{ str+="<p><b>DATA ENTRY</b>:&nbsp;&nbsp;"+o.node_user_full_s+"</p>"; } catch(e) {}
-		this.metaContent[1]=str; 																// Add to tab
+		this.content[1]="<div style='height:2px'/>"+str+"<br>"; 								// Add to tab
 
 		str="";																					// Start fresh on tab 2
 		if (d.field_pbcore_instantiation && d.field_pbcore_instantiation.und && d.field_pbcore_instantiation.und.length) {	// If instantiation spec'd	
@@ -178,7 +166,7 @@ class AudioVideo  {
 			}
 		try{ str+="<p><b>FORMAT ID</b>:&nbsp;&nbsp;"+d.field_video.und[0].entryid+"</p>"; } catch(e) {}
 		str+="<p><b>FORMAT ID SOURCE</b>:&nbsp;&nbsp;(Kaltura.com)</p>"; 
-		this.metaContent[2]=str; 																// Add to tab
+		this.content[2]="<div style='height:2px'/>"+str+"<br>"; 								// Add to tab
 	}
 
 
