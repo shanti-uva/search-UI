@@ -353,8 +353,8 @@ class SearchUI  {
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			this.DrawAdvanced();																	// Draw advanced search if active
-			});
-	}
+			}).fail((msg)=> { trace(msg); this.LoadingIcon(false);  this.Popup("Query error"); });	// Failure message
+		}
 	   
 	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
 	{
@@ -362,8 +362,8 @@ class SearchUI  {
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			data=this.MassageKmapData(data);														// Normalize kmap
 			callback(data.response.docs[0]);														// Return kmap
-			});
-		}
+			}).fail((msg)=> { trace(msg); });														// Failure message
+	}
 
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
 	{
@@ -371,15 +371,15 @@ class SearchUI  {
 		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]";		// Add query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs[0]);														// Return data
-			});
-		}
+			}).fail((msg)=> { trace(msg); });														// Failure message
+	}
 	
 	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
 	{
 		let url=`https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
-			});
+			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 
 	GetTreeChildren(facet, path, callback)
@@ -388,15 +388,17 @@ class SearchUI  {
 		let lvla=Math.max(path.split("/").length+1,2);												// Set level
 		if ((facet == "features") ||  (facet == "languages")) facet="subjects";						// Features and languages are in subjects
 		var url=sui.solrUtil.buildQuery(base,facet,path,lvla,lvla);									// Build query using Yuji's builder
-		$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) { callback(res); });			// Run query
+		$.ajax( { url: url, dataType: 'jsonp' } ).done((res)=> {									// Get children
+			callback(res);																			// Return dats																					
+			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 	
 	GetAudioFromID(id, callback)																// GET AUDIO FILE FROM ID
 	{
-	id=4;
+id=4;
 		$.getJSON("http://terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {				// Get info
 			try{  callback(d.recordings[0].audio_file); } 	catch(e){}								// Return audio file url
-			});
+			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 
 	GetJSONFromKmap(kmap, callback)																// GET JSON FROM KMAP
@@ -406,7 +408,7 @@ class SearchUI  {
 		url=url.replace(/images.shanti.virginia.edu/i,"images-stage.shanti.virginia.edu");			// Look in stage			
 		url+="?callback=myfunc";																	// Add callback
 		if (kmap.asset_type == "audio-video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
-		$.ajax( { url:url, dataType:'jsonp', error: (xhr)=>{ this.Popup("Access error")}}).done((data)=> { callback(data); });	// Get JSON and send to callback
+		$.ajax( { url:url, dataType:'jsonp', error: (xhr)=>{ this.Popup("Access error");}}).done((data)=> { callback(data); });	// Get JSON and send to callback
 	}
 
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR DISPLAY

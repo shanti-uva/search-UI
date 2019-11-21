@@ -22,9 +22,9 @@ class Subjects  {
 	Draw(o)																					// DRAW SOURCE PAGE FROM KMAP
 	{
 		let _this=this;																			// Save context
-		let str=`<div class='sui-sources' style='margin:8px 0px 0 192px'>
-		<div><span style='font-size:24px;color:${sui.assets[o.asset_type].c};vertical-align:-4px'>${sui.assets[o.asset_type].g}</span>
-		&nbsp;&nbsp;&nbsp;&nbsp;<span class='sui-sourceText' style='font-size:20px;font-weight:500'>${o.title[0]}</span>
+		let str=`<div class='sui-subjects'>
+		<div><span class='sui-subIcon'>${sui.assets[o.asset_type].g}</span>
+		<span class='sui-subText'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`;
 		if (o.caption)	str+="<p id='sui-spCap'>"+o.caption+"</p></div>";
 		str+="<table>";
@@ -128,7 +128,7 @@ class Subjects  {
 				id:c[i].related_uid_s });														// Add id
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
-		let str=`<b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		let str=`<br><b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
 		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
@@ -148,7 +148,7 @@ class Subjects  {
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
 		let n=0;
-		let str=`<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
+		let str=`<br><b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
@@ -211,6 +211,7 @@ class Subjects  {
 				str+=this.AddTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
 				}
 			$(dot).prop("id","sui-spDot-null");													// Inhibit reloading
+			$(dot).html("&ndash;"); 															// Change label to 'open'
 			dot.parent().append(str);															// Append branch
 
 			$("[id^=sui-spLab-]").off("click");													// Kill handler

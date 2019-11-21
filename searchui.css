@@ -171,30 +171,25 @@
 .sui-tree ul li ul li { position: relative; }
 
 /* PLACES */
-
-#plc-infoDiv { 		position: absolute; top:250px; left:219px; pointer-events:initial; }
+#plc-infoDiv 	{ 	position: absolute; top:250px; left:219px; pointer-events:initial; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
 
-/* PAGES */
+/* RELATED */
+.sui-related	 {	position:absolute; top:0; left:0; width:168px; background-color:#ddd; border-left:12px solid transparent; padding:18px 0 0 12px; color:#000; }
+.sui-relatedImg  {	width:150px; margin:12px 0 12px 0; outline:1px solid #999; outline-offset:4px;	}
+.sui-relatedList {	font-size:14px; color:#222; padding:0;	}
+.sui-relatedItem {  cursor:pointer; padding: 6px 3px 3px 6px; border-radius:4px; } 	.sui-relatedItem:hover { background-color: #f7f7f7;	}
 
-.sui-breadCrumbs {  display:inline-block; font-size:13px; margin-left:24x; cursor:pointer;
-					}
-.sui-crumb:hover { 	text-decoration:underline;
-					}
-.sui-related {		position:absolute; top:0; left:0; width:168px; background-color:#ddd;
-					border-left:12px solid transparent; padding:18px 0 0 12px; color:#000;
-					}
-.sui-relatedImg {	width:150px; margin:12px 0 12px 0; outline:1px solid #999; outline-offset:4px;
-					}
-.sui-relatedList {	font-size:14px; color:#222; padding:0;
-					}
-.sui-relatedItem {  cursor:pointer; padding: 6px 3px 3px 6px; border-radius:4px; } 	.sui-relatedItem:hover { background-color: #f7f7f7;
-					}
 /* SOURCES PAGE */
 .sui-sources 	 {	max-width:900px; margin:8px auto 8px 192px; background-color: #f7f7f7; border:1px solid #999;border-radius:6px; padding:50px; font-weight:400; color:#000; }
 .sui-sourceText	 {	font-family:"EB Garamond",serif,shanticon; font-weight:400; line-height:24px; font-size:17px; }
 .sui-sourceTitle {	font-family:"EB Garamond",serif; font-weight:500; line-height:24px; font-size:20px; }
 .sui-sourceSec   {	font-size:18px; font-weight:400; }
+
+/* SUBJECTS PAGE */
+.sui-subjects 	{	max-width:900px; margin:8px auto 8px 192px; background-color: #f7f7f7; border:1px solid #999;border-radius:6px; padding:50px; font-weight:400; color:#000; }
+.sui-subIcon   	{	font-size:24px; color:#cc4c39; vertical-align:-4px; margin-right:12px; }
+.sui-subText	{	font-family:"EB Garamond",serif,shanticon; font-weight:500; line-height:24px; font-size:20px; }
 
 /* TERMS PAGE */
 .sui-terms 		{	max-width:900px; margin:8px auto 8px 192px; background-color: #f7f7f7; border:1px solid #999; border-radius:6px; padding:50px; color:#000; }
@@ -232,8 +227,7 @@
 					padding:22px; border-bottom:1px solid #999; border-left:1px solid #999; border-right:1px solid #999; line-height:22px; }
 .sui-textTop 	 {	background-color: #fff; width:100%; overflow-x:hidden; white-space:nowrap; user-select:none; }
 .sui-textTab 	 {	display:inline-block; height:26px; width:calc(33.33% - 2px); text-align:center; user-select:none; padding-top:10px; 
-					font-weight:500; font-size:12px; color:#888; cursor:pointer; border:1px solid #999; border-bottom:none;
-					}
+					font-weight:500; font-size:12px; color:#888; cursor:pointer; border:1px solid #999; border-bottom:none;	}
 /* AV PAGE */
 .sui-vPlayer 	 {	display:inline-block;margin:0; padding:0; }
 .sui-avTop 		 {	background-color: #fff; border-top:1px solid #999; width:100%; overflow-x:hidden; white-space:nowrap;
@@ -261,33 +255,19 @@
 .sui-transPlay 	{	color:#fff; font-size:20px; cursor:pointer; border-radius:6px; width:90px; height:26px;
 					padding:2px 0 0 4px; background-color:#bbb; margin: 6px 44px 0 0; }
 					.sui-transPlay:hover { background-color: #999;	}
-
-.sui-popItem:hover{ color:#a4baec
-					}	
-.sui-popover {		position:absolute; width:300px; min-height: 100px; padding:12px; font-size:13px; border-radius: 4px;
-					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); 
-					}					
 					
 /* SUBJECTS & PLACES TAB MENUS */
-
-.sui-spCat {		background-color:#cc4c39;width:calc(100% - 12px);color:#fff; padding:2px 0; text-align:center; text-transform: capitalize;
-					font-weight:600; cursor:pointer; margin:0 8px; }
-					.sui-spCat:hover {  background-color:#a53d2d;
+.sui-spCat 		{	background-color:#cc4c39;width:calc(100% - 12px);color:#fff; padding:2px 0; text-align:center; text-transform: capitalize;
+					font-weight:600; cursor:pointer; margin:0 8px; } .sui-spCat:hover {  background-color:#a53d2d;
 					}
-.sui-spSubCat {		color:#5b66cb; text-transform:uppercase; font-size:15px;
-					}
-.sui-spDot {		display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:14px;
+.sui-spSubCat 	{	color:#5b66cb; text-transform:uppercase; font-size:15px; }
+.sui-spDot 		{	display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:14px;
 					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin-right:6px; }
-					.sui-spDot:hover {  opacity: .66;
-					}
-.sui-spLin { 		margin:4px 0; list-style-type:none; padding:0;
-					}
-.sui-spImg {		float:left; width:160px; margin:0 16px 16px 4px; border-radius:2px; outline:1px solid #999; outline-offset:4px;
-					}
+					.sui-spDot:hover {  opacity: .66;	}
+.sui-spLin 		{ 	margin:4px 0; list-style-type:none; padding:0;	}
+.sui-spImg {		float:left; width:160px; margin:0 16px 16px 4px; border-radius:2px; outline:1px solid #999; outline-offset:4px;	}
 .sui-spSub {		background-color:#ddd; padding:0 8px; width:120px; font-weight:600; cursor:pointer; border-radius:16px; 
-					border:1px solid #aaa; margin:4px 0 4px -32px; }
-					.sui-spSub:hover {  border-color:#333;
-					}
+					border:1px solid #aaa; margin:4px 0 4px -32px; } .sui-spSub:hover {  border-color:#333; 	}
 /* TABS */
 .sui-tabTab 	{	display:inline-block; background-color:#999; text-align:center; user-select:none; padding-top:10px; font-weight:500; font-size:12px; color:#fff; cursor:pointer; border-left:1px solid #eee; border-right:1px solid #eee; height:26px; }
 .sui-tabContent {	background-color: #eee; width:calc(100% - 50px); color:#333; padding:0 24px; line-height:22px;	}
@@ -308,7 +288,14 @@
 .sui-caroRes 	{	display:inline-block; font-size:14px; font-weight:400; margin-top:8px; }					
 .sui-caroDots 	{	display:inline-block; width:calc(66% - 200px); text-align:center; min-width:200px;	}	
 .sui-caroDot 	{	display:inline-block; opacity:.8; width:8px; height:8px; border-radius:8px; border:1px solid #999; margin-right:16px;
-					} .sui-caroDot:hover {	 background-color:#5d68cc; }				
+					} .sui-caroDot:hover {	 background-color:#5d68cc; }
+					
+/* MISC PAGES */
+.sui-breadCrumbs {  display:inline-block; font-size:13px; margin-left:24x; cursor:pointer; }
+.sui-crumb:hover { 	text-decoration:underline;	} .sui-popItem:hover{ color:#a4baec; }	
+.sui-popover 	 { 	position:absolute; width:300px; min-height: 100px; padding:12px; font-size:13px; border-radius:4px;
+					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); }					
+					
 
 /* PSUEDO ELEMENTS */
 

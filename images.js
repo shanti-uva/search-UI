@@ -90,10 +90,10 @@ class Images  {
 					} catch(e){}
 					try{ str+=d("&#xe600",j.field_image_agents.und[0].field_agent_role.und[0].value.toUpperCase(),
 						 j.field_image_agents.und[0].title+" ("+sui.pages.FormatDate(j.field_image_agents.und[0].field_agent_dates.und[0].value)+")"
-						); } 	catch(e) {trace(e)}
-					try{ str+="<p>";																	// A sub description
-					str+=j.field_image_descriptions.und[0].field_description.und[0].value+"<br>";	// Add it
-					str+="</p>";  } catch(e){trace(e)}
+						); } 	catch(e) {}
+					try{ str+="<p>";																// A sub description
+						str+=j.field_image_descriptions.und[0].field_description.und[0].value+"<br>"; // Add it
+					str+="</p>";  } catch(e){}
 				str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
 				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>ONLY DIGITAL</span>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
 					 str+="&nbsp;&nbsp;<span class='sui-pageLab'>COLOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"+"</span>"; } catch(e){}
