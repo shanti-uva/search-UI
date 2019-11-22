@@ -3,9 +3,14 @@
 	This module puts up the audio video pages based on a kmap from SOLR.It uses the Kaltura media player 
 	to actually play the video and has a transcript section that tracks video.
 
+	The SHANTI-styled Kaltura player is loaded into an iFrame using their kwidget API. Once loaded, 
+	events are bound to trap whenever the video is played or paused. On play, PlayAV() is called to 
+	start a ~10fps time that calls a function to update the transcript code (see section below) to 
+	track the video. On pause, that timer is canceled.
+
 	Some metadata is displyed under the video along with the summary. A MORE link will reveal and 
 	additonal summary information about the clip. A tabbed menu appears below that
-	to reduce coginitive load, with sections showing DETAILS, PEOPLE involved and TECHNICAL details/
+	to reduce coginitive load, with sections showing video DETAILS, PEOPLE, involved and TECHNICAL data.
 
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
@@ -172,7 +177,6 @@ class AudioVideo  {
 		str+="<p><b>FORMAT ID SOURCE</b>:&nbsp;&nbsp;(Kaltura.com)</p>"; 
 		this.content[2]="<div style='height:2px'/>"+str+"<br>"; 								// Add to tab
 	}
-
 
 /* TRANSCRIPT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
