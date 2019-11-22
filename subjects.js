@@ -1,6 +1,15 @@
 /* 	SUBJECTS PAGES ****************************************************************************************************************************
 
-	This module draws the subjects page based on a kmap from SOLR
+	This module draws the subjects page based on a kmap from SOLR. Some information comes from the kmap
+	passed in and some from the a second query from the child data in the Terms index. 
+	
+	The related resources menu is drawn, which pulls data via another SOLR call. If an image is present
+	it is drawn there. Below that is a browsable index of subjects. Clicking on one will bring up that page.
+	
+	A tabbed menu shows the CONTEXT, where the page fits in the tree. Clicking on one will bring up that page.
+	You can drill down further in the tree by clicking on a '+' dot or collapse branches with th '-'. The SUMMARY,
+	which lists the related subjects to this page, catagorized by their type and alpabetically sorted. 	Clicking 
+	on one will bring up that page. Hovering over a blue popover icon will show more information about it.
 
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'

@@ -1,7 +1,8 @@
 /* 	SOURCE PAGES ****************************************************************************************************************************
 
-	This module draws the sources page based on a kmap from SOLR
-
+	This module draws the sources page based on a kmap from SOLR. Some information comes from the kmap
+	passed in and some from the a second query from the JSON data coming from Drupal. 	
+	
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions

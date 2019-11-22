@@ -1,10 +1,15 @@
 /* 	TEXT PAGES ****************************************************************************************************************************
 
-	This module puts up the text page based on a kmap from SOLR
-	The actual marked up text come from an AJAX call to Drupal
+	This module draws the Texts page based on a kmap from SOLR. Some information comes from the kmap
+	passed in and some from the a second query from the JSON data coming from Drupal. The formatted 
+	table of contents and text content are tsaken directly from the JSON markup.
+
+	A tabbed interface shows that TOC, descriptive metadata. and links to alternative ways to view 
+	the text in other formats. 
 
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
+				https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css		// For contents formatting		
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	JSON:		From Drupal site
 	Globals:	Looks for sui and sui.pages
@@ -99,7 +104,7 @@ class Texts  {
 					showTab(id);																// Draw it
 				});
 	
-			function showTab(which) {
+			function showTab(which) {															// SHOW TAB CONTENTS
 				$("#sui-textContent").html("<div class='sui-sourceText' style='font-size:18px;color:#000'>"+o.title+"<div><hr>");	// Set title
 				$("[id^=sui-textTab]").css({"background-color":"#eee"});
 				$("#sui-textTab"+which).css({"background-color":"#fff"});

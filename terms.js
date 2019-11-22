@@ -1,6 +1,21 @@
 /* 	TEERMS PAGES ****************************************************************************************************************************
 
-	This module draws the terms page based on a kmap from SOLR
+	This module draws the terms page based on a kmap from SOLR. Some information comes from the kmap
+	passed in and some from the a second query from the child data in the Terms index. 	The terms icon
+	and the term are shown, followed by a list of names associated with that term.
+
+	The related resources menu is drawn, which pulls data via another SOLR call. If an image is present
+	it is drawn there. Below that is a browsable index of terms. Clicking on one will bring up that page.
+
+	An button will appear if there is a recording associated with the term,found by a third query to SOLR.
+	Clicking on it will play the various mp3 versions as available  and chosen by the pulldown menu.
+
+	A tabbed menu shows the DEFINITIONS, whih lists the definition for that term, along with its language.
+	The DETAILS tab lists the subjects to this page Hovering over a blue popover icon will show more information 
+	about it. The OTHER DICTIONARIES tab shows definitions from other dictionaries.
+
+	The tab will open to the DEFINATIONS tab is there are any, otehr wise it will open the OTHER DICTIONARIES
+	tab, and fianlly the DETAILS tab
 
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
@@ -9,6 +24,7 @@
 	Globals:	Looks for sui and sui.pages
 	Dependents:	pages.js, searchui.js								// JS modules called
 
+	
 *********************************************************************************************************************************************/
 
 class Terms  {																					

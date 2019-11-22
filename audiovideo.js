@@ -1,8 +1,12 @@
 /* 	AUDIO VIDEO PAGES ****************************************************************************************************************************
 
-	This module puts up the audio video page based on a kmap from SOLR
-	It uses the Kaltura media player to actually play the video
-	Has transcript  module that tracks video
+	This module puts up the audio video pages based on a kmap from SOLR.It uses the Kaltura media player 
+	to actually play the video and has a transcript section that tracks video.
+
+	Some metadata is displyed under the video along with the summary. A MORE link will reveal and 
+	additonal summary information about the clip. A tabbed menu appears below that
+	to reduce coginitive load, with sections showing DETAILS, PEOPLE involved and TECHNICAL details/
+
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Requires: 	jQuery 												// Almost any version should work
@@ -18,7 +22,7 @@ class AudioVideo  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
-		this.content=["...loading","...loading","...loading"];								// Content pages
+		this.content=["...loading","...loading","...loading"];									// Content pages
 		this.inPlay=false;																		// If AV is in play
 		this.curTransSeg=-1;																	// Currently active transceipt segment
 		this.transRes=null;																		// Holds transcript resources	
@@ -170,7 +174,11 @@ class AudioVideo  {
 	}
 
 
-// TRANSCRIPT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+/* TRANSCRIPT //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	This section draws the transcript which follows a video, if available.
+
+*///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 	DrawTranscript(kmap, div)																// DRAW TRANSCRIPT FROM SOLR 
 	{
@@ -269,7 +277,7 @@ class AudioVideo  {
 				sui.av.curTransSeg=hits[curHit];												// Set cur seg														
 				sui.av.HighlightSeg(sui.av.curTransSeg,undefined);								// Highlight seg
 				}
-		}
+			}
 
 		str=`<div class='sui-transRow'>Transcript options<span class='sui-transCheck'
 		onclick='$("#sui-transOps").slideToggle()'>&#xe60f</span></div>
@@ -437,6 +445,10 @@ class AudioVideo  {
 		$("#sui-transSeg-"+num).css("background-color","#aaa");									// Hilite active one				
 	}
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// HELPER FUNCTIONS 
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	TimecodeToSeconds(timecode) 															// CONVERT TIMECODE TO SECONDS
 	{
 		var h=0,m=0;
@@ -463,6 +475,5 @@ class AudioVideo  {
 	//	str+="."+Math.round((secs-Math.floor(secs))*10);										// Add fractional
 		return str;																				// Return timecode			
 	}
-
 	
 } // AudioVideo class closure

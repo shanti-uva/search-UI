@@ -1,14 +1,17 @@
-/* 	MANDALA PAGES ****************************************************************************************************************************
+/* 	PAGES ****************************************************************************************************************************
 
-	This module has 3 functions:
-		1. It routes to code that draws a page based on a kmap
-		2. It contains helper functions to  that all pages use to draw (.e. headers, footers, reated assets, popovers)
-		2. It contains the funcions to draw the less complex pages (subjects and terms)
+	This module provide the backbone to draw individual asset pages, and control the somewhat complex flow
+	when browsing collections and realted resources. It routes to the specific modules that draw a page based on a kmap,
+	and it contains helper functions to  that all pages use to draw (.e. headers, footers, related assets, popovers)
 
+	It allocates the indivisual page classes and puts pointer to them in the global app variable (sui)
+
+	
 	Requires: 	jQuery 												// Almost any version should work
-	Calls:		seachui.js, audiovideo.js, places.js				// Other JS modules that are dynamically loaded (not ued in plain search)
+	Calls:		seachui.js, audiovideo.js, places.js,				// Other JS modules that are dynamically loaded (not ued in plain search)
+				texts.js, images.js, subjects.js, sources.js,
+				terms.js, places.js, visuals.js
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
-				https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css				
 	JS:			ECMA-6												// Uses lambda (arrow) functions
 	Images:		popover.png
 	Globals:	sui													// Declared globally

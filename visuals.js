@@ -1,5 +1,9 @@
 /* 	VISUAL PAGES ****************************************************************************************************************************
 
+	This module draws the visuals page based on a kmap from SOLR. An iframe displays the visualization 
+	based on a url and the metadata associated with it appears below. The various methods of sharing
+	the viz with other are revealed aa they are clicked on.
+
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
 	JS:			ECMA-6												// Uses lambda (arrow) functions
