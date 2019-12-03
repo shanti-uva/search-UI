@@ -1,6 +1,11 @@
 /* 	IMAGE PAGES ****************************************************************************************************************************
 
-	This module draws the images page based on a kmap from SOLR
+	This module draws the images page based on a kmap from SOLR. The image can be zoomed into an panned 
+	by clicking the magnifier icon.	A row of thumbnails of all the imges in the search results appears in
+	 a scrollable window below the picture.	Clicking one shows that picture's page.
+		
+	Some metadata is displyed under the image along with the summary. Images can be downloaded by clicking
+	on the DOWNLOAD IMAGE label.
 
 	Requires: 	jQuery 												// Almost any version should work
 	CSS:		searchui.css										// All styles are prefixed with 'sui-'
@@ -28,7 +33,7 @@ class Images  {
 
 		var str=`<div class='sui-imagesBox' style='margin:${(sui.ss.mode == "related") ? "-12px 0 0 0" : "-12px -12px 0 -12px"}'>
 		<div id='sui-picEnlarge' style='cursor:pointer;font-size:16px' title='Click to enlarge and pan'>&#xe650</div></p>
-		<div id='sui-imageDiv' style='overflow:hidden;width:50%;height:${h}px;margin-left:auto; margin-right:auto; user-select:none'>
+		<div id='sui-imageDiv' class='sui-imageDiv' style='height:${h}px'>
 			<img id='sui-thisPic' src='${o.url_thumb.replace(/200,200/,"2000,2000")}' style='width:100%'> 
 		</div><br>
 		<div><span style='font-size:14px;vertical-align:-2px;color:#ccc'>&#xe62a</span>&nbsp;&nbsp;${o.title[0]}</div>

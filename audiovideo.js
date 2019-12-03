@@ -1,7 +1,7 @@
 /* 	AUDIO VIDEO PAGES ****************************************************************************************************************************
 
-	This module puts up the audio video pages based on a kmap from SOLR.It uses the Kaltura media player 
-	to actually play the video and has a transcript section that tracks video.
+	This module puts up the audio video pages based on a kmap from SOLR. It uses the Kaltura media 
+	player to actually play the video and has a transcript section that tracks the video.
 
 	The SHANTI-styled Kaltura player is loaded into an iFrame using their kwidget API. Once loaded, 
 	events are bound to trap whenever the video is played or paused. On play, PlayAV() is called to 
