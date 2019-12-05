@@ -85,6 +85,10 @@ class SearchUI  {
 	{
 		var key;
 		var str=`<div id='sui-main' class='sui-main'>
+			<div id='sui-header' class='sui-header'>
+				<div id='sui-headLeft' class='sui-headLeft'></div>
+				<div id='sui-headRight' class='sui-headRight'></div>
+			</div>
 			<div id='sui-top' class='sui-top'>
 				<div class='sui-search1'>
 				<input type='text' id='sui-search' class='sui-search2' placeholder='Enter Search'>
@@ -93,10 +97,6 @@ class SearchUI  {
 				<div id='sui-searchgo' class='sui-search4'>&#xe623</div>
 				<div id='sui-mode' class='sui-search5' title='Advanced search'>ADVANCED<br>SEARCH</div>
 			</div>
-			<div id='sui-header' class='sui-header'>
-				<div id='sui-headLeft' class='sui-headLeft'></div>
-				<div id='sui-headRight' class='sui-headRight'></div>
-			</div>
 			<div id='sui-left' class='sui-left'>
 			<div id='sui-pages' class='sui-results scrollbar'></div>
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
@@ -104,12 +104,7 @@ class SearchUI  {
 				<div id='sui-adv' class='sui-adv'>
 					<div class='sui-advTop'>Advanced search
 					<div id='sui-advClose' style='float:right;font-size:12px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
-					</div><br>
-					<div class='sui-search1' style='margin-left:20px'>
-						<input type='text' id='sui-search2' class='sui-search2' placeholder='Enter Search'>
-						<div id='sui-clear' class='sui-search3'>&#xe610</div>
-					</div>
-					<div id='sui-searchgo2' class='sui-search4'>&#xe623</div><br><br>`;
+					</div><br>`;
 					for (key in this.facets) { 
 						str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
 							${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
@@ -409,8 +404,7 @@ class SearchUI  {
 	GetAudioFromID(id, callback)																// GET AUDIO FILE FROM ID
 	{
 		$.getJSON("http://terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {				// Get info
-			try{ trace(d) 
-					callback(d.recordings[0].audio_file); } 	catch(e){}								// Return audio file url
+			try{ callback(d.recordings[0].audio_file); } 	catch(e){}								// Return audio file url
 			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 
@@ -539,16 +533,15 @@ class SearchUI  {
 		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-		str=`
-			SHOW&nbsp; 
+		str=`SHOW&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
 			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
-			${this.assets[this.ss.type].g}</div>${this.ss.type.charAt(0).toUpperCase()+this.ss.type.substr(1)} ${(n != undefined) ? "("+n+")" : "" } 
+			${this.assets[this.ss.type].g}</div>
+			${this.ss.type.charAt(0).toUpperCase()+this.ss.type.substr(1)} ${(n != undefined) ? "("+n+")" : "" } 
 			<div id='sui-typeSet' class='sui-typeSet'>&#xe609</div>
-			</div>
-			`;
+			</div>`;
 		$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-		$("#sui-typeSet").on("click", ()=> {														// ON CHANGE ASSET BUTTON
+		$("#sui-type").on("click", ()=> {															// ON CHANGE ASSET BUTTON
 			if ($("#sui-typeList").length) { $("#sui-typeList").remove(); return; }					// Quit if open
 			$("#sui-typeList").remove();															// Remove type list
 			str="<div id='sui-typeList' class='sui-typeList'>";										// Enclosing div for list

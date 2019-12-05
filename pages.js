@@ -76,7 +76,7 @@ class Pages  {
 		var url=sui.solrUtil.createKmapQuery(o.uid);											// Get query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
 			var i,n,tot=0;
-			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
+				if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
 				let d=data.facets.asset_counts.buckets;											// Point at bucket array
 				for (i=0;i<d.length;++i) {														// For each bucket
 					n=d[i].count;																// Get count													
