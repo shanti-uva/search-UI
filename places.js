@@ -43,7 +43,7 @@ class Places  {
 		this.content=["...loading","...loading","...loading","<br>...loading"];
 	}
 
-	Draw(kmap)
+	Draw(kmap, openTab)
 	{
 		var _this=this;																			// Save context
 		this.kmap=kmap;																			// Save kmap
@@ -103,7 +103,7 @@ class Places  {
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
 
-			_this.DrawMetadata();																	// Draw metadata
+			_this.DrawMetadata(openTab);															// Draw metadata
 
 			if (!$("#plc-switch-btn").length) {														// If not initted yet
 			var str=`<div id="plc-infoDiv">
@@ -140,6 +140,7 @@ class Places  {
 			container: app.container, map: app.map 													// Primary view
 			});
 		app.ShowOptions();																			// Hide/show options		
+			
 		
 		if (app.kml) {																				// Add KML/KMZ if spec'd	
 			app.kml=new KMLLayer({ url:app.kml });													// Make new layer
@@ -269,15 +270,15 @@ class Places  {
 // META DATA
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawMetadata()																				// SHOW PLACES METADATA
+	DrawMetadata(openTab)																		// SHOW PLACES METADATA
 	{
 		let i;
 		let _this=this;
 		let str="<div style='position:absolute;text-align:center'>";											
 		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
-		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {						// If features
-			str+="<div style='margin: 12px 0 6px 192px'><b>FEATURE TYPE:</b>";						// Add header
-			for (i=0;i<this.kmap.feature_types_ss.length;++i) 										// For each type
+		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
+			str+="<div style='margin: 12px 0 6px 192px'><b>FEATURE TYPE:</b>";					// Add header
+			for (i=0;i<this.kmap.feature_types_ss.length;++i) 									// For each type
 				str+=" <i>"+this.kmap.feature_types_idfacet[i].split("|")[0]+"</i>"+sui.pages.AddPop(this.kmap.feature_types_idfacet[i].split("|")[1]);  // Add
 			str+="</div>";
 			}
@@ -288,61 +289,8 @@ class Places  {
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
-			showTab(e.currentTarget.id.substring(10));											// Get index of tab	and draw it
+			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
 			});
-
-		function showTab(which) {
-			$("[id^=sui-spLab-]").off("click");													// Kill handler
-			$("[id^=sui-spDot-]").off("click");													// Kill handler
-			$("[id^=sui-spItem-]").off("click");												// Kill handler
-			$("[id^=sui-togCat-]").off("click");												// Kill handler
-			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
-			$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
-			$("#sui-tabContent").css({display:"block","background-color":"#eee"});				// Show content
-			$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
-			$("#sui-tabContent").html(_this.content[which]);									// Set content
-			if (which == 0)	{																	// If summary, add events
-				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
-					let id=e.currentTarget.id.substring(10);									// Get id
-					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
-					});
-				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
-					let firstChild=$(this).parent().find("ul")[0];								// Get first child
-					let path=e.currentTarget.id.substring(10);									// Get id
-					if (path != "null") _this.AddBranch(_this.kmap.asset_type,path,$(this));	// Lazy load branch
-					$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 	// Change label
-					$(this).parent().find('ul').slideToggle();            						// Slide into place
-					});
-				$("#sui-spLab-"+_this.kmap.uid).css({ "border-bottom":"1px solid #999" });		// Highlight current one	
-				}
-			else if (which == 1) {																// If summary, add events
-				$("[id^=sui-spCatUL-]").slideDown();											// All down
-				$("[id^=sui-spCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
-					let id=e.currentTarget.id.substring(9);										// Get id
-						if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
-						$("#sui-spCatUL"+id).slideDown();										// Show
-					else																		// If showing
-						$("#sui-spCatUL"+id).slideUp();											// Hide
-					});
-				$("[id^=sui-spSub-]").on("click", (e)=> {										// ON SUB-CATEGORY CLICK
-					let id=e.currentTarget.id.substring(9);										// Get id
-					if ($("#sui-spSubUL"+id).css("display") == "none")							// If hidden
-						$("#sui-spSubUL"+id).slideDown();										// Show
-					else																		// If showing
-						$("#sui-spSubUL"+id).slideUp();											// Hide
-					});
-				$("[id^=sui-spItem-]").on("click", (e)=> {										// ON SUMMARY ITEM CLICK
-					let id=e.currentTarget.id.substring(11);									// Get id
-					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
-					});
-				$("#sui-togCatA").on("click", ()=> {											// ON EXPAND ALL
-					$("[id^=sui-spCatUL-]").slideDown();										// All down
-					});
-				$("#sui-togCatN").on("click", ()=> {											// ON COLLAPSE ALL
-					$("[id^=sui-spCatUL-]").slideUp();											// All down
-					});
-				}
-		}
 
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
 			if (data.illustration_external_url && data.illustration_external_url[0]) {			// If an image spec'd
@@ -355,7 +303,8 @@ class Places  {
 				}
 			this.AddSummary(this.kmap,data._childDocuments_);									// Add summary html
 			this.AddContext(this.kmap,data);													// Add context html
-			});
+			if (openTab)	this.ShowTab(openTab-1);											// Open tab up	
+		});
 		
 		str=`<div style='display:inline-block;width:50%'><br>
 		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>NAMES</div>`;
@@ -365,8 +314,62 @@ class Places  {
 		...to be added
 		</div><br>`;
 		this.content[2]=str;											
-	}	
+		}	
 	
+	ShowTab(which)																			// OPEN TAB
+	{	
+		$("[id^=sui-spLab-]").off("click");														// Kill handler
+		$("[id^=sui-spDot-]").off("click");														// Kill handler
+		$("[id^=sui-spItem-]").off("click");													// Kill handler
+		$("[id^=sui-togCat-]").off("click");													// Kill handler
+		$("[id^=sui-spCatUL-]").off("click");													// Kill handler
+		$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });					// Reset all tabs
+		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
+		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
+		$("#sui-tabContent").html(this.content[which]);											// Set content
+		if (which == 0)	{																		// If summary, add events
+			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
+				let id=e.currentTarget.id.substring(10);										// Get id
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				});
+			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
+				let firstChild=$(this).parent().find("ul")[0];									// Get first child
+				let path=e.currentTarget.id.substring(10);										// Get id
+				if (path != "null") this.AddBranch(this.kmap.asset_type,path,$(this));			// Lazy load branch
+				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+				$(this).parent().find('ul').slideToggle();            							// Slide into place
+				});
+			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
+			}
+		else if (which == 1) {																	// If summary, add events
+			$("[id^=sui-spCatUL-]").slideDown();												// All down
+			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
+				let id=e.currentTarget.id.substring(9);											// Get id
+					if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
+					$("#sui-spCatUL"+id).slideDown();											// Show
+				else																			// If showing
+					$("#sui-spCatUL"+id).slideUp();												// Hide
+				});
+			$("[id^=sui-spSub-]").on("click", (e)=> {											// ON SUB-CATEGORY CLICK
+				let id=e.currentTarget.id.substring(9);											// Get id
+				if ($("#sui-spSubUL"+id).css("display") == "none")								// If hidden
+					$("#sui-spSubUL"+id).slideDown();											// Show
+				else																			// If showing
+					$("#sui-spSubUL"+id).slideUp();												// Hide
+				});
+			$("[id^=sui-spItem-]").on("click", (e)=> {											// ON SUMMARY ITEM CLICK
+				let id=e.currentTarget.id.substring(11);										// Get id
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				});
+			$("#sui-togCatA").on("click", ()=> {												// ON EXPAND ALL
+				$("[id^=sui-spCatUL-]").slideDown();											// All down
+				});
+			$("#sui-togCatN").on("click", ()=> {												// ON COLLAPSE ALL
+				$("[id^=sui-spCatUL-]").slideUp();												// All down
+				});
+			}
+	}
+
 	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
 	{	
 		let f,i,s=[],n=0;

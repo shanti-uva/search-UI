@@ -131,7 +131,7 @@ class SearchUI  {
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
 		$("#sui-clear, sui-clear2").on("mouseout", function() { $(this).html("&#xe610"); });		// Normal						
 		$("#sui-clear, sui-clear2").on("click",()=> { 												// ON ERASE
-			$("#sui-search, #sui-search2" ).val("");	this.ss.query.text=""; 						// Clear input and query												
+			$("#sui-search, #sui-search2" ).val("");	this.ClearQuery(); 							// Clear input and query												
 			this.Query(); 																			// Load and redraw
 			});					
 		
@@ -408,9 +408,9 @@ class SearchUI  {
 	
 	GetAudioFromID(id, callback)																// GET AUDIO FILE FROM ID
 	{
-id=4;
 		$.getJSON("http://terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {				// Get info
-			try{  callback(d.recordings[0].audio_file); } 	catch(e){}								// Return audio file url
+			try{ trace(d) 
+					callback(d.recordings[0].audio_file); } 	catch(e){}								// Return audio file url
 			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 
