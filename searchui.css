@@ -178,7 +178,7 @@
 .sui-related	 {	position:absolute; top:0; left:0; width:168px; background-color:#ddd; border-left:12px solid transparent; padding:18px 0 0 12px; color:#000; }
 .sui-relatedImg  {	width:150px; margin:12px 0 12px 0; outline:1px solid #999; outline-offset:4px;	}
 .sui-relatedList {	font-size:14px; color:#222; padding:0;	}
-.sui-relatedItem {  cursor:pointer; padding: 6px 3px 3px 6px; border-radius:4px; } 	.sui-relatedItem:hover { background-color: #f7f7f7;	}
+.sui-relatedItem {  cursor:pointer; padding: 6px 3px 3px 6px; border-radius:4px; color:#000; font-weight:normal } 	
 
 /* SOURCES PAGE */
 .sui-sources 	 {	max-width:900px; margin:8px auto 8px 192px; background-color: #f7f7f7; border:1px solid #999;border-radius:6px; padding:50px; font-weight:400; color:#000; }
@@ -280,14 +280,15 @@
 					
 /* MISC PAGES */
 .sui-breadCrumbs {  display:inline-block; font-size:13px; margin-left:24x; cursor:pointer; }
-.sui-crumb:hover { 	text-decoration:underline;	} .sui-popItem:hover{ color:#a4baec; }	
+.sui-crumb:hover { 	text-decoration:underline;	} 
+.sui-popItem	 {  color:#ddd; 	
+					} .sui-popItem:hover{ color:#a4baec; }	
 .sui-popover 	 { 	position:absolute; width:300px; min-height: 100px; padding:12px; font-size:13px; border-radius:4px;
 					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); }					
 .sui-pageLab	 { 	font-weight:400; letter-spacing: 0.0475rem; font-size:13px;	}
 .sui-pageVal	 { 	word-wrap:break-word; font-family:"EB Garamond",serif; font-weight:400; font-size:17px; 		}
 .sui-pageThumb 	 { 	display:inline-block; height:50px; margin-bottom:4px; cursor:pointer; border-radius:3px; border: 2px solid #000; 
 					}.sui-pageThumb:hover { border-color:#fff; }
-
 
 
 /* PSUEDO ELEMENTS */
@@ -298,5 +299,4 @@
 .sui-main ::-webkit-scrollbar-thumb:hover { background: #888 }
 .sui-main ::-webkit-input-placeholder { color: #bbb }	::placeholder { color: #bbb }
 
-a { color:#0f0f93 ; text-decoration:none; font-weight:600 }
-a:hover { color: #e42c2c; border-bottom:1px solid #ccc}
+a { text-decoration:none; } a:hover { border-bottom:1px solid #ccc}

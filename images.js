@@ -64,8 +64,12 @@ class Images  {
 		str=`<table class='sui-imageMid'>
 			<tr class='sui-pageLab' style='font-size:16px;padding-bottom:4px'><td style='width:50%'>MANDALA COLLECTIONS</td><td>CLASSIFICATION</td></tr>
 			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;`;
-			if (o.collection_title)	str+=`<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</td><td>`;
-			else					str+="None</td><td>";	
+			if (o.collection_title) 															// If a collection	
+				str+=`<a title='Collection' id='sui-imgCol'
+				href='#c=${o.asset_type}-${o.id}=${o.collection_idfacet[0]}'>
+				${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</a>`;
+			else str+="None";
+			str+="</td><td>";  																	// Close left side
 			if (subjects.length) {																// If subjects	
 				str+="<span style='color:#cc4c39'>&#xe634</span>&nbsp;&nbsp";					// Add icon
 				for (i=0;i<subjects.length;++i) str+=subjects[i]+", ";							// Add item
@@ -132,7 +136,12 @@ class Images  {
 					</div>
 				</p></div></div></div>`;
 				$(sui.pages.div).append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
-		}
+				
+				$("#sui-imgCol").on("click",()=>	{												// ON COLLECTION CLICK
+					sui.pages.ShowCollection(o.asset_type+"-"+o.id,o.collection_idfacet[0]);		// Show
+					return false;																	// Stop propagation
+					});
+			}
 	
 		$("[id^=sui-pageThumb-]").on("click",(e)=> {												// ON THUMBNAIL CLICK
 			var id=e.currentTarget.id.split("-")[2];												// Get id

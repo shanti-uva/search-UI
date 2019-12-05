@@ -239,6 +239,19 @@ class SearchUI  {
 			$("#sui-search2").val(this.ss.query.text);												// Set adv search
 			this.Query(true);																		// Run query
 			}	
+		else if ((id=hash.match(/#v=(.+)/))) {														// If showing popover results
+			setupPage();																			// Prepare page's <div> environment
+			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
+			let url=sui.solrUtil.createKmapQuery(v[0],v[1],0,1000);									// Get query url
+			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=>{ 			// Get related places
+				sui.MassageKmapData(data);															// Normalize for display
+				sui.curResults=data.response.docs;													// Save current results
+				sui.DrawItems();																	// Draw items																
+				sui.DrawFooter();																	// Draw footer															
+				sui.ss.page=0;																		// Start at beginning
+				});
+			}
+
 		function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
 			sui.ss.mode="simple";																	// Simple display mode	
 			sui.ss.page=0;																			// Start at beginning

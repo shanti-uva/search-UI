@@ -72,9 +72,14 @@ class AudioVideo  {
 			<div title='Published'>&#xe60c&nbsp;&nbsp;&nbsp;Published `;
 			if (d.field_year_published && d.field_year_published.en)	str+=+d.field_year_published.en[0].value;
 			else if (o.node_created) 									str+=sui.pages.FormatDate(o.node_created);
-			try{ if (o.collection_title)	str+=`<div>&#xe633&nbsp;&nbsp;&nbsp;<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</div>`;
-			else							str+="None</div>"; }  catch(e) {}
-			str+=`</div></div><div style='display:inline-block;vertical-align:top;width:calc(100% - 320px)'>`;
+			str+="</div>";
+			try{ if (o.collection_title) 	
+					str+=`<a title='Collection' id='sui-avCol'
+					href='#c=${o.asset_type}-${o.id}=${o.collection_idfacet[0]}'>
+					&#xe633&nbsp;&nbsp;&nbsp;
+					${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</a>`;
+			   }  catch(e) {}
+			str+=`</div><div style='display:inline-block;vertical-align:top;width:calc(100% - 320px)'>`;
 			try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
 			str+=`</div><hr>
 			<p class='sui-sourceText'>${o.summary ? o.summary : o.caption ? o.caption : ""}</p>`;
@@ -90,7 +95,12 @@ class AudioVideo  {
 				}
 			str+=sui.pages.DrawTabMenu(["DETAILS","PEOPLE","TECHNICAL"]);						// Add tab menu
 			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player
-			
+	
+			$("#sui-avCol").on("click",()=>	{													// ON COLLECTION CLICK
+				sui.pages.ShowCollection(o.asset_type+"-"+o.id,o.collection_idfacet[0]);		// Show
+				return false;																	// Stop propagation
+				});
+
 			this.DrawTranscript(o,"#sui-trans");												// Draw transcript in div
 			str=`//cdnapi.kaltura.com/p/${partnerId}/sp/${partnerId}00/embedIframeJs/uiconf_id/${uiConfId}/partner_id/${partnerId}`;
 			$.ajax(	{ url:str, dataType:"script" }).done((e)=> { 

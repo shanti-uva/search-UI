@@ -1,7 +1,7 @@
 /* 	PAGES ****************************************************************************************************************************
 
 	This module provide the backbone to draw individual asset pages, and control the somewhat complex flow
-	when browsing collections and realted resources. It routes to the specific modules that draw a page based on a kmap,
+	when browsing collections and related resources. It routes to the specific modules that draw a page based on a kmap,
 	and it contains helper functions to  that all pages use to draw (.e. headers, footers, related assets, popovers)
 
 	It allocates the indivisual page classes and puts pointer to them in the global app variable (sui)
@@ -93,22 +93,23 @@ class Pages  {
 
 		let k=o.asset_type;																		// Get this asset type																	
 		var str=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"}'>`;														
-		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";
-		str+="<div class='sui-relatedList'>";
-		if (sui.ss.mode == "related")
-			str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
+		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";		str+="<div class='sui-relatedList'>";
+		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
-			str+="<div class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase()+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
-			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</div>";
+			str+="<a class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase();
+			str+="' href='#r="+this.relatedId+"="+this.relatedId+"="+k+"="+o.uid+"'>";
+			str+="<span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
+			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</a>";
 			}
 		if (browse) {																			// If browsing
 			str+="<img id='sui-relatedImg'>";													// Image, if available
 			str+="</div>BROWSE "+o.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
-			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+o.asset_type+"'></div>";				// Add browsing tree div
+			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+o.asset_type+"'></div>";	// Add browsing tree div
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		if (browse) this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type);						// If browsing, add tree
-		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
+		if (this.relatedType != "Home")															// If not home
+			$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});				// Hilite current
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
 			if (this.relatedType == "Home")	{													// Home asset
@@ -121,6 +122,7 @@ class Pages  {
 				if (!fromHistory)																// If not from history API
 					sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state
 				}
+			return false;																		// Don't propagate
 			});							
 	}
 
@@ -128,8 +130,6 @@ class Pages  {
 	{
 		sui.ss.mode="related";																	// Go to related mode
 		if (!this.relatedBase)	 this.relatedBase=o;											// If starting fresh
-		let str=sui.assets[this.relatedType].g+"&nbsp;&nbsp;Resources related to <i>"+this.relatedBase.title[0]+"</i>"; 	// New header
-		$("#sui-headLeft").html(str);															// Add to div
 		this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;						// Set id
 		sui.Query();																			// Query and show results
 		sui.DrawFooter();																		// Draw footer
@@ -145,8 +145,9 @@ class Pages  {
 		if (o.ancestors_txt && o.ancestors_txt.length) {										// If has an ancestors trail
 			str+="<br><div class='sui-breadCrumbs'>"+o.asset_type.toUpperCase()+":&nbsp; ";		// Header
 			for (i=0;i<o.ancestors_txt.length;++i) {											// For each trail member
-				str+=`<span class='sui-crumb' id='sui-crumb-${o.uid.split("-")[0]}-${o.ancestor_ids_is[i]}'>				
-				${o.ancestors_txt[i]}</span>`;											
+				str+=`<a class='sui-crumb' style='color:#fff' id='sui-crumb-${o.uid.split("-")[0]}-${o.ancestor_ids_is[i]}'
+				 href='#p=${o.uid.split("-")[0]}-${o.ancestor_ids_is[i]}'>				
+				${o.ancestors_txt[i]}</a>`;											
 				if (i < o.ancestors_txt.length-1)	str+=" > ";									// Add separator
 				}
 			}
@@ -159,6 +160,7 @@ class Pages  {
 			var id=e.currentTarget.id.substring(10).toLowerCase();								// Get id
 			if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=sui.ss.lastMode;	// Get back to regular search mode
 			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
+			return false;																		// Don't propagate
 			});
 	}
 
@@ -201,25 +203,28 @@ class Pages  {
 				For more information about this ${o.asset_type.slice(0,-1)}, see Full Entry below.<br>
 				<b><p>${o.asset_type}: </b>`;
 				for (i=0;i<o.ancestors_txt.length-1;++i) {										// For each trail member
-					str+=`<span class='sui-crumb' style='color:#000099;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i+1]}'>				
-					${o.ancestors_txt[i]}</span>`;											
+					str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i]}'
+					href='#p=${o.asset_type}-${o.ancestor_ids_is[i]}'>${o.ancestors_txt[i]}</a>`;											
 					if (i < o.ancestors_txt.length-2)	str+=" / ";								// Add separator
 					}
 				str+=`</p></span><br>
 				<div id='sui-popbot' style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
 				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
-				<p class='sui-popItem' id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p>
+				<a class='sui-popItem' href='#p=${o.uid}'>
+				<p id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p></a>
 				</div>`;
 			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
 
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				return false;																	// Don't propagate
 				});
 			
 			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
 				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				return false;																	// Don't propagate
 				});
 			});
 
@@ -231,9 +236,10 @@ class Pages  {
 				for (i=0;i<d.length;++i) {														// For each bucket
 					n=d[i].count;																// Get count													
 					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
-					str+=`<p class='sui-popItem' id='sui-pop-${id}-${d[i].val}' style='cursor:pointer;text-transform:capitalize'>
+					str+=`<a class='sui-popItem' href='#v=${id}=${d[i].val}'>
+					<p id='sui-pop-${id}-${d[i].val}' style='cursor:pointer;text-transform:capitalize'>
 					<span style='color:${sui.assets[d[i].val].c}'>${sui.assets[d[i].val].g}</span>
-					&nbsp;&nbsp;Related ${d[i].val} (${n})</p>`;
+					&nbsp;&nbsp;Related ${d[i].val} (${n})</p></a>`;
 					$("#sui-rln-"+d[i].val).html(n);											// Set number
 					}
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
@@ -248,7 +254,9 @@ class Pages  {
 						sui.DrawItems();														// Draw items																
 						sui.DrawFooter();														// Draw footer															
 						sui.ss.page=0;															// Start at beginning
+						sui.SetState("v="+v[2]+'-'+v[3]+"="+v[4]);								// This is the active page
 						});
+					return false;																// Don't propagate
 					});
 				}
 			});
@@ -330,7 +338,7 @@ class Pages  {
 				<div class='sui-caroText' id='sui-caroText'></div>
 			</div>
 			<img class='sui-caroPic' id='sui-caroPic' src=''><br>
-			<a class='sui-caroRes' id='sui-caroRes')'>
+			<a class='sui-caroRes' id='sui-caroRes')' href='#p=${content[curCon].id}'>
 			<i>View Resource</i>&nbsp;&nbsp;&#xe683</a>
 			<div class='sui-caroDots'>`;
 				for (i=0;i<content.length;++i) 													// For each panel
@@ -351,7 +359,8 @@ class Pages  {
 	
 		$("#sui-caroRes").on("click", (e)=>{													// ON SEE RESOURCE CLICK
 			sui.GetKmapFromID(content[curCon].id,(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
-			});
+			return false;																		// Don't propagate
+		});
 
 		$("#sui-caroButL").on("click", (e)=>{													// ON BACK CLICK
 			curCon=curCon ? curCon-1 : content.length-1;										// Go back or wrap
