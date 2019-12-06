@@ -839,28 +839,27 @@ class SearchUI  {
 	{
 		let i,o,str;
 		for (let key in this.facets) {																// For each facet
-			if ($("#sui-advEdit-"+key).css("display") == "block") {									// Refresh list results
-				if ((this.facets[key].mode == "tree") && (this.ss.query[key.toLowerCase()].length)) // If still a tree and some seach active
-					this.DrawFacetList(key,true);													// Draw as a list and keep it open
-				this.QueryFacets(key);			
+			if ($("#sui-advEdit-"+key).css("display") == "block") {									// Refresh list results if open
+				this.DrawFacetItems(key,true);														// Draw proper facets menu
+				this.QueryFacets(key);																// Fill facet data			
 				}
 			$("#sui-advTerm-"+key).empty();															// Clear list
 			for (i=0;i<this.ss.query[key].length;++i) {												// For each term in facet	
 				o=sui.ss.query[key][i];																// Point at facet to add to div
 				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
-					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}</div>
-					<i> ${o.title}</i></div>`;
-				$("#sui-advTerm-"+key).append(str);
+					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}&#xe609</div>
+				<i> &nbsp;${o.title}</i></div>`;
+				$("#sui-advTerm-"+key).append(str);													// Add terms
 				}
 			}
 	
-		$("[id^=sui-advBool-]").on("click",(e)=> {
+		$("[id^=sui-advBool-]").on("click",(e)=> {													// ON BOOLEAN
 			let v=e.currentTarget.id.split("-");													// Get ids
 			let b=this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
 			if (b == "AND")	 		b="OR"; 														// Toggle through options
 			else if (b == "OR") 	b="NOT";												
 			else 				  	b="AND";															
-			$("#"+e.currentTarget.id).html(this[b]);												// Set new value
+			$("#"+e.currentTarget.id).html(this[b]+"&#xe609");										// Set new value
 			this.ss.query[v[2]][v[3]].bool=b;														// Set state
 			this.Query();																			// Run query and show results
 			});
@@ -873,18 +872,18 @@ class SearchUI  {
 			});
 		}
 
-	DrawFacetItems(facet)																		// DRAW FACETS ITEMS
+	DrawFacetItems(facet, open)																	// DRAW FACETS ITEMS
 	{
 		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			
-		else if (this.facets[facet].type == "input") 	this.DrawInput(facet);						// Draw input editor			
+		else if (this.facets[facet].type == "input") 	this.DrawInput(facet,open);					// Draw input editor			
 		else if (this.facets[facet].type == "tree") {												// If base type is a tree
-			if (this.ActiveSearch())					this.DrawFacetList(facet);					// If an active search, draw tree as a list	
-			else 										this.DrawFacetTree(facet);					// Draw tree as a tree 	
+			if (this.ActiveSearch())					this.DrawFacetList(facet,open);				// If an active search, draw tree as a list	
+			else 										this.DrawFacetTree(facet,open);				// Draw tree as a tree 	
 			}			
-		else 											this.DrawFacetList(facet);					// Draw list editor
+		else 											this.DrawFacetList(facet,open);				// Draw list editor
 	}
 
-	ActiveSearch()
+	ActiveSearch()																				// IS THERE AN ACTIVE SEARCH?
 	{
 		let key,activeSearch=false;																	// Assume no active search happening
 		if (this.ss.query.text.length) 					activeSearch=true;							// Flag if something set in text
@@ -917,7 +916,7 @@ class SearchUI  {
 	{
 		if ($("#sui-advEdit-recent").css("display") != "none") {									// If open
 			$("#sui-advEdit-recent").slideUp();														// Close it 
-			return;																			
+			return;																					// Quit														
 			}
 		let i,j,f,str="<i>Click below to recall a previous search</i><hr><div class='sui-advEditList'>"; // Enclosing div
 		for (i=this.searches.length-1;i>=0;i--) {													// For each search, last first
@@ -985,15 +984,17 @@ class SearchUI  {
 		this.facets[facet].mode="list";																// List mode active
 		var str=`<input id='sui-advEditFilter-${facet}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>`;
-		if (this.facets[facet].type == "tree")
-			str+=`<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div>`;
-		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
+		str+=` &nbsp; <div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
+		<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>
+		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+		<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
 		<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}</div>
 		<hr style='border: .5px solid #a4baec'>
 		<div class='sui-advEditList' id='sui-advEditList-${facet}'></div>`;
 		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add to div
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
-	
+		$("#sui-advTreeMap-"+facet).css({ color: "#668eec" });										// Highlight list
+
 		$("[id^=sui-advEditFilter-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advEditFilter-"+facet).on("keydown",(e)=> {											// ON FILTER CHANGE
 			let line;
@@ -1074,7 +1075,8 @@ class SearchUI  {
 		var div="#sui-tree"+facet;																	// Tree div
 		if (!$(div).length) {																		// If doesn't exist
 			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
-			style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>
+			style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'> &nbsp; 
+			<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
 			<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>
 			<hr style='border: .5px solid #a4baec'>
 			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
@@ -1084,6 +1086,8 @@ class SearchUI  {
 			else if (facet == "languages") 	this.LazyLoad(div,null,facet,301);						// Languages
 			else 							this.GetTopRow(div,facet);								// Constructed top layers
 			
+			$("#sui-advListMap-"+facet).css({ color: "#668eec" });									// Highlight tree
+
 			$("[id^=sui-advTreeMap-]").off("click");												// KILL OLD HANDLER
 			$("#sui-advTreeMap-"+facet).on("click", ()=> {											// ON CLICK LIST BUTTON
 				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list

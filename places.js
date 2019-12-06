@@ -40,7 +40,7 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
-		this.content=["...loading","...loading","...loading","<br>...loading"];
+		this.content=["","...loading","...loading","...loading","<br>...loading"];
 	}
 
 	Draw(kmap, openTab)
@@ -72,6 +72,8 @@ class Places  {
 */
 
 		this.app=app;	   
+		this.DrawMetadata(openTab);																// Draw metadata
+		
 		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");								// Scalebar if spec'd
 		if (app.opt&2)	 app.reqs.push("esri/widgets/Search");									// Search
 		if (app.opt&8)	 app.reqs.push("esri/widgets/BasemapGallery");							// Basepicker 
@@ -102,8 +104,6 @@ class Places  {
 				else if (key == "GraphicsLayer")	GraphicsLayer=arguments[i];
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
-
-			_this.DrawMetadata(openTab);															// Draw metadata
 
 			if (!$("#plc-switch-btn").length) {														// If not initted yet
 			var str=`<div id="plc-infoDiv">
@@ -273,9 +273,9 @@ class Places  {
 	DrawMetadata(openTab)																		// SHOW PLACES METADATA
 	{
 		let i;
-		let _this=this;
-		let str="<div style='position:absolute;text-align:center'>";											
-		str+="</div><div style='width:calc(100% - 192px);margin-left:192px;height:75%' id='plc-main'></div>";
+		let str="<div style='margin-left:192px'>";
+		str+=sui.pages.DrawTabMenu(["MAP","CONTEXT","SUMMARY","NAMES","LOCATION"])+"</div></div>";	// Add tab menu
+		str+="<div class='plc-main' id='plc-main'></div>";										// Maqp holder
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
 			str+="<div style='margin: 12px 0 6px 192px'><b>FEATURE TYPE:</b>";					// Add header
 			for (i=0;i<this.kmap.feature_types_ss.length;++i) 									// For each type
@@ -283,10 +283,9 @@ class Places  {
 			str+="</div>";
 			}
 		if (this.kmap.caption) str+="<div class='sui-sourceText' style='margin-left:192px'>"+this.kmap.caption+"</div></div><br>";
-		str+="<div style='margin-left:192px'>";
-		str+=sui.pages.DrawTabMenu(["CONTEXT","SUMMARY","NAMES","LOCATION"])+"</div></div>";	// Add tab menu
 		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
+		this.ShowTab(0);																		// Open on map
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
@@ -313,7 +312,7 @@ class Places  {
 		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
 		...to be added
 		</div><br>`;
-		this.content[2]=str;											
+		this.content[3]=str;											
 		}	
 	
 	ShowTab(which)																			// OPEN TAB
@@ -327,7 +326,9 @@ class Places  {
 		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
-		if (which == 0)	{																		// If summary, add events
+		if (which == 0)		$("#plc-main").slideDown();											// Show map
+		else				$("#plc-main").slideUp();											// Hide map
+		if (which == 1)	{																		// If summary, add events
 			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
 				let id=e.currentTarget.id.substring(10);										// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
@@ -341,7 +342,7 @@ class Places  {
 				});
 			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
 			}
-		else if (which == 1) {																	// If summary, add events
+		else if (which == 2) {																	// If summary, add events
 			$("[id^=sui-spCatUL-]").slideDown();												// All down
 			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
 				let id=e.currentTarget.id.substring(9);											// Get id
@@ -391,7 +392,7 @@ class Places  {
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
-		this.content[1]=str;																	// Set summary tab
+		this.content[2]=str;																	// Set summary tab
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			let sub="xxx";
@@ -444,7 +445,7 @@ class Places  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
+			this.content[1]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
 			});
 	}
 

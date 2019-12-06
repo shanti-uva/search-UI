@@ -118,7 +118,7 @@ class Pages  {
 				this.Draw(this.relatedBase);													// Show
 				}
 			else{
-				if (this.relatedType == "places") 	sui.plc.Draw(o,1)							// If places, draw with context tab open
+				if (this.relatedType == "places") 	sui.plc.Draw(o,2)							// If places, draw with context tab open
 				else this.DrawRelatedResults(o);												// Related asset browsing
 				if (!fromHistory)																// If not from history API
 					sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state

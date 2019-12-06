@@ -7,10 +7,10 @@
 .sui-topBar {		height:41px; margin:-8px; padding:0; font-size:27px; font-weight:300; color: #404aa9;
 					font-family:"Open Sans","Segoe UI",Tahoma,sans-serif,shanticon; letter-spacing:1.8px;
 					}
-.sui-search1 {		float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:170px; padding: 6px 8px 0 8px;
+.sui-search1 {		float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:230px; padding: 6px 8px 0 8px;
 					border-radius:16px 0 0 16px; border-left: 1px solid #999; border-top:1px solid #999; border-bottom:1px solid #999;
 					}
-.sui-search2 {		float:left; background-color:#fafafa; color:#888; height:17px; width:150px; margin-top:-2px; margin-left:2px; font-size:14px;
+.sui-search2 {		float:left; background-color:#fafafa; color:#888; height:17px; width:195px; margin-top:-2px; margin-left:2px; font-size:14px;
 					outline:none; border-radius:0; border:0; appearance: none; -webkit-appearance: none; box-shadow: none !important;
 					}
 .sui-search3 {		float:right; font-size:16px; color: #ccc; cursor:pointer;
@@ -138,12 +138,13 @@
 .sui-advEdit {		display:none; border:1px solid #ccc; margin-bottom:8px; width:calc(100% - 44px); background-color:#fff; text-align:left;
 					border-radius:5px;  padding:8px; font-size:12px; color:#666; margin-left:12px;
 					}
-.sui-advEditBut { 	display:inline-block; cursor:pointer; margin-left: 12px; vertical-align:-2px; }
+.sui-advEditBut { 	display:inline-block; cursor:pointer; vertical-align:-2px; color: #999; }
 					.sui-advEditBut:hover { color:#a4baec;	
 					}
 .sui-advEditNums { 	float:right; font-size:9px; padding-top:5px;
 					}
-.sui-advEditBool { 	display:inline-block; cursor:pointer; color:#668eec;}   .sui-advEditBool:hover	{ color:#ccc
+.sui-advEditBool { 	display:inline-block; cursor:pointer; color:#668eec; border:.5px solid #668eec; border-radius:2px; padding:0 0 1px 3px; margin:2px 0; }   
+					.sui-advEditBool:hover	{ color:#ccc
 					}
 .sui-advEditList {	overflow-x:hidden; max-height:110px;   
 					}
@@ -169,7 +170,8 @@
 .sui-tree ul li ul li { position: relative; }
 
 /* PLACES */
-#plc-infoDiv 	{ 	position: absolute; top:250px; left:219px; }
+#plc-main 		{   height:75%; width:calc(100% - 193px); margin-left:192px; }
+#plc-infoDiv 	{ 	position: absolute; top:292px; left:219px; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
 
 /* RELATED */
