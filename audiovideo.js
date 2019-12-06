@@ -32,6 +32,7 @@ class AudioVideo  {
 		this.curTransSeg=-1;																	// Currently active transceipt segment
 		this.transRes=null;																		// Holds transcript resources	
 		this.scrollStart=0;																		// Initial transcript scroll distance when starting play
+		this.handScroll=false;																	// Set when transcript is scrolled by hand
 		this.playEnd=0;	
 		this.kmap=null;
 	}
@@ -414,6 +415,10 @@ class AudioVideo  {
 				}
 			}
 		$("#sui-trans").html(str.replace(/\t|\n|\r/g,""));										// Add transcript to div
+		
+		$("#sui-trans").on("mousedown", ()=> {  this.handScroll=true;  });						// Set scrolling flag
+		$("#sui-trans").on("mouseup",   ()=> {  this.handScroll=false; });						// Unset flag
+		
 		$("[id^=sui-transPlay-]").on("click", (e)=> {											// ON PLAY CLICK
 			this.curTransSeg=e.currentTarget.id.substring(14);									// Get index of seg	
 			this.PlayAV(res.segs[this.curTransSeg].start,res.segs[this.curTransSeg].end);		// Play seg
@@ -450,6 +455,7 @@ class AudioVideo  {
 	HighlightSeg(num, start)																	// HIGHLIGHT A SEGMENT
 	{
 		let t=$(`#sui-trans${this.transRes.layout == "Minimal" ? "Min" : ""}Seg-${num}`).position().top-$(`#sui-trans${this.transRes.layout == "Minimal" ? "Min" : ""}Seg-0`).position().top;	// Get offset to top seg
+		if (this.handScroll)	start=1;														// Inhibit transcript autoscrolling while manually scrolling
 		if (start == undefined)	 $("#sui-trans").scrollTop(t-this.scrollStart);					// Scroll to position if not playing a particular seg
 		$("[id^=sui-transSeg-]").css("background-color","#ddd");								// All backgrounds off
 		$("[id^=sui-transMinSeg-]").css("border-color","#fff");									// All borders off

@@ -332,6 +332,7 @@ class SearchUI  {
 			relationships:[],																		// Relationships
 			users:[],																				// Users
 			assets:[],																				// Assets
+			perspectives:[]																			// Perspectives
 			};																
 	}
 
