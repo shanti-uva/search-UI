@@ -80,27 +80,29 @@ class SearchUI  {
 			this.PageRouter(state); 																// Route on state
 			});					
 		}
-
+	
 	AddFrame()																					// ADD DIV FRAMEWORK FOR APP
 	{
-		var key;
+		let key;
 		var str=`<div id='sui-main' class='sui-main'>
-			<div id='sui-header' class='sui-header'>
-				<div id='sui-headLeft' class='sui-headLeft'></div>
-				<div id='sui-headRight' class='sui-headRight'></div>
-			</div>
-			<div id='sui-top' class='sui-top'>
+		<div id='sui-top' class='sui-top'>
+			<div id='sui-headRight' class='sui-headRight'></div>
+			<div style='display:inline-block'>
 				<div class='sui-search1'>
-				<input type='text' id='sui-search' class='sui-search2' placeholder='Enter Search'>
-				<div id='sui-clear' class='sui-search3'>&#xe610</div>
+					<input type='text' id='sui-search' class='sui-search2' placeholder='Enter Search'>
+					<div id='sui-clear' class='sui-search3'>&#xe610</div>
 				</div>
 				<div id='sui-searchgo' class='sui-search4'>&#xe623</div>
 				<div id='sui-mode' class='sui-search5' title='Advanced search'>ADVANCED<br>SEARCH</div>
+				</div>
 			</div>
+		<div>
 			<div id='sui-left' class='sui-left'>
+			<div id='sui-header' class='sui-header'>
+				<div id='sui-headLeft' class='sui-headLeft'></div>
+			</div>
 			<div id='sui-pages' class='sui-results scrollbar'></div>
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
-					<div id='sui-footer' class='sui-footer'></div>
 				<div id='sui-adv' class='sui-adv'>
 					<div class='sui-advTop'>Advanced search
 					<div id='sui-advClose' style='float:right;font-size:12px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
@@ -121,6 +123,7 @@ class SearchUI  {
 						</div>`;
 					str+=`</div>
 				</div>
+			<div id='sui-footer' class='sui-footer'></div>
 			</div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
@@ -499,7 +502,6 @@ class SearchUI  {
 				$("#sui-adv").css({ display:"none"});												// Hide search ui
 				$("#sui-pages").css({ display:"block",color:"#000" });								// Show pages page	
 				$("#sui-results").css({ display:"none" });											// Hide results page	
-//				if (this.pages)	this.pages.DrawLandingPage();										// Draw landing page
 				}
 			$("#sui-adv").css({ display:"none" });													// Hide adv search ui
 			return;																					// Quit
@@ -510,17 +512,17 @@ class SearchUI  {
 			$("#sui-left").slideDown();																// Slide down
 			$("#sui-pages").css({ display:"none" });												// Hide pages page	
 			$("#sui-results").css({ display:"block" });												// Show results page	
-		}
+			}
 		else if (this.ss.mode == "advanced") {														// Advanced search
 			$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width()-19+"px",display:"inline-block"});	// Size and show results area
-			$("#sui-adv").css({ display:"inline-block" });											// Show search ui
+			$("#sui-adv").css({ display:"block" });													// Show search ui
 			$("#sui-pages").css({ display:"none" });												// Hide pages page	
 			$("#sui-results").css({ display:"block" });												// Show results page	
-		}
+			}
 		$("#sui-headLeft").css({ display:"inline-block" });											// Show left header
 		$("#sui-mode").prop({"title": this.ss.mode == "advanced" ? "Regular search" : "Advanced search" } );	// Set tooltip
-		$("#sui-mode").html(this.ss.mode == "advanced" ? "REGULAR<br>SEARCH" : "ADVANCED<br>SEARCH" );			// Set mode icon	
-		$("#sui-header").css({display:"inline-block"} );											// Show header
+		$("#sui-mode").html(this.ss.mode == "advanced" ? "REGULAR <br>SEARCH" : "ADVANCED<br>SEARCH" );			// Set mode icon	
+		$("#sui-header").css({display:"block"} );													// Show header
 		$("#sui-typeList").remove();																// Remove type list
 		this.DrawHeader();																			// Draw header
 		this.DrawItems();																			// Draw items
@@ -537,7 +539,7 @@ class SearchUI  {
 		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-		str=`SHOW&nbsp; 
+		str=`SHOW&nbsp;&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
 			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
 			${this.assets[this.ss.type].g}</div>

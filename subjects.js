@@ -67,8 +67,8 @@ class Subjects  {
 			if (which == 0)	{																	// If summary, add events
 				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
 					let id=e.currentTarget.id.substring(10);									// Get id
-					trace(id)
 					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+					return false;																// Don't prop
 					});
 				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
 					let firstChild=$(this).parent().find("ul")[0];								// Get first child
@@ -92,6 +92,7 @@ class Subjects  {
 				$("[id^=sui-spItem-]").on("click", (e)=> {										// ON SUMMARY ITEM CLICK
 					let id=e.currentTarget.id.substring(11);									// Get id
 					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
+					return false;																// Don't prop
 					});
 				$("#sui-togCatA").on("click", ()=> {											// ON EXPAND ALL
 					$("[id^=sui-spCatUL-]").slideDown();										// All down
@@ -148,8 +149,11 @@ class Subjects  {
 		function drawCat(f) {																	// DRAW CATEGORY
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
 			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
-			for (i=0;i<s[f].length;++i)															// For each item
-				str+="<li><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+			for (i=0;i<s[f].length;++i)	{														// For each item
+				str+="<li><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id;				// Line
+				str+="' href='#p="+s[f][i].id+"'>";												// Href
+				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					// Add popover
+				}
 			return str+"</ul>";																	// Close category
 			}
 	}
@@ -194,7 +198,7 @@ class Subjects  {
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
 		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-		s+=`<a style='cursor:pointer' id='sui-spLab-${id}'>${lab}</a>`;							// Add name
+		s+=`<a style='cursor:pointer' id='sui-spLab-${id}' href='#p="${id}'>${lab}</a>`;		// Add name
 		return s;																				// Return line
 	}
 

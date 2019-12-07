@@ -278,7 +278,7 @@ class Pages  {
 
 	DrawLandingPage()																		// DRAW SITE SPECIFIC LANDING PAGE
 	{
-		$("#sui-pages").css({ display:"block" });												// Hide results page	
+		$("#sui-pages").css({ display:"block", top:"52px" });									// Hide results page	
 		$("#sui-results").css({ display:"none" });												// Hide results page	
 		$("#sui-headLeft").html("<div style='margin-top:8px'>Bhutan Cultural Library</div>");	// Set left header
 		$("#sui-headRight").html("");															// Clear right header

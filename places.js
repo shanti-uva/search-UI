@@ -361,6 +361,7 @@ class Places  {
 			$("[id^=sui-spItem-]").on("click", (e)=> {											// ON SUMMARY ITEM CLICK
 				let id=e.currentTarget.id.substring(11);										// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				return false;																	// Don't propagate
 				});
 			$("#sui-togCatA").on("click", ()=> {												// ON EXPAND ALL
 				$("[id^=sui-spCatUL-]").slideDown();											// All down
@@ -408,7 +409,8 @@ class Places  {
 					str+="<b>"+sub+"</b></div>";												// Add sub title
 					str+="<ul id='sui-spSubUL-"+s[f][i].id+"' style='list-style-type:none'>";	// Add new container ul
 					}
-				str+="<li style='list-style-type:none'><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id+"'>"
+				str+="<li style='list-style-type:none'><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id;
+				str+="' href='#p="+s[f][i].id+"'>";
 				str+=+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
 				}
 			return str+"</ul></ul>";															// Close category and sub container ul
