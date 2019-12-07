@@ -34,11 +34,12 @@ class Terms  {
 		sui.trm=this;																			// Save context
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 		this.content=["...loading","...loading","...loading"];									// Content pages
+		this.recordingGroup=0;																	// Which group
 	}
 
 	Draw(o)																					// DRAW TERM PAGE FROM KMAP
 	{
-		let audioURL="//viseyes.org/visualeyes/ding.mp3";
+		let audioURLs=[""];
 		var latin=(typeof(o.name_latin) == "string" ) ? o.name_latin : o.name_latin.join(", ");
 		var str=`<div class='sui-terms' id='sui-terms' style=''>
 		<span class='sui-termIcon'>${sui.assets[o.asset_type].g}</span>
@@ -46,8 +47,9 @@ class Terms  {
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p>TIBETAN:&nbsp;&nbsp<span class='sui-sourceText'>${o.name_tibt}&nbsp;&nbsp;(Tibetan script, original)</span></p>
 		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>`;
-		str+=`<p><span class='sui-termPlay' id='sui-termPlay'>&#xe60a</span>
-		<select class='sui-termSpeak'><option>AMDO GROUP</option><option>KHAM-HOR GROUP</option></select></p>`;
+		str+=`<div id='sui-player' style='display:none'>
+		<p><span class='sui-termPlay' id='sui-termPlay'>&#xe60a</span>
+		<select class='sui-termSpeak' id='sui-termGroup'><option>AMDO GROUP</option></select></p></div>`;
 		str+=sui.pages.DrawTabMenu(["DEFINITIONS","DETAILS","OTHER DICTIONARIES"])+"</div>";	// Add tab menu
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 		this.SetTabContent(o);																	// Fill tab contents
@@ -58,11 +60,19 @@ class Terms  {
 			});
 		$("#sui-termPlay").on("click", (e)=>{													// ON TERM PLAY
 			let snd=new Audio();																// Init audio object
-			snd=new Audio(audioURL);															// Load it				
+			snd=new Audio(audioURLs[this.recordingGroup]);										// Load it				
 			snd.play();																			// Play it
 			});
 
-		sui.GetAudioFromID(o.id, (d)=>{ audioURL=d; });											// Get audio info
+		$("#sui-termGroup").on("change", (e)=>{													// ON GROUP SET
+			this.recordingGroup=$("#sui-termGroup").prop('selectedIndex');						// Get group
+			});
+
+		sui.GetAudioFromID(o.id, (d)=>{ 														// Get audio info
+			audioURLs=d; 																		// Get urls
+			$("#sui-player").slideDown();
+			if (d.length == 2)	$("#sui-termGroup").append("<option>KHAM-HOR GROUP</option>");	// Add 2nd group if there
+			});											
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu
 	}
 

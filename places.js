@@ -274,7 +274,7 @@ class Places  {
 	{
 		let i;
 		let str="<div style='margin-left:192px'>";
-		str+=sui.pages.DrawTabMenu(["MAP","CONTEXT","SUMMARY","NAMES","LOCATION"])+"</div></div>";	// Add tab menu
+		str+=sui.pages.DrawTabMenu(["MAP","CONTEXT","RELATIONSHIPS","NAMES","LOCATION"])+"</div></div>";	// Add tab menu
 		str+="<div class='plc-main' id='plc-main'></div>";										// Maqp holder
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
 			str+="<div style='margin: 12px 0 6px 192px'><b>FEATURE TYPE:</b>";					// Add header
@@ -408,7 +408,8 @@ class Places  {
 					str+="<b>"+sub+"</b></div>";												// Add sub title
 					str+="<ul id='sui-spSubUL-"+s[f][i].id+"' style='list-style-type:none'>";	// Add new container ul
 					}
-				str+="<li style='list-style-type:none'><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id+"'>"+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+				str+="<li style='list-style-type:none'><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id+"'>"
+				str+=+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
 				}
 			return str+"</ul></ul>";															// Close category and sub container ul
 			}
@@ -454,7 +455,7 @@ class Places  {
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
 		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-		s+=`<a style='cursor:pointer' id='sui-spLab-${id}'>${lab}</a>`;							// Add name
+		s+=`<a style='cursor:pointer' href='#p=${id}' id='sui-spLab-${id}'>${lab}</a>`;			// Add line
 		return s;																				// Return line
 	}
 
@@ -487,6 +488,7 @@ class Places  {
 			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
 				let id=e.currentTarget.id.substring(10);										// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				return false;																	// Stop propagation
 				});
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child

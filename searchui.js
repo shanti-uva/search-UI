@@ -404,8 +404,11 @@ class SearchUI  {
 	
 	GetAudioFromID(id, callback)																// GET AUDIO FILE FROM ID
 	{
-		$.getJSON("http://terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {				// Get info
-			try{ callback(d.recordings[0].audio_file); } 	catch(e){}								// Return audio file url
+		$.getJSON("https://terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {			// Get info
+			let i,r=[];
+			try{ for (i=0;i<d.recordings.length;++i)												// For each recording
+					r.push(d.recordings[i].audio_file);												// Add to array
+				callback(r); } 	catch(e){}															// Return audio file urls as array
 			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 

@@ -120,7 +120,8 @@ class AudioVideo  {
 				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
 				this.DrawMetaData(o,d);															// Draw metadata content
 				sui.pages.DrawRelatedAssets(o);													// Draw related assets menu if active
-				
+				showTab(0);																		// Open details
+
 				$("[id^=sui-tabTab]").on("click", (e)=> {										// ON TAB CLICK
 					var id=e.currentTarget.id.substring(10);									// Get index of tab	
 						showTab(id);															// Draw it
@@ -411,7 +412,7 @@ class AudioVideo  {
 				for (lang in res.languages)  													// For each language
 					if (res.segs[i][lang] && res.languages[lang])								// If something there and checked
 						str+=res.segs[i][lang]+"<hr style='margin:0;border-top:1px dashed #eee'>";	// Add transcription and dividing line	
-					str+="</div></div>";															// Close box and seg
+				str+="</div></div>";															// Close box and seg
 				}
 			}
 		$("#sui-trans").html(str.replace(/\t|\n|\r/g,""));										// Add transcript to div
