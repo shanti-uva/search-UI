@@ -103,26 +103,26 @@ class SearchUI  {
 			</div>
 			<div id='sui-pages' class='sui-results scrollbar'></div>
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
-				<div id='sui-adv' class='sui-adv'>
-					<div class='sui-advTop'>Advanced search
-					<div id='sui-advClose' style='float:right;font-size:12px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
-					</div><br>`;
-					for (key in this.facets) { 
-						str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
-							${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
-							<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
-						</div>
-						<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
-						<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
-						}
-					str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>
-						&#xe62e&nbsp;&nbsp;RECENT SEARCHES
-						<span id='sui-advPlus-recent' style='float:right'>&#xe669</span>
-						<div class='sui-advTerm'></div>
-						<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div>
-						</div>`;
-					str+=`</div>
+		</div>
+		<div id='sui-adv' class='sui-adv'>
+			<div class='sui-advTop'>&nbsp;&nbsp;Advanced search
+			<div id='sui-advClose' style='float:right;font-size:12px;margin-top:-8px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
+			</div><br>`;
+			for (key in this.facets) { 
+				str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
+					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
+					<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
 				</div>
+				<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
+				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
+				}
+			str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>
+				&#xe62e&nbsp;&nbsp;RECENT SEARCHES
+				<span id='sui-advPlus-recent' style='float:right'>&#xe669</span>
+				<div class='sui-advTerm'></div>
+				<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div>
+				</div>`;
+			str+=`</div>
 			<div id='sui-footer' class='sui-footer'></div>
 			</div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
