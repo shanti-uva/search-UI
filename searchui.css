@@ -3,11 +3,10 @@
 					width:100vw; height:100vh; font-family:"Open Sans","Segoe UI",Tahoma,sans-serif,shanticon;
 					} .sui-main b { font-weight:600; }				
 .sui-top 		{	position:absolute; right:12px; top:7px; user-select:none; }
-.sui-topBar 	{	height:41px; margin:-8px; padding:0; font-size:27px; font-weight:300; color: #404aa9;
-					font-family:"Open Sans","Segoe UI",Tahoma,sans-serif,shanticon; letter-spacing:1.8px;	}
-.sui-search1 	{	float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:220px; padding: 6px 8px 0 8px;
+.sui-topBar 	{	height:43px; width:calc(100% + 16px); margin:-8px;background-color:#eee; }
+.sui-search1 	{	float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:210px; padding: 6px 8px 0 8px;
 					border-radius:16px 0 0 16px; border-left: 1px solid #999; border-top:1px solid #999; border-bottom:1px solid #999;	}
-.sui-search2 	{	float:left; background-color:#fafafa; color:#888; height:17px; width:185px; margin-top:-2px; margin-left:2px; font-size:14px;
+.sui-search2 	{	float:left; background-color:#fafafa; color:#888; height:17px; width:175px; margin-top:-2px; margin-left:2px; font-size:14px;
 					outline:none; border-radius:0; border:0; appearance: none; -webkit-appearance: none; box-shadow: none; }
 .sui-search3 	{	float:right; font-size:16px; color: #ccc; cursor:pointer; }
 .sui-search4 	{	display:inline-block; background-color:#ddd; font-size:16px; color:#999; border-radius: 0 16px 16px 0; border: 1px solid #999;

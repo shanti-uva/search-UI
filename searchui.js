@@ -105,9 +105,12 @@ class SearchUI  {
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
 		</div>
 		<div id='sui-adv' class='sui-adv'>
+<!---		
 			<div class='sui-advTop'>&nbsp;&nbsp;Advanced search
-			<div id='sui-advClose' style='float:right;font-size:12px;margin-top:-8px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;</div>
-			</div><br>`;
+			<!div id='sui-advClose' style='float:right;font-size:12px;margin-top:-8px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;<div>
+			</div><br>
+--->			
+			`;
 			for (key in this.facets) { 
 				str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
 					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
@@ -129,14 +132,13 @@ class SearchUI  {
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
 		$("#sui-clear, sui-clear2").on("mouseout", function() { $(this).html("&#xe610"); });		// Normal						
 		$("#sui-clear, sui-clear2").on("click",()=> { 												// ON ERASE
-			$("#sui-search, #sui-search2" ).val("");	this.ClearQuery(); 							// Clear input and query												
+			$("#sui-search").val("");	this.ClearQuery(); 											// Clear input and query												
 			this.Query(); 																			// Load and redraw
 			});					
 		
-		$("#sui-search, #sui-search2").on("change", (e)=> { 										// ON SEARCH CHANGE
+		$("#sui-search").on("change", (e)=> { 														// ON SEARCH CHANGE
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
-			$("#sui-search2").val(this.ss.query.text);												// Set adv search
 			if ((this.ss.mode == "input") || (this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode="simple";	// Toggle simple mode
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
@@ -234,7 +236,6 @@ class SearchUI  {
 			id=id[1].replace(/\%20/g," ");															// Get ids	
 			this.ParseQuery(id);																	// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
-			$("#sui-search2").val(this.ss.query.text);												// Set adv search
 			this.Query(true);																		// Run query
 			}	
 		else if ((id=hash.match(/#v=(.+)/))) {														// If showing popover results
@@ -945,7 +946,6 @@ class SearchUI  {
 			let id=e.target.id.substr(11);															// Get which
 			this.ss.query=(JSON.parse(JSON.stringify(this.searches[id].query)));					// Restore search query only
 			$("#sui-search").val(this.ss.query.text);												// Set top search
-			$("#sui-search2").val(this.ss.query.text);												// Set adv search
 			this.ss.type=this.ss.query.assets[0].id;												// Set type
 			this.DrawAdvanced();																	// Draw advanced 
 			this.Query();																			// Rerun search	
