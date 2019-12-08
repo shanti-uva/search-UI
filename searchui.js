@@ -845,6 +845,7 @@ class SearchUI  {
 	DrawAdvanced()																				// DRAW SEARCH UI SECTION
 	{
 		let i,o,str;
+		let _this=this;
 		for (let key in this.facets) {																// For each facet
 			if ($("#sui-advEdit-"+key).css("display") == "block") {									// Refresh list results if open
 				this.DrawFacetItems(key,true);														// Draw proper facets menu
@@ -854,13 +855,13 @@ class SearchUI  {
 			for (i=0;i<this.ss.query[key].length;++i) {												// For each term in facet	
 				o=sui.ss.query[key][i];																// Point at facet to add to div
 				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
-					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}&#xe609</div>
+					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Click to change boolean method'>${this[o.bool]}&#xe609</div>
 				<i> &nbsp;${o.title}</i></div>`;
 				$("#sui-advTerm-"+key).append(str);													// Add terms
 				}
 			}
 	
-		$("[id^=sui-advBool-]").on("click",(e)=> {													// ON BOOLEAN
+		$("[id^=sui-advBool-]").on("click",(e)=> {													// ON BOOLEAN CLICK
 			let v=e.currentTarget.id.split("-");													// Get ids
 			let b=this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
 			if (b == "AND")	 		b="OR"; 														// Toggle through options
@@ -870,7 +871,26 @@ class SearchUI  {
 			this.ss.query[v[2]][v[3]].bool=b;														// Set state
 			this.Query();																			// Run query and show results
 			});
-			
+
+/*		$("[id^=sui-advBool-]").on("mouseover",function(e) {										// ON BOOLEAN HOVER
+			let str="";
+			str+="<span class='sui-boolItem' id='sui-boolItem-AND'>AND<br></span>";				// AND option		
+			str+="<span class='sui-boolItem' id='sui-boolItem-OR'>OR<br></span>";				// OR		
+			str+="<span class='sui-boolItem' id='sui-boolItem-NOT'>NOT<br></span>";				// NOT		
+			let v=e.currentTarget.id.split("-");													// Get ids
+			let b=_this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
+			str+=_this[b]+"&#xe609";																// Set new value
+			$(this).html(str);																		// Set new value
+			$(this).height(61);																		// Make bigger
+			});
+
+		$("[id^=sui-advBool-]").on("mouseleave",function(e) {									// ON BOOLEAN OUT
+			let v=e.currentTarget.id.split("-");													// Get ids
+			let b=_this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
+			$(this).html(_this[b]+"&#xe609");														// Set new value
+			$(this).height(15);																		// Restore height
+			});
+*/
 		$("[id^=sui-advKill-]").on("click",(e)=> {													// REMOVE ITEM FROM QUERY
 			let v=e.currentTarget.id.split("-");													// Get ids
 			this.ss.query[v[2]].splice(v[3],1);														// Remove
@@ -878,7 +898,7 @@ class SearchUI  {
 			this.Query();																			// Run query and show results
 			});
 		}
-
+	
 	DrawFacetItems(facet, open)																	// DRAW FACETS ITEMS
 	{
 		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			

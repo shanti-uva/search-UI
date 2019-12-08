@@ -108,32 +108,26 @@
 					border-radius:5px;  padding:8px; font-size:12px; color:#666; margin-left:12px;
 					}
 .sui-advEditBut { 	display:inline-block; cursor:pointer; vertical-align:-2px; color: #999; }
-					.sui-advEditBut:hover { color:#a4baec;	
-					}
-.sui-advEditNums { 	float:right; font-size:9px; padding-top:5px;
-					}
-.sui-advEditBool { 	display:inline-block; cursor:pointer; color:#668eec; border:.5px solid #668eec; border-radius:2px; padding:0 0 1px 3px; margin:2px 0; }   
-					.sui-advEditBool:hover	{ color:#ccc
-					}
-.sui-advEditList {	overflow-x:hidden; max-height:110px;   
-					}
-.sui-advEditLine { 	cursor:pointer; padding:2px; border-radius:5px; }	.sui-advEditLine:hover { background-color: #dee7f1
-					}
-.sui-advViewListPage { 	display:inline-block; } .sui-advViewListPage:hover { color:#668eec;	
-					}	
-.sui-advViewTreePage { 	display:inline-block; padding:0 4px; color:#ccc; } .sui-advViewTreePage:hover { color: #a4baec;
-					}														
+					.sui-advEditBut:hover { color:#a4baec; }
+.sui-advEditNums { 	float:right; font-size:9px; padding-top:5px; }
+.sui-advEditBool { 	display:inline-block; cursor:pointer; color:#668eec; border:.5px solid#999; border-radius:2px; padding:0 0 1px 3px; margin:2px 0; height: 15px; }   
+.sui-boolItem	 { 	color:#999; }
+					.sui-boolItem:hover	{ background-color:#a4baec; }
+.sui-advEditList {	overflow-x:hidden; max-height:110px;   		}
+.sui-advEditLine { 	cursor:pointer; padding:2px; border-radius:5px; }	
+					.sui-advEditLine:hover { background-color: #dee7f1	}
+.sui-advViewListPage { 	display:inline-block; } 
+					.sui-advViewListPage:hover { color:#668eec;	}	
+.sui-advViewTreePage { 	display:inline-block; padding:0 4px; color:#ccc; } 
+					.sui-advViewTreePage:hover { color: #a4baec; }														
 /* TREE */
-
-.sui-tree {      	user-select: none; overflow-x:hidden; max-height:360px; padding-left:6px; font-size:12px; 
-					}
+.sui-tree {      	user-select: none; overflow-x:hidden; max-height:360px; padding-left:6px; font-size:12px; 	}
 .sui-tree ul { 		list-style:none outside none; padding:0; margin:0 }
 .sui-tree li a { 	line-height: 19px; cursor: pointer; }
 .sui-tree > ul > li > a { color: #3B4C56; display: block;  font-weight: normal; position: relative; text-decoration: none; }
 .sui-tree li.parent > a { padding: 0 0 2px 20px;  }
 .sui-tree li.parent > a:before { background-image: url("treebuts.png"); content: ""; display: block;
-								height: 15px; left:0; position: absolute; top:2px; width: 15px;  background-position:0;
-					}
+								height: 15px; left:0; position: absolute; top:2px; width: 15px;  background-position:0;	}
 .sui-tree ul li.active > a:before { background-position: 30px; }
 .sui-tree ul li ul 	{ border-left: 1px solid #a4baec;  display: none; margin: 0 0 0 7px; padding: 0 0 0 12px; }
 .sui-tree ul li ul li { position: relative; }
