@@ -410,8 +410,8 @@ class Places  {
 					str+="<ul id='sui-spSubUL-"+s[f][i].id+"' style='list-style-type:none'>";	// Add new container ul
 					}
 				str+="<li style='list-style-type:none'><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id;
-				str+="' href='#p="+s[f][i].id+"'>";
-				str+=+s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";	// Show it with popover
+				str+="' href='#p="+s[f][i].id+"'>";												// Add url
+				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					//Add title it with popover
 				}
 			return str+"</ul></ul>";															// Close category and sub container ul
 			}
