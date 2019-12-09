@@ -198,7 +198,7 @@ class Subjects  {
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
 		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-		s+=`<a style='cursor:pointer' id='sui-spLab-${id}' href='#p="${id}'>${lab}</a>`;		// Add name
+		s+=`<a style='cursor:pointer' id='sui-spLab-${id}' href='#p=${id}'>${lab}</a>`;			// Add name
 		return s;																				// Return line
 	}
 
