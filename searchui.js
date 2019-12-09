@@ -860,37 +860,29 @@ class SearchUI  {
 				$("#sui-advTerm-"+key).append(str);													// Add terms
 				}
 			}
-	
-		$("[id^=sui-advBool-]").on("click",(e)=> {													// ON BOOLEAN CLICK
+
+		$("[id^=sui-advBool-]").on("mouseenter",function(e) {										// ON BOOLEAN HOVER
 			let v=e.currentTarget.id.split("-");													// Get ids
-			let b=this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
-			if (b == "AND")	 		b="OR"; 														// Toggle through options
-			else if (b == "OR") 	b="NOT";												
-			else 				  	b="AND";															
-			$("#"+e.currentTarget.id).html(this[b]+"&#xe609");										// Set new value
-			this.ss.query[v[2]][v[3]].bool=b;														// Set state
-			this.Query();																			// Run query and show results
+			let str=`<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-AND'>AND</div>|			
+				<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-OR'>OR</div>|					
+				<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-NOT'>NOT</div>&nbsp;`;	// Add options	
+			$(this).html(str.replace(/\t|\n|\r/g,""));												// Set new value
+
+			$(".sui-boolItem").on("click",(e)=> {													// ON CLICK
+				let v=e.currentTarget.id.split("-");												// Get ids
+				$("#"+e.currentTarget.id).html(_this[v[4]]+"&#xe609");								// Set new value
+				_this.ss.query[v[2]][v[3]].bool=v[4];												// Set state
+				$(this).html(_this[v[4]]+"&#xe609");												// Set new value
+				_this.Query();																		// Run query and show results
+				});
 			});
 
-/*		$("[id^=sui-advBool-]").on("mouseover",function(e) {										// ON BOOLEAN HOVER
-			let str="";
-			str+="<span class='sui-boolItem' id='sui-boolItem-AND'>AND<br></span>";				// AND option		
-			str+="<span class='sui-boolItem' id='sui-boolItem-OR'>OR<br></span>";				// OR		
-			str+="<span class='sui-boolItem' id='sui-boolItem-NOT'>NOT<br></span>";				// NOT		
-			let v=e.currentTarget.id.split("-");													// Get ids
-			let b=_this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
-			str+=_this[b]+"&#xe609";																// Set new value
-			$(this).html(str);																		// Set new value
-			$(this).height(61);																		// Make bigger
-			});
-
-		$("[id^=sui-advBool-]").on("mouseleave",function(e) {									// ON BOOLEAN OUT
+		$("[id^=sui-advBool-]").on("mouseleave",function(e) {										// ON BOOLEAN OUT
 			let v=e.currentTarget.id.split("-");													// Get ids
 			let b=_this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
 			$(this).html(_this[b]+"&#xe609");														// Set new value
-			$(this).height(15);																		// Restore height
 			});
-*/
+
 		$("[id^=sui-advKill-]").on("click",(e)=> {													// REMOVE ITEM FROM QUERY
 			let v=e.currentTarget.id.split("-");													// Get ids
 			this.ss.query[v[2]].splice(v[3],1);														// Remove

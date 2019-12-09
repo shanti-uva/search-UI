@@ -110,9 +110,9 @@
 .sui-advEditBut { 	display:inline-block; cursor:pointer; vertical-align:-2px; color: #999; }
 					.sui-advEditBut:hover { color:#a4baec; }
 .sui-advEditNums { 	float:right; font-size:9px; padding-top:5px; }
-.sui-advEditBool { 	display:inline-block; cursor:pointer; color:#668eec; border:.5px solid#999; border-radius:2px; padding:0 0 1px 3px; margin:2px 0; height: 15px; }   
-.sui-boolItem	 { 	color:#999; }
-					.sui-boolItem:hover	{ background-color:#a4baec; }
+.sui-advEditBool { 	display:inline-block; cursor:pointer; color:#668eec; border:.5px solid#999; border-radius:2px; padding:0 0 1px 3px; margin:2px 0; }   
+.sui-boolItem	 { 	display:inline-block; color:#999; }
+					.sui-boolItem:hover	{ color:#668eec; }
 .sui-advEditList {	overflow-x:hidden; max-height:110px;   		}
 .sui-advEditLine { 	cursor:pointer; padding:2px; border-radius:5px; }	
 					.sui-advEditLine:hover { background-color: #dee7f1	}
