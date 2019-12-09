@@ -69,8 +69,9 @@ class Terms  {
 			});
 
 		sui.GetAudioFromID(o.id, (d)=>{ 														// Get audio info
+			trace(d)
 			audioURLs=d; 																		// Get urls
-			$("#sui-player").slideDown();
+			if (d.length)	$("#sui-player").slideDown();										// If any recording,show structure
 			if (d.length == 2)	$("#sui-termGroup").append("<option>KHAM-HOR GROUP</option>");	// Add 2nd group if there
 			});											
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu

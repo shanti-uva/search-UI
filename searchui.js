@@ -104,13 +104,7 @@ class SearchUI  {
 			<div id='sui-pages' class='sui-results scrollbar'></div>
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
 		</div>
-		<div id='sui-adv' class='sui-adv'>
-<!---		
-			<div class='sui-advTop'>&nbsp;&nbsp;Advanced search
-			<!div id='sui-advClose' style='float:right;font-size:12px;margin-top:-8px;cursor:pointer' title='Hide' onclick='$("#sui-mode").trigger("click")'>&#xe684;<div>
-			</div><br>
---->			
-			`;
+		<div id='sui-adv' class='sui-adv'>`;
 			for (key in this.facets) { 
 				str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
 					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
@@ -666,10 +660,12 @@ class SearchUI  {
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
+			return false;																			// Stop propagation
 			});
 		$("[id^=sui-itemPic-]").on("click",(e)=> { 													// ON ITEM CLICK
 			var num=e.currentTarget.id.substring(12);												// Get index of result	
 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
+			return false;																			// Stop propagation
 			});
 		$(".sui-gridInfo").on("mouseover",(e)=> { 													// ON INFO BUTTON HOVER
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
@@ -693,6 +689,7 @@ class SearchUI  {
 		$("[id^=sui-itemTitle-]").on("click",(e)=> { 												// ON TITLE CLICK
 			var num=e.currentTarget.id.substring(14);												// Get index of result	
 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);			// Send message
+			return false;																			// Stop propagation
 			});
 		$(".sui-itemPlus").on("click",(e)=> { 														// ON MORE BUTTON CLICK
 			this.ShowItemMore(e.currentTarget.id.substring(13));									// Show more info below
@@ -706,8 +703,9 @@ class SearchUI  {
 		var str="<div class='sui-item'>";
 		str+="<div class='sui-itemPlus' id='sui-itemPlus-"+num+"'>&#xe669</div>";
 		str+="<div class='sui-itemIcon' id='sui-itemIcon-"+num+"' style='background-color:"+this.assets[o.asset_type].c+"'>";
-		str+=this.assets[o.asset_type].g+"</div>";
-		str+="<div class='sui-itemTitle' id='sui-itemTitle-"+num+"'>"+o.title+"</div>";
+		str+="<a href='#p="+o.uid+"'>"+this.assets[o.asset_type].g+"</a></div>";					// Add href for right click
+		str+="<div class='sui-itemTitle' id='sui-itemTitle-"+num+"'>";								// Add
+		str+="<a href='#p="+o.uid+"'>"+o.title+"</a></div>";										// Add href for right click
 		if (o.feature_types_ss) {																	// If a feature
 			str+="<span style='color:"+this.assets[o.asset_type].c+"'>&nbsp;&bull;&nbsp;</span>";	// Add dot
 			str+="<div class='sui-itemFeature'>&nbsp;"+o.feature_types_ss.join(", ")+"</div>";		// Add feature(s)
@@ -722,7 +720,7 @@ class SearchUI  {
 				str+="<span class='sui-itemAncestor' onclick='sui.SendMessage(\"page=";				// Add ancestor
 				str+="https://mandala.shanti.virginia.edu/"+o.asset_type+"/";						// URL stem
 				str+=o.ancestor_ids_is[i+1]+"/overview/nojs#search\,"+this.curResults[num]+")'>";	// URL end
-				str+=o.ancestors_txt[i]+"</span>";													// Finish ancestor link
+				str+="<a href='#p="+o.uid+"'>"+o.ancestors_txt[i]+"</a></span>";					// Add href for right click
 				if (i < o.ancestors_txt.length-1)	str+=" > ";										// Add separator
 				}
 			str+="</div>";																			// Close trail div
@@ -797,7 +795,8 @@ class SearchUI  {
 	{
 		var str="<div class='sui-grid'>";
 		var o=this.curResults[num];																	// Point at item
-		str+="<img src='"+o.url_thumb+"' class='sui-gridPic' id='sui-itemPic-"+num+"'>";			// Add pic
+		str+="<a href='#p="+o.uid+"'>";																// Add href for right click
+		str+="<img src='"+o.url_thumb+"' class='sui-gridPic' id='sui-itemPic-"+num+"'></a>";		// Add pic
 		if (o.url_thumb.match(/gradient.jpg/))	{													// If a generic
 			 str+=`<div class='sui-gridGlyph' style='color:${this.assets[o.asset_type].c}'>
 			 ${this.assets[o.asset_type].g}
@@ -816,7 +815,8 @@ class SearchUI  {
 		var label=o.collection_title;																// Set label
 		var str="<div class='sui-card'>";															// Overall container
 		str+="<div style='width:100%;height:100px;overflow:hidden;display:inline-block;margin:0;padding:0'>";			// Div container
-		str+="<img src='"+o.url_thumb+"' class='sui-cardPic' id='sui-itemPic-"+num+"'></div>";		// Add pic
+		str+="<a href='#p="+o.uid+"'>";																// Add href for right click
+		str+="<img src='"+o.url_thumb+"' class='sui-cardPic' id='sui-itemPic-"+num+"'></a></div>";	// Add pic
 		var gg=this.assets[o.asset_type].g;															// Assume generic icon
 		if (o.asset_subtype == "Audio")			gg="&#xe60a";										// Audio
 		else if (o.asset_subtype == "Video")	gg="&#xe62d";										// Video
