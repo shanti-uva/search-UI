@@ -69,7 +69,7 @@ class SearchUI  {
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
 		this.InitSearchState();																		// Init search state to default
 		this.AddFrame();																			// Add div framework
-		if (!location.hash)	{ 																		// Regular startup
+		if (!location.hash)	{ 																		// Normal startup
 			this.Query(true);																		// Load search data
 			this.Draw(); 																			// Draw
 			}										
@@ -134,12 +134,14 @@ class SearchUI  {
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			if ((this.ss.mode == "input") || (this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode="simple";	// Toggle simple mode
+			if (this.ActiveSearch(true)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
 
 		$("#sui-searchgo, #sui-searchgo2").on("click", (e)=> { 										// ON SEARCH BUTTON CLCK
 			if ((this.ss.mode == "input") || (this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode="simple";	// Toggle simple mode
+			if (this.ActiveSearch(true)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
@@ -515,8 +517,8 @@ class SearchUI  {
 			$("#sui-results").css({ display:"block" });												// Show results page	
 			}
 		$("#sui-headLeft").css({ display:"inline-block" });											// Show left header
-		$("#sui-mode").prop({"title": this.ss.mode == "advanced" ? "Regular search" : "Advanced search" } );	// Set tooltip
-		$("#sui-mode").html(this.ss.mode == "advanced" ? "REGULAR <br>SEARCH" : "ADVANCED<br>SEARCH" );			// Set mode icon	
+		$("#sui-mode").prop({"title": this.ss.mode == "advanced" ? "Basic search" : "Advanced search" } );	// Set tooltip
+		$("#sui-mode").html(this.ss.mode == "advanced" ? "BASIC<br>SEARCH" : "ADVANCED<br>SEARCH" );		// Set mode icon	
 		$("#sui-header").css({display:"block"} );													// Show header
 		$("#sui-typeList").remove();																// Remove type list
 		this.DrawHeader();																			// Draw header
@@ -560,7 +562,7 @@ class SearchUI  {
 				this.ss.type=e.currentTarget.id.substring(7).toLowerCase();							// Get asset name		
 				$("#sui-typeList").remove();														// Remove type list
 				this.ss.page=0;																		// Start at beginning
-				if ((this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode=this.ss.lastMode;	// Get back to regular search mode
+				if ((this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode=this.ss.lastMode;	// Get back to basic search mode
 				this.Query(); 																		// Get new results
 				});							
 			});
@@ -855,7 +857,7 @@ class SearchUI  {
 			for (i=0;i<this.ss.query[key].length;++i) {												// For each term in facet	
 				o=sui.ss.query[key][i];																// Point at facet to add to div
 				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
-					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Click to change boolean method'>${this[o.bool]}&#xe609</div>
+					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}&#xe642</div>
 				<i> &nbsp;${o.title}</i></div>`;
 				$("#sui-advTerm-"+key).append(str);													// Add terms
 				}
@@ -870,9 +872,9 @@ class SearchUI  {
 
 			$(".sui-boolItem").on("click",(e)=> {													// ON CLICK
 				let v=e.currentTarget.id.split("-");												// Get ids
-				$("#"+e.currentTarget.id).html(_this[v[4]]+"&#xe609");								// Set new value
+				$("#"+e.currentTarget.id).html(_this[v[4]]+"&#xe642");								// Set new value
 				_this.ss.query[v[2]][v[3]].bool=v[4];												// Set state
-				$(this).html(_this[v[4]]+"&#xe609");												// Set new value
+				$(this).html(_this[v[4]]+"&#xe642");												// Set new value
 				_this.Query();																		// Run query and show results
 				});
 			});
@@ -880,7 +882,7 @@ class SearchUI  {
 		$("[id^=sui-advBool-]").on("mouseleave",function(e) {										// ON BOOLEAN OUT
 			let v=e.currentTarget.id.split("-");													// Get ids
 			let b=_this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
-			$(this).html(_this[b]+"&#xe609");														// Set new value
+			$(this).html(_this[b]+"&#xe642");														// Set new value
 			});
 
 		$("[id^=sui-advKill-]").on("click",(e)=> {													// REMOVE ITEM FROM QUERY
@@ -902,10 +904,10 @@ class SearchUI  {
 		else 											this.DrawFacetList(facet,open);				// Draw list editor
 	}
 
-	ActiveSearch()																				// IS THERE AN ACTIVE SEARCH?
+	ActiveSearch(ignoreText)																	// IS THERE AN ACTIVE SEARCH?
 	{
 		let key,activeSearch=false;																	// Assume no active search happening
-		if (this.ss.query.text.length) 					activeSearch=true;							// Flag if something set in text
+		if (this.ss.query.text.length && !ignoreText) 	activeSearch=true;							// Flag if something set in text
 		for (key in this.facets) 																	// For each facet
 			if (this.ss.query[key].length) 				activeSearch=true;							// Flag if something set
 		return activeSearch;

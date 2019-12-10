@@ -33,10 +33,10 @@ class Sources  {
 			}
 		if (o.url_thumb && !o.url_thumb.match(/gradient.jpg/)) str+="<img src='"+o.url_thumb+"' style='float:right;width:33%; padding:0 0 12px 12px'>";
 		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</p>";
-		str+="<p class='sui-pageLab'>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcYear'></span>";
+		str+="<p class='sui-pageLab' id='sui-p2'>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcYear'></span>";
 		if (o.publisher_s) str+="<p>PUBLISHER:&nbsp;&nbsp<span class='sui-sourceText'>"+o.publisher_s+"</p>";
-		str+="<p class='sui-pageLab'>PLACE OF PUBLICATION:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPlc'></span>";
-		str+="<p class='sui-pageLab'>PAGES:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPages'></span>";
+		str+="<p class='sui-pageLab' id='sui-p3'>PLACE OF PUBLICATION:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPlc'></span>";
+		str+="<p class='sui-pageLab' id='sui-p1'>PAGES:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPages'></span>";
 		str+="<p class='sui-pageLab'>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
 		if (o.summary) str+="<p>ABSTRACT:<div class='sui-sourceText'>"+o.summary+"</div></p>";
 		str+="</div>";
@@ -46,9 +46,13 @@ class Sources  {
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
 			let i,str="";
 			if (d.biblio_pages) 			$("#sui-srcPages").html(d.biblio_pages);			// Add pages
+			else							$("#sui-sp1").hide();								// Hide
 			if (d.biblio_year) 				$("#sui-srcYear").html(d.biblio_year);				// Year
+			else							$("#sui-sp2").hide();								// Hide
 			if (d.biblio_secondary_title) 	$("#sui-srcSec").html(d.biblio_secondary_title);	// Pub
+			else							$("#sui-srcSec").hide();							// Hide
 			if (d.biblio_place_published) 	$("#sui-srcPlc").html(d.biblio_place_published);	// Pub place
+			else							$("#sui-sp3").hide();								// Hide
 			if (d.field_kmaps_subjects && d.field_kmaps_subjects.und) {							// If subjects
 				str+="<p class='sui-pageLab'>SUBJECTS:&nbsp;&nbsp;";							// Add header
 				for (i=0;i<d.field_kmaps_subjects.und.length;++i) {								// For each item
