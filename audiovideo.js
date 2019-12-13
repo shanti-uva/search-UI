@@ -33,8 +33,9 @@ class AudioVideo  {
 		this.transRes=null;																		// Holds transcript resources	
 		this.scrollStart=0;																		// Initial transcript scroll distance when starting play
 		this.handScroll=false;																	// Set when transcript is scrolled by hand
-		this.playEnd=0;	
-		this.kmap=null;
+		this.mouseDown=false;																	// When mouse is down
+		this.playEnd=0;																			// End of clip
+		this.kmap=null;																			// Current kmap of clip
 	}
 
 	Draw(o)																					// DRAW AUDIO/VIDEO PAGE
@@ -382,6 +383,7 @@ class AudioVideo  {
 	DrawTransContent()																		// DRAW TRANSCRIPT CONTENT IN WINDOW
 	{
 		var i,lang,str="";
+		const _this=this;																		// Context
 		var res=this.transRes;																	// Point at res
 		if (res.layout == "Minimal") {															// Drawing minimal layput
 			for (i=0;i<res.segs.length;++i) {													// For each seg
@@ -417,9 +419,16 @@ class AudioVideo  {
 			}
 		$("#sui-trans").html(str.replace(/\t|\n|\r/g,""));										// Add transcript to div
 		
-		$("#sui-trans").on("mousedown", ()=> {  this.handScroll=true;  });						// Set scrolling flag
-		$("#sui-trans").on("mouseup",   ()=> {  this.handScroll=false; });						// Unset flag
-		
+		$("#sui-trans").on("mousedown", ()=> {  this.mouseDown=true;  });						// Set scrolling flag
+		$("#sui-trans").on("mouseup",   ()=> {  this.mouseDown=false; });						// Unset flag
+		$("#sui-trans").on("scroll", function() { 												// On scroll event
+			_this.handScroll=true;																// Inhibit auto scrolling
+			if (_this.mouseDown)	return;														// Quit if mouse is still down
+			clearTimeout($.data(this,'scrollTimer'));
+			$.data(this,'scrollTimer', setTimeout(function() {
+				_this.handScroll=false; }, 250));
+			});
+
 		$("[id^=sui-transPlay-]").on("click", (e)=> {											// ON PLAY CLICK
 			this.curTransSeg=e.currentTarget.id.substring(14);									// Get index of seg	
 			this.PlayAV(res.segs[this.curTransSeg].start,res.segs[this.curTransSeg].end);		// Play seg
