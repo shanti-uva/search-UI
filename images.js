@@ -137,7 +137,7 @@ class Images  {
 				</p></div></div></div>`;
 				$(sui.pages.div).append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
 				
-				$("#sui-imgCol").on("click",()=>	{												// ON COLLECTION CLICK
+				$("#sui-imgCol").on("click",()=> {													// ON COLLECTION CLICK
 					sui.pages.ShowCollection(o.asset_type+"-"+o.id,o.collection_idfacet[0]);		// Show
 					return false;																	// Stop propagation
 					});
@@ -162,8 +162,15 @@ class Images  {
 				}
 			$("#sui-picEnlarge").html("Zoom &nbsp; &#xe651  &nbsp; out ");							// Zoom out icon
 			$("#sui-thisPic").css("width","auto");													// True size
+
 			pic.style.cursor="grab";																// Grab cursor
-			pic.onmousedown=(e)=> {																	// On click
+			pic.onwheel=(e)=> {																		// On wheel foir trackpad moving
+				e=e||window.event;						e.preventDefault();							// Set event locally									
+				sx=$("#sui-thisPic").offset();														// Current pos
+				$("#sui-thisPic").offset({left:(e.deltaX ? e.deltaX : 0)/5+sx.left,top:(e.deltaY ? e.deltaY : 0)/3+sx.top}); // Set image via offset
+				};
+
+			pic.onmousedown=(e)=> {																	// On click for mouse moving
 				e=e||window.event;						e.preventDefault();							// Set event locally									
 				sx=e.pageX;    							sy=e.pageY;									// Start of drag
 				px=$("#sui-thisPic").offset().left;		py=$("#sui-thisPic").offset().top;			// Start image offset
