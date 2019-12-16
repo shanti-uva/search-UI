@@ -92,8 +92,8 @@
 
 /* ADVANCED SEARCH */
 
-.sui-adv { 			position:absolute; left:calc(100% - 361px); top:43px; height:calc(100% - 75px); width:326px; background-color:#eee; display:none;
-					border-left:1px solid #aaa; border-right:2px solid #aaa; padding:16px;color:#333; font-size:15px;
+.sui-adv { 			position:absolute; left:calc(100% - 361px); top:43px; height:calc(100% - 75px); width:328px; background-color:#eee; display:none;
+					border-left:1px solid #aaa; padding:16px;color:#333; font-size:15px;
 					}
 .sui-advTop { 		text-align:center; color:#fff; background-color:#888; padding:16px 8px 0 0; margin:-16px 0 0 -16px; width:calc(100% + 24px); height:36px;
 					}

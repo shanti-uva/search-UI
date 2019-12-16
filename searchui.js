@@ -44,11 +44,11 @@ class SearchUI  {
 		this.runMode=mode;																			// Current mode
 		this.facets={};																				
 		this.facets.places=			{ type:"tree",  icon:"&#xe62b", mode:null, data:[] };			// Places 
-		this.facets.collections=	{ type:"list",  icon:"&#xe633", mode:null, data:[] };			// Collections 
-		this.facets.languages=		{ type:"tree",  icon:"&#xe670", mode:null, data:[] };			// Languages 
 		this.facets.features=		{ type:"tree",  icon:"&#xe638", mode:null, data:[] };			// Features 
 		this.facets.subjects=		{ type:"tree",  icon:"&#xe634", mode:null, data:[] };			// Subjects 
 		this.facets.terms=			{ type:"tree",  icon:"&#xe635", mode:null, data:[] };			// Terms 
+		this.facets.collections=	{ type:"list",  icon:"&#xe633", mode:null, data:[] };			// Collections 
+		this.facets.languages=		{ type:"tree",  icon:"&#xe670", mode:null, data:[] };			// Languages 
 		this.facets.users=			{ type:"input", icon:"&#xe600", mode:null, data:[] };			// Terms 
 		this.facets.relationships=	{ type:"list",  icon:"&#xe638", mode:null, data:[] };			// Relationships
 	
@@ -116,8 +116,9 @@ class SearchUI  {
 				str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
 					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
 					<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
-				</div>
-				<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
+				</div>`;
+				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:20px 0 8px 0'>";
+				str+=`<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
 				}
 			str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>
@@ -543,7 +544,7 @@ class SearchUI  {
 		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-		str=`SHOW&nbsp;&nbsp; 
+		str=`TYPE&nbsp;&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
 			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
 			${this.assets[this.ss.type].g}</div>
