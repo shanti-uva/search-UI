@@ -48,7 +48,7 @@ class Pages  {
 		if (!kmap)	return;																		// Quit if no kmap
 		if (!fromHistory)	sui.SetState(`p=${kmap.uid}`);										// This is the active page
 		this.curKmap=kmap;																		// Set active page's map
-		this.DrawHeader(kmap);																	// Draw header
+		if (sui.ss.mode != "related")		this.DrawHeader(kmap);								// Draw header if not showing relateds
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px", display:"none"});	// Reset to normal size and hide
 		$(this.div).css({ display:"block",color:"#000"});										// Show page
 		if (sui.ss.mode == "related") {															// If browsing related pages
@@ -246,6 +246,8 @@ class Pages  {
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 				
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
+					if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;					// Get out of related
+					this.baseMap=null;															// No base and set to home
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
 					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url

@@ -543,7 +543,7 @@ class SearchUI  {
 		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-		str=`SHOW&nbsp;&nbsp; 
+		str=`TYPE&nbsp;&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
 			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
 			${this.assets[this.ss.type].g}</div>
