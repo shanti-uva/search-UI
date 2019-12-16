@@ -117,7 +117,7 @@ class SearchUI  {
 					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
 					<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
 				</div>`;
-				if ((key == "terms") || (key == "users")) str+="<br><hr style='border-top:8px solid #ddd'>";
+				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:20px 0 8px 0'>";
 				str+=`<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
 				}
