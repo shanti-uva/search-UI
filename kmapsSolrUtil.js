@@ -174,12 +174,12 @@ class KmapsSolrUtil {
         return [
             {id: "audio-video", title: "audio-video", bool: "OR"},
             {id: "images", title: "images", bool: "OR"},
-            {id: "texts", title: "texts", bool: "OR"},
-            {id: "visuals", title: "texts", bool: "OR"},
-            {id: "sources", title: "texts", bool: "OR"},
-            {id: "subjects", title: "texts", bool: "OR"},
-            {id: "places", title: "texts", bool: "OR"},
-            {id: "terms", title: "texts", bool: "OR"}
+            {id: "texts", title: "images", bool: "OR"},
+            {id: "visuals", title: "visuals", bool: "OR"},
+            {id: "sources", title: "sources", bool: "OR"},
+            {id: "subjects", title: "subjects", bool: "OR"},
+            {id: "places", title: "places", bool: "OR"},
+            {id: "terms", title: "terms", bool: "OR"}
         ];
     }
 
@@ -232,19 +232,22 @@ class KmapsSolrUtil {
             }
         }
 
-        // console.dir(facet_fqs);
-
+        function escapeSearchString(str) {
+            str = str.replace(' ','\\ ');
+            return str;
+        }
         // create request object
 
         var searchstring = state.query.text || "";
+        searchstring = escapeSearchString(searchstring);
         var page = state.page || 0;
         var pageSize = state.pageSize || 100;
 
         if (facet_fqs.length > 0) pageSize = 0;  // zero pagesize if this is a facet filtering situation
 
         // console.log (JSON.stringify(state));
-        var starts = searchstring + "*";
-        var search = "*" + searchstring + "*";
+        var starts = (searchstring.length)?searchstring + "*":"*";
+        var search = (searchstring.length)?"*" + searchstring + "*":"*";
         var slashy = searchstring + "/";
          if ($.type(searchstring) === "undefined" || searchstring.length === 0 ) {
              searchstring = search = slashy = "*";
