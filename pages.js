@@ -246,7 +246,7 @@ class Pages  {
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 				
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
-					if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;					// Get out of related
+					if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=this.lastMode;	// Get out of related and collections
 					this.baseMap=null;															// No base and set to home
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
