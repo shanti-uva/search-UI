@@ -69,12 +69,19 @@ class SearchUI  {
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
 		this.InitSearchState();																		// Init search state to default
 		this.AddFrame();																			// Add div framework
+		
 		if (!location.hash)	{ 																		// Normal startup
 			this.Query(true);																		// Load search data
 			this.Draw(); 																			// Draw
 			}										
-		window.onresize=()=> { if (!(location.hash+" ").match(/audio-video/)) this.Draw(); };		// On window resize. redraw if not an AV
-		window.addEventListener("popstate", (h)=> { 												// Route if hash change
+		
+		window.onresize=()=> { 																		// ON RESIZE
+			if ((location.hash+" ").match(/audio-video/)) 	return;									// If AV don't refresh
+			if ((location.hash+" ").match(/#p/))			this.PageRouter(location.hash);			// Get from hash
+			else											this.Draw(); 							// Full reraw
+			};
+		
+		window.addEventListener("popstate", (h)=> { 												// ON PAGE STATE CHANGE
 			let state=h.state;																		// Get state
 			if (!state)	state=location.hash;														// If no state, get directly from hash
 			this.PageRouter(state); 																// Route on state
