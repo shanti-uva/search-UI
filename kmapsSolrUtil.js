@@ -233,7 +233,15 @@ class KmapsSolrUtil {
         }
 
         function escapeSearchString(str) {
-            str = str.replace(/ /g,'\\ ');
+            str = str.replace(/ /g,'\\ '); // escape spaces
+            str = str.replace('(','\\(');
+            str = str.replace(')','\\)');
+            str = str.replace(':','\\:');
+            str = str.replace('+','\\+');
+            str = str.replace('-','\\-');
+            str = str.replace('"','\\\"');
+            str = str.replace('?','\\?');
+
             return str;
         }
         // create request object
