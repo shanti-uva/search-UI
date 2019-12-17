@@ -141,6 +141,7 @@ class AudioVideo  {
 	{
 		let i,t,v,f;
 		let	str="";																					// Start fresh on tab 0
+		try{ if (o.title) str+="<p title='Title'><b>TITLE</b>:&nbsp;&nbsp;"+o.title+"</p>"; } catch(e) {}
 		try{ if (o.collection_title) str+="<p title='Collection'><b>COLLECTION</b>:&nbsp;&nbsp;"+o.collection_title+"</p>"; } catch(e) {}
 		try{ str+="<p><b>SUBCOLLECTION</b>:&nbsp;&nbsp;";
 			for (i=0;i<d.field_subcollection_new.und.length;++i) {
