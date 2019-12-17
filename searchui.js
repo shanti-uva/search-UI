@@ -365,7 +365,6 @@ class SearchUI  {
 			this.curResults=data.response.docs;														// Save current results
 			this.MassageKmapData(data);																// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
-			this.ss.numResults=this.assets.all.n=data.response.numFound;							// Set total count
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			this.DrawAdvanced();																	// Draw advanced search if active
@@ -448,15 +447,16 @@ class SearchUI  {
 
 	GetFacetData(data)																				// GET FACET COUNTS
 	{
-		var i,f,val,buckets;
+		var i,f,val,buckets,n=0;
 		for (f in this.assets)	this.assets[f].n=0;													// Zero them out
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
 				for (i=0;i<buckets.length;++i) {													// For each bucket
 					val=buckets[i].val;																// Get name
 					this.assets[val].n=buckets[i].count;											// Set count
+					n+=buckets[i].count;															// Add to count
 					}
-				this.assets.all.n=data.response.numFound;											// All count
+				this.ss.numResults=this.assets.all.n=n;												// Set total count
 				}	
 	}
 
