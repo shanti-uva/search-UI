@@ -303,7 +303,7 @@ class KmapsSolrUtil {
                 }
             }
 
-            fq_array.push(this.buildFq(state.query.assets, "asset_type", "id"));
+            fq_array.push(this.buildFq(state.query.assets, "asset_type", "id", "ast"));
         }
 
 
@@ -432,9 +432,9 @@ class KmapsSolrUtil {
         );
     }
 
-    buildFq(facets, facet_field, type) {
-
+    buildFq(facets, facet_field, type, tag) {
         if (!type) { type = "id"; }
+        var bangtag = (tag)?"{!tag=" + tag+ "}":"";
         // console.log("Got facet values: " + JSON.stringify(facets));
         var st = "";
         for (var i = 0; i < facets.length; i++) {
@@ -456,7 +456,7 @@ class KmapsSolrUtil {
             st += " " + op + "\"" + km + "\"";
         }
 
-        var fq = facet_field +
+        var fq = bangtag + facet_field +
             ":(" + st + ")";
         // console.log("FQ: " + fq);
         return fq;
