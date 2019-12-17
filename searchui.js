@@ -297,7 +297,6 @@ class SearchUI  {
 			}			
 	}
 
-
 /*	QUERY TOOLS //////////////////////////////////////////////////////////////////////////////////
 
 	A series of functions that manage the search process. The state of the current search is

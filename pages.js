@@ -114,11 +114,12 @@ class Pages  {
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
 			if (this.relatedType == "Home")	{													// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
-				this.baseMap=null;																// No base and set to home
 				this.Draw(this.relatedBase);													// Show
+				this.relatedBase=null;															// No base and set to home
 				}
 			else{
-				if (this.relatedType == "places") 	sui.plc.Draw(o,2)							// If places, draw with context tab open
+				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
+				if (this.relatedBase.asset_type == "places") 	sui.plc.Draw(o,2);				// If base is a place, draw place with context tab open
 				else this.DrawRelatedResults(o);												// Related asset browsing
 				if (!fromHistory)																// If not from history API
 					sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state
@@ -232,6 +233,7 @@ class Pages  {
 		var url=sui.solrUtil.createKmapQuery(id,null,null,300);									// Get query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
 			let i,n,str="";
+			if ($("[id^=sui-pop-]")[0])	return; 												// Quit if already loaded
 			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
 				let d=data.facets.asset_counts.buckets;											// Point at bucket array
 				for (i=0;i<d.length;++i) {														// For each bucket
@@ -247,7 +249,7 @@ class Pages  {
 				
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
 					if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=this.lastMode;	// Get out of related and collections
-					this.baseMap=null;															// No base and set to home
+					this.relatedBase=null;															// No base and set to home
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
 					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url

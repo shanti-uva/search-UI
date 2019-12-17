@@ -157,7 +157,7 @@ class Images  {
 				$("#sui-thisPic").css("width","100%");												// Fit in window
 				$("#sui-thisPic").offset($("#sui-imageDiv").offset());								// Restore offset
 				$("#sui-imageDiv").css("width","50%");												// Back to half screen
-				pic.onmousedown=null;																// Remove handler
+				pic.onmousedown=pic.onwheel=null;													// Remove listeners
 				return;																				// Quit
 				}
 			$("#sui-picEnlarge").html("Zoom &nbsp; &#xe651  &nbsp; out ");							// Zoom out icon
@@ -179,7 +179,7 @@ class Images  {
 					var dx=e.pageX-sx;   	var dy=e.pageY-sy;										// Get delta
 					$("#sui-thisPic").offset({left:px+dx,top:py+dy});								// Set image via offset
 					};
-				pic.onmouseup=(e)=> {	pic.onmouseup=pic.onmousemove=null; }; 						// Remove listeners
+				pic.onmouseup=(e)=> {	pic.onwheeel=pic.onmouseup=pic.onmousemove=null; }; 		// Remove listeners
 				};
 			});
 		}
