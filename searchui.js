@@ -668,14 +668,14 @@ class SearchUI  {
 
 		$(".sui-itemIcon").on("click",(e)=> { 														// ON ICON BUTTON CLICK
 			var num=e.currentTarget.id.substring(13);												// Get index of result	
-			if (e.ctrlKey)	window.open("#p="+this.curResults[num].uid,"_blank");					// Open in new window
-			else			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);	// Send message
+			if (e.originalEvent.metaKey) window.open("#p="+this.curResults[num].uid,"_blank");		// Open in new window
+			else this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);		// Send message
 			return false;																			// Stop propagation
 			});
 		$("[id^=sui-itemPic-]").on("click",(e)=> { 													// ON ITEM CLICK
 			var num=e.currentTarget.id.substring(12);												// Get index of result	
-			if (e.ctrlKey)	window.open("#p="+this.curResults[num].uid,"_blank");					// Open in new window
-			else 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);	// Send message
+			if (e.originalEvent.metaKey) window.open("#p="+this.curResults[num].uid,"_blank");		// Open in new window
+			else this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);		// Send message
 			return false;																			// Stop propagation
 			});
 		$(".sui-gridInfo").on("mouseover",(e)=> { 													// ON INFO BUTTON HOVER
@@ -699,8 +699,8 @@ class SearchUI  {
 		$(".sui-gridInfo").on("mouseout",(e)=> { $("#sui-popupDiv").remove(); });					// ON INFO BUTTON OUT
 		$("[id^=sui-itemTitle-]").on("click",(e)=> { 												// ON TITLE CLICK
 			var num=e.currentTarget.id.substring(14);												// Get index of result	
-			if (e.ctrlKey)	window.open("#p="+this.curResults[num].uid,"_blank");					// Open in new window
-			else 			this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);	// Send message
+			if (e.originalEvent.metaKey) window.open("#p="+this.curResults[num].uid,"_blank");		// Open in new window
+			else this.SendMessage("page="+this.curResults[num].url_html,this.curResults[num]);		// Send message
 			return false;																			// Stop propagation
 			});
 		$(".sui-itemPlus").on("click",(e)=> { 														// ON MORE BUTTON CLICK
