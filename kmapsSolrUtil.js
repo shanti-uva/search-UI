@@ -262,7 +262,6 @@ class KmapsSolrUtil {
          }
          var start = page * pageSize;
 
-
          var fq_array = [];
 
          // places
@@ -354,13 +353,18 @@ class KmapsSolrUtil {
             "slashy": slashy,
         };
 
+        var all_req = {
+          "q": "*"
+        };
+
         var kmapid_req = {
             "q":        "(uid:${kmapid}^100 kmapid:${kmapid})",
             "kmapid":   kmapid
         };
 
-        var reqbase = (kmapid.length)?kmapid_req:basic_req;
+        if (searchstring === "*" || searchstring === "") { basic_req = all_req; }
 
+        var reqbase = (kmapid.length)?kmapid_req:basic_req;
         var req = $.extend(
             {},
             {
