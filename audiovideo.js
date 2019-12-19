@@ -48,7 +48,8 @@ class AudioVideo  {
 		this.inPlay=false;																		// Not playying yet
 		let w=$(this.div).width();																// Width of area
 		$(this.div).css("background-color","#eee");												// BG color
-		$(this.div).html("");																	// Clear screen
+		$(this.div).html("<div id='sui-av'></div>");											// Clear screen
+		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu if active
 		this.kmap=o;																			// Save kmap
 		if (typeof kWidget != "undefined") 	kWidget.destroy("sui-kplayer");						// If Kaltura player already initted yet, kill it
 		
@@ -96,7 +97,7 @@ class AudioVideo  {
 				str+="</div>";
 				}
 			str+=sui.pages.DrawTabMenu(["DETAILS","PEOPLE","TECHNICAL"]);						// Add tab menu
-			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Add player
+			$("#sui-av").html(str.replace(/\t|\n|\r/g,""));										// Add player
 	
 			$("#sui-avCol").on("click",()=>	{													// ON COLLECTION CLICK
 				sui.pages.ShowCollection(o.asset_type+"-"+o.id,o.collection_idfacet[0]);		// Show
@@ -120,7 +121,6 @@ class AudioVideo  {
 				sui.LoadingIcon(false);															// Hide loading icon
 				if (typeof kWidget != "undefined") kWidget.embed({ entry_id:entryId });			// If Kaltura player already inittted yet
 				this.DrawMetaData(o,d);															// Draw metadata content
-				sui.pages.DrawRelatedAssets(o);													// Draw related assets menu if active
 				showTab(0);																		// Open details
 
 				$("[id^=sui-tabTab]").on("click", (e)=> {										// ON TAB CLICK
@@ -267,7 +267,7 @@ class AudioVideo  {
 			<div id='sui-transOps' class='sui-transOps'></div>
 			<div id='sui-trans' class='sui-trans'></div>
 		</div>`;
-		$(this.div).append(str.replace(/\t|\n|\r/g,""));
+		$("#sui-av").append(str.replace(/\t|\n|\r/g,""));
 		
 		var curHit=0,hits=[];																	// Holds search hits
 

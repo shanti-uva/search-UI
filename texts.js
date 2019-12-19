@@ -28,29 +28,28 @@ class Texts  {
 	Draw(o)																					// DRAW TEXTS PAGE FROM KMAP
 	{
 		let _this=this;
-		var str="<div class='sui-texts'>";
 		if (!$(".shanti-texts-section-content").length)											// No CSS yet
 			$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://texts-dev.shanti.virginia.edu/sites/all/themes/shanti_sarvaka_texts/css/shanti_texts.css" }).appendTo("head"); 	// Load CSS
 		var url=o.url_ajax.replace(/node_ajax/i,"node_embed")+"?callback=pfunc";				// Make url
-		$(this.div).html("");																	// Clear page	
+		$(this.div).html();																		// Clear page	
+		var str=`<div id='sui-textCon' class='sui-texts'></div>
+		<div style='display:inline-block;width:calc(34% + 3px);margin-left:-8px;vertical-align:top'>
+		<div class='sui-textTop' id='sui-textTop'>
+			<div class='sui-textTab' id='sui-textTab0'>CONTENTS</div>
+			<div class='sui-textTab' id='sui-textTab1'>DESCRIPTION</div>
+			<div class='sui-textTab' id='sui-textTab2'>VIEWS</div>
+		</div>
+		<div class='sui-textContent' id='sui-textContent'></div></div>`;
+		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu if active
 
 		sui.LoadingIcon(true,64);																// Show loading icon
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {									// Get json
 			sui.LoadingIcon(false);																// Hide loading icon
-			str+=data+`</div>																
-			<div style='display:inline-block;width:calc(34% + 3px);margin-left:-8px;vertical-align:top'>
-			<div class='sui-textTop' id='sui-textTop'>
-				<div class='sui-textTab' id='sui-textTab0'>CONTENTS</div>
-				<div class='sui-textTab' id='sui-textTab1'>DESCRIPTION</div>
-				<div class='sui-textTab' id='sui-textTab2'>VIEWS</div>
-			</div>
-			<div class='sui-textContent' id='sui-textContent'></div></div>`;
-			$(this.div).html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div	
-			sui.pages.DrawRelatedAssets(o);														// Draw related assets menu if active
-
-			this.content[0]=$("#shanti-texts-toc").html();										// Save toc
+			$("#sui-textCon").html(data);								// Add text content															
+			this.content[0]=$("#shanti-texts-toc").html();										// Save TOC
 			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
-			showTab(0);
+			showTab(0);																			// Show TOC
 	
 			let s=`<p><b>ALTERNATIVE FORMATS</b></p>
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/book_pubreader/${o.id}'>&#xe678&nbsp;&nbsp;View in PubReader</a></p>

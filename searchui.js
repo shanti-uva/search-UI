@@ -92,6 +92,9 @@ class SearchUI  {
 	{
 		let key;
 		var str=`<div id='sui-main' class='sui-main'>
+		<div class='sui-topBar'>
+			<img src="img/bhutanleft.gif" style='cursor:pointer' onclick='sui.pages.DrawLandingPage()' title='Home page'>
+		</div>
 		<div id='sui-top' class='sui-top'>
 			<div id='sui-headRight' class='sui-headRight'></div>
 			<div style='display:inline-block'>
@@ -175,7 +178,7 @@ class SearchUI  {
 			this.DrawFacetItems(id);																// Draw appropriate tree, list, or input
 			});
 
-		$("#sui-results").on("click",()=>{ $("#sui-popover").remove(); });							// ON CLICK OF RESULTS PAGE 
+		$("#sui-results").on("click",()=>{$("[id^=sui-popover-]").remove(); });						// ON CLICK OF RESULTS PAGE 
 		}
 
 	Draw(mode)																					// DRAW SEARCH COMPONENTS
@@ -313,7 +316,6 @@ class SearchUI  {
 	InitSearchState()																			// INIIALIZE SEARCH STATE
 	{
 		this.ss={};																					// Clear search state
-//		this.ss.solrUrl="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select";		// SOLR dev url
 		this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets_stage/select";		// Production
 		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
 		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
@@ -328,6 +330,7 @@ class SearchUI  {
 
 	ClearQuery()																				// CLEAR SEARCH QUERY STATE TO START
 	{
+		$("#sui-search").val("");																	// Clear input field
 		this.ss.query={ 																			// Current query
 			text:"",																				// Search word 
 			places:[],																				// Places
@@ -1291,6 +1294,14 @@ class SearchUI  {
 		str+=msg+"</div>"; 																			// Add content
 		$("#sui-main").append(str);																	// Add to div 
 		$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);					// Animate in and out		
+	}
+
+	ShortenString(str, len)																		// SHORTEN A STRING TO LENGTH
+	{
+		if (typeof str == "object")	str=str[0];														// Get 1st member if an array
+		if (str && str.length > len)																// Too long
+			str=str.substr(0,(len-3))+"...";														// Shorten	
+		return str;																					// Return string
 	}
 
 } // SearchUI class closure

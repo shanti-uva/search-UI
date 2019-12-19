@@ -317,6 +317,7 @@ class Places  {
 	
 	ShowTab(which)																			// OPEN TAB
 	{	
+		let _this=this;																			// Context
 		$("[id^=sui-spLab-]").off("click");														// Kill handler
 		$("[id^=sui-spDot-]").off("click");														// Kill handler
 		$("[id^=sui-spItem-]").off("click");													// Kill handler
@@ -336,7 +337,7 @@ class Places  {
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") this.AddBranch(this.kmap.asset_type,path,$(this));			// Lazy load branch
+				if (path != "null") _this.AddBranch(_this.kmap.asset_type,path,$(this));		// Lazy load branch
 				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
@@ -489,6 +490,7 @@ class Places  {
 			$("[id^=sui-spDot-]").off("click");													// Kill handler
 			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
 				let id=e.currentTarget.id.substring(10);										// Get id
+				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				return false;																	// Stop propagation
 				});

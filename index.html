@@ -20,25 +20,17 @@
 	<link REL="SHORTCUT ICON" HREF="img/shanti.ico">
 	<title>Mandala Search UI</title>
 </head>
-
 <style>
 	@font-face { font-family: 'shanticon'; src: url('shanticon.ttf?ueun15') format('truetype'); font-weight: normal; font-style: normal; }
-	
 </style>
-
 <body>
-	<div class='sui-topBar'>
-		<div style='white-space:nowrap'>
-			<img src="img/bhutanleft.gif" style='cursor:pointer' onclick='sui.pages.DrawLandingPage()' title='Home page'>
-		<div>
-	</div>
 <script>
 
 var sui=new SearchUI("Mandala","standalone");											// Alloc new search object
 sui.pages=new Pages();																	// Alloc pages (standalone only)
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
-	sui.SerializeQuery(sui.ss)
+
 });
 
 	function trace(msg, p1, p2, p3, p4)										// CONSOLE 

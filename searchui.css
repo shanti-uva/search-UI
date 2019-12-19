@@ -3,7 +3,7 @@
 					width:100vw; height:100vh; font-family:"Open Sans","Segoe UI",Tahoma,sans-serif,shanticon;
 					} .sui-main b { font-weight:600; }				
 .sui-top 		{	position:absolute; right:12px; top:7px; user-select:none; }
-.sui-topBar 	{	height:43px; width:calc(100% + 16px); margin:-8px;background-color:#eee; }
+.sui-topBar 	{	height:43px; width:100%; background-color:#eee; }
 .sui-search1 	{	float:left; background-color:#fafafa; font-size:16px; color: #ccc; height:22px; width:210px; padding: 6px 8px 0 8px;
 					border-radius:16px 0 0 16px; border-left: 1px solid #999; border-top:1px solid #999; border-bottom:1px solid #999;	}
 .sui-search2 	{	float:left; background-color:#fafafa; color:#888; height:17px; width:175px; margin-top:-2px; margin-left:2px; font-size:14px;

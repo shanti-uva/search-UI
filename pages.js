@@ -63,6 +63,11 @@ class Pages  {
 		else if (kmap.asset_type == "audio-video") 	sui.av.Draw(kmap);							// AV
 		else if (kmap.asset_type == "texts") 		sui.txt.Draw(kmap);							// Text
 		else if (kmap.asset_type == "visuals") 		sui.vis.Draw(kmap);							// Visual
+		if (sui.ss.mode == "related") {															// If related
+			this.DrawHeader(kmap);																// Put up header
+			for (let k in sui.assets) $(`#sui-rl-${k}`).remove();								// For each asset type, remove
+			$(`#sui-rl-Home`).append(`<div style='font-size:12px'>${sui.ShortenString(this.relatedBase.title,20)}</div><br>`);
+		}
 	}
 
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
@@ -72,7 +77,7 @@ class Pages  {
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
-		if (!o.asset_type.match(/places|subjects|terms/) && (sui.ss.mode != "related")) return;	// Quit if not related or a sub/term/place
+		if (!browse && (sui.ss.mode != "related")) return;										// Quit if not related or a sub/term/place
 		var url=sui.solrUtil.createKmapQuery(o.uid);											// Get query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
 			var i,n,tot=0;
@@ -184,10 +189,10 @@ class Pages  {
 	{
 		var i;
 		if (id && id.match(/collections-/))	return;												// No maps for collections yet
-		$("#sui-popover").remove();																// Remove old one
+		$("[id^=sui-popover-]").remove();														// Remove old one
 		var pos=$(event.target).position();														// Get position of icon
 		let x=Math.max(12,Math.min(pos.left,$("body").width()-162));							// Cap sides
-		let str=`<div id='sui-popover' class='sui-popover' 
+		let str=`<div id='sui-popover-${id}' class='sui-popover' 
 		style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
 		<div style='width:0;height:0;border-left:10px solid transparent;
 		border-right:10px solid transparent;border-bottom:10px solid #999;
@@ -199,7 +204,7 @@ class Pages  {
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
-			if (!o)  { $("#sui-popover").remove(); return; }									// Quit if nothing
+			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
 			let str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
 			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
 			<span style='font-size:12px;text-transform:capitalize'>
@@ -216,7 +221,7 @@ class Pages  {
 				<a class='sui-popItem' href='#p=${o.uid}'>
 				<p id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p></a>
 				</div>`;
-			$("#sui-popover").append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div
+			$("#sui-popover-"+id).append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
@@ -309,6 +314,8 @@ class Pages  {
 				</div>
 			</div>`;
 		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		sui.ClearQuery();																		// Clear query
+		$("#sui-search").focus();																// Focus on search input
 	}
 
 	DrawCarousel(content)																	// DRAW RESOURCE CAROUSEL

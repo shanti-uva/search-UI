@@ -110,6 +110,7 @@ class Subjects  {
 	GetTabData(o)																			// GET TAB DATA FOR CONTEXT / SUMMARY
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
+			if (!data)	return;																	// Quit if no data
 			if (data.illustration_external_url && data.illustration_external_url[0]) {			// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
 				$("#sui-relatedImg").prop("src",data.illustration_external_url[0]);				// Show it
@@ -231,6 +232,7 @@ class Subjects  {
 			$("[id^=sui-spDot-]").off("click");													// Kill handler
 			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
 				let id=e.currentTarget.id.substring(10);										// Get id
+				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				});
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
