@@ -65,11 +65,7 @@ class Subjects  {
 			$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
 			$("#sui-tabContent").html(_this.content[which]);									// Set content
 			if (which == 0)	{																	// If summary, add events
-				$("[id^=sui-spLab-]").on("click", (e)=> {										// ON RELATIONSHIP TREE ITEM CLICK
-					let id=e.currentTarget.id.substring(10);									// Get id
-					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
-					return false;																// Don't prop
-					});
+				$("[id^=sui-spLab-]").on("click", function(e) {return false;	});				// ON CONEXT LINE CLICK, INHIBIT
 				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
 					let firstChild=$(this).parent().find("ul")[0];								// Get first child
 					let path=e.currentTarget.id.substring(10);									// Get id
@@ -80,6 +76,7 @@ class Subjects  {
 				$("#sui-spLab-"+o.uid).css({ "border-bottom":"1px solid #999" });				// Highlight current one	
 				}
 			else if (which == 1) {																// If summary, add events
+				$("[id^=sui-spItem-]").on("click", function(e) {return false;	});				// ON CONEXT LINE CLICK, INHIBIT
 				$("[id^=sui-spCatUL-]").slideDown();											// All down
 				$("[id^=sui-spCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
 					let id=e.currentTarget.id.substring(9);										// Get id
@@ -89,11 +86,6 @@ class Subjects  {
 						$("#sui-spCatUL"+id).slideUp();											// Hide
 					});
 
-				$("[id^=sui-spItem-]").on("click", (e)=> {										// ON SUMMARY ITEM CLICK
-					let id=e.currentTarget.id.substring(11);									// Get id
-					sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
-					return false;																// Don't prop
-					});
 				$("#sui-togCatA").on("click", ()=> {											// ON EXPAND ALL
 					$("[id^=sui-spCatUL-]").slideDown();										// All down
 					});
@@ -151,7 +143,7 @@ class Subjects  {
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
 			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
 			for (i=0;i<s[f].length;++i)	{														// For each item
-				str+="<li><a style='cursor:pointer' id='sui-spItem-"+s[f][i].id;				// Line
+				str+="<li><a style='cursor:pointer;color:#000' id='sui-spItem-"+s[f][i].id;		// Line
 				str+="' href='#p="+s[f][i].id+"'>";												// Href
 				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					// Add popover
 				}
@@ -199,7 +191,8 @@ class Subjects  {
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
 		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-		s+=`<a style='cursor:pointer' id='sui-spLab-${id}' href='#p=${id}'>${lab}</a>`;			// Add name
+		s+=`<a style='cursor:pointer;color:#000' id='sui-spLab-${id}' href='#p=${id}'>${lab}
+		${sui.pages.AddPop(id)}</a>`;		
 		return s;																				// Return line
 	}
 
@@ -228,13 +221,7 @@ class Subjects  {
 			$(dot).html("&ndash;"); 															// Change label to 'open'
 			dot.parent().append(str);															// Append branch
 
-			$("[id^=sui-spLab-]").off("click");													// Kill handler
 			$("[id^=sui-spDot-]").off("click");													// Kill handler
-			$("[id^=sui-spLab-]").on("click", (e)=> {											// ON RELATIONSHIP TREE ITEM CLICK
-				let id=e.currentTarget.id.substring(10);										// Get id
-				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
-				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
-				});
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id

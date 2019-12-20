@@ -63,11 +63,6 @@ class Pages  {
 		else if (kmap.asset_type == "audio-video") 	sui.av.Draw(kmap);							// AV
 		else if (kmap.asset_type == "texts") 		sui.txt.Draw(kmap);							// Text
 		else if (kmap.asset_type == "visuals") 		sui.vis.Draw(kmap);							// Visual
-		if (sui.ss.mode == "related") {															// If related
-			this.DrawHeader(kmap);																// Put up header
-			for (let k in sui.assets) $(`#sui-rl-${k}`).remove();								// For each asset type, remove
-			$(`#sui-rl-Home`).append(`<div style='font-size:12px'>${sui.ShortenString(this.relatedBase.title,20)}</div><br>`);
-		}
 	}
 
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
