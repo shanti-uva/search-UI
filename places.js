@@ -274,7 +274,7 @@ class Places  {
 	{
 		let i;
 		let str="<div style='margin-left:192px'>";
-		str+=sui.pages.DrawTabMenu(["MAP","CONTEXT","RELATIONSHIPS","NAMES","LOCATION"])+"</div></div>";	// Add tab menu
+		str+=this.DrawTabMenu(["MAP","NAMES","LOCATION","GEOGRAPHIC CONTEXT","PLACE RELATIONSHIPS"],3)+"</div></div>";	// Add tab menu
 		str+="<div class='plc-main' id='plc-main'></div>";										// Maqp holder
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
 			str+="<div style='margin: 12px 0 6px 192px'><b>FEATURE TYPE:</b>";					// Add header
@@ -312,9 +312,22 @@ class Places  {
 		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
 		...to be added
 		</div><br>`;
-		this.content[3]=str;											
+		this.content[1]=str;											
 		}	
-	
+
+	DrawTabMenu(tabs, split)																// DRAW TAB MENU
+	{
+		let i, str="",pct=100/split;														
+		for (i=0;i<tabs.length;++i) {
+			if (i >= split)	pct=100/(tabs.length-split);										// For each tab	
+			str+=`<div class='sui-tabTab' id='sui-tabTab${i}' style='width:calc(${pct}% - 2px)
+			${(i >= split) ? ";display:none'" :"'" }>
+			${tabs[i]}&nbsp;&#xe609</div>`;
+		}
+		str+="<div class='sui-tabContent' id='sui-tabContent'></div>";							// Tab contents
+		return str.replace(/\t|\n|\r|/g,"");													// Return tab markup
+	}
+
 	ShowTab(which)																			// OPEN TAB
 	{	
 		let _this=this;																			// Context
@@ -328,8 +341,15 @@ class Places  {
 		$("#sui-tabContent").html(this.content[which]);											// Set content
 		if (which == 0)		$("#plc-main").slideDown();											// Show map
 		else				$("#plc-main").slideUp();											// Hide map
+		if (which < 3) {																		// Main tab bank
+			$("#sui-tabTab0,#sui-tabTab1, #sui-tabTab2").show();								// Show 1st 3
+			$("#sui-tabTab3,#sui-tabTab4").hide();												// Hide rest
+			}
+		else{																					// Second tab bank
+			$("#sui-tabTab0,#sui-tabTab1, #sui-tabTab2").hide();								// Hide 1st 3
+			$("#sui-tabTab3,#sui-tabTab4").show();												// Show rest
+			}
 		if (which == 1)	{																		// If summary, add events
-			$("[id^=sui-spLab-]").on("click", function(e) {	return false;		});				// ON CONEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
@@ -339,7 +359,8 @@ class Places  {
 				});
 			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
 			}
-		else if (which == 2) {																	// If summary, add events
+		else if (which > 2) {																	// If context/relationships, add events
+			$("[id^=sui-spLab-]").on("click", function(e) {	return false;		});				// ON CONEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spItem-]").on("click", function(e) {	return false;		});			// ON LINE CLICK, INHIBIT
 			$("[id^=sui-spCatUL-]").slideDown();												// All down
 			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
@@ -386,7 +407,7 @@ class Places  {
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
-		this.content[2]=str;																	// Set summary tab
+		this.content[3]=str;																	// Set summary tab
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			let sub="xxx";
@@ -441,7 +462,7 @@ class Places  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[1]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
+			this.content[4]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
 			});
 	}
 
