@@ -160,7 +160,8 @@ class SearchUI  {
 		$("#sui-mode").on("click",()=> { 															// ON CHANGE MODE
 			if (this.ss.mode == "advanced") this.ss.mode="simple";									// Go to simple mode
 			else							this.ss.mode="advanced";								// Go to advanced mode
-			this.Draw(); 																			// Redraw
+			this.DrawResults(true);																	// Draw results page if active
+			this.DrawAdvanced();																	// Draw search UI if active
 			});	
 			
 		$("[id^=sui-advHeader-]").on("click",(e)=> {												// ON FACET HEADER CLICK
@@ -491,7 +492,7 @@ class SearchUI  {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////  */
 
-	DrawResults()																				// DRAW RESULTS SECTION
+	DrawResults(noRefresh)																		// DRAW RESULTS SECTION
 	{
 		$("#sui-results").scrollTop(0);																// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
@@ -531,6 +532,7 @@ class SearchUI  {
 		$("#sui-mode").html(this.ss.mode == "advanced" ? "BASIC<br>SEARCH" : "ADVANCED<br>SEARCH" );		// Set mode icon	
 		$("#sui-header").css({display:"block"} );													// Show header
 		$("#sui-typeList").remove();																// Remove type list
+		if (noRefresh)	return;																		// Don't refresh page
 		this.DrawHeader();																			// Draw header
 		this.DrawItems();																			// Draw items
 		this.DrawFooter();																			// Draw footer
