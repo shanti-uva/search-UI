@@ -219,12 +219,16 @@ class Pages  {
 			$("#sui-popover-"+id).append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
+				if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=this.lastMode;	// Get out of related and collections
+				this.relatedBase=null;															// No base and set to home
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				return false;																	// Don't propagate
 				});
 			
 			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
+				if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=this.lastMode;	// Get out of related and collections
+				this.relatedBase=null;															// No base and set to home
 				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
 				return false;																	// Don't propagate
