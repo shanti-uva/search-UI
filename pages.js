@@ -68,7 +68,7 @@ class Pages  {
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
 	{
 		let browse=true;
-		if (o)	browse=o.asset_type.match(/places|subjects|terms/);								// Add browsing to this menu?	
+		if (this.relatedBase)	browse=this.relatedBase.asset_type.match(/places|subjects|terms/);	// Add browsing to this menu?	
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
@@ -101,10 +101,10 @@ class Pages  {
 			str+="<span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
 			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</a>";
 			}
-		if (browse) {																			// If browsing
+		if (browse && this.relatedBase) {														// If browsing
 			str+="<img id='sui-relatedImg'>";													// Image, if available
-			str+="</div>BROWSE "+o.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
-			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+o.asset_type+"'></div>";	// Add browsing tree div
+			str+="</div>BROWSE "+this.relatedBase.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
+			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+this.relatedBase.asset_type+"'></div>";	// Add browsing tree div
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		if (browse) this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type);						// If browsing, add tree
