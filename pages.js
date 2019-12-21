@@ -68,7 +68,8 @@ class Pages  {
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
 	{
 		let browse=true;
-		if (this.relatedBase)	browse=this.relatedBase.asset_type.match(/places|subjects|terms/);	// Add browsing to this menu?	
+		let p=(this.relatedBase || o);															// Pointer to base kmap
+		if (p)	browse=p.asset_type.match(/places|subjects|terms/);								// Add browsing to this menu?	
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
@@ -94,7 +95,8 @@ class Pages  {
 		let k=o.asset_type;																		// Get this asset type																	
 		var str=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"};
 			height:${$("#sui-results").height()}px'>`;														
-		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";		str+="<div class='sui-relatedList'>";
+		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:24px'>";		
+		str+="<div class='sui-relatedList'>";
 		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
 			str+="<a class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase();
@@ -102,10 +104,9 @@ class Pages  {
 			str+="<span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
 			str+=k.charAt(0).toUpperCase()+k.substr(1)+" (<span id='sui-rln-"+k.toLowerCase()+"'>0</span>)</a>";
 			}
-		if (browse && (this.relatedBase || o)) {												// If browsing
-			let p=(this.relatedBase || o);
+		if (browse && p) {																		// If browsing
 			str+="<img id='sui-relatedImg'>";													// Image, if available
-			str+="</div>BROWSE "+p.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
+			str+="</div>BROWSE "+p.asset_type.toUpperCase()+"<hr style='margin:8px 24px 16px 0'>";	// Add label
 			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+p.asset_type+"'></div>";	// Add browsing tree div
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div

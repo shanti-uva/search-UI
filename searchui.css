@@ -133,7 +133,7 @@
 .sui-tree ul li ul li { position: relative; }
 
 /* PLACES */
-#plc-main 		{   height:66vh; width:calc(100% - 193px); margin-left:192px; }
+#plc-main 		{   height:66vh; width:calc(100% - 181px); margin-left:180px; }
 #plc-infoDiv 	{ 	position: absolute; top:292px; left:219px; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
 
