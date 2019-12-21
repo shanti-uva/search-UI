@@ -143,7 +143,7 @@ class Subjects  {
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
 			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
 			for (i=0;i<s[f].length;++i)	{														// For each item
-				str+="<li><a style='cursor:pointer;color:#000' id='sui-spItem-"+s[f][i].id;		// Line
+				str+="<li><a class='sui-noA' id='sui-spItem-"+s[f][i].id;		// Line
 				str+="' href='#p="+s[f][i].id+"'>";												// Href
 				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					// Add popover
 				}
@@ -191,8 +191,7 @@ class Subjects  {
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
 		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-		s+=`<a style='cursor:pointer;color:#000' id='sui-spLab-${id}' href='#p=${id}'>${lab}
-		${sui.pages.AddPop(id)}</a>`;		
+		s+=`<a class='sui-noA' id='sui-spLab-${id}' href='#p=${id}'>${lab}${sui.pages.AddPop(id)}</a>`;		
 		return s;																				// Return line
 	}
 

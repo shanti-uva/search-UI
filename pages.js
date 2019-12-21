@@ -49,7 +49,7 @@ class Pages  {
 		if (!fromHistory)	sui.SetState(`p=${kmap.uid}`);										// This is the active page
 		this.curKmap=kmap;																		// Set active page's map
 		if (sui.ss.mode != "related")		this.DrawHeader(kmap);								// Draw header if not showing relateds
-		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px", display:"none"});	// Reset to normal size and hide
+		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 12px", display:"none"});	// Reset to normal size and hide
 		$(this.div).css({ display:"block",color:"#000"});										// Show page
 		if (sui.ss.mode == "related") {															// If browsing related pages
 			if (!kmap.asset_type.match(/places|subjects|terms/))								// Need to add space for these types
@@ -95,7 +95,7 @@ class Pages  {
 		let k=o.asset_type;																		// Get this asset type																	
 		var str=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"};
 			height:${$("#sui-results").height()}px'>`;														
-		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:24px'>";		
+		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";		
 		str+="<div class='sui-relatedList'>";
 		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		for (k in sui.assets) {																	// For each asset type														
@@ -106,7 +106,7 @@ class Pages  {
 			}
 		if (browse && p) {																		// If browsing
 			str+="<img id='sui-relatedImg'>";													// Image, if available
-			str+="</div>BROWSE "+p.asset_type.toUpperCase()+"<hr style='margin:8px 24px 16px 0'>";	// Add label
+			str+="</div>BROWSE "+p.asset_type.toUpperCase()+"<hr style='margin:8px 12px 16px 0'>";	// Add label
 			str+="<div class='sui-tree' style='padding-left:0;margin-right:12px;' id='sui-btree-"+p.asset_type+"'></div>";	// Add browsing tree div
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div

@@ -272,17 +272,17 @@ class Places  {
 
 	DrawMetadata(openTab)																		// SHOW PLACES METADATA
 	{
-		let i;
-		let str="<div>";
+		let i,str="<div style='margin-left:180px'><div>";
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
-			str+="<div style='margin: 6px 0 8px 192px'><b>FEATURE TYPE:</b>";					// Add header
+			str+="<div style='margin: 6px 0 8px 0'><b>FEATURE TYPE:</b>";						// Add header
 			for (i=0;i<this.kmap.feature_types_ss.length;++i) 									// For each type
 				str+=" <i>"+this.kmap.feature_types_idfacet[i].split("|")[0]+"</i>"+sui.pages.AddPop(this.kmap.feature_types_idfacet[i].split("|")[1]);  // Add
-			str+="</div>";
+			if (this.kmap.caption) str+="<div class='sui-sourceText'>"+this.kmap.caption+"</div>";	// Add caption
+			str+="</div>";																		// Close top of map div
 			}
 		str+=this.DrawTabMenu(["MAP","NAMES","LOCATION","GEOGRAPHIC CONTEXT","PLACE RELATIONSHIPS"],3)+"</div></div>";	// Add tab menu
 		str+="<div class='plc-main' id='plc-main'></div>";										// Map holder
-		if (this.kmap.caption) str+="<div class='sui-sourceText' style='margin-left:192px'>"+this.kmap.caption+"</div></div><br>";
+		str+="</div>";																			// Close total div
 		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
 		this.ShowTab(0);																		// Open on map
@@ -423,7 +423,7 @@ class Places  {
 					str+="<b>"+sub+"</b></div>";												// Add sub title
 					str+="<ul id='sui-spSubUL-"+s[f][i].id+"' style='list-style-type:none'>";	// Add new container ul
 					}
-				str+="<li style='list-style-type:none'><a style='cursor:pointer;color:#000' id='sui-spItem-"+s[f][i].id;
+				str+="<li style='list-style-type:none'><a class='sui-noA' id='sui-spItem-"+s[f][i].id;
 				str+="' href='#p="+s[f][i].id+"'>";												// Add url
 				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					//Add title it with popover
 				}
@@ -471,7 +471,7 @@ class Places  {
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
 		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-		s+=`<a style='cursor:pointer;color:#000' href='#p=${id}' id='sui-spLab-${id}'>${lab}
+		s+=`<a class='sui-noA' href='#p=${id}' id='sui-spLab-${id}'>${lab}
 		${sui.pages.AddPop(id)}</a>`;		
 		return s;																				// Return line
 	}

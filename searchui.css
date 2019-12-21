@@ -134,7 +134,7 @@
 
 /* PLACES */
 #plc-main 		{   height:66vh; width:calc(100% - 181px); margin-left:180px; }
-#plc-infoDiv 	{ 	position: absolute; top:292px; left:219px; }
+#plc-infoDiv 	{ 	position: absolute; top:292px; left:207px; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
 
 /* RELATED */
@@ -262,4 +262,5 @@
 .sui-main ::-webkit-scrollbar-thumb:hover { background: #aaa }
 .sui-main ::-webkit-input-placeholder { color: #bbb }	::placeholder { color: #bbb }
 
-a { text-decoration:none; } a:hover { border-bottom:1px solid #ccc}
+a { text-decoration:none; } a:hover { border-bottom:1px solid #ccc }
+.sui-noA { text-decoration:none; color:#333 } 
