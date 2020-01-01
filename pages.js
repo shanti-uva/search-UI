@@ -203,7 +203,20 @@ class Pages  {
 
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
 			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
-			let str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
+
+			$("[id^=sui-popover-]").remove();														// Remove old one
+			let str=`<div id='sui-popover-${id}' class='sui-popover' 
+			style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
+			<div style='width:0;height:0;border-left:10px solid transparent;
+			border-right:10px solid transparent;border-bottom:10px solid #999;
+			margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
+			<div style='width:0;height:0;border-left:8px solid transparent;
+			border-right:8px solid transparent;border-bottom:10px solid #fff;
+			margin-left:calc(50% - 8px)'</div>
+			</div>`;
+			$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+	
+			str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
 			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
 			<span style='font-size:12px;text-transform:capitalize'>
 				For more information about this ${o.asset_type.slice(0,-1)}, see Full Entry below.<br>
@@ -428,7 +441,7 @@ class Pages  {
 
 	AddPop(id)																				// ADD KMAP POPOVER
 	{
-		return "&nbsp;<img src='popover.png' onmouseenter='sui.pages.ShowPopover(\""+id+"\",event)'>";	// Add image call to show popover
+		return "&nbsp;<img src='popover.png' onmouseenter='sui.pages.ShowPopover(\""+id+"\",event)' onmousedown='sui.pages.ShowPopover(\""+id+"\",event)'>";	// Add image call to show popover
 	}
 
 	DrawTree(div, facet)  																		// DRAW FACET TREE
