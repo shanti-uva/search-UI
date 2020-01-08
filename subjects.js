@@ -143,7 +143,7 @@ class Subjects  {
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
 			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
 			for (i=0;i<s[f].length;++i)	{														// For each item
-				str+="<li><a class='sui-noA' id='sui-spItem-"+s[f][i].id;		// Line
+				str+="<li><a class='sui-noA' id='sui-spItem-"+s[f][i].id;						// Line
 				str+="' href='#p="+s[f][i].id+"'>";												// Href
 				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					// Add popover
 				}

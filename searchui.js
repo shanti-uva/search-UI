@@ -332,6 +332,7 @@ class SearchUI  {
 	ClearQuery()																				// CLEAR SEARCH QUERY STATE TO START
 	{
 		$("#sui-search").val("");																	// Clear input field
+		if (this.pages) this.pages.relatedBase=this.pages.relatedId="";								// Clear relateds
 		this.ss.query={ 																			// Current query
 			text:"",																				// Search word 
 			places:[],																				// Places
