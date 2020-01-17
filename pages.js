@@ -38,6 +38,7 @@ class Pages  {
 		sui.src=new Sources();																	// Alloc Sources (standalone)
 		sui.vis=new Visuals();																	// Alloc Visuals (standalone)
 		sui.trm=new Terms();																	// Alloc Terms (standalone)
+		sui.col=new Collections();																// Alloc Collections (standalone)
 		this.DrawLandingPage();																	// Draw landing page
 		if (location.hash) sui.PageRouter(location.hash);										// Go to particular page
 		}
@@ -63,6 +64,7 @@ class Pages  {
 		else if (kmap.asset_type == "audio-video") 	sui.av.Draw(kmap);							// AV
 		else if (kmap.asset_type == "texts") 		sui.txt.Draw(kmap);							// Text
 		else if (kmap.asset_type == "visuals") 		sui.vis.Draw(kmap);							// Visual
+		else if (kmap.asset_type == "collections") 	sui.col.Draw(kmap);							// Collections
 	}
 
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
@@ -449,7 +451,7 @@ class Pages  {
 		sui.curTree=facet;																		// Save current facet
 		if (facet == "places") 		 	sui.LazyLoad(div,null,facet,13735);						// Embedded top layer for places
 		else 							sui.GetTopRow(div,facet);								// Constructed top layers
-
+		$(div).css("max-height",$("#sui-footer").offset().top-$(div).offset().top-120+"px");	// Fill space
 	}
 
 	

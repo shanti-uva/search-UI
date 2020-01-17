@@ -262,5 +262,5 @@
 .sui-main ::-webkit-scrollbar-thumb:hover { background: #aaa }
 .sui-main ::-webkit-input-placeholder { color: #bbb }	::placeholder { color: #bbb }
 
-a { text-decoration:none; } a:hover { border-bottom:1px solid #ccc }
-.sui-noA { border:hidden; cursor:default; color:#333 } 
+a { text-decoration:none; }
+.sui-noA { border-bottom:hidden; cursor:default; color:#333 } 

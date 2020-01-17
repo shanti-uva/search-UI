@@ -62,6 +62,7 @@ class SearchUI  {
 		this.assets.visuals= 		{ c:"#6e9456", g:"&#xe63b" };									// Visuals
 		this.assets.subjects=		{ c:"#cc4c39", g:"&#xe634" };									// Subjects
 		this.assets.terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
+		this.assets.collections=   	{ c:"#5b66cb", g:"&#xe633" };									// Collections
 		this.searches=[];																			// Saves recent searches
 
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
@@ -429,7 +430,8 @@ class SearchUI  {
 		if (!url) return;																			// No asset type
 		url=url.replace(/images.shanti.virginia.edu/i,"images-stage.shanti.virginia.edu");			// Look in stage			
 		url+="?callback=myfunc";																	// Add callback
-		if (kmap.asset_type == "audio-video")	url=url.replace(/.json/i,".jsonp");					// Json to jsonp for AV			
+		if ((kmap.asset_type == "audio-video") || kmap.subcollection_uid_ss)						// AV or collection
+			url=url.replace(/.json/i,".jsonp");														// Json to jsonp 			
 		$.ajax( { url:url, dataType:'jsonp', error: (xhr)=>{ this.Popup("Access error");}}).done((data)=> { callback(data); });	// Get JSON and send to callback
 	}
 
@@ -450,9 +452,9 @@ class SearchUI  {
 		return data;
 	}
 
-	GetFacetData(data)																				// GET FACET COUNTS
+	GetFacetData(data)																			// GET FACET COUNTS
 	{
-		var i,f,val,buckets,n=0;
+		let i,f,val,buckets,n=0;
 		for (f in this.assets)	this.assets[f].n=0;													// Zero them out
 		if (data && data.facets && data.facets.asset_counts && data.facets.asset_counts.buckets) {	// If valid
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
@@ -1193,8 +1195,11 @@ class SearchUI  {
 				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
 				if (!div.match(/sui-btree-/))															// If in advanced search
 					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND", _this.curTree);// Add term to search state and refresh
-				else					
+				else{					
+					_this.pages.relatedBase=_this.pages.relatedId="";									// No related
+					if ((_this.ss.mode == "related") || (_this.ss.mode == "collections")) _this.ss.mode=_this.ss.lastMode;	// Get back to search mode
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
+					}
 				}
 		}
 	}
@@ -1257,8 +1262,11 @@ class SearchUI  {
 				let s=$("#"+e.target.id).text().slice(0,-1);											// Get ter
 				if (!div.match(/sui-btree-/))															// If in advanced search
 					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree); // Add term to search state and refresh
-				else	
+				else{	
+					_this.pages.relatedBase=_this.pages.relatedId="";									// No related
+					if ((_this.ss.mode == "related") || (_this.ss.mode == "collections")) _this.ss.mode=_this.ss.lastMode;	// Get back to search mode
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
+					}
 				}
 			}
 	}
