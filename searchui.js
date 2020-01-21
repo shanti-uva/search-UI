@@ -25,7 +25,7 @@
 				sui=query|searchState ->							// Asks Drupul to turn search state (JSON) into SOLR query string
 				sui=close ->										// Tells Drupal search page is closed
 				-> sui=open|[searchState] 							// Open search page is to search state
-				-> sui=close										// Close search page 
+				-> sui=close										// Close search page   
 
 **********************************************************************************************************************************************/
 
