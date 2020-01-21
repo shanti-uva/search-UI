@@ -121,9 +121,9 @@ class SearchUI  {
 					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
 					<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
 				</div>`;
-				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:20px 0 8px 0'>";
 				str+=`<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
+				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:20px 0 8px 0'>";
 				}
 			str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>
 				&#xe62e&nbsp;&nbsp;RECENT SEARCHES
@@ -723,9 +723,9 @@ class SearchUI  {
 		var str="<div class='sui-item'>";
 		str+="<div class='sui-itemPlus' id='sui-itemPlus-"+num+"'>&#xe669</div>";
 		str+="<div class='sui-itemIcon' id='sui-itemIcon-"+num+"' style='background-color:"+this.assets[o.asset_type].c+"'>";
-		str+="<a href='#p="+o.uid+"'>"+this.assets[o.asset_type].g+"</a></div>";					// Add href for right click
+		str+="<a class='sui-noA' href='#p="+o.uid+"'><span style='color:#fff'>"+this.assets[o.asset_type].g+"</span></a></div>";	// Add href for right click
 		str+="<div class='sui-itemTitle' id='sui-itemTitle-"+num+"'>";								// Add
-		str+="<a href='#p="+o.uid+"'>"+o.title+"</a></div>";										// Add href for right click
+		str+="<a class='sui-noA' href='#p="+o.uid+"'>"+o.title+"</a></div>";						// Add href for right click
 		if (o.feature_types_ss) {																	// If a feature
 			str+="<span style='color:"+this.assets[o.asset_type].c+"'>&nbsp;&bull;&nbsp;</span>";	// Add dot
 			str+="<div class='sui-itemFeature'>&nbsp;"+o.feature_types_ss.join(", ")+"</div>";		// Add feature(s)
