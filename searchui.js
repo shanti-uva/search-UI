@@ -123,7 +123,7 @@ class SearchUI  {
 				</div>`;
 				str+=`<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
 				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
-				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:20px 0 8px 0'>";
+				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:8px 0 16px 0'>";
 				}
 			str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>
 				&#xe62e&nbsp;&nbsp;RECENT SEARCHES
@@ -941,7 +941,7 @@ class SearchUI  {
 		this.facets[facet].mode="input";															// Input mode active
 		var str=`<input id='sui-advInput-${facet}' placeholder='Type here'  
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>
-		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${facet}s</div>`;
+		<div class='sui-advEditNums'> <span id='sui-advListNum'>${tot}</span> ${facet}</div>`;
 		$("#sui-advEdit-"+facet).html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
 
