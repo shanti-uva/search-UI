@@ -115,8 +115,12 @@ class SearchUI  {
 			<div id='sui-pages' class='sui-results scrollbar'></div>
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
 		</div>
-		<div id='sui-adv' class='sui-adv'>`;
-			for (key in this.facets) { 
+		<div id='sui-adv' class='sui-adv'>
+			<div class='sui-advHeader' id='sui-advHeader-type'>&#xe60b&nbsp;&nbsp;ASSET TYPE
+			<span id='sui-advPlus-type' style='float:right'>&#xe669</span></div>
+			<div class='sui-advTerm' id='sui-advTerm-type'></div>
+			<div class='sui-advEdit' style='display:none' id='sui-advEdit-type'></div>`;
+		for (key in this.facets) { 
 				str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
 					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
 					<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
@@ -125,15 +129,11 @@ class SearchUI  {
 				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
 				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:8px 0 16px 0'>";
 				}
-			str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>
-				&#xe62e&nbsp;&nbsp;RECENT SEARCHES
-				<span id='sui-advPlus-recent' style='float:right'>&#xe669</span>
-				<div class='sui-advTerm'></div>
-				<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div>
-				</div>`;
-			str+=`</div>
-			<div id='sui-footer' class='sui-footer'></div>
-			</div>`;
+		str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>&#xe62e&nbsp;&nbsp;RECENT SEARCHES
+			<span id='sui-advPlus-recent' style='float:right'>&#xe669</span></div>
+			<div class='sui-advTerm'></div>
+			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div>
+		<div id='sui-footer' class='sui-footer'></div></div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
 		$("#sui-clear, sui-clear2").on("mouseout", function() { $(this).html("&#xe610"); });		// Normal						
@@ -388,7 +388,7 @@ class SearchUI  {
 
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
 	{
-		let url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod2/query";		// Base url
+		let url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/query";		// Base url
 		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]";		// Add query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs[0]);														// Return data
@@ -914,6 +914,7 @@ class SearchUI  {
 	DrawFacetItems(facet, open)																	// DRAW FACETS ITEMS
 	{
 		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			
+		else if (facet == "type") 						this.DrawAssetType();						// Show asset picker			
 		else if (this.facets[facet].type == "input") 	this.DrawInput(facet,open);					// Draw input editor			
 		else if (this.facets[facet].type == "tree") {												// If base type is a tree
 			if (this.ActiveSearch())					this.DrawFacetList(facet,open);				// If an active search, draw tree as a list	
@@ -930,6 +931,33 @@ class SearchUI  {
 			if (this.ss.query[key].length) 				activeSearch=true;							// Flag if something set
 		return activeSearch;
 	}
+
+	DrawAssetType()																				// DRAW TYPE PICKER
+	{
+		let n,k,str="";
+		if ($("#sui-advEdit-type").css("display") != "none") {										// If open
+			$("#sui-advEdit-type").slideUp();														// Close it 
+			return;																			
+			}
+		for (k in this.assets) {																	// For each asset type														
+			n=this.assets[k].n;																		// Get number of items
+			if (n > 1000)	n=Math.floor(n/1000)+"K";												// Shorten
+			str+="<div class='sui-advEditLine' style='width:100%' id='sui-advtyp-"+k+"'>";			// Item head
+			str+="<span style='font-size:16px; vertical-align:-1px; color:"+this.assets[k].c+"'>";
+			str+=this.assets[k].g+"&nbsp;</span> "+k.charAt(0).toUpperCase()+k.substr(1);			// Asset name
+			if (n != undefined) str+=" ("+n+")</div>";												// Counts
+			}
+		$("#sui-advEdit-type").html(str.replace(/\t|\n|\r/g,""));									// Add to div
+		$("#sui-advEdit-type").slideDown();															// Show it
+		
+		$("[id^=sui-advtyp-]").off("click");
+		$("[id^=sui-advtyp-]").on("click", (e)=> {													// ON CLICK ON ASSET 
+			this.ss.type=e.currentTarget.id.substring(11).toLowerCase();							// Get asset name		
+			this.ss.page=0;																			// Start at beginning
+			this.Query(); 																			// Get new results
+			});							
+	}
+
 
 	DrawInput(facet)																			// DRAW INPUT FACET PICKER
 	{
