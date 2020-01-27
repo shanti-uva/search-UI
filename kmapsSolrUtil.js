@@ -596,8 +596,7 @@ class KmapsSolrUtil {
 			"&facet.mincount=2" +
 			"&facet.limit=-1" +
 		    // "&sort=" + levelField + "+ASC" +
-			"&sort=position_i+asc" +
-		    // "&sort=header+asc" +
+			"&sort=position_i+asc,header+asc" +
 			"&facet.sort=" + ancestorField +"+ASC" +
 			"&facet.field={!ex=hoot}" + ancestorField +
             "&json.facet=" + JSON.stringify(jsonfacetblob) +
