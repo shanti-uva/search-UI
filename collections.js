@@ -33,17 +33,15 @@ class Collections  {
 		str+=`<div class='sui-sourceText' style='display:inline-block;width:calc(66% - 12px)'>${o.summary}</div><br><br>`;
 		str+=sui.pages.DrawTabMenu(["SUBCOLLECTIONS","MEMBERS","DETAILS"])+"</div>";			// Add tab menu
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-//		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
-//			trace(d)
-//			});
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(10);											// Get index of tab	
 			this.ShowTab(id);																	// Draw it
 			});
 			
-		sui.pages.DrawRelatedAssets();															// Draw related assets menu if active
+		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu if active
 		this.AddTabContent(o);																	// Add contents of tabs
+		this.ShowTab(2);																		// Show details
 		}
 	
 	AddTabContent(o)																		// GET TAB CONTENTS
@@ -70,7 +68,6 @@ class Collections  {
 		if (o.node_user_full_s) this.content[2]+=sui.pages.DrawItem("&#xe600","OWNER",o.node_user_full_s+" &nbsp; ("+o.node_user+")","","sui-pageLab",1);	// Owner
 		if (o.collection_visibility_s) this.content[2]+=sui.pages.DrawItem("&#xe622","VISIBILITY",o.collection_visibility_s.substr(0,1).toUpperCase()+o.collection_visibility_s.substr(1),"","sui-pageLab",1);	// Visibility
 		if (o.asset_subtype) this.content[2]+=sui.pages.DrawItem(sui.assets[o.asset_subtype.toLowerCase()].g,"TYPE",o.asset_subtype,"","sui-pageLab",1);	// Type
-		if (o.mogrified_ss && o.mogrified_ss[0]) this.content[2]+=sui.pages.DrawItem("&#xe603","MOGRIFIED?",o.mogrified_ss[0].substr(0,1).toUpperCase()+o.mogrified_ss[0].substr(1),"","sui-pageLab",1);	// Mogrified
 		this.content[2]+="<br>";
 	}
 

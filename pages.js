@@ -71,15 +71,15 @@ class Pages  {
 	{
 		let browse=true;
 		let p=(this.relatedBase || o);															// Pointer to base kmap
-		if (p)	browse=p.asset_type.match(/places|subjects|terms/);								// Add browsing to this menu?	
+		if (p)	browse=p.asset_type.match(/places|subjects|terms|collections/);					// Add browsing to this menu?	
 		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
 		else	this.lastMode=sui.ss.mode;														// Save last search mode
 		if (!o)							return;													// No related to show
 		if (!browse && (sui.ss.mode != "related")) return;										// Quit if not related or a sub/term/place
 		var url=sui.solrUtil.createKmapQuery(o.uid);											// Get query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
-			var i,n,tot=0;
-				if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
+				var i,n,tot=0;
+				if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length) { // If valid data
 				let d=data.facets.asset_counts.buckets;											// Point at bucket array
 				for (i=0;i<d.length;++i) {														// For each bucket
 					n=d[i].count;																// Get count													
