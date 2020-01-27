@@ -394,6 +394,14 @@ class SearchUI  {
 			callback(data.response.docs[0]);														// Return data
 			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
+
+	GetChildNamesFromID(facet,id, callback) 													// GET NAMES/ETYMOLGY DATA FROM ID
+	{
+		let url=`https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
+		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
+			callback(data.response.docs);															// Return data
+			}).fail((msg)=> { trace(msg); });														// Failure message
+	}
 	
 	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
 	{
@@ -1244,7 +1252,7 @@ class SearchUI  {
 				var str="<ul>";																			// Wrapper, show if not initting
 				if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
 					f=res.facet_counts.facet_fields.ancestor_id_path.join();							// Get list of facets
-				res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); 		// Sort
+//				res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); 		// Sort
 				for (i=0;i<res.response.docs.length;++i) {												// For each child
 					o=res.response.docs[i];																// Point at child
 					re=new RegExp("\/"+o.id.split("-")[1]);												// Id

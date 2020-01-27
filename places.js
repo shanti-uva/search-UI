@@ -291,6 +291,43 @@ class Places  {
 			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
 			});
 
+		sui.GetChildNamesFromID("places", this.kmap.id, (d)=> {									// Get name from children
+			let i,o,oo,l=[];
+			let str=`<div style='display:inline-block;width:50%'><br>
+			<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>NAMES</div>`;
+			if (d && d[0] && d[0]._childDocuments_ && d[0]._childDocuments_.length) {			// If docs
+				for (i=0;i<d[0]._childDocuments_.length;++i) {									// For each one
+					o=d[0]._childDocuments_[i];													// Point at it
+					trace(o)
+					oo={};																		// Clear obj
+					oo.lab=o.related_names_header_s;											// Label
+					oo.lang=o.related_names_language_s;											// Language
+					oo.rel=o.related_names_relationship_s;										// Relationship
+					oo.write=o.related_names_writing_system_s;									// Writing system
+					oo.ety=o.related_names_etymology_s;											// Etymology
+					oo.path=o.related_names_path_s;												// Path
+					oo.tab=o.related_names_level_i-1;
+					l.push(oo);																	// Add to array
+					}
+				l.sort(function(a, b) {															// Sort by path								
+						if (a.path > b.path) 		return 1;									// Higher
+						else if (a.path < b.path) 	return -1;									// Lower
+						else						return 0;									// The same
+						});
+					}
+			for (i=0;i<l.length;++i) {															// For each one
+				str+=`<div style='margin-left:${l[i].tab*16}px'>`;								// Header
+				if (i) str+="&bull; ";															// Add bullet
+				str+=`${l[i].lab} &nbsp; (${l[i].lang}, ${l[i].write}, ${l[i].rel})</div>`;		// Text
+				}
+			str+=`<br></div><div style='display:inline-block;width:calc(50% - 24px);vertical-align:top;border-left:1px solid #ccc; padding-left:12px;margin-top:22px'>
+			<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>`;
+			for (i=0;i<l.length;++i) 															// For each one
+				if (l[i].ety)	str+=`<div>Etymology for ${l[i].lab}: &nbsp; ${l[i].ety}</div>`; // Text
+			str+="</div><br>";
+			this.content[1]=str.replace(/\t|\n|\r|/g,"");										// Set tab											
+			});
+	
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
 			if (data.illustration_external_url && data.illustration_external_url[0]) {			// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
@@ -305,14 +342,6 @@ class Places  {
 			if (openTab)	this.ShowTab(openTab-1);											// Open tab up	
 		});
 		
-		str=`<div style='display:inline-block;width:50%'><br>
-		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>NAMES</div>`;
-		if (this.kmap.names_txt)	for (i=0;i<this.kmap.names_txt.length;++i) str+=this.kmap.names_txt[i]+"<br>";
-		str+=`<br></div><div style='display:inline-block;width:calc(50% - 24px);vertical-align:top;border-left:1px solid #ccc; padding-left:12px;margin-top:22px'>
-		<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>
-		...to be added
-		</div><br>`;
-		this.content[1]=str;											
 		}	
 
 	DrawTabMenu(tabs, split)																// DRAW TAB MENU
