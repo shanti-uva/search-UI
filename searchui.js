@@ -145,14 +145,14 @@ class SearchUI  {
 		$("#sui-search").on("change", (e)=> { 														// ON SEARCH CHANGE
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
-			if ((this.ss.mode == "input") || (this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode="simple";	// Toggle simple mode
+			if ((this.ss.mode == "input") || (this.ss.mode == "related")) this.ss.mode="simple";	// Toggle simple mode
 			if (this.ActiveSearch(true)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
 
 		$("#sui-searchgo, #sui-searchgo2").on("click", (e)=> { 										// ON SEARCH BUTTON CLCK
-			if ((this.ss.mode == "input") || (this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode="simple";	// Toggle simple mode
+			if ((this.ss.mode == "input") || (this.ss.mode == "related") ) this.ss.mode="simple";	// Toggle simple mode
 			if (this.ActiveSearch(true)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
@@ -168,10 +168,13 @@ class SearchUI  {
 		$("[id^=sui-advHeader-]").on("click",(e)=> {												// ON FACET HEADER CLICK
 			var id=e.currentTarget.id.substring(14);												// Get facet name		
 			$(".sui-advEdit").slideUp(400, ()=> {													// Close any open tree or lists
-				$("[id^=sui-advPlus-]").html("&#xe669");											// Reset them all to closed
-				if ($("#sui-advEdit-"+id).css("display") != "none")									// If open
-					$("#sui-advPlus-"+id).html("&#xe66a");											// Show open
-				});
+				$("[id^=sui-advHeader-]").css("border-bottom-style","solid")						// Reset them all to closed
+			$("[id^=sui-advPlus-]").html("&#xe669");												// Reset them all to closed
+			if ($("#sui-advEdit-"+id).css("display") != "none")	{									// If open
+				$("#sui-advPlus-"+id).html("&#xe66a");												// Show open
+				$("#sui-advHeader-"+id).css("border-bottom-style","hidden")							// Hide border
+				}
+			});
 			$("#sui-advPlus-"+id).html("&#xe66a");													// Show open
 
 			for (var key in this.facets)															// For each facet
@@ -229,11 +232,6 @@ class SearchUI  {
 			this.ss.type=id[1];																		// Set asset type
 			this.Query(); 																			// Get new results
 			}	
-		else if ((id=hash.match(/#c=(.+)/))) {														// If showing collections
-			setupPage();																			// Prepare page's <div> environment
-			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
-			this.pages.ShowCollection(v[0],v[1],true);												// Show collection
-			}
 		else if ((id=hash.match(/#r=(.+)/))) {														// If showing related results
 			setupPage();																			// Prepare page's <div> environment
 			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
@@ -349,15 +347,21 @@ class SearchUI  {
 			};																
 	}
 
-	Query(fromHistory)																			// QUERY AND UPDATE RESULTS
+	Query(fromHistory, collectionId)															// QUERY AND UPDATE RESULTS
 	{
 		let url;
 		this.LoadingIcon(true,64);																	// Show loading icon
 		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
-		if (this.ss.mode == "related")			url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
-		else if (this.ss.mode == "collections")	url=sui.solrUtil.createAssetsByCollectionQuery(this.pages.relatedId.toLowerCase(),sui.ss.page,sui.ss.pageSize);		// Query for collections
+		if (collectionId)	{																		// If getting collection members
+			let ts=JSON.parse(JSON.stringify(this.ss));												// Clone search
+			ts.query={ text:"", places:[], assets:[], languages:[],	features:[],subjects:[],															
+					  terms:[], relationships:[], users:[], perspectives:[],	
+					  collections:[{ title:"all", id:collectionId, bool: "AND" }] };				// Set new search
+			url=this.solrUtil.buildAssetQuery(ts);													// Set url
+			}
+		else if (this.ss.mode == "related")		url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
 		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
-		if ((this.ss.mode != "collections") && (this.ss.mode != "related") && !fromHistory) 		// These set their own states and not from history API
+		if ((this.ss.mode != "related") && !fromHistory) 											// These set their own states and not from history API
 			this.SetState("s="+this.SerializeQuery(this.ss));										// Save search state	
 		$("#sui-relatedAssets").remove();															// Remove related assets panel
 		if (this.ActiveSearch()) {																	// If an active search
@@ -551,15 +555,15 @@ class SearchUI  {
 
 	DrawHeader()																				// DRAW RESULTS HEADER
 	{
-		if ((this.ss.mode == "related") || (this.ss.mode == "collections")) 	return;				// Quit for special search modes
+		if (this.ss.mode == "related") 	return;														// Quit for special search modes
 		var s=this.ss.page*this.ss.pageSize+1;														// Starting item number
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
 		if (n >= 1000)	n=Math.floor(n/1000)+"K";													// Shorten if need be
-		var str=`<span style='vertical-align:-10px'>Search results: <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
+		var str=`<span style='vertical-align:-10px'>${this.assets[this.ss.type].g} &nbsp;${this.ss.type.toUpperCase()} search results  &nbsp; <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-		str=` <span style='font-size:14px'> TYPE</span>&nbsp;&nbsp; 
+/*		str=` <span style='font-size:14px'> TYPE</span>&nbsp;&nbsp; 
 			<div id='sui-type' class='sui-type' title='Choose asset type'>
 			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
 			${this.assets[this.ss.type].g}</div>
@@ -585,17 +589,17 @@ class SearchUI  {
 				this.ss.type=e.currentTarget.id.substring(7).toLowerCase();							// Get asset name		
 				$("#sui-typeList").remove();														// Remove type list
 				this.ss.page=0;																		// Start at beginning
-				if ((this.ss.mode == "related") || (this.ss.mode == "collections")) this.ss.mode=this.ss.lastMode;	// Get back to basic search mode
+				if (this.ss.mode == "related") this.ss.mode=this.ss.lastMode;						// Get back to basic search mode
 				this.Query(); 																		// Get new results
 				});							
 			});
-	}
+		*/
+		}
 
 	DrawFooter()																				// DRAW RESULTS FOOTER
 	{
 		var lastPage=Math.floor(this.numItems/this.ss.pageSize);									// Calc last page
-		if ((this.ss.mode != "related") && (this.ss.mode != "collections"))
-			$("#sui-footer").css("background-color","#888");										// Set b/g color
+		if (this.ss.mode != "related")	$("#sui-footer").css("background-color","#888");			// Set b/g color
 		var str=`
 		<div style='float:left;font-size:18px'>
 			<div id='sui-viewModeList' class='sui-resDisplay' title='List view'>&#xe61f</div>
@@ -966,7 +970,6 @@ class SearchUI  {
 			});							
 	}
 
-
 	DrawInput(facet)																			// DRAW INPUT FACET PICKER
 	{
 		if ($("#sui-advEdit-"+facet).css("display") != "none") {									// If open
@@ -1232,7 +1235,7 @@ class SearchUI  {
 					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND", _this.curTree);// Add term to search state and refresh
 				else{					
 					_this.pages.relatedBase=_this.pages.relatedId="";									// No related
-					if ((_this.ss.mode == "related") || (_this.ss.mode == "collections")) _this.ss.mode=_this.ss.lastMode;	// Get back to search mode
+					if (_this.ss.mode == "related") _this.ss.mode=_this.ss.lastMode;					// Get back to search mode
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 					}
 				}
@@ -1249,7 +1252,6 @@ class SearchUI  {
 			this.GetTreeChildren(facet, path, (res)=> {													// Get children
 				var o,i,re,f="";
 				var str="<ul>";																			// Wrapper, show if not initting
-				trace(res)
 				if (facet == "terms") {
 					if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields["ancestor_id_tib.alpha_path"])	// If valid
 						f=res.facet_counts.facet_fields["ancestor_id_tib.alpha_path"].join();					// Get list of facets
@@ -1308,7 +1310,7 @@ class SearchUI  {
 					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree); // Add term to search state and refresh
 				else{	
 					_this.pages.relatedBase=_this.pages.relatedId="";									// No related
-					if ((_this.ss.mode == "related") || (_this.ss.mode == "collections")) _this.ss.mode=_this.ss.lastMode;	// Get back to search mode
+					if (_this.ss.mode == "related") _this.ss.mode=_this.ss.lastMode;					// Get back to search mode
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 					}
 				}

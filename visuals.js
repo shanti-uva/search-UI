@@ -36,7 +36,7 @@ class Visuals  {
 			var str=`<iframe id='sui-iframe' frameborder='0' scrolling='no' src='${url}' 
 			style='margin-left:auto;margin-right:auto;height:${hgt};width:${wid};display:block;overflow:hidden'></Iframe><br>`;	
 			str+="<div class='sui-sources' style='padding-top:0'>";
-			try{ if (o.collection_title)	s=`<a onclick='javascript: sui.pages.ShowCollection(\"${o.asset_type}-${o.id}\",\"${o.collection_idfacet}\")'>${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}`;
+			try{ if (o.collection_title)	s=`<a title='Collection' id='sui-imgCol'	href='#p=${o.collection_uid_s}'>${o.collection_title}</a>`;
 			else							s="None"; }  catch(e) {}
 			str+="<div style='text-align:center'>"+d("&#xe633","MANDALA COLLECTION",s)+"</div>";
 			str+="<hr style='border-top: 1px solid #6e9456;margin-top:12px'>";

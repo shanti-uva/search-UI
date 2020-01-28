@@ -80,8 +80,8 @@ class AudioVideo  {
 					str+=`<a title='Collection' id='sui-avCol'
 					href='#c=${o.asset_type}-${o.id}=${o.collection_idfacet[0]}'>
 					&#xe633&nbsp;&nbsp;&nbsp;
-					${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</a>`;
-			   }  catch(e) {}
+					<a title='Collection' id='sui-avCol'	href='#p=${o.collection_uid_s}'>${o.collection_title}</a>`;
+				   }  catch(e) {}
 			str+=`</div><div style='display:inline-block;vertical-align:top;width:calc(100% - 320px)'>`;
 			try{ str+="<div title='Creators'>&#xe600&nbsp;&nbsp;&nbsp;"+o.creator.join(", ")+"</div>";  } catch(e) {}
 			str+=`</div><hr>
@@ -100,7 +100,7 @@ class AudioVideo  {
 			$("#sui-av").html(str.replace(/\t|\n|\r/g,""));										// Add player
 	
 			$("#sui-avCol").on("click",()=>	{													// ON COLLECTION CLICK
-				sui.pages.ShowCollection(o.asset_type+"-"+o.id,o.collection_idfacet[0]);		// Show
+				sui.GetKmapFromID(o.collection_uid_s,(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 				return false;																	// Stop propagation
 				});
 

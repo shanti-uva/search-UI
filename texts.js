@@ -60,8 +60,10 @@ class Texts  {
 			sui.GetJSONFromKmap(o, (d)=> { 														// Get JSON
 				let i,str="";
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
-				try { s=`<a id='sui-txtCol' href='#c=${o.asset_type}-${o.id}=${o.collection_idfacet[0]}'>${o.collection_title}</a>`;
-					str+=sui.pages.DrawItem("&#xe633","COLLECTION",s+sui.pages.AddPop("collections-"+o.collection_idfacet[0].split("|")[1]),"","sui-pageLab",1); } catch(e) {}
+
+	
+				try { s=`<a title='Collection' id='sui-txtCol' href='#p=${o.collection_uid_s}'>${o.collection_title}</a>`;
+					str+=sui.pages.DrawItem("&#xe633","COLLECTION",s) } catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe600","AUTHOR",d.field_book_author.und,"","sui-pageLab",1); } catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","YEAR PUBLISHED", d.field_dc_date_publication_year.und[0].value.substr(0,4),"","sui-pageLab",1); }		catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","ORIGINAL YEAR PUBLISHED", d.field_dc_date_orginial_year.und[0].value.substr(0,4),"","sui-pageLab",1); }	catch(e) {}
@@ -110,7 +112,7 @@ class Texts  {
 				$("#sui-textContent").append(_this.content[which]);								// Set content
 				$("#sui-txtCol").off("click");													// Clear old handler
 				$("#sui-txtCol").on("click",()=>	{											// ON COLLECTION CLICK
-					sui.pages.ShowCollection(o.asset_type+"-"+o.id,o.collection_idfacet[0]);	// Show
+					sui.GetKmapFromID(o.collection_uid_s,(kmap)=>{ sui.SendMessage("",kmap); }); // Get kmap and show page
 					return false;																// Stop propagation
 					});
 	

@@ -69,37 +69,45 @@ class Pages  {
 
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
 	{
-		let browse=true;
+		let k,sk,str="",browse=true;
 		let p=(this.relatedBase || o);															// Pointer to base kmap
 		if (p)	browse=p.asset_type.match(/places|subjects|terms|collections/);					// Add browsing to this menu?	
-		if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) o=this.relatedBase;	// If special, use base
-		else	this.lastMode=sui.ss.mode;														// Save last search mode
+		if (sui.ss.mode == "related")  	o=this.relatedBase;										// If special, use base
+		else							this.lastMode=sui.ss.mode;								// Save last search mode
 		if (!o)							return;													// No related to show
-		if (!browse && (sui.ss.mode != "related")) return;										// Quit if not related or a sub/term/place
-		var url=sui.solrUtil.createKmapQuery(o.uid);											// Get query url
-		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
-				var i,n,tot=0;
-				if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length) { // If valid data
-				let d=data.facets.asset_counts.buckets;											// Point at bucket array
-				for (i=0;i<d.length;++i) {														// For each bucket
-					n=d[i].count;																// Get count													
-					tot+=n;																		// Add to total
-					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
-					$("#sui-rln-"+d[i].val).html(n);											// Set number
-					$("#sui-rl-"+d[i].val).css({display:"block"});								// Show it				
+		if (!browse && (sui.ss.mode != "related")) return;										// Quit if not related or a sub/term/place/collection
+		if (p.asset_type != "collections") {
+			var url=sui.solrUtil.createKmapQuery(o.uid);										// Get query url
+			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {		// Get related places
+					var i,n,tot=0;
+					if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length) { // If valid data
+					let d=data.facets.asset_counts.buckets;										// Point at bucket array
+					for (i=0;i<d.length;++i) {													// For each bucket
+						n=d[i].count;															// Get count													
+						tot+=n;																	// Add to total
+						if (n > 1000)	n=Math.floor(n/1000)+"K";								// Shorten
+						$("#sui-rln-"+d[i].val).html(n);										// Set number
+						$("#sui-rl-"+d[i].val).css({display:"block"});							// Show it				
+						}
+					if (tot > 1000)	tot=Math.floor(tot/1000)+"K";								// Shorten
+					$("#sui-rln-all").html(tot);												// Set total number
+					$("#sui-rl-all").css({display:"block"});									// Show total
 					}
-				if (tot > 1000)	tot=Math.floor(tot/1000)+"K";									// Shorten
-				$("#sui-rln-all").html(tot);													// Set total number
-				$("#sui-rl-all").css({display:"block"});										// Show total
-				}
-			});
+				});
+			}
+		else{																					// Collections
+			browse=false;																		// No browsing
+			sk=o.asset_subtype.toLowerCase();													// Get asset sub-type
+			}
 
-		let k=o.asset_type;																		// Get this asset type																	
-		var str=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"};
+		k=o.asset_type;																			// Get this asset type																	
+		str+=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"};
 			height:${$("#sui-results").height()+6}px'>`;														
 		if (sui.ss.mode != "related")	str+="RELATED RESOURCES<hr style='margin-right:12px'>";		
 		str+="<div class='sui-relatedList'>";
 		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
+		if (p.asset_type == "collections")
+			str+="<div class='sui-relatedItem' id='sui-rl-"+sk+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[sk].c+"'>"+sui.assets[sk].g+" </span> "+o.asset_subtype+"</div>";
 		for (k in sui.assets) {																	// For each asset type														
 			str+="<a class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase();
 			str+="' href='#r="+this.relatedId+"="+this.relatedId+"="+k+"="+o.uid+"'>";
@@ -139,7 +147,7 @@ class Pages  {
 		sui.ss.mode="related";																	// Go to related mode
 		if (!this.relatedBase)	 this.relatedBase=o;											// If starting fresh
 		this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;						// Set id
-		sui.Query();																			// Query and show results
+		sui.Query(false, o.asset_type == "collections" ? o.uid : "");							// Query and show resultsadd id if a collection to trigger collection search
 		sui.DrawFooter();																		// Draw footer
 		sui.ss.page=0;																			// Start at beginning
 	}
@@ -166,23 +174,10 @@ class Pages  {
 	
 		$("[id^=sui-crumb-]").on("click",(e)=> {												// ON BREAD CRUMB CLICK
 			var id=e.currentTarget.id.substring(10).toLowerCase();								// Get id
-			if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=sui.ss.lastMode;	// Get back to regular search mode
+			if (sui.ss.mode == "related") sui.ss.mode=sui.ss.lastMode;							// Get back to regular search mode
 			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
 			return false;																		// Don't propagate
 			});
-	}
-
-	ShowCollection(kmapId, collectionId, fromHistory)										// SHOW A COLLECTION OF ASSETS
-	{
-		sui.ss.mode="collections";																// Collections mode
-		sui.GetKmapFromID(kmapId.toLowerCase(), (kmap)=> { this.relatedBase=kmap; });			// Get kmap to return to	
-		this.relatedId=collectionId.split("|")[1].toLowerCase();								// Get collections id 
-		if (!fromHistory)	sui.SetState(`c=${kmapId}=${collectionId}`);						// Set the active page, unless recalling from history API
-		sui.Query();																			// Query and show results
-		sui.DrawItems();																		// Draw items																
-		sui.DrawFooter();																		// Draw footer															
-		let str="&#xe633&nbsp;&nbsp"+collectionId.split("|")[0];								// Icon and title
-		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 	}
 
 	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
@@ -237,7 +232,7 @@ class Pages  {
 			$("#sui-popover-"+id).append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
-				if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=this.lastMode;	// Get out of related and collections
+				if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;						// Get out of related and collections
 				this.relatedBase=null;															// No base and set to home
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
@@ -245,7 +240,7 @@ class Pages  {
 				});
 			
 			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
-				if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=this.lastMode;	// Get out of related and collections
+				if (sui.ss.mode == "related")	 sui.ss.mode=this.lastMode;						// Get out of related and collections
 				this.relatedBase=null;															// No base and set to home
 				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
 				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
@@ -271,8 +266,8 @@ class Pages  {
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 				
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
-					if ((sui.ss.mode == "related") || (sui.ss.mode == "collections")) sui.ss.mode=this.lastMode;	// Get out of related and collections
-					this.relatedBase=null;															// No base and set to home
+					if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;					// Get out of related and collections
+					this.relatedBase=null;														// No base and set to home
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
 					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url

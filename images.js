@@ -65,9 +65,7 @@ class Images  {
 			<tr class='sui-pageLab' style='font-size:16px;padding-bottom:4px'><td style='width:50%'>MANDALA COLLECTIONS</td><td>CLASSIFICATION</td></tr>
 			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;`;
 			if (o.collection_title) 															// If a collection	
-				str+=`<a title='Collection' id='sui-imgCol'
-				href='#c=${o.asset_type}-${o.id}=${o.collection_idfacet[0]}'>
-				${o.collection_title}</a>${sui.pages.AddPop("collections-"+o.collection_nid)}</a>`;
+				str+=`<a title='Collection' id='sui-imgCol'	href='#p=${o.collection_uid_s}'>${o.collection_title}</a>`;
 			else str+="None";
 			str+="</td><td>";  																	// Close left side
 			if (subjects.length) {																// If subjects	
@@ -138,7 +136,7 @@ class Images  {
 				$(sui.pages.div).append(str.replace(/\t|\n|\r/g,""));								// Remove format and add to div	
 				
 				$("#sui-imgCol").on("click",()=> {													// ON COLLECTION CLICK
-					sui.pages.ShowCollection(o.asset_type+"-"+o.id,o.collection_idfacet[0]);		// Show
+					sui.GetKmapFromID(o.collection_uid_s,(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 					return false;																	// Stop propagation
 					});
 			}

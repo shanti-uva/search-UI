@@ -28,9 +28,8 @@ class Subjects  {
 		this.content=["...loading","...loading"];												// Content pages
 	}
 
-	Draw(o)																					// DRAW SOURCE PAGE FROM KMAP
+	Draw(o, tab)																			// DRAW SOURCE PAGE FROM KMAP
 	{
-		let _this=this;																			// Save context
 		let str=`<div class='sui-subjects'>
 		<div><span class='sui-subIcon'>${sui.assets[o.asset_type].g}</span>
 		<span class='sui-subText'>${o.title[0]}</span>
@@ -51,52 +50,54 @@ class Subjects  {
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(10);											// Get index of tab	
-			showTab(id);																		// Draw it
+			this.ShowTab(id);																		// Draw it
 			});
 			
-		function showTab(which) {																// SHOW TAB
-			$("[id^=sui-spLab-]").off("click");													// Kill handler
-			$("[id^=sui-spDot-]").off("click");													// Kill handler
-			$("[id^=sui-spItem-]").off("click");												// Kill handler
-			$("[id^=sui-togCat-]").off("click");												// Kill handler
-			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
-			$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
-			$("#sui-tabContent").css({display:"block","background-color":"#eee"});				// Show content
-			$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
-			$("#sui-tabContent").html(_this.content[which]);									// Set content
-			if (which == 0)	{																	// If summary, add events
-				$("[id^=sui-spLab-]").on("click", function(e) {return false;	});				// ON CONEXT LINE CLICK, INHIBIT
-				$("[id^=sui-spDot-]").on("click", function(e) {									// ON RELATIONSHIP TREE DOT CLICK
-					let firstChild=$(this).parent().find("ul")[0];								// Get first child
-					let path=e.currentTarget.id.substring(10);									// Get id
-					if (path != "null") _this.AddBranch(o.asset_type,path,$(this));				// Lazy load branch
-					$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 	// Change label
-					$(this).parent().find('ul').slideToggle();            						// Slide into place
-					});
-				$("#sui-spLab-"+o.uid).css({ "border-bottom":"1px solid #999" });				// Highlight current one	
-				}
-			else if (which == 1) {																// If summary, add events
-				$("[id^=sui-spItem-]").on("click", function(e) {return false;	});				// ON CONEXT LINE CLICK, INHIBIT
-				$("[id^=sui-spCatUL-]").slideDown();											// All down
-				$("[id^=sui-spCat-]").on("click", (e)=> {										// ON CATEGORY CLICK
-					let id=e.currentTarget.id.substring(9);										// Get id
-					if ($("#sui-spCatUL"+id).css("display") == "none")							// If hidden
-						$("#sui-spCatUL"+id).slideDown();										// Show
-					else																		// If showing
-						$("#sui-spCatUL"+id).slideUp();											// Hide
-					});
-
-				$("#sui-togCatA").on("click", ()=> {											// ON EXPAND ALL
-					$("[id^=sui-spCatUL-]").slideDown();										// All down
-					});
-				$("#sui-togCatN").on("click", ()=> {											// ON COLLAPSE ALL
-					$("[id^=sui-spCatUL-]").slideUp();											// All down
-					});
-				}
-			}
 
 		this.GetTabData(o);																		// Get relationship/summary tab content	
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets men
+	}
+
+	ShowTab(which) 																			// SHOW TAB
+	{
+		$("[id^=sui-spLab-]").off("click");														// Kill handler
+		$("[id^=sui-spDot-]").off("click");														// Kill handler
+		$("[id^=sui-spItem-]").off("click");													// Kill handler
+		$("[id^=sui-togCat-]").off("click");													// Kill handler
+		$("[id^=sui-spCatUL-]").off("click");													// Kill handler
+		$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });					// Reset all tabs
+		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
+		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
+		$("#sui-tabContent").html(this.content[which]);											// Set content
+		if (which == 0)	{																		// If summary, add events
+			$("[id^=sui-spLab-]").on("click", function(e) {return false;	});					// ON CONEXT LINE CLICK, INHIBIT
+			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
+				let firstChild=$(this).parent().find("ul")[0];									// Get first child
+				let path=e.currentTarget.id.substring(10);										// Get id
+				if (path != "null") _this.AddBranch(o.asset_type,path,$(this));					// Lazy load branch
+				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+				$(this).parent().find('ul').slideToggle();            							// Slide into place
+				});
+			$("#sui-spLab-"+o.uid).css({ "border-bottom":"1px solid #999" });					// Highlight current one	
+			}
+		else if (which == 1) {																	// If summary, add events
+			$("[id^=sui-spItem-]").on("click", function(e) {return false;	});					// ON CONEXT LINE CLICK, INHIBIT
+			$("[id^=sui-spCatUL-]").slideDown();												// All down
+			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
+				let id=e.currentTarget.id.substring(9);											// Get id
+				if ($("#sui-spCatUL"+id).css("display") == "none")								// If hidden
+					$("#sui-spCatUL"+id).slideDown();											// Show
+				else																			// If showing
+					$("#sui-spCatUL"+id).slideUp();												// Hide
+				});
+
+			$("#sui-togCatA").on("click", ()=> {												// ON EXPAND ALL
+				$("[id^=sui-spCatUL-]").slideDown();											// All down
+				});
+			$("#sui-togCatN").on("click", ()=> {												// ON COLLAPSE ALL
+				$("[id^=sui-spCatUL-]").slideUp();												// All down
+				});
+			}
 	}
 
 	GetTabData(o)																			// GET TAB DATA FOR CONTEXT / SUMMARY
@@ -118,6 +119,7 @@ class Subjects  {
 		});
 	}
 
+
 	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
 	{	
 		let f,i,s=[];
@@ -138,7 +140,7 @@ class Subjects  {
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
 		this.content[1]=str;																	// Set summary tab
-		showTab(0);																		// Draw it
+		this.ShowTab(1);																		// Draw it
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
