@@ -132,7 +132,7 @@ class SearchUI  {
 		str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>&#xe62e&nbsp;&nbsp;RECENT SEARCHES
 			<span id='sui-advPlus-recent' style='float:right'>&#xe669</span></div>
 			<div class='sui-advTerm'></div>
-			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div>
+			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div>
 		<div id='sui-footer' class='sui-footer'></div></div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
@@ -1076,7 +1076,6 @@ class SearchUI  {
 			let r=$("#sui-advEditFilter-"+facet).val();												// Get filter text
 			if ((e.keyCode > 31) && (e.keyCode < 91)) r+=e.key;										// Add current key if a-Z
 			if ((e.keyCode == 8) && r.length)	r=r.slice(0,-1);									// Remove last char on backspace
-//			this.QueryFacets(facet, r);																// Get facet items
 			r=RegExp(r,"i");																		// Turn into regex
 			for (i=0;i<n;++i) {																		// For each item
 				line=$("#sui-advEditLine-"+i);														// Point at line
@@ -1265,7 +1264,10 @@ class SearchUI  {
 					str+="<li";																			// Start row
 					if ((f && f.match(re)) || init)	str+=" class='parent'";								// If has children or is top, add parent class
 					str+="><a id='"+o.id;																// Add id
-					str+="' data-path='"+o.ancestor_id_path+"'>";										// Add path
+					if (facet == "terms")																// If terms
+						str+="' data-path='"+o["ancestor_id_tib.alpha_path"]+"'>";						// Add path
+					else																				// All others
+						str+="' data-path='"+o.ancestor_id_path+"'>";									// Add path
 					str+=o.header;																		// Add label
 					if (!div.match(/sui-btree-/))														// If in advanced search
 						str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+o.id+"' title='View page'>&#xe67c</div>";					

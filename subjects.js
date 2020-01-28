@@ -46,7 +46,7 @@ class Subjects  {
 					}
 				}
 		str+="</table><br>";		
-		str+=sui.pages.DrawTabMenu(["CONTEXT","SUMMARY"])+"</div>";								// Add tab menu
+		str+=sui.pages.DrawTabMenu(["SUBJECT CONTEXT","SUBJECT RELATIONSHIPS"])+"</div>";		// Add tab menu
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
@@ -138,6 +138,7 @@ class Subjects  {
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
 		this.content[1]=str;																	// Set summary tab
+		showTab(0);																		// Draw it
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort

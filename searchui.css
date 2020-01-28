@@ -118,7 +118,7 @@
 					.sui-advEditLine:hover { background-color: #dee7f1	}
 .sui-advViewListPage { 	display:inline-block; } 
 					.sui-advViewListPage:hover { color:#668eec;	}	
-.sui-advViewTreePage { 	display:inline-block; padding:0 4px; color:#ccc; } 
+.sui-advViewTreePage { 	display:inline-block; padding:0 4px; color:#aaa; } 
 					.sui-advViewTreePage:hover { color: #a4baec; }														
 /* TREE */
 .sui-tree {      	user-select: none; overflow-x:hidden; max-height:360px; padding-left:6px; font-size:12px; 	}
