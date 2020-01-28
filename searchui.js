@@ -1250,9 +1250,15 @@ class SearchUI  {
 			this.GetTreeChildren(facet, path, (res)=> {													// Get children
 				var o,i,re,f="";
 				var str="<ul>";																			// Wrapper, show if not initting
-				if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
+				trace(res)
+				if (facet == "terms") {
+					if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields["ancestor_id_tib.alpha_path"])	// If valid
+						f=res.facet_counts.facet_fields["ancestor_id_tib.alpha_path"].join();					// Get list of facets
+					}
+				else{
+					if (res.facet_counts && res.facet_counts.facet_fields && res.facet_counts.facet_fields.ancestor_id_path)	// If valid
 					f=res.facet_counts.facet_fields.ancestor_id_path.join();							// Get list of facets
-//				res.response.docs.sort(function(a,b) { return (a.header > b.header) ? 1 : -1 }); 		// Sort
+					}
 				for (i=0;i<res.response.docs.length;++i) {												// For each child
 					o=res.response.docs[i];																// Point at child
 					re=new RegExp("\/"+o.id.split("-")[1]);												// Id
