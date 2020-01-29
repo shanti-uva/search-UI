@@ -121,8 +121,7 @@ class Pages  {
 			}
 		$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		if (browse) this.DrawTree("#sui-btree-"+o.asset_type,o.asset_type);						// If browsing, add tree
-		if (this.relatedType != "Home")															// If not home
-			$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});				// Hilite current
+		$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"});					// Hilite current
 		$("[id^=sui-rl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
 			if (this.relatedType == "Home")	{													// Home asset

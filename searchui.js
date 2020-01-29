@@ -43,6 +43,7 @@ class SearchUI  {
 		this.site=site;																				// Site to use
 		this.runMode=mode;																			// Current mode
 		this.facets={};																				
+		this.facets.assets=			{ type:"list",  icon:"&#xe60b", mode:null, data:[] };			// Assets 
 		this.facets.places=			{ type:"tree",  icon:"&#xe62b", mode:null, data:[] };			// Places 
 		this.facets.features=		{ type:"tree",  icon:"&#xe638", mode:null, data:[] };			// Features 
 		this.facets.subjects=		{ type:"tree",  icon:"&#xe634", mode:null, data:[] };			// Subjects 
@@ -115,26 +116,24 @@ class SearchUI  {
 			<div id='sui-pages' class='sui-results scrollbar'></div>
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
 		</div>
-		<div id='sui-adv' class='sui-adv'>
-			<div class='sui-advHeader' id='sui-advHeader-type'>&#xe60b&nbsp;&nbsp;ASSET TYPE
-			<span id='sui-advPlus-type' style='float:right'>&#xe669</span></div>
-			<div class='sui-advTerm' id='sui-advTerm-type'></div>
-			<div class='sui-advEdit' style='display:none' id='sui-advEdit-type'></div>`;
+		<div id='sui-adv' class='sui-adv'>`;
 		for (key in this.facets) { 
-				str+=`<div class='sui-advHeader' id='sui-advHeader-${key}'>
+				str+=`<div class='sui-advBox' id='sui-advBox-${key}'>
+				<div class='sui-advHeader' id='sui-advHeader-${key}'>	
 					${this.facets[key].icon}&nbsp;&nbsp;${key.toUpperCase()}
-					<span id='sui-advPlus-${key}' style='float:right'>&#xe669</span>
-				</div>`;
-				str+=`<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
-				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div>`;
-				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:8px 0 16px 0'>";
+					<span id='sui-advPlus-${key}' style='float:right'>&#xe669 </span></div>
+					<div class='sui-advTerm' id='sui-advTerm-${key}'></div>
+				<div class='sui-advEdit' style='display:none' id='sui-advEdit-${key}'></div></div>`;
+				if ((key == "terms") || (key == "users")) str+="<hr style='border-top:8px solid #ddd;margin:16px 0 16px 12px'>";
 				}
-		str+=`<div class='sui-advHeader' id='sui-advHeader-recent'>&#xe62e&nbsp;&nbsp;RECENT SEARCHES
+		str+=`<div class='sui-advBox' id='sui-advBox-recent'>
+			<div class='sui-advHeader' id='sui-advHeader-recent'>&#xe62e&nbsp;&nbsp;RECENT SEARCHES
 			<span id='sui-advPlus-recent' style='float:right'>&#xe669</span></div>
 			<div class='sui-advTerm'></div>
-			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div>
+			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div></div>
 		<div id='sui-footer' class='sui-footer'></div></div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
+		$("#sui-advHeader-assets").html($("#sui-advHeader-assets").html().replace(/Assets/i,"ITEM TYPE"));  // Rename assets
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
 		$("#sui-clear, sui-clear2").on("mouseout", function() { $(this).html("&#xe610"); });		// Normal						
 		$("#sui-clear, sui-clear2").on("click",()=> { 												// ON ERASE
@@ -168,11 +167,11 @@ class SearchUI  {
 		$("[id^=sui-advHeader-]").on("click",(e)=> {												// ON FACET HEADER CLICK
 			var id=e.currentTarget.id.substring(14);												// Get facet name		
 			$(".sui-advEdit").slideUp(400, ()=> {													// Close any open tree or lists
-				$("[id^=sui-advHeader-]").css("border-bottom-style","solid")						// Reset them all to closed
+				$("[id^=sui-advHeaderBox-]").css("border","solid")									// Reset them all to closed
 			$("[id^=sui-advPlus-]").html("&#xe669");												// Reset them all to closed
 			if ($("#sui-advEdit-"+id).css("display") != "none")	{									// If open
 				$("#sui-advPlus-"+id).html("&#xe66a");												// Show open
-				$("#sui-advHeader-"+id).css("border-bottom-style","hidden")							// Hide border
+				$("#sui-advHeaderBox-"+id).css("border-top-style","hidden")							// Hide border
 				}
 			});
 			$("#sui-advPlus-"+id).html("&#xe66a");													// Show open
@@ -342,7 +341,7 @@ class SearchUI  {
 			terms:[],																				// Terms
 			relationships:[],																		// Relationships
 			users:[],																				// Users
-			assets:[],																				// Assets
+			assets:[{title:"All", id:"all",bool:"AND"}],											// Assets
 			perspectives:[]																			// Perspectives
 			};																
 	}
@@ -351,7 +350,6 @@ class SearchUI  {
 	{
 		let url;
 		this.LoadingIcon(true,64);																	// Show loading icon
-		this.ss.query.assets=[{ title:this.ss.type.toLowerCase(), id:this.ss.type.toLowerCase(), bool: "AND" }];	// Put in assets section
 		if (collectionId)	{																		// If getting collection members
 			let ts=JSON.parse(JSON.stringify(this.ss));												// Clone search
 			ts.query={ text:"", places:[], assets:[], languages:[],	features:[],subjects:[],															
@@ -483,7 +481,7 @@ class SearchUI  {
     {
 		if ((facet == "users") || (facet == "relationships"))	return;								// No facets for these 
 		this.LoadingIcon(true,64); 																	// Show loading icon
-  		let url=this.solrUtil.createBasicQuery(this.ss,[facet]);									// Get query url
+		let url=this.solrUtil.createBasicQuery(this.ss,[facet == "assets" ? "languages" : facet ]);	 // Get query url (avoid assets)
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get facets
 				let i,o,v;
 				this.LoadingIcon(false);															// Hide loading icon
@@ -537,7 +535,7 @@ class SearchUI  {
 			$("#sui-results").css({ display:"block" });												// Show results page	
 			}
 		else if (this.ss.mode == "advanced") {														// Advanced search
-			$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width()-19+"px",display:"inline-block"});	// Size and show results area
+			$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width(),display:"inline-block"});	// Size and show results area
 			$("#sui-adv").css({ display:"block" });													// Show search ui
 			$("#sui-pages").css({ display:"none" });												// Hide pages page	
 			$("#sui-results").css({ display:"block" });												// Show results page	
@@ -879,7 +877,7 @@ class SearchUI  {
 		let i,o,str;
 		let _this=this;
 		for (let key in this.facets) {																// For each facet
-			if ($("#sui-advEdit-"+key).css("display") == "block") {									// Refresh list results if open
+			if ($("#sui-advEdit-"+key).css("display") == "block")	 {								// Refresh list results if open
 				this.DrawFacetItems(key,true);														// Draw proper facets menu
 				this.QueryFacets(key);																// Fill facet data			
 				}
@@ -889,7 +887,7 @@ class SearchUI  {
 				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
 					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}&#xe642</div>
 				<i> &nbsp;${o.title}</i></div>`;
-				$("#sui-advTerm-"+key).append(str);													// Add terms
+				if (key != "assets") $("#sui-advTerm-"+key).append(str);							// Add terms, unless assets
 				}
 			}
 
@@ -926,7 +924,6 @@ class SearchUI  {
 	DrawFacetItems(facet, open)																	// DRAW FACETS ITEMS
 	{
 		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			
-		else if (facet == "type") 						this.DrawAssetType();						// Show asset picker			
 		else if (this.facets[facet].type == "input") 	this.DrawInput(facet,open);					// Draw input editor			
 		else if (this.facets[facet].type == "tree") {												// If base type is a tree
 			if (this.ActiveSearch())					this.DrawFacetList(facet,open);				// If an active search, draw tree as a list	
@@ -940,34 +937,8 @@ class SearchUI  {
 		let key,activeSearch=false;																	// Assume no active search happening
 		if (this.ss.query.text.length && !ignoreText) 	activeSearch=true;							// Flag if something set in text
 		for (key in this.facets) 																	// For each facet
-			if (this.ss.query[key].length) 				activeSearch=true;							// Flag if something set
+			if ((this.ss.query[key].length) && (key != "assets"))	activeSearch=true;				// Flag if something set
 		return activeSearch;
-	}
-
-	DrawAssetType()																				// DRAW TYPE PICKER
-	{
-		let n,k,str="";
-		if ($("#sui-advEdit-type").css("display") != "none") {										// If open
-			$("#sui-advEdit-type").slideUp();														// Close it 
-			return;																			
-			}
-		for (k in this.assets) {																	// For each asset type														
-			n=this.assets[k].n;																		// Get number of items
-			if (n > 1000)	n=Math.floor(n/1000)+"K";												// Shorten
-			str+="<div class='sui-advEditLine' style='width:100%' id='sui-advtyp-"+k+"'>";			// Item head
-			str+="<span style='font-size:16px; vertical-align:-1px; color:"+this.assets[k].c+"'>";
-			str+=this.assets[k].g+"&nbsp;</span> "+k.charAt(0).toUpperCase()+k.substr(1);			// Asset name
-			if (n != undefined) str+=" ("+n+")</div>";												// Counts
-			}
-		$("#sui-advEdit-type").html(str.replace(/\t|\n|\r/g,""));									// Add to div
-		$("#sui-advEdit-type").slideDown();															// Show it
-		
-		$("[id^=sui-advtyp-]").off("click");
-		$("[id^=sui-advtyp-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-			this.ss.type=e.currentTarget.id.substring(11).toLowerCase();							// Get asset name		
-			this.ss.page=0;																			// Start at beginning
-			this.Query(); 																			// Get new results
-			});							
 	}
 
 	DrawInput(facet)																			// DRAW INPUT FACET PICKER
@@ -1027,6 +998,11 @@ class SearchUI  {
 	ResetFacetList(facet)																		// RESET FACET LIST UI
 	{
 		var i,k,str="";
+		if (facet == "assets") {																	// If assets
+			let o=this.facets.assets.data=[];														// Point at data
+			for (k in this.assets)																	// For each asset type														
+				o.push({ title:k.charAt(0).toUpperCase()+k.slice(1), id:k, n:this.assets[k].n});	// Add data
+			}
 		let n=Math.min(300,this.facets[facet].data.length);											// Cap at 300
 		$("[id^=sui-advEditLine-]").remove();														// Remove old members, in all facets
 		for (i=0;i<n;++i) {																			// Add items
@@ -1120,7 +1096,8 @@ class SearchUI  {
 		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
 			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
 			});      
-	}
+		$(".sui-advEditList").css("max-height",$("#sui-main").height()-$("#sui-advHeader-"+facet).offset().top-120+"px");	// Fill space
+		}
 
 	AddNewFilter(title, id, bool, facet)														// ADD NEW TERM TO SEARCH STATE
 	{
@@ -1132,6 +1109,7 @@ class SearchUI  {
 		o[num].title=title;																			// Get title
 		o[num].id=id ? id.replace(/collections-/,"") : "";											// Id (remove collections- prefix)
 		o[num].bool=bool;																			// Bool
+		if (facet == "assets") 	o.splice(0,1)														// Clear first one								
 		this.DrawAdvanced();																		// Redraw
 		this.Query();																				// Run query and show results
 	}
@@ -1149,6 +1127,7 @@ class SearchUI  {
 		this.facets[facet].mode="tree";																// Tree mode active
 		this.curTree=facet;
 		var div="#sui-tree"+facet;																	// Tree div
+	
 		if (!$(div).length) {																		// If doesn't exist
 			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
 			style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'> &nbsp; 
@@ -1161,7 +1140,7 @@ class SearchUI  {
 			else if (facet == "features") 	this.LazyLoad(div,null,facet,20);						// Features
 			else if (facet == "languages") 	this.LazyLoad(div,null,facet,301);						// Languages
 			else 							this.GetTopRow(div,facet);								// Constructed top layers
-			
+
 			$("#sui-advListMap-"+facet).css({ color: "#668eec" });									// Highlight tree
 
 			$("[id^=sui-advTreeMap-]").off("click");												// KILL OLD HANDLER
@@ -1182,7 +1161,7 @@ class SearchUI  {
 				e.stopPropagation();																// Stop propagation
 				});      
 			}
-	
+		$(div).css("max-height",$("#sui-main").height()-$("#sui-advHeader-"+facet).offset().top-120+"px");	// Fill space
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
 	}
 
