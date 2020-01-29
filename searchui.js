@@ -551,6 +551,7 @@ class SearchUI  {
 		this.DrawFooter();																			// Draw footer
 	}
 
+
 	DrawHeader()																				// DRAW RESULTS HEADER
 	{
 		if (this.ss.mode == "related") 	return;														// Quit for special search modes
@@ -558,7 +559,7 @@ class SearchUI  {
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
 		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
 		if (n >= 1000)	n=Math.floor(n/1000)+"K";													// Shorten if need be
-		var str=`<span style='vertical-align:-10px'>${this.assets[this.ss.type].g} &nbsp;${this.ss.type.toUpperCase()} search results  &nbsp; <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
+			var str=`<span style='vertical-align:-10px'>${this.ss.query.assets[0].title.toUpperCase()} search results &nbsp; <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
 /*		str=` <span style='font-size:14px'> TYPE</span>&nbsp;&nbsp; 

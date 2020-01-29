@@ -26,10 +26,12 @@ class Subjects  {
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 		this.content=["...loading","...loading"];												// Content pages
+		this.kmap=null;																			// Holds kmap
 	}
 
 	Draw(o, tab)																			// DRAW SOURCE PAGE FROM KMAP
 	{
+		this.kmap=o;																			// Save kmap
 		let str=`<div class='sui-subjects'>
 		<div><span class='sui-subIcon'>${sui.assets[o.asset_type].g}</span>
 		<span class='sui-subText'>${o.title[0]}</span>
@@ -60,6 +62,7 @@ class Subjects  {
 
 	ShowTab(which) 																			// SHOW TAB
 	{
+		let _this=this;
 		$("[id^=sui-spLab-]").off("click");														// Kill handler
 		$("[id^=sui-spDot-]").off("click");														// Kill handler
 		$("[id^=sui-spItem-]").off("click");													// Kill handler
@@ -74,11 +77,11 @@ class Subjects  {
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") _this.AddBranch(o.asset_type,path,$(this));					// Lazy load branch
+				if (path != "null") _this.AddBranch(_this.kmap.asset_type,path,$(this));		// Lazy load branch
 				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
-			$("#sui-spLab-"+o.uid).css({ "border-bottom":"1px solid #999" });					// Highlight current one	
+			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
 			}
 		else if (which == 1) {																	// If summary, add events
 			$("[id^=sui-spItem-]").on("click", function(e) {return false;	});					// ON CONEXT LINE CLICK, INHIBIT
@@ -202,6 +205,7 @@ class Subjects  {
 	{
 		let _this=this;
 		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
+			trace(1)
 			let str="";
 			let i,j,re,m,path;
 			let counts=[];
