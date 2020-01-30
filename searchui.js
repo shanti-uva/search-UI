@@ -1161,7 +1161,7 @@ class SearchUI  {
 				if (!div.match(/sui-btree-/))															// If in advanced search
 					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND", _this.curTree);// Add term to search state and refresh
 				else{					
-					_this.pages.relatedBase=_this.pages.relatedId="";									// No related
+					_this.pages.relatedBase=_this.pages.relatedType=_this.pages.relatedBase=_this.pages.relatedId="";	// No related
 					if (_this.ss.mode == "related") _this.ss.mode=_this.ss.lastMode;					// Get back to search mode
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 					}
