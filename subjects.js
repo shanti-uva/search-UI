@@ -27,11 +27,13 @@ class Subjects  {
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 		this.content=["...loading","...loading"];												// Content pages
 		this.kmap=null;																			// Holds kmap
+		this.subTab=0;
 	}
 
-	Draw(o, tab)																			// DRAW SOURCE PAGE FROM KMAP
+	Draw(o, subTab)																			// DRAW SOURCE PAGE FROM KMAP
 	{
 		this.kmap=o;																			// Save kmap
+		this.subTab=subTab;
 		let str=`<div class='sui-subjects'>
 		<div><span class='sui-subIcon'>${sui.assets[o.asset_type].g}</span>
 		<span class='sui-subText'>${o.title[0]}</span>
@@ -143,7 +145,7 @@ class Subjects  {
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
 		this.content[1]=str;																	// Set summary tab
-		this.ShowTab(1);																		// Draw it
+		this.ShowTab(this.subTab ? 0 : 1);														// Draw it (if subTab, show context tab)
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort

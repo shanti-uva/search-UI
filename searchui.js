@@ -78,10 +78,9 @@ class SearchUI  {
 			}										
 		
 		window.onresize=()=> { 																		// ON RESIZE
-			if ((location.hash+" ").match(/audio-video/)) 	return;									// If AV don't refresh
-			if ((location.hash+" ").match(/#p/))			this.PageRouter(location.hash);			// Get from hash
-			else											this.Draw(); 							// Full reraw
-			};
+			if (this.ss.mode == "advanced") 														// Advanced search
+				$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width() });				// Size results area
+		};
 		
 		window.addEventListener("popstate", (h)=> { 												// ON PAGE STATE CHANGE
 			let state=h.state;																		// Get state
@@ -187,7 +186,6 @@ class SearchUI  {
 
 	Draw(mode)																					// DRAW SEARCH COMPONENTS
 	{
-		$("#sui-typeList").remove();																// Remove type list
 		if (mode) this.ss.mode=mode;																// If mode spec'd, use it
 		this.DrawResults();																			// Draw results page if active
 		this.DrawAdvanced();																		// Draw search UI if active
@@ -206,7 +204,6 @@ class SearchUI  {
 	
 	OPTIONS:
 	#p=kmapId		// Shows page that has kmapid
-	#a=AssetType	// Shows results from current search that match AssetType
 
 ///////////////////////////////////////////////////////////////////////////////////////////////// */
 
@@ -226,11 +223,6 @@ class SearchUI  {
 			setupPage();																			// Prepare page's <div> environment
 			this.GetKmapFromID(id,(kmap)=>{  this.pages.Draw(kmap,true); });						// Get kmap and show page
 			}	
-		else if ((id=hash.match(/#a=(.+)/))) {														// If showing assets
-			setupPage();																			// Prepare page's <div> environment
-			this.ss.type=id[1];																		// Set asset type
-			this.Query(); 																			// Get new results
-			}	
 		else if ((id=hash.match(/#r=(.+)/))) {														// If showing related results
 			setupPage();																			// Prepare page's <div> environment
 			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
@@ -244,23 +236,9 @@ class SearchUI  {
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			this.Query(true);																		// Run query
 			}	
-		else if ((id=hash.match(/#v=(.+)/))) {														// If showing popover results
-			setupPage();																			// Prepare page's <div> environment
-			let v=id[1].replace(/\%20/g," ").split("=");											// Get ids	
-			let url=sui.solrUtil.createKmapQuery(v[0],v[1],0,1000);									// Get query url
-			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=>{ 			// Get related places
-				sui.MassageKmapData(data);															// Normalize for display
-				sui.curResults=data.response.docs;													// Save current results
-				sui.DrawItems();																	// Draw items																
-				sui.DrawFooter();																	// Draw footer															
-				sui.ss.page=0;																		// Start at beginning
-				});
-			}
-
 		function setupPage() {																		// PREPARES <DIV> TO DRAW NEW PAGE
 			sui.ss.mode="simple";																	// Simple display mode	
 			sui.ss.page=0;																			// Start at beginning
-			$("#sui-typeList").remove();															// Remove type list
 			$("#sui-results").scrollTop(0);															// Scroll to top
 			$("#sui-pages").scrollTop(0);															// Scroll to top
 			$("#plc-infoDiv").remove();																// Remove map buttons
@@ -274,6 +252,7 @@ class SearchUI  {
 	SerializeQuery(q)																			// SERIALZE QUERY INTO STRING
 	{
 		let i,f,str="";
+		this.ss.query.assets=[ this.ss.query.assets[0] ];											// Keep only 1st asset *************************** ASSETS1
 		for (f in q.query) {																		// For each facet type
 			if ((f == "text") && q.query[f])														// If text spec'd
 				str+=`${f}:${q.query[f]}=`;															// Add it
@@ -289,6 +268,7 @@ class SearchUI  {
 		let i,v,o;
 		let fs=qString.split("=");																	// Split parts
 		this.ClearQuery();																			// Clear search query
+		this.ss.query.assets=[];																	// Clear assets ********************************** ASSETS1
 		for (i=0;i<fs.length;++i) {																	// For each term
 			if (fs[i].match(/^text/))	this.ss.query.text=fs[i].substr(5);							// Get text
 			else{																					// Get all other facets
@@ -297,7 +277,8 @@ class SearchUI  {
 				this.ss.query[v[0]].push(o);														// Add	
 				}
 			}			
-	}
+		this.ss.query.assets=[ this.ss.query.assets[0] ];											// Keep only 1st asset *************************** ASSETS1
+		}
 
 /*	QUERY TOOLS //////////////////////////////////////////////////////////////////////////////////
 
@@ -319,7 +300,6 @@ class SearchUI  {
 		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
 		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
 		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author
-		this.ss.type="all";																			// Current item types
 		this.ss.page=0;																				// Current page being shown
 		this.ss.pageSize=100;																		// Results per page	
 		this.ss.site="Mandala";																		// Site
@@ -476,7 +456,7 @@ class SearchUI  {
 				this.ss.numResults=this.assets.all.n=n;												// Set total count
 				}	
 	}
-
+	
     QueryFacets(facet, filter)																	// QUERY AND UPDATE FACET OPTIONS
     {
 		if ((facet == "users") || (facet == "relationships"))	return;								// No facets for these 
@@ -510,7 +490,7 @@ class SearchUI  {
 		$("#sui-results").scrollTop(0);																// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
 		if (this.ss.mode == "related")		this.numItems=this.assets[this.pages.relatedType].n;	// Set number of items based on related type
-		else								this.numItems=this.assets[this.ss.type].n;				// Set number of items based on current asset being shown
+		else								this.numItems=this.assets[this.ss.query.assets[0].id].n; // Set number of items based on current asset being shown  ***ASSETS1
 		if (this.ss.mode == "input") {																// Just the search box
 			$("#sui-header").css({ display:"none"});												// Show header
 			if (this.runMode != "standalone") {														// If not standalone															
@@ -544,7 +524,6 @@ class SearchUI  {
 		$("#sui-mode").prop({"title": this.ss.mode == "advanced" ? "Basic search" : "Advanced search" } );	// Set tooltip
 		$("#sui-mode").html(this.ss.mode == "advanced" ? "BASIC<br>SEARCH" : "ADVANCED<br>SEARCH" );		// Set mode icon	
 		$("#sui-header").css({display:"block"} );													// Show header
-		$("#sui-typeList").remove();																// Remove type list
 		if (noRefresh)	return;																		// Don't refresh page
 		this.DrawHeader();																			// Draw header
 		this.DrawItems();																			// Draw items
@@ -557,42 +536,9 @@ class SearchUI  {
 		if (this.ss.mode == "related") 	return;														// Quit for special search modes
 		var s=this.ss.page*this.ss.pageSize+1;														// Starting item number
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
-		var n=this.assets[this.ss.type].n;															// Get number of items in current asset
-		if (n >= 1000)	n=Math.floor(n/1000)+"K";													// Shorten if need be
-			var str=`<span style='vertical-align:-10px'>${this.ss.query.assets[0].title.toUpperCase()} search results &nbsp; <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
+		var str=`<span style='vertical-align:-10px'>${this.ss.query.assets[0].title.toUpperCase()} search results &nbsp; <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-/*		str=` <span style='font-size:14px'> TYPE</span>&nbsp;&nbsp; 
-			<div id='sui-type' class='sui-type' title='Choose asset type'>
-			<div id='sui-typeIcon' class='sui-typeIcon' style='background-color:${this.assets[this.ss.type].c}'>
-			${this.assets[this.ss.type].g}</div>
-			${this.ss.type.charAt(0).toUpperCase()+this.ss.type.substr(1)} ${(n != undefined) ? "("+n+")" : "" } 
-			<div id='sui-typeSet' class='sui-typeSet'>&#xe609</div>
-			</div>`;
-		$("#sui-headRight").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-		$("#sui-type").on("click", ()=> {															// ON CHANGE ASSET BUTTON
-			if ($("#sui-typeList").length) { $("#sui-typeList").remove(); return; }					// Quit if open
-			$("#sui-typeList").remove();															// Remove type list
-			str="<div id='sui-typeList' class='sui-typeList'>";										// Enclosing div for list
-			for (var k in this.assets) {															// For each asset type														
-				n=this.assets[k].n;																	// Get number of items
-				if (n > 1000)	n=Math.floor(n/1000)+"K";											// Shorten
-				str+="<div class='sui-typeItem' id='sui-tl-"+k+"'>";								// Item head
-				str+="<span style='font-size:18px; line-height: 24px; vertical-align:-3px; color:"+this.assets[k].c+"'>";
-				str+=this.assets[k].g+" </span> "+k.charAt(0).toUpperCase()+k.substr(1);			// Asset name
-				if (n != undefined) str+=" ("+n+")</div>";											// Counts
-				}
-			$("#sui-main").append(str);																// Add to main div
-			
-			$("[id^=sui-tl-]").on("click", (e)=> {													// ON CLICK ON ASSET 
-				this.ss.type=e.currentTarget.id.substring(7).toLowerCase();							// Get asset name		
-				$("#sui-typeList").remove();														// Remove type list
-				this.ss.page=0;																		// Start at beginning
-				if (this.ss.mode == "related") this.ss.mode=this.ss.lastMode;						// Get back to basic search mode
-				this.Query(); 																		// Get new results
-				});							
-			});
-		*/
 		}
 
 	DrawFooter()																				// DRAW RESULTS FOOTER
@@ -989,7 +935,6 @@ class SearchUI  {
 			let id=e.target.id.substr(11);															// Get which
 			this.ss.query=(JSON.parse(JSON.stringify(this.searches[id].query)));					// Restore search query only
 			$("#sui-search").val(this.ss.query.text);												// Set top search
-			this.ss.type=this.ss.query.assets[0].id;												// Set type
 			this.DrawAdvanced();																	// Draw advanced 
 			this.Query();																			// Rerun search	
 			});
@@ -1024,12 +969,12 @@ class SearchUI  {
 				this.QueryFacets(facet);															// Requery the facets
 				}
 			});
-		$("#sui-advListNum").html((n < 300) ? n : n="300+");										// Set number
+		$("#sui-advListNum").html((n < 300) ? n : "300+");											// Set number
 	}
 
 	DrawFacetList(facet, open, searchItem)														// DRAW LIST FACET PICKER
 	{
-		var i,sorted=0;
+		let i,sorted=0;
 		if (!open && ($("#sui-advEdit-"+facet).css("display") != "none")) {							// If open
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
@@ -1037,11 +982,13 @@ class SearchUI  {
 		this.QueryFacets(facet);																	// Get initial list	
 		this.facets[facet].mode="list";																// List mode active
 		var str=`<input id='sui-advEditFilter-${facet}' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
-		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'>`;
-		str+=` &nbsp; <div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
-		<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>
-		&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-		<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
+		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'> &nbsp; `;
+		if (this.facets[facet].type == "tree") {
+			str+=`<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
+			<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp`;
+			}
+		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
 		<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}</div>
 		<hr style='border: .5px solid #a4baec'>
 		<div class='sui-advEditList' id='sui-advEditList-${facet}'></div>`;
@@ -1110,7 +1057,7 @@ class SearchUI  {
 		o[num].title=title;																			// Get title
 		o[num].id=id ? id.replace(/collections-/,"") : "";											// Id (remove collections- prefix)
 		o[num].bool=bool;																			// Bool
-		if (facet == "assets") 	o.splice(0,1)														// Clear first one								
+		if (facet == "assets") 	this.ss.query.assets=[ {title:title, id:id, bool:bool} ];			// Only one	************************** ASSETS1							
 		this.DrawAdvanced();																		// Redraw
 		this.Query();																				// Run query and show results
 	}
@@ -1304,7 +1251,7 @@ class SearchUI  {
 	LoadingIcon(mode, size)																		// SHOW/HIDE LOADING ICON		
 	{
 		if (!mode) {																				// If hiding
-			$("#sui-loadingIcon").remove();															// Remove it
+			$("[id^=sui-loadingIcon]").remove();														// Remove it
 			return;																					// Quit
 			}
 		var str="<img src='loading.gif' width='"+size+"' ";											// Img

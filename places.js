@@ -272,7 +272,7 @@ class Places  {
 
 	DrawMetadata(openTab)																		// SHOW PLACES METADATA
 	{
-		let i,str="<div style='margin-left:180px'><div>";
+		let i,str="<div style='margin-left:192px'><div>";
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
 			str+="<div style='margin: 6px 0 8px 0'><b>FEATURE TYPE:</b>";						// Add header
 			for (i=0;i<this.kmap.feature_types_ss.length;++i) 									// For each type
@@ -298,7 +298,6 @@ class Places  {
 			if (d && d[0] && d[0]._childDocuments_ && d[0]._childDocuments_.length) {			// If docs
 				for (i=0;i<d[0]._childDocuments_.length;++i) {									// For each one
 					o=d[0]._childDocuments_[i];													// Point at it
-					trace(o)
 					oo={};																		// Clear obj
 					oo.lab=o.related_names_header_s;											// Label
 					oo.lang=o.related_names_language_s;											// Language
@@ -430,8 +429,8 @@ class Places  {
 				id:c[i].related_uid_s });														// Add id
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
-		let str=`<br><b>${o.title[0]}</b> has <b>${n}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		let str=`<br><b>${o.title[0]}</b> has <b>${n}</b> other place${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		See the PLACE RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column

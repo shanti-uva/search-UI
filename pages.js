@@ -25,7 +25,7 @@ class Pages  {
 		sui.pages=this;																			// Save context
 		this.div="#sui-results";																// Div to hold page
 		this.relatedBase=null;																	// Holds based kmap for related
-		this.relatedType="home";																// Holds current related category
+		this.relatedType="Home";																// Holds current related category
 		this.relatedId="";																		// Holds current related id
 		this.lastMode=sui.ss.mode;																// Previous search mode
 		this.curKmap=null;																		// Currently active page kmap
@@ -133,7 +133,9 @@ class Pages  {
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
 				if ((this.relatedBase.asset_type == "places") && (this.relatedType == "places")) // If base is a place and showing related places
 					 sui.plc.Draw(o,4);															// Draw place with context tab open		
-				else this.DrawRelatedResults(o);												// Related asset browsing
+				else if ((this.relatedBase.asset_type == "subjects") && (this.relatedType == "subjects")) // If base is a place and showing related places
+					sui.sub.Draw(o,1);															// Draw subjects with context tab open		
+				 else this.DrawRelatedResults(o);												// Related asset browsing
 				if (!fromHistory)																// If not from history API
 					sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state
 				}
@@ -200,7 +202,7 @@ class Pages  {
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
 			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
 
-			$("[id^=sui-popover-]").remove();														// Remove old one
+			$("[id^=sui-popover-]").remove();													// Remove old one
 			let str=`<div id='sui-popover-${id}' class='sui-popover' 
 			style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
 			<div style='width:0;height:0;border-left:10px solid transparent;
@@ -210,7 +212,7 @@ class Pages  {
 			border-right:8px solid transparent;border-bottom:10px solid #fff;
 			margin-left:calc(50% - 8px)'</div>
 			</div>`;
-			$(this.div).append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+			$(this.div).append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 	
 			str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
 			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
@@ -265,8 +267,6 @@ class Pages  {
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 				
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
-					if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;					// Get out of related and collections
-					this.relatedBase=null;														// No base and set to home
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
 					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url
@@ -276,8 +276,12 @@ class Pages  {
 						sui.DrawItems();														// Draw items																
 						sui.DrawFooter();														// Draw footer															
 						sui.ss.page=0;															// Start at beginning
-						sui.SetState("v="+v[2]+'-'+v[3]+"="+v[4]);								// This is the active page
-						});
+					});
+					sui.GetKmapFromID(id,(o)=>{													// Get kmap
+						 this.relatedBase=o;													// Set new base
+							this.relatedId=o.asset_type+"-"+o.id;								// Set id
+							this.DrawHeader(o);													// Set header
+							});
 					return false;																// Don't propagate
 					});
 				}
