@@ -32,9 +32,10 @@ class Sources  {
 			&nbsp;&nbsp;${o.creator.join(", ")}<br><br>`;
 			}
 		if (o.url_thumb && !o.url_thumb.match(/gradient.jpg/)) str+="<img src='"+o.url_thumb+"' style='float:right;width:33%; padding:0 0 12px 12px'>";
-		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</p>";
+		if (o.collection_title) str+=`<p>COLLECTION:&nbsp;&nbsp<a id='sui-imgCol' href='#p=${o.collection_uid_s}'>${o.collection_title}</a></p>`;
+		if (o.asset_subtype) str+="<p>FORMAT:&nbsp;&nbsp<span class='sui-sourceText'>"+o.asset_subtype+"</span></p>";
 		str+="<p class='sui-pageLab' id='sui-p2'>PUBLICATION YEAR:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcYear'></span>";
-		if (o.publisher_s) str+="<p>PUBLISHER:&nbsp;&nbsp<span class='sui-sourceText'>"+o.publisher_s+"</p>";
+		if (o.publisher_s) str+="<p>PUBLISHER:&nbsp;&nbsp<span class='sui-sourceText'>"+o.publisher_s+"</span></p>";
 		str+="<p class='sui-pageLab' id='sui-p3'>PLACE OF PUBLICATION:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPlc'></span>";
 		str+="<p class='sui-pageLab' id='sui-p1'>PAGES:&nbsp;&nbsp<span class='sui-sourceText' id='sui-srcPages'></span>";
 		str+="<p class='sui-pageLab'>SOURCE ID:&nbsp;&nbsp<span class='sui-sourceText'>sources-"+o.id+"</span></p>";
@@ -42,7 +43,12 @@ class Sources  {
 		str+="</div>";
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 		sui.pages.DrawRelatedAssets();															// Draw related assets menu if active
-		
+
+		$("#sui-imgCol").on("click",()=> {														// ON COLLECTION CLICK
+			sui.GetKmapFromID(o.collection_uid_s,(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
+			return false;																		// Stop propagation
+			});
+
 		sui.GetJSONFromKmap(o, (d)=> {															// Get details from JSON
 			let i,str="";
 			if (d.biblio_pages) 			$("#sui-srcPages").html(d.biblio_pages);			// Add pages

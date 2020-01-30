@@ -23,6 +23,7 @@ class Collections  {
 
 	Draw(o)																					// DRAW SOURCE PAGE FROM KMAP
 	{
+		this.noSubs=1;
 		let a=sui.assets[o.asset_subtype.toLowerCase()];
 		var str=`<div class='sui-sources' id='sui-collections'>
 		<span style='font-size:24px;color:${a.c};vertical-align:-4px'>${a.g}</span>
@@ -41,6 +42,11 @@ class Collections  {
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(10);											// Get index of tab	
 			this.ShowTab(id);																	// Draw it
+			});
+
+		$("#sui-imgCol").on("click",()=> {														// ON COLLECTION CLICK
+			sui.GetKmapFromID(o.collection_uid_s,(kmap)=>{ sui.SendMessage("",kmap); });		// Get kmap and show page
+			return false;																		// Stop propagation
 			});
 			
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu if active
@@ -70,6 +76,7 @@ class Collections  {
 		if (o.node_user_full_s) this.content[n]+=sui.pages.DrawItem("&#xe600","OWNER",o.node_user_full_s+" &nbsp; ("+o.node_user+")","","sui-pageLab",1);	// Owner
 		if (o.collection_visibility_s) this.content[n]+=sui.pages.DrawItem("&#xe622","VISIBILITY",o.collection_visibility_s.substr(0,1).toUpperCase()+o.collection_visibility_s.substr(1),"","sui-pageLab",1);	// Visibility
 		if (o.asset_subtype) this.content[n]+=sui.pages.DrawItem(sui.assets[o.asset_subtype.toLowerCase()].g,"TYPE",o.asset_subtype,"","sui-pageLab",1);	// Type
+		if (o.collection_title) this.content[n]+=sui.pages.DrawItem(sui.assets[o.asset_subtype.toLowerCase()].g,"COLLECTION",`<a title='Collection' id='sui-imgCol'	href='#p=${o.collection_uid_s}'>${o.collection_title}</a>`,"","sui-pageLab",1);	// Type
 		this.content[n]+="<br>";
 	}
 
