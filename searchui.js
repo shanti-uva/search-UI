@@ -38,7 +38,7 @@ class SearchUI  {
 		sui=this;																					// Save ref to class as global
 		this.curResults="";																			// Returns results
 		this.numItems=0;																			// Number of items																						
-		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
+		this.AND="AND ONLY";	this.OR="OR";	this.NOT="NOT";										// Boolean display names
 		this.ss={};																					// Holds search state
 		this.site=site;																				// Site to use
 		this.runMode=mode;																			// Current mode
@@ -832,7 +832,7 @@ class SearchUI  {
 			for (i=0;i<this.ss.query[key].length;++i) {												// For each term in facet	
 				o=sui.ss.query[key][i];																// Point at facet to add to div
 				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
-					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}&#xe642</div>
+					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${i ? this[o.bool] : ""}&#xe642</div>
 				<i> &nbsp;${o.title}</i></div>`;
 				if (key != "assets") $("#sui-advTerm-"+key).append(str);							// Add terms, unless assets
 				}
@@ -840,7 +840,7 @@ class SearchUI  {
 
 		$("[id^=sui-advBool-]").on("mouseenter",function(e) {										// ON BOOLEAN HOVER
 			let v=e.currentTarget.id.split("-");													// Get ids
-			let str=`<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-AND'>AND</div>|			
+			let str=`<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-AND'>AND ONLY</div>|			
 				<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-OR'>OR</div>|					
 				<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-NOT'>NOT</div>&nbsp;`;	// Add options	
 			$(this).html(str.replace(/\t|\n|\r/g,""));												// Set new value
@@ -856,8 +856,8 @@ class SearchUI  {
 
 		$("[id^=sui-advBool-]").on("mouseleave",function(e) {										// ON BOOLEAN OUT
 			let v=e.currentTarget.id.split("-");													// Get ids
-			let b=_this.ss.query[v[2]][v[3]].bool;													// Get current boolean state
-			$(this).html(_this[b]+"&#xe642");														// Set new value
+			let b= _this.ss.query[v[2]][v[3]].bool ;												// Get current boolean state 
+			$(this).html((v[3]-0 ? _this[b] : "")+"&#xe642");										// Set new value (not 1st one)
 			});
 
 		$("[id^=sui-advKill-]").on("click",(e)=> {													// REMOVE ITEM FROM QUERY
@@ -1044,7 +1044,7 @@ class SearchUI  {
 		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
 			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
 			});      
-		$(".sui-advEditList").css("max-height",$("#sui-main").height()-$("#sui-advHeader-"+facet).offset().top-120+"px");	// Fill space
+		$(".sui-advEditList").css("max-height",$("#sui-main").height()-$("#sui-advTerm-"+facet).offset().top-$("#sui-advTerm-"+facet).height()-102+"px");	// Fill space
 		}
 
 	AddNewFilter(title, id, bool, facet)														// ADD NEW TERM TO SEARCH STATE
@@ -1109,7 +1109,7 @@ class SearchUI  {
 				e.stopPropagation();																// Stop propagation
 				});      
 			}
-		$(div).css("max-height",$("#sui-main").height()-$("#sui-advHeader-"+facet).offset().top-120+"px");	// Fill space
+		$(div).css("max-height",$("#sui-main").height()-$("#sui-advTerm-"+facet).offset().top-$("#sui-advTerm-"+facet).height()-102+"px");	// Fill space
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
 	}
 
