@@ -825,7 +825,7 @@ class SearchUI  {
 		let i,o,str;
 		let _this=this;
 		for (let key in this.facets) {																// For each facet
-			if ($("#sui-advEdit-"+key).css("display") == "block")	 {								// Refresh list results if open
+			if ($("#sui-advEdit-"+key).css("display") == "block") {									// Refresh list results if open
 				this.DrawFacetItems(key,true);														// Draw proper facets menu
 				this.QueryFacets(key);																// Fill facet data			
 				}
@@ -968,7 +968,6 @@ class SearchUI  {
 			if (v[0].match(/ViewListPage/))	this.GetKmapFromID(items[v[1]].id,(kmap)=>{ this.SendMessage("page="+items[v[1]].url,kmap); }); // Get kmap and show page
 			else{																					// Add term
 				this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND", facet);					// Add to search state
-				this.QueryFacets(facet);															// Requery the facets
 				}
 			});
 		$("#sui-advListNum").html((n < 300) ? n : "300+");											// Set number
