@@ -40,7 +40,7 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
-		this.content=["","...loading","...loading","...loading","<br>...loading"];
+		this.content=["...loading","...loading","...loading","<br>...loading",""];
 	}
 
 	Draw(kmap, openTab)
@@ -280,12 +280,12 @@ class Places  {
 			if (this.kmap.caption) str+="<div class='sui-sourceText'>"+this.kmap.caption+"</div>";	// Add caption
 			str+="</div>";																		// Close top of map div
 			}
-		str+=this.DrawTabMenu(["MAP","NAMES","LOCATION","GEOGRAPHIC CONTEXT","PLACE RELATIONSHIPS"],3)+"</div></div>";	// Add tab menu
+		str+=sui.pages.DrawTabMenu(["NAMES","LOCATION","GEOGRAPHIC CONTEXT","PLACE RELATIONSHIPS","MAP"])+"</div></div>";	// Add tab menu
 		str+="<div class='plc-main' id='plc-main'></div>";										// Map holder
 		str+="</div>";																			// Close total div
 		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
-		this.ShowTab(0);																		// Open on map
+		this.ShowTab(4);																		// Open on map
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
@@ -324,7 +324,7 @@ class Places  {
 			for (i=0;i<l.length;++i) 															// For each one
 				if (l[i].ety)	str+=`<div>Etymology for ${l[i].lab}: &nbsp; ${l[i].ety}</div>`; // Text
 			str+="</div><br>";
-			this.content[1]=str.replace(/\t|\n|\r|/g,"");										// Set tab											
+			this.content[0]=str.replace(/\t|\n|\r|/g,"");										// Set tab											
 			});
 	
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
@@ -343,19 +343,6 @@ class Places  {
 		
 		}	
 
-	DrawTabMenu(tabs, split)																// DRAW TAB MENU
-	{
-		let i, str="",pct=100/split;														
-		for (i=0;i<tabs.length;++i) {
-			if (i >= split)	pct=100/(tabs.length-split);										// For each tab	
-			str+=`<div class='sui-tabTab' id='sui-tabTab${i}' style='width:calc(${pct}% - 2px)
-			${(i >= split) ? ";display:none'" :"'" }>
-			${tabs[i]}&nbsp;&#xe609</div>`;
-		}
-		str+="<div class='sui-tabContent' id='sui-tabContent'></div>";							// Tab contents
-		return str.replace(/\t|\n|\r|/g,"");													// Return tab markup
-	}
-
 	ShowTab(which)																			// OPEN TAB
 	{	
 		let _this=this;																			// Context
@@ -366,17 +353,10 @@ class Places  {
 		$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });					// Reset all tabs
 		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
+		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
-		if (which == 0)		$("#plc-main").slideDown();											// Show map
+		if (which == 4)		$("#plc-main").slideDown();											// Show map
 		else				$("#plc-main").slideUp();											// Hide map
-		if (which < 3) {																		// Main tab bank
-			$("#sui-tabTab0,#sui-tabTab1, #sui-tabTab2").show();								// Show 1st 3
-			$("#sui-tabTab3,#sui-tabTab4").hide();												// Hide rest
-			}
-		else{																					// Second tab bank
-			$("#sui-tabTab0,#sui-tabTab1, #sui-tabTab2").hide();								// Hide 1st 3
-			$("#sui-tabTab3,#sui-tabTab4").show();												// Show rest
-			}
 		if (which == 1)	{																		// If summary, add events
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
@@ -435,7 +415,7 @@ class Places  {
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
-		this.content[3]=str;																	// Set summary tab
+		this.content[2]=str;																	// Set summary tab
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			let sub="xxx";
@@ -490,7 +470,7 @@ class Places  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[4]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
+			this.content[3]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
 			});
 	}
 

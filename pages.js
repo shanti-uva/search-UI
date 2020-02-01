@@ -78,7 +78,7 @@ class Pages  {
 		if (!browse && (sui.ss.mode != "related")) return;										// Quit if not related or a sub/term/place/collection
 		if (p.asset_type != "collections") {
 			var url=sui.solrUtil.createKmapQuery(o.uid);										// Get query url
-			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {		// Get related places
+			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {		// Get related assets
 					var i,n,tot=0;
 					if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length) { // If valid data
 					let d=data.facets.asset_counts.buckets;										// Point at bucket array
@@ -108,7 +108,10 @@ class Pages  {
 		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		if (p.asset_type == "collections")
 			str+="<div class='sui-relatedItem' id='sui-rl-"+sk+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[sk].c+"'>"+sui.assets[sk].g+" </span> "+o.asset_subtype+"</div>";
+		
 		for (k in sui.assets) {																	// For each asset type														
+			if ((p.asset_type == "places") && (k == "places")) 		continue;					// If base is a place skip places
+			if ((p.asset_type == "subjects") && (k == "subjects")) 	continue;					// If base is a subject skip subjects
 			str+="<a class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase();
 			str+="' href='#r="+this.relatedId+"="+this.relatedId+"="+k+"="+o.uid+"'>";
 			str+="<span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
@@ -133,11 +136,7 @@ class Pages  {
 				}
 			else{
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
-				if ((this.relatedBase.asset_type == "places") && (this.relatedType == "places")) // If base is a place and showing related places
-					 sui.plc.Draw(o,4);															// Draw place with context tab open		
-				else if ((this.relatedBase.asset_type == "subjects") && (this.relatedType == "subjects")) // If base is a place and showing related places
-					sui.sub.Draw(o,1);															// Draw subjects with context tab open		
-				 else this.DrawRelatedResults(o);												// Related asset browsing
+				this.DrawRelatedResults(o);														// Related asset browsing
 				if (!fromHistory)																// If not from history API
 					sui.SetState("r="+this.relatedId+"="+this.relatedBase.uid+"="+this.relatedType+"="+o.uid);	// Set state
 				}

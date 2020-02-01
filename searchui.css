@@ -103,7 +103,7 @@
 					}					
 .sui-advTermRem { 	display:inline-block; cursor:pointer; margin-right: 4px; } .sui-advValueRem:hover { color: #668eec;
 					}
-.sui-advTerm { 		margin:2px 0 0 24px; font-size:11px;
+.sui-advTerm { 		margin:2px 0 2px 24px; font-size:11px;
 					}
 .sui-advEdit {		display:none; border:1px solid #ccc; width:calc(100% - 18px); background-color:#fff; text-align:left;
 					border-radius:5px; padding:8px; font-size:12px; color:#666; margin:6px 0 6px 0;

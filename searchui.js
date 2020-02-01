@@ -419,6 +419,7 @@ class SearchUI  {
 		var url=kmap.url_json;																		// Get json
 		if (!url) return;																			// No asset type
 		url=url.replace(/images.shanti.virginia.edu/i,"images-stage.shanti.virginia.edu");			// Look in stage			
+		url=url.replace(/https:|http:/i,"");														// Strip off http
 		url+="?callback=myfunc";																	// Add callback
 		if ((kmap.asset_type == "audio-video") || kmap.subcollection_uid_ss)						// AV or collection
 			url=url.replace(/.json/i,".jsonp");														// Json to jsonp 			
@@ -834,7 +835,8 @@ class SearchUI  {
 				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
 					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${i ? this[o.bool] : ""}&#xe642</div>
 				<i> &nbsp;${o.title}</i></div>`;
-				if (key != "assets") $("#sui-advTerm-"+key).append(str);							// Add terms, unless assets
+				if (key == "assets") 	$("#sui-advTerm-"+key).html(`<span style='color:${this.assets[o.id].c}'>${this.assets[o.id].g} </span><i> &nbsp;${o.title}</i>`);
+				else					$("#sui-advTerm-"+key).append(str);							// Add term
 				}
 			}
 
