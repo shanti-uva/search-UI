@@ -919,16 +919,17 @@ class SearchUI  {
 		let i,j,f,str="<i>Click below to recall a previous search</i><hr><div class='sui-advEditList'>"; // Enclosing div
 		for (i=this.searches.length-1;i>=0;i--) {													// For each search, last first
 			str+=`<div class='sui-advEditLine' style='width:100%' id='sui-recSrc-${i}' `;			// Add text item, if any
-			str+= "title='"+this.searches[i].query.text;											// Add tooltip to show entire search
+			str+= "title='"+this.searches[i].query.assets[0].title.toUpperCase();					// Add tooltip to show entire search
+			str+=" "+this.searches[i].query.text;													// Add text
 			for (f in this.facets) {																// For each facet
-				if (this.searches[i].query[f].length)												// If something there
-					for (j=0;j<this.searches[i].query[f].length;++j)								// For each one of them
-						str+=" "+this.searches[i].query[f][j].bool+" "+this.searches[i].query[f][j].title;	// Add to tooltip
+				if (this.searches[i].query[f].length &&	(f != "assets"))							// If something there
+					for (j=0;j<this.searches[i].query[f].length;++j)  								// For each one of them
+						str+=" "+this[this.searches[i].query[f][j].bool]+" "+this.searches[i].query[f][j].title;	// Add to tooltip
 					}
 			f=this.searches[i].query.assets[0].id;													// Point at asset id
-			str+=`'><span style='color:${this.assets[f].c}'>${this.assets[f].g} </span>`; 		// Add asset type
+			str+=`'><span style='color:${this.assets[f].c}'>${this.assets[f].g} </span>`; 			// Add asset type
 			str+=this.searches[i].query.text;														// End title and add text item
-			for (f in this.facets) 	if (this.searches[i].query[f].length) str+=" + "+this.facets[f].icon; // Add facets icons
+			for (f in this.facets) 	if (this.searches[i].query[f].length && (f != "assets")) str+=" + "+this.facets[f].icon; // Add facets icons, except assets
 			str+="</div>";
 			}
 		$("#sui-advEdit-recent").html(str+"</div>".replace(/\t|\n|\r/g,""));						// Add to div
