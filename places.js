@@ -40,7 +40,7 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
-		this.content=["...loading","...loading","...loading","<br>...loading",""];
+		this.content=["...loading","...loading","...loading","<br>",""];
 	}
 
 	Draw(kmap, openTab)
@@ -207,10 +207,10 @@ class Places  {
 				if ($("#plc-infoDiv").length) {
 					$("#plc-infoDiv").remove();
 					var h=$(app.div).height()-4;
-					var link="https://www.thlib.org/places/maps/interactive_ajax/#fid:"+sui.places.id;
+					var link="https://www.thlib.org/places/maps/interactive_ajax/#fid:"+kmap.id;
 					$(app.div).html("<iframe frameborder='0' src='"+link+"' style='height:"+h+"px;width:100%'></iframe>");
 					}
-				else sui.places.Draw(sui.places.id);
+				else sui.plc.Draw(kmap);
 				});
 		}
 
@@ -446,6 +446,7 @@ class Places  {
 		You can browse this subordinate places as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as placess non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
+		if (!d.ancestors)	return;																// No ancestors
 		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor (skipping Earth)
 			str+="<ul style='list-style-type:none'>";											// Add header
 			str+=this.AddTreeLine(d.ancestors[n+1],d.ancestor_uids_generic[n+1],"&ndash;",null); // Add it 

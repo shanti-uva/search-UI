@@ -38,7 +38,7 @@ class SearchUI  {
 		sui=this;																					// Save ref to class as global
 		this.curResults="";																			// Returns results
 		this.numItems=0;																			// Number of items																						
-		this.AND="AND ONLY";	this.OR="OR";	this.NOT="NOT";										// Boolean display names
+		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
 		this.ss={};																					// Holds search state
 		this.site=site;																				// Site to use
 		this.runMode=mode;																			// Current mode
