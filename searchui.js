@@ -295,7 +295,8 @@ class SearchUI  {
 
 	InitSearchState()																			// INIIALIZE SEARCH STATE
 	{
-		this.ss={};																					// Clear search state
+		this.ss={ roots:[]};																		// Clear search state
+		this.ss.roots["places"]="/";	this.ss.roots["subjects"]="/";  this.ss.roots.terms="/";   this.ss.roots["languages"]="/";
 		this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets_stage/select";		// Production
 		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
 		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
