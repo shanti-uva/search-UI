@@ -220,11 +220,12 @@ class Pages  {
 			<span style='font-size:12px;text-transform:capitalize'>
 				For more information about this ${o.asset_type.slice(0,-1)}, see Full Entry below.<br>
 				<b><p>${o.asset_type}: </b>`;
-				for (i=0;i<o.ancestors_txt.length-1;++i) {										// For each trail member
-					str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i]}'
-					href='#p=${o.asset_type}-${o.ancestor_ids_is[i]}'>${o.ancestors_txt[i]}</a>`;											
-					if (i < o.ancestors_txt.length-2)	str+=" / ";								// Add separator
-					}
+				if (o.ancestors_txt)
+					for (i=0;i<o.ancestors_txt.length-1;++i) {									// For each trail member
+						str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i]}'
+						href='#p=${o.asset_type}-${o.ancestor_ids_is[i]}'>${o.ancestors_txt[i]}</a>`;											
+						if (i < o.ancestors_txt.length-2)	str+=" / ";							// Add separator
+						}
 				str+=`</p></span><br>
 				<div id='sui-popbot' style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
 				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>

@@ -241,6 +241,7 @@ class SearchUI  {
 			sui.ss.page=0;																			// Start at beginning
 			$("#sui-results").scrollTop(0);															// Scroll to top
 			$("#sui-pages").scrollTop(0);															// Scroll to top
+			$("#sui-left").scrollTop(0);															// Scroll to top
 			$("#plc-infoDiv").remove();																// Remove map buttons
 			$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
 			$("#sui-adv").css({ display:"none"});													// Hide search ui
@@ -489,7 +490,7 @@ class SearchUI  {
 
 	DrawResults(noRefresh)																		// DRAW RESULTS SECTION
 	{
-		$("#sui-results").scrollTop(0);																// Scroll to top
+		$("#sui-results").scrollTop(0);			$("#sui-left").scrollTop(0);						// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
 		if (this.ss.mode == "related")		this.numItems=this.assets[this.pages.relatedType].n;	// Set number of items based on related type
 		else								this.numItems=this.assets[this.ss.query.assets[0].id].n; // Set number of items based on current asset being shown  ***ASSETS1

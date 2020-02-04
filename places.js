@@ -442,9 +442,9 @@ class Places  {
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
 		let n=0;
-		let str=`<br><b>${o.title[0]}</b> has <b> ~~ </b> immediate subordinate places. 
-		You can browse this subordinate places as well as its superordinate categories with the tree below. 
-		See the SUMMARY tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as placess non-hierarchically related to it.<br><br>
+		let str=`<br><b>${o.title[0]}</b> has <b> ~~ </b> immediately subordinate places. 
+		You can browse these subordinate places as well as its superordinate categories with the tree below. 
+		See the SUMMARY tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as places non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		if (!d.ancestors)	return;																// No ancestors
 		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor (skipping Earth)

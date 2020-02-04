@@ -163,7 +163,7 @@ class Subjects  {
 	{	
 		let n=0;
 		let str=`<br><b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
-		You can browse this subordinate subject as well as its superordinate categories with the tree below. 
+		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		for (n=0;n<d.ancestors.length;++n) {													// For each ancestor
