@@ -71,13 +71,13 @@ class Collections  {
 				}
 			}	
 		this.content[0]+="<br><br>";
-		
+		this.content[1]="";
 		if (o.members_name_ss && o.members_name_ss.length) {									// If members
 			for (i=0;i<o.members_name_ss.length;++i)											// For each member												
 				this.content[1]+="<br>"+o.members_name_ss[i]+" &nbsp; ("+o.members_id_ss[i]+")"; // Add
 			this.content[1]+="<br><br>";
 			}	
-		this.content[2]="<br>";																// Advance to details tab
+		this.content[2]="<br>";																	// Advance to details tab
 		if (o.node_user_full_s) this.content[2]+=sui.pages.DrawItem("&#xe600","OWNER",o.node_user_full_s+" &nbsp; ("+o.node_user+")","","sui-pageLab",1);	// Owner
 		if (o.collection_visibility_s) this.content[2]+=sui.pages.DrawItem("&#xe622","VISIBILITY",o.collection_visibility_s.substr(0,1).toUpperCase()+o.collection_visibility_s.substr(1),"","sui-pageLab",1);	// Visibility
 		if (o.asset_subtype) this.content[2]+=sui.pages.DrawItem(sui.assets[o.asset_subtype.toLowerCase()].g,"TYPE",o.asset_subtype,"","sui-pageLab",1);	// Type
