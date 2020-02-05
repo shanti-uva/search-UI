@@ -959,8 +959,9 @@ class SearchUI  {
 		for (i=0;i<n;++i) {																			// Add items
 			k=this.facets[facet].data[i].n;															// Number of assets
 			if (k > 1000)	k=Math.floor(k/1000)+"K";												// Shorten
-			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'> 
-			<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
+			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>` 
+			if (facet == "assets")  str+=`<span style='color:${this.assets[this.facets[facet].data[i].id].c}'>${this.assets[this.facets[facet].data[i].id].g}</span> &nbsp;`;
+			else 					str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
 			str+=`${this.facets[facet].data[i].title} (${k}) </div>`;								// Add item to list
 			}
 		$("#sui-advEditList-"+facet).html("</div>"+str.replace(/\t|\n|\r/g,""));					// Add to div

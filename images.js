@@ -65,7 +65,7 @@ class Images  {
 			<tr class='sui-pageLab' style='font-size:16px;padding-bottom:4px'><td style='width:50%'>MANDALA COLLECTIONS</td><td>CLASSIFICATION</td></tr>
 			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;`;
 			if (o.collection_title) 															// If a collection	
-				str+=`<a title='Collection' id='sui-imgCol'	href='#p=${o.collection_uid_s}'>${o.collection_title}</a>${sui.pages.AddPop(o.collection_uid_s)}`;
+				str+=`${o.collection_title}${sui.pages.AddPop(o.collection_uid_s)}`;			// Show name and popup
 			else str+="None";
 			str+="</td><td>";  																	// Close left side
 			if (subjects.length) {																// If subjects	
