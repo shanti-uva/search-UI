@@ -410,7 +410,7 @@ class Places  {
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
 		let str=`<br><b>${o.title[0]}</b> has <b>${n}</b> other place${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-		See the PLACE RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		See the PLACE RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate places for ${o.title[0]}.
 		<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column

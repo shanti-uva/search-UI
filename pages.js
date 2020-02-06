@@ -88,8 +88,7 @@ class Pages  {
 						if (n > 1000)	n=Math.floor(n/1000)+"K";								// Shorten
 						$("#sui-rln-"+d[i].val).html(n);										// Set number
 						$("#sui-rl-"+d[i].val).css({display:"block"});							// Show it				
-					trace(d)	
-					}
+						}
 					if (tot > 1000)	tot=Math.floor(tot/1000)+"K";								// Shorten
 					$("#sui-rln-all").html(tot);												// Set total number
 					$("#sui-rl-all").css({display:"block"});									// Show total
