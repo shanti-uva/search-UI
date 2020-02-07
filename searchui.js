@@ -490,7 +490,7 @@ class SearchUI  {
 
 	DrawResults(noRefresh)																		// DRAW RESULTS SECTION
 	{
-		$("#sui-results").scrollTop(0);		$("#sui-left").scrollTop(0);							// Scroll to top
+		$("#sui-left").scrollTop(0); 		$("#sui-results").scrollTop(0);							// Scroll to top
 		$("#plc-infoDiv").remove();																	// Remove map buttons
 		if (this.ss.mode == "related")		this.numItems=this.assets[this.pages.relatedType].n;	// Set number of items based on related type
 		else								this.numItems=this.assets[this.ss.query.assets[0].id].n; // Set number of items based on current asset being shown  ***ASSETS1

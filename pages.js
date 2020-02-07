@@ -100,6 +100,7 @@ class Pages  {
 			sk=o.asset_subtype.toLowerCase();													// Get asset sub-type
 			}
 
+		$("#sui-left").scrollTop(0); $("#sui-results").scrollTop(0);							// Scroll to top
 		k=o.asset_type;																			// Get this asset type																	
 		str+=`<div class='sui-related' style='border-color:${sui.ss.mode == "related" ? sui.assets[k].c : "transparent"};
 			height:${$("#sui-results").height()+6}px'>`;														
