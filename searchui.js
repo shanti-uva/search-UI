@@ -217,7 +217,7 @@ class SearchUI  {
 	{
 		const here=window.location.href.split("#")[0];												// Remove any hashes
 		let id;
-		if (hash)	hash=hash.replace(/dev_shanti_/,"stage_shanti_");								// Not dev!
+	//	if (hash)	hash=hash.replace(/dev_shanti_/,"stage_shanti_");								// Not dev!
 		if ((id=hash.match(/#p=(.+)/))) {															// If a page
 			id=id[1].toLowerCase();																	// Isolate kmap id
 			setupPage();																			// Prepare page's <div> environment
@@ -296,9 +296,9 @@ class SearchUI  {
 
 	InitSearchState()																			// INIIALIZE SEARCH STATE
 	{
-		this.ss={ roots:[]};																		// Clear search state
-		this.ss.roots["places"]="/";	this.ss.roots["subjects"]="/";  this.ss.roots.terms="/";   this.ss.roots["languages"]="/";
-		this.ss.solrUrl="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmassets_stage/select";		// Production
+//		this.solrBase="https://ss395824-us-east-1-aws.measuredsearch.com/solr/";					// Staging base
+		this.solrBase="https://ss251856-us-east-1-aws.measuredsearch.com/solr/";					// Dev base	
+		this.ss.solrUrl=this.solrBase+"kmassets_dev/select";										// Full url
 		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
 		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
 		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author
@@ -372,7 +372,7 @@ class SearchUI  {
 
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
 	{
-		let url="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/query";		// Base url
+		let url=`${this.solrBase}kmterms_dev/query`;												// Base url
 		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]";		// Add query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs[0]);														// Return data
@@ -381,7 +381,7 @@ class SearchUI  {
 
 	GetChildNamesFromID(facet,id, callback) 													// GET NAMES/ETYMOLGY DATA FROM ID
 	{
-		let url=`https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
+		let url=`${this.solrBase}kmterms_dev/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
 			}).fail((msg)=> { trace(msg); });														// Failure message
@@ -389,7 +389,7 @@ class SearchUI  {
 	
 	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
 	{
-		let url=`https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_prod/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
+		let url=`${this.solrBase}kmterms_dev/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
 			}).fail((msg)=> { trace(msg); });														// Failure message
@@ -397,7 +397,7 @@ class SearchUI  {
 
 	GetTreeChildren(facet, path, callback)
 	{
-		let base="https://ss395824-us-east-1-aws.measuredsearch.com/solr/kmterms_stage";			// Base url
+		let base=`${this.solrBase}kmterms_dev`;													// Base url
 		let lvla=Math.max(path.split("/").length+1,2);												// Set level
 		if ((facet == "features") ||  (facet == "languages")) facet="subjects";						// Features and languages are in subjects
 		var url=sui.solrUtil.buildQuery(base,facet,path,lvla,lvla);									// Build query using Yuji's builder
@@ -420,7 +420,7 @@ class SearchUI  {
 	{
 		var url=kmap.url_json;																		// Get json
 		if (!url) return;																			// No asset type
-		url=url.replace(/images.shanti.virginia.edu/i,"images-stage.shanti.virginia.edu");			// Look in stage			
+		url=url.replace(/images.shanti.virginia.edu/i,"images-dev.shanti.virginia.edu");			// Look in dev			
 		url=url.replace(/https:|http:/i,"");														// Strip off http
 		url+="?callback=myfunc";																	// Add callback
 		if ((kmap.asset_type == "audio-video") || kmap.subcollection_uid_ss)						// AV or collection

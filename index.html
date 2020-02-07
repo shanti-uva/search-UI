@@ -28,6 +28,7 @@
 <script>
 
 var sui=new SearchUI("Mandala","standalone");											// Alloc new search object
+sui.ss.query.constant="Bhutan";															// Site specific constant query
 sui.pages=new Pages();																	// Alloc pages (standalone only)
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
