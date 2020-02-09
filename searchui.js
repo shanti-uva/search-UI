@@ -51,7 +51,7 @@ class SearchUI  {
 		this.facets.collections=	{ type:"list",  icon:"&#xe633", mode:null, data:[] };			// Collections 
 		this.facets.languages=		{ type:"tree",  icon:"&#xe670", mode:null, data:[] };			// Languages 
 		this.facets.users=			{ type:"input", icon:"&#xe600", mode:null, data:[] };			// Terms 
-		this.facets.relationships=	{ type:"list",  icon:"&#xe638", mode:null, data:[] };			// Relationships
+//		this.facets.relationships=	{ type:"list",  icon:"&#xe638", mode:null, data:[] };			// Relationships
 	
 		this.assets={};
 		this.assets.all=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
@@ -65,6 +65,7 @@ class SearchUI  {
 		this.assets.terms=   		{ c:"#a2733f", g:"&#xe635" };									// Terms
 		this.assets.collections=   	{ c:"#5b66cb", g:"&#xe633" };									// Collections
 		this.searches=[];																			// Saves recent searches
+		this.showBool=false;																		// Where to show Boolean in advanced
 
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
@@ -92,6 +93,7 @@ class SearchUI  {
 	AddFrame()																					// ADD DIV FRAMEWORK FOR APP
 	{
 		let key;
+		this.showBool=this.GetCookie("showBool") == "true";
 		var str=`<div id='sui-main' class='sui-main'>
 		<div class='sui-topBar'>
 			<img src="img/bhutanleft.gif" style='cursor:pointer' onclick='sui.pages.DrawLandingPage()' title='Home page'>
@@ -129,7 +131,9 @@ class SearchUI  {
 			<div class='sui-advHeader' id='sui-advHeader-recent'>&#xe62e&nbsp;&nbsp;RECENT SEARCHES
 			<span id='sui-advPlus-recent' style='float:right'>&#xe669</span></div>
 			<div class='sui-advTerm'></div>
-			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div></div>
+			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div>
+			<div style='margin-top:4px;float:right;font-size:13px'>Show Boolean controls? &nbsp;<input type='checkbox' id='sui-showBool' ${this.showBool ? "checked" : ""}></div> 
+		</div>
 		<div id='sui-footer' class='sui-footer'></div></div>`;
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
 		$("#sui-advHeader-assets").html($("#sui-advHeader-assets").html().replace(/Assets/i,"ITEM TYPE"));  // Rename assets
@@ -162,7 +166,13 @@ class SearchUI  {
 			this.DrawResults(true);																	// Draw results page if active
 			this.DrawAdvanced();																	// Draw search UI if active
 			});	
-			
+
+		$("#sui-showBool").on("click",()=> { 														// ON CHANGE BOOLEAN
+			this.showBool=!this.showBool;															// Toggle flag
+			this.SetCookie("showBool", this.showBool);												// Set cookie
+			this.DrawAdvanced();																	// Draw search UI 
+			});	
+				
 		$("[id^=sui-advHeader-]").on("click",(e)=> {												// ON FACET HEADER CLICK
 			var id=e.currentTarget.id.substring(14);												// Get facet name		
 			$(".sui-advEdit").slideUp(400, ()=> {													// Close any open tree or lists
@@ -834,9 +844,10 @@ class SearchUI  {
 			$("#sui-advTerm-"+key).empty();															// Clear list
 			for (i=0;i<this.ss.query[key].length;++i) {												// For each term in facet	
 				o=sui.ss.query[key][i];																// Point at facet to add to div
-				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>
-					<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${i ? this[o.bool] : ""}&#xe642</div>
-				<i> &nbsp;${o.title}</i></div>`;
+				str=`<div><div class='sui-advTermRem' id='sui-advKill-${key}-${i}'>&#xe60f</div>`;
+				if (this.showBool)
+					str+=`<div class='sui-advEditBool' id='sui-advBool-${key}-${i}' title='Change boolean method'>${this[o.bool]}&#xe642</div>`;
+				str+=`<i> &nbsp;${o.title}</i></div>`;
 				if (key == "assets") 	$("#sui-advTerm-"+key).html(`<span style='color:${this.assets[o.id].c}'>${this.assets[o.id].g} </span><i> &nbsp;${o.title}</i>`);
 				else					$("#sui-advTerm-"+key).append(str);							// Add term
 				}
@@ -844,7 +855,7 @@ class SearchUI  {
 
 		$("[id^=sui-advBool-]").on("mouseenter",function(e) {										// ON BOOLEAN HOVER
 			let v=e.currentTarget.id.split("-");													// Get ids
-			let str=`<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-AND'>AND ONLY</div>|			
+			let str=`<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-AND'>AND</div>|			
 				<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-OR'>OR</div>|					
 				<div class='sui-boolItem' id='sui-boolItem-${v[2]}-${v[3]}-NOT'>NOT</div>&nbsp;`;	// Add options	
 			$(this).html(str.replace(/\t|\n|\r/g,""));												// Set new value
@@ -861,7 +872,7 @@ class SearchUI  {
 		$("[id^=sui-advBool-]").on("mouseleave",function(e) {										// ON BOOLEAN OUT
 			let v=e.currentTarget.id.split("-");													// Get ids
 			let b= _this.ss.query[v[2]][v[3]].bool ;												// Get current boolean state 
-			$(this).html((v[3]-0 ? _this[b] : "")+"&#xe642");										// Set new value (not 1st one)
+			$(this).html(_this[b]+"&#xe642");														// Set new value 
 			});
 
 		$("[id^=sui-advKill-]").on("click",(e)=> {													// REMOVE ITEM FROM QUERY
@@ -1291,6 +1302,24 @@ class SearchUI  {
 		if (str && str.length > len)																// Too long
 			str=str.substr(0,(len-3))+"...";														// Shorten	
 		return str;																					// Return string
+	}
+
+	GetCookie(cname) 																			// GET COOKIE
+	{
+		let i,c,name=cname+"=";
+		let ca=decodeURIComponent(document.cookie).split(';');										// Get cookie array
+		for (i=0;i<ca.length;i++) {																	// For each cookie
+			c=ca[i];
+			while (c.charAt(0) == ' ')	c=c.substring(1);
+			if (c.indexOf(name) == 0) 	return c.substring(name.length, c.length);
+			}
+		return "";
+	}
+
+	SetCookie(cname, value) 																		// SET COOKIE
+	{
+		let d=new Date();	d.setTime(d.getTime()+365*24*60*60*1000);	d=d.toUTCString()			// Cookie expires after a year
+		document.cookie=`${cname}=${value}; expires=${d};`;											// Set cookie
 	}
 
 } // SearchUI class closure
