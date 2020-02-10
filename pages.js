@@ -333,6 +333,7 @@ class Pages  {
 			</div>`;
 		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 		sui.ClearQuery();																		// Clear query
+		sui.DrawAdvanced();																		// Refresh advanced search
 		$("#sui-search").focus();																// Focus on search input
 	}
 
