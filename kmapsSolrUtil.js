@@ -41,7 +41,8 @@ class KmapsSolrUtil {
                 "users": [],																			// Users
                 "assets": [],																			// Assets
                 "dateStart": "",
-                "dateEnd": ""															// Beginning and ending dates
+                "dateEnd": "",															// Beginning and ending dates
+                "project_filter": ""
             }
         };
 
@@ -313,7 +314,6 @@ class KmapsSolrUtil {
             fq_array.push(this.buildFq(state.query.assets, "asset_type", "id", "ast"));
         }
 
-
         if (state.query.users && state.query.users.length) {
 
 
@@ -324,7 +324,10 @@ class KmapsSolrUtil {
 
         }
 
-
+        // project filtering
+        if (state.query.project_filter && state.query.project_filter.length) {
+            fq_array.push(state.query.project_filter);
+        }
 
         var kmapid = "";
         if (state.query.kmapid) {
