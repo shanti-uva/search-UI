@@ -28,7 +28,7 @@
 <script>
 
 var sui=new SearchUI("Mandala","standalone");											// Alloc new search object
-sui.ss.query.constant="Bhutan";															// Site specific constant query
+sui.ss.query.project_filter = "kmapid: (places-427 subjects-8260)"						// Site specific constant query
 sui.pages=new Pages();																	// Alloc pages (standalone only)
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;

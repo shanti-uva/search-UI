@@ -140,10 +140,12 @@ class Terms  {
 			function addSubjects(title, val) {													// ADD SUBJECTS
 				let i=0;
 				if (!val)	return;																// Quit if nothing there
-				if (o.kmapid_subjects_idfacet)													// No facet data
+				if (o.kmapid_subjects_idfacet) {												// No facet data
 					for (i=0;i<o.kmapid_subjects_idfacet.length;++i)							// For each one
 						if (o.kmapid_subjects_idfacet[i].split("|")[0] == val)					// Find a match
 							break;																// Quit
+					i=Math.min(o.kmapid_subjects_idfacet.length-1,i);							// Cap
+					}
 				str3+=`<p>${title}: <i>${val}</i>`;												// Add title
 				if (o.kmapid_subjects_idfacet)													// If data
 					str3+=sui.pages.AddPop(o.kmapid_subjects_idfacet[i].split("|")[1])+"</p>";	// Add popover

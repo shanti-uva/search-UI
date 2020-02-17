@@ -1037,7 +1037,8 @@ class SearchUI  {
 				$(".sui-advEditList").empty();														// Remove items from list
 				for (i=0;i<n;++i) {																	// For each one
 					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
-					if (items[i].id.split("-")[1] != 0) str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c</div>`;					
+					// if (items[i].id.split("-")[1] != 0) 
+					str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
 					str+=`${items[i].title}</div>`;													// Add item to list
 					}
 				$(".sui-advEditList").html(str);													// Add back
