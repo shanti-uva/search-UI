@@ -27,9 +27,9 @@
 <body>
 <script>
 
-var sui=new SearchUI("Mandala","standalone");											// Alloc new search object
-sui.ss.query.project_filter = "kmapid: (places-427 subjects-8260)"						// Site specific constant query
-sui.pages=new Pages();																	// Alloc pages (standalone only)
+var sui=new SearchUI("Mandala");														// Alloc new search object
+sui.ss.project_filter="kmapid: (places-427 subjects-8260)"								// Site specific constant query
+sui.pages=new Pages();																	// Alloc pages 
 
 $("#specialK").on("click",(e)=> { if (!e.altKey) return;
 

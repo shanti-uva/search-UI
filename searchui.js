@@ -33,7 +33,7 @@ $=jQuery;																							// For Drupal only
 
 class SearchUI  {																					
 
-	constructor(site, mode)   																	// CONSTRUCTOR
+	constructor(site)   																		// CONSTRUCTOR
 	{
 		sui=this;																					// Save ref to class as global
 		this.curResults="";																			// Returns results
@@ -41,7 +41,6 @@ class SearchUI  {
 		this.AND="AND";	this.OR="OR";	this.NOT="NOT";												// Boolean display names
 		this.ss={};																					// Holds search state
 		this.site=site;																				// Site to use
-		this.runMode=mode;																			// Current mode
 		this.facets={};																				
 		this.facets.assets=			{ type:"list",  icon:"&#xe60b", mode:null, data:[] };			// Assets 
 		this.facets.places=			{ type:"tree",  icon:"&#xe62b", mode:null, data:[] };			// Places 
@@ -68,8 +67,7 @@ class SearchUI  {
 		this.showBool=false;																		// Where to show Boolean in advanced
 
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
-		var pre=(this.runMode == "drupal") ? Drupal.settings.shanti_sarvaka.theme_path+"/js/inc/shanti_search_ui/" : ""; // Drupal path
-		$("<link/>", { rel:"stylesheet", type:"text/css", href:pre+"searchui.css" }).appendTo("head"); 	// Load CSS
+		$("<link/>", { rel:"stylesheet", type:"text/css", href:"searchui.css" }).appendTo("head"); 	// Load CSS
 		this.InitSearchState();																		// Init search state to default
 		this.AddFrame();																			// Add div framework
 		
@@ -506,17 +504,11 @@ class SearchUI  {
 		else								this.numItems=this.assets[this.ss.query.assets[0].id].n; // Set number of items based on current asset being shown  ***ASSETS1
 		if (this.ss.mode == "input") {																// Just the search box
 			$("#sui-header").css({ display:"none"});												// Show header
-			if (this.runMode != "standalone") {														// If not standalone															
-				$("#sui-left").css({ display:"none" });												// Hide results
-				$("#sui-headLeft").css({ display:"none" });											// Hide left header
-				}
-			else{																					// If standalone
-				$("#sui-header").css({display:"inline-block","background-color":"#4d59ca"} );		// Show header
-				$("#sui-left").css({ display:"block",width:"100%" });								// Size and show left side
-				$("#sui-adv").css({ display:"none"});												// Hide search ui
-				$("#sui-pages").css({ display:"block",color:"#000" });								// Show pages page	
-				$("#sui-results").css({ display:"none" });											// Hide results page	
-				}
+			$("#sui-header").css({display:"inline-block","background-color":"#4d59ca"} );			// Show header
+			$("#sui-left").css({ display:"block",width:"100%" });									// Size and show left side
+			$("#sui-adv").css({ display:"none"});													// Hide search ui
+			$("#sui-pages").css({ display:"block",color:"#000" });									// Show pages page	
+			$("#sui-results").css({ display:"none" });												// Hide results page	
 			$("#sui-adv").css({ display:"none" });													// Hide adv search ui
 			return;																					// Quit
 			}
@@ -1278,13 +1270,7 @@ class SearchUI  {
 
 	SendMessage(msg, kmap)																		// SEND MESSAGE TO HOST
 	{
-		if (this.pages && (this.runMode == "standalone")) {											// If a standalone													
-			this.pages.Draw(kmap);																	// Route to page
-			return;
-			}
-		trace("sui="+msg);																			// Show message sent on console
-		window.postMessage("sui="+msg,"*");															// Send message to drupal app
-		this.Draw("input");																			// Return to hidden mode
+		this.pages.Draw(kmap);																		// Route to page
 	}
 
 	Popup(msg, time, x, y)																		// POPUP 
