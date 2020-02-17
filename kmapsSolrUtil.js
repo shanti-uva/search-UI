@@ -325,8 +325,12 @@ class KmapsSolrUtil {
         }
 
         // project filtering
-        if (state.query.project_filter && state.query.project_filter.length) {
-            fq_array.push(state.query.project_filter);
+        if (state.project_filter && state.project_filter.length) {
+            fq_array.push(state.project_filter);
+            console.error("PROJECT_FILTER:");
+            console.dir(state.project_filter);
+            console.error("FQ:");
+            console.dir(fq_array);
         }
 
         var kmapid = "";
