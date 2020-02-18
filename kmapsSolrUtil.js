@@ -9,6 +9,9 @@ Usage:
     createBasicQuery(state) uses a populated "state" object and returns the appropriate url as a String.
 
  */
+
+const DEBUG=false
+
 class KmapsSolrUtil {
 
     constructor(jq) {
@@ -317,8 +320,10 @@ class KmapsSolrUtil {
         if (state.query.users && state.query.users.length) {
 
 
-            console.error("USERS!");
-            console.dir(state.query.users);
+            if (DEBUG) {
+                console.error("USERS!");
+                console.dir(state.query.users);
+            }
 
             fq_array.push(this.buildFq(state.query.users, "node_user", "title"));
 
@@ -327,10 +332,12 @@ class KmapsSolrUtil {
         // project filtering
         if (state.project_filter && state.project_filter.length) {
             fq_array.push(state.project_filter);
-            console.error("PROJECT_FILTER:");
-            console.dir(state.project_filter);
-            console.error("FQ:");
-            console.dir(fq_array);
+            if (DEBUG) { // debugging
+                console.error("PROJECT_FILTER:");
+                console.dir(state.project_filter);
+                console.error("FQ:");
+                console.dir(fq_array);
+            }
         }
 
         var kmapid = "";
