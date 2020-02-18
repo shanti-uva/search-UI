@@ -29,6 +29,7 @@ class Images  {
 		var asp=o.url_thumb_height/o.url_thumb_width;
 		var w=$(this.div).width()/2;
 		var h=w*asp;
+		if (o.url_thumb)	 o.url_thumb=o.url_thumb.replace(/images-test/i,"images");			// Force to prod
 		for (i=0;i<sui.curResults.length;++i) {	if (o.id == sui.curResults[i].id)	mid=i; }
 
 		var str=`<div class='sui-imagesBox' style='margin:${(sui.ss.mode == "related") ? "-12px 0 0 0" : "-12px -12px 0 -12px"}'>

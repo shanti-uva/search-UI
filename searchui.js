@@ -442,6 +442,7 @@ class SearchUI  {
 		for (i=0;i<data.response.docs.length;++i) {													// For each result, massage data
 			o=data.response.docs[i];																// Point at item
 			if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
+			if (o.url_thumb)	 o.url_thumb=o.url_thumb.replace(/images-test/i,"images");			// Force to prod
 			if (o.asset_type =="places") {															// If places
 				if (o.ancestors_txt && o.ancestors_txt.length)		o.ancestors_txt.splice(0,1);	// Remove "Earth" from trail
 				if (o.ancestor_ids_is && o.ancestor_ids_is.length)	o.ancestor_ids_is.splice(0,1);	// And it's id
