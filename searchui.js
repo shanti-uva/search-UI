@@ -94,7 +94,7 @@ class SearchUI  {
 		this.showBool=this.GetCookie("showBool") == "true";
 		var str=`<div id='sui-main' class='sui-main'>
 		<div class='sui-topBar'>
-			<img src="img/bhutanleft.gif" style='cursor:pointer' onclick='sui.pages.DrawLandingPage()' title='Home page'>
+			<img src="img/bhutanleft.gif" style='cursor:pointer' onclick='DrawLandingPage()' title='Home page'>
 		</div>
 		<div id='sui-top' class='sui-top'>
 			<div id='sui-headRight' class='sui-headRight'></div>
