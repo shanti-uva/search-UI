@@ -27,18 +27,20 @@
 <body>
 <script>
 
-	let site="Mandala";																			// Assume Mandala
+	let suiSite="Mandala";																		// Assume Mandala
 	let url=window.location.search;						   										// Get query string
-	if (url && url.match(/^\?b/i))	site="Bhutan";												// Bhutan
-	var sui=new SearchUI(site);																	// Alloc main program
-	if (site == "Bhutan") 	sui.ss.project_filter="kmapid: (places-427 subjects-8260)"			// Site specific constant query
+	if (url && url.match(/^\?b/i))	suiSite="Bhutan";											// Bhutan
+	var sui=new SearchUI(suiSite);																// Alloc main program
+	if (suiSite == "Bhutan") 	sui.ss.project_filter="kmapid: (places-427 subjects-8260)"		// Site specific constant query
 	sui.pages=new Pages();																		// Alloc pages 
 
-	function DrawLandingPage(site)															// DRAW SITE SPECIFIC LANDING PAGE
+	function DrawLandingPage()																// DRAW SITE SPECIFIC LANDING PAGE
 	{
+		let title="Mandala"; 
+		if (suiSite == "Bhutan")	title="Bhutan Cultural Library";							// Set title
 		$("#sui-pages").css({ display:"block", top:"52px" });									// Hide results page	
 		$("#sui-results").css({ display:"none" });												// Hide results page	
-		$("#sui-headLeft").html("<div style='margin-top:8px'>Bhutan Cultural Library</div>");	// Set left header
+		$("#sui-headLeft").html(`<div style='margin-top:8px'>${title}</div>`);					// Set left header
 		$("#sui-headRight").html("");															// Clear right header
 		$("#sui-footer").html("");																// Clear footer
 		$("#sui-footer").css("background-color","#ddd");										// Gray
