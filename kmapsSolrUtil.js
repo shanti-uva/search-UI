@@ -131,6 +131,11 @@ class KmapsSolrUtil {
                 "type": "terms",
                 "field": "user_name_full_s"
             },
+            "creator": {
+                "limit": 300,
+                "type": "terms",
+                "field": "creator"
+            }
             // "feature_types_ss": {
             //     "limit": 300,
             //     "type": "terms",
@@ -326,6 +331,18 @@ class KmapsSolrUtil {
             }
 
             fq_array.push(this.buildFq(state.query.users, "node_user", "title"));
+
+        }
+
+        if (state.query.creators && state.query.creators.length) {
+
+
+            if (DEBUG) {
+                console.error("CREATORS!");
+                console.dir(state.query.creators);
+            }
+
+            fq_array.push(this.buildFq(state.query.creators, "creator", "title"));
 
         }
 
