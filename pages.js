@@ -51,8 +51,12 @@ class Pages  {
 		if (!fromHistory)	sui.SetState(`p=${kmap.uid}`);										// This is the active page
 		this.curKmap=kmap;																		// Set active page's map
 		this.recentPages.push(kmap.uid+"|"+kmap.title+"|"+kmap.asset_type);						// Add to recents list
-		let n=this.recentPages.length;															// Length of recents	
-		if ((n > 1) && (this.recentPages[n-1] == this.recentPages[n-2])) this.recentPages.pop();	// Remove it if the same
+		let i,n=this.recentPages.length-1;														// Length of recents	
+		for (i=n-1;i>=0;--i)																	// Work backwards
+			if (this.recentPages[i] == this.recentPages[n]) {									// Ff already saved 
+				this.recentPages.splice(i,1);													// Remove it 
+				break;																			// Quit looking
+				}
 		if (sui.ss.mode != "related")		this.DrawHeader(kmap);								// Draw header if not showing relateds
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px", display:"none"});	// Reset to normal size and hide
 		$(this.div).css({ display:"block",color:"#000"});										// Show page
