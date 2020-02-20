@@ -97,14 +97,14 @@ class SearchUI  {
 			<img src="img/bhutanleft.gif" style='cursor:pointer' onclick='DrawLandingPage()' title='Home page'>
 		</div>
 		<div id='sui-top' class='sui-top'>
-			<div id='sui-headRight' class='sui-headRight'></div>
 			<div style='display:inline-block'>
-				<div class='sui-search1'>
+			<div class='sui-search1'>
 					<input type='text' id='sui-search' class='sui-search2' placeholder='Enter Search'>
 					<div id='sui-clear' class='sui-search3'>&#xe610</div>
 				</div>
 				<div id='sui-searchgo' class='sui-search4'>&#xe623</div>
 				<div id='sui-mode' class='sui-search5' title='Advanced search'>ADVANCED<br>SEARCH</div>
+				<div id='sui-hamBut' class='sui-hamBut' title='Help + options'>&#xe627</div>	
 				</div>
 			</div>
 		<div>
@@ -132,7 +132,9 @@ class SearchUI  {
 			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div>
 			<div style='margin-top:4px;float:right;font-size:13px'>Show Boolean controls? &nbsp;<input type='checkbox' id='sui-showBool' ${this.showBool ? "checked" : ""}></div> 
 		</div>
-		<div id='sui-footer' class='sui-footer'></div></div>`;
+		<div id='sui-footer' class='sui-footer'></div></div>
+		<div class='sui-hamburger' id='sui-hamburger'></div>`;
+	
 		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
 		$("#sui-advHeader-assets").html($("#sui-advHeader-assets").html().replace(/Assets/i,"ITEM TYPE"));  // Rename assets
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
@@ -190,13 +192,25 @@ class SearchUI  {
 			});
 
 		$("#sui-results").on("click",()=>{$("[id^=sui-popover-]").remove(); });						// ON CLICK OF RESULTS PAGE 
-		}
+		$("#sui-hamBut").on("click",()=>{ this.ShowHamburger() });									// SHOW HAMBURGER MENU
+	}
 
 	Draw(mode)																					// DRAW SEARCH COMPONENTS
 	{
 		if (mode) this.ss.mode=mode;																// If mode spec'd, use it
 		this.DrawResults();																			// Draw results page if active
 		this.DrawAdvanced();																		// Draw search UI if active
+	}
+
+	ShowHamburger()																				// SHOW HAMBURGER MENU
+	{
+		let str=`<span id='sui-help' class='sui-hamItem'>&#xe67e&nbsp;&nbsp;HELP GUIDE</span>
+		<span id='sui-home' class='sui-hamItem'>&#xe60b&nbsp;&nbsp;HOME</span>`;
+		$("#sui-hamburger").html(str.replace(/\t|\n|\r/g,""));										// Remove formatting and add to menu
+		$("#sui-hamburger").slideToggle();															// Open or close
+		$("#sui-home").on("click",()=>{  DrawLandingPage()});										// Go home
+		$("#sui-help").on("click",()=>{ window.open("https://wiki.shanti.virginia.edu/display/KB/Mandala+Suite+of+Tools","_blank");	});	// Show help
+		$("#sui-hamburger").on("click",()=>{$("#sui-hamburger").slideUp() });						// Close
 	}
 
 /*	PAGE STATE  ////////////////////////////////////////////////////////////////////////////////////
