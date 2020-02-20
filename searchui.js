@@ -209,7 +209,7 @@ class SearchUI  {
 		$("#sui-hamburger").html(str.replace(/\t|\n|\r/g,""));										// Remove formatting and add to menu
 		$("#sui-hamburger").slideToggle();															// Open or close
 		$("#sui-home").on("click",()=>{  DrawLandingPage()});										// Go home
-		$("#sui-help").on("click",()=>{ window.open("https://wiki.shanti.virginia.edu/display/KB/Mandala+Suite+of+Tools","_blank");	});	// Show help
+		$("#sui-help").on("click",()=>{ window.open("//confluence.its.virginia.edu/display/KB/Mandala+Suite+of+Tools","_blank"); });	// Show help
 		$("#sui-hamburger").on("click",()=>{$("#sui-hamburger").slideUp() });						// Close
 	}
 
