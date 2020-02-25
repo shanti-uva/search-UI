@@ -217,7 +217,7 @@ class SearchUI  {
 	
 	Controls the forward/back buttons  and the bookmarking for the standlone version.
 	It uses the HTML5 History API. When page is navigated to programatically, SetState() is called.
-	It's state paramete contains information identifying the page via it's kmapId
+	It's state parameter contains information identifying the page via it's kmapId
 	This is added as a hash value to the browser's search bar for bookmarking.
 	It is added to the browser history for the browser's forward/back buttons.
 
