@@ -119,10 +119,7 @@ class Pages  {
 		str+="<div class='sui-relatedItem' id='sui-rl-Home'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+" </span> <b style='color:"+sui.assets[k].c+"'>Home</b></div>";
 		if (p.asset_type == "collections")
 			str+="<div class='sui-relatedItem' id='sui-rl-"+sk+"'><span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[sk].c+"'>"+sui.assets[sk].g+" </span> "+o.asset_subtype+"</div>";
-		
 		for (k in sui.assets) {																	// For each asset type														
-			if ((p.asset_type == "places") && (k == "places")) 		continue;					// If base is a place skip places
-			if ((p.asset_type == "subjects") && (k == "subjects")) 	continue;					// If base is a subject skip subjects
 			str+="<a class='sui-relatedItem' style='display:none' id='sui-rl-"+k.toLowerCase();
 			str+="' href='#r="+this.relatedId+"="+this.relatedId+"="+k+"="+o.uid+"'>";
 			str+="<span style='font-size:18px; vertical-align:-3px; color:"+sui.assets[k].c+"'>"+sui.assets[k].g+"</span> ";
@@ -162,7 +159,10 @@ class Pages  {
 				this.Draw(this.relatedBase);													// Show
 				this.relatedBase=null;															// No base and set to home
 				}
-			else{
+			else if ((p.asset_type == "places")   && (this.relatedType == "places")) 	sui.plc.Draw(o,4);		// If place in places, open PLACES TAB
+			else if ((p.asset_type == "places")   && (this.relatedType == "subjects")) 	sui.plc.Draw(o,5);		// If subject in places, open SUBJECTS TAB
+			else if ((p.asset_type == "subjects") && (this.relatedType == "subjects")) 	sui.sub.Draw(o,1);		// If subject in subjects
+				else{
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
 				this.DrawRelatedResults(o);														// Related asset browsing
 				if (!fromHistory)																// If not from history API
