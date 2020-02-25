@@ -476,7 +476,7 @@ class SearchUI  {
 				buckets=data.facets.asset_counts.buckets;											// Point at buckets
 				for (i=0;i<buckets.length;++i) {													// For each bucket
 					val=buckets[i].val;																// Get name
-					this.assets[val].n=buckets[i].count;											// Set count
+					if(this.assets[val]) this.assets[val].n=buckets[i].count;						// Set count
 					n+=buckets[i].count;															// Add to count
 					}
 				this.ss.numResults=this.assets.all.n=n;												// Set total count
