@@ -7,11 +7,12 @@
 <body>
 
 <input id='search' type="text">
-<a class="hotlink" href=""> LINK </a>
+<a class="generate" href=""> LINK </a>
 <div>
     <a class="linkTo" id="linkTo" href="">link</a>
 </div>
 <div><pre id="output"></pre></div>
+
 
 <script language="JavaScript" src="kmapsSolrUtil.js"></script>
 <script
@@ -22,12 +23,12 @@
 <script>
     $(function() {
         var util = new KmapsSolrUtil();
-        $(".hotlink").on('click', function() {
+        $(".generate").on('click', function() {
             var searchstring = $('input#search').val();
             var state = {
                 "page": 0,																			// Current page being shown
                 "pageSize": 100,
-                "query": { "text": searchstring, "collections": [ { title: "images-330306", id: "images-330306", bool: "OR"}] }
+                "query": { "text": searchstring }
             };
             var url = util.createBasicQuery(state);
             // var url = util.createBasicQuery(state, [ "xplaces", "xfeature_types", "beetle" ], [ "xplaces:lha"]);
@@ -48,5 +49,6 @@
 
     });
 </script>
+
 </body>
 </html>

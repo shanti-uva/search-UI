@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sample Query</title>
+    <style>
+        label {
+            display: inline-block;
+            width: 5em;
+            text-align: right;
+            margin-right: 1em;
+        }
+
+        input[type=text] {
+            width: 40em;
+        }
+
+        input[type=number] {
+            width: 2em;
+        }
+
+    </style>
+</head>
+<body>
+
+<div><label for="path">base</label><input id='base' type="text" value="https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmterms_dev"></div>
+<div><label for="path">path</label><input id='path' type="text" value="13735/13740/1"></div>
+<div><label for="path">type</label><select id='type'><option>places</option>
+    <option>subjects</option>
+    <option>terms</option></select></div>
+<div><label for="path">level a</label><input id='lvla' type="number" value=1></div>
+<div><label for="path">level b</label><input id='lvlb' type="number" value=3></div>
+<div><label for="path">full entry</label><input id='full' type="checkbox" value=full></div>
+
+<div style="text-align: center">
+<button class="generate">GENERATE</button>
+</div>
+<div>
+    <a class="linkTo" id="linkTo" href="">link</a>
+</div>
+<div><pre id="output"></pre></div>
+
+
+<script language="JavaScript" src="kmapsSolrUtil.js"></script>
+<script
+        src="https://code.jquery.com/jquery-3.4.1.min.js"
+        integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo="
+        crossorigin="anonymous">
+</script>
+<script>
+    $(function() {
+        var util = new KmapsSolrUtil();
+        $(".generate").on('click', function() {
+            var base = $('input#base').val();
+            var type = $('select#type').val();
+            var path = $('input#path').val();
+            var lvla = Number($('input#lvla').val());
+            var lvlb = Number($('input#lvlb').val());
+            var fl = ($('input#full').is(":checked"))?undefined:"uid,header,ancestor_id_path,level_i";
+            var url = util.buildQuery(base,type,path,lvla,lvlb,fl);
+            // var url = util.createBasicQuery(state, [ "xplaces", "xfeature_types", "beetle" ], [ "xplaces:lha"]);
+            // var url = util.createKmapQuery(searchstring,"audio-video",0,15);
+            $.ajax({
+                    url: url, dataType: 'jsonp', jsonp: 'json.wrf',
+                    success: function (data) {
+                        $('#output').text(
+                            JSON.stringify(data, undefined, 2)
+                        );
+                        $('#linkTo').text(url).attr('href',url);
+                    },
+                    error: function (err, data) {
+                        $('#linkTo').text(url).attr('href',url);
+                        alert(JSON.stringify(arguments, undefined, 3));
+                        $('#output').text(
+                            JSON.stringify(arguments, undefined, 2)
+                        );
+                        console.dir(err);
+                    }
+                }
+            )
+            return false;
+        });
+
+
+    });
+</script>
+
+</body>
+</html>
