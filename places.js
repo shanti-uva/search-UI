@@ -40,7 +40,7 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
-		this.content=["...loading","...loading","...loading","<br>",""];
+		this.content=["...loading","...loading","...loading","<br>","<br>",""];
 	}
 
 	Draw(kmap, openTab)
@@ -270,7 +270,7 @@ class Places  {
 // META DATA
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawMetadata(openTab)																		// SHOW PLACES METADATA
+	DrawMetadata(openTab)																	// SHOW PLACES METADATA
 	{
 		let i,str="<div style='margin-left:192px'><div>";
 		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
@@ -280,12 +280,12 @@ class Places  {
 			if (this.kmap.caption) str+="<div class='sui-sourceText'>"+this.kmap.caption+"</div>";	// Add caption
 			str+="</div>";																		// Close top of map div
 			}
-		str+=sui.pages.DrawTabMenu(["NAMES","LOCATION","GEOGRAPHIC CONTEXT","PLACE RELATIONSHIPS","MAP"])+"</div></div>";	// Add tab menu
+		str+=sui.pages.DrawTabMenu(["NAMES","LOCATION","CONTEXT","PLACES","SUBJECTS","MAP"])+"</div></div>";	// Add tab menu
 		str+="<div class='plc-main' id='plc-main'></div>";										// Map holder
 		str+="</div>";																			// Close total div
 		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
-		this.ShowTab(4);																		// Open on map
+		this.ShowTab(5);																		// Open on map
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
@@ -338,10 +338,11 @@ class Places  {
 				}
 			this.AddSummary(this.kmap,data._childDocuments_);									// Add summary html
 			this.AddContext(this.kmap,data);													// Add context html
+			this.AddSubjects(this.kmap);														// Add subjects html
 			if (openTab)	this.ShowTab(openTab-1);											// Open tab up	
 		});
 		
-		}	
+	}	
 
 	ShowTab(which)																			// OPEN TAB
 	{	
@@ -355,7 +356,7 @@ class Places  {
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
-		if (which == 4)		$("#plc-main").slideDown();											// Show map
+		if (which == 5)		$("#plc-main").slideDown();											// Show map
 		else				$("#plc-main").slideUp();											// Hide map
 		if (which == 1)	{																		// If summary, add events
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
@@ -392,6 +393,30 @@ class Places  {
 				$("[id^=sui-spCatUL-]").slideUp();												// All down
 				});
 			}
+	}
+
+	AddSubjects(o)																			// ADD SUMMARY TAB CONTENTS 	
+	{	
+		let i;
+		let str=`<br><div style='width:50%;vertical-align:top'>`;
+		if (o.feature_types_ss && o.feature_types_ss.length) {									// If feature types
+			str+=`<div class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px'>
+			Feature Types</div>
+			<div style='margin-left:24px'>`;													// Header
+			for (i=0;i<o.feature_types_ss.length;++i) 											// For each feature
+				str+=o.feature_types_idfacet[i].split("|")[0]+sui.pages.AddPop(o.feature_types_idfacet[i].split("|")[1])+"<br>";  // Add
+			str+="</div><br>"
+			}
+		if (o.associated_subjects_ss && o.associated_subjects_ss.length) {						// If subjects
+				str+=`<div class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px'>
+				Realted subjects</div>
+				<div style='margin-left:24px'>`;												// Header
+				for (i=0;i<o.associated_subjects_ss.length;++i) 								// For each feature
+					str+=o.associated_subjects_ss[i]+sui.pages.AddPop(o.related_uid_ss[i])+"<br>";  // Add
+				str+="</div><br>"
+				}
+			str+="</div>"
+		this.content[4]=str.replace(/\t|\n|\r|/g,"");										// Set summary tab
 	}
 
 	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
