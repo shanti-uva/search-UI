@@ -338,7 +338,7 @@ class Places  {
 				}
 			this.AddSummary(this.kmap,data._childDocuments_);									// Add summary html
 			this.AddContext(this.kmap,data);													// Add context html
-			this.AddSubjects(this.kmap);														// Add subjects html
+			this.AddSubjects(this.kmap,data._childDocuments_);									// Add subjects html
 			if (openTab)	this.ShowTab(openTab-1);											// Open tab up	
 		});
 		
@@ -395,9 +395,9 @@ class Places  {
 			}
 	}
 
-	AddSubjects(o)																			// ADD SUMMARY TAB CONTENTS 	
+	AddSubjects(o,c)																		// ADD SUMMARY TAB CONTENTS 	
 	{	
-		let i;
+		let i,s=[],ss;
 		let str=`<br><div style='width:50%;vertical-align:top'>`;
 		if (o.feature_types_ss && o.feature_types_ss.length) {									// If feature types
 			str+=`<div class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px'>
@@ -407,16 +407,23 @@ class Places  {
 				str+=o.feature_types_idfacet[i].split("|")[0]+sui.pages.AddPop(o.feature_types_idfacet[i].split("|")[1])+"<br>";  // Add
 			str+="</div><br>"
 			}
-		if (o.associated_subjects_ss && o.associated_subjects_ss.length) {						// If subjects
-				str+=`<div class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px'>
-				Realted subjects</div>
+		for (i=0;i<c.length;++i) {																// For each subject get data  
+			if (c[i].block_child_type != "related_subjects") continue;							// Add only related subjects
+			ss=c[i].related_subjects_display_string_s;											// Add title
+			if (c[i].related_subjects_time_units_t && c[i].related_subjects_time_units_t[0])	// If a time
+				ss+=` (${c[i].related_subjects_time_units_t[0]})`;								// Add it to title
+			s.push({ title:ss, id:c[i].related_subjects_id_s });								// Add title and id
+			}											
+		if (s.length) {																			// If subjects
+			str+=`<div class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px'>
+				Related subjects</div>
 				<div style='margin-left:24px'>`;												// Header
-				for (i=0;i<o.associated_subjects_ss.length;++i) 								// For each feature
-					str+=o.associated_subjects_ss[i]+sui.pages.AddPop(o.related_uid_ss[i])+"<br>";  // Add
-				str+="</div><br>"
-				}
-			str+="</div>"
-		this.content[4]=str.replace(/\t|\n|\r|/g,"");										// Set summary tab
+			for (i=0;i<s.length;++i) 															// For each subject  
+				str+=s[i].title+sui.pages.AddPop(s[i].id)+"<br>"; 								// Add
+			str+="</div><br>"
+			}
+		str+="</div>";																			// End half div
+		this.content[4]=str.replace(/\t|\n|\r|/g,"");											// Set summary tab
 	}
 
 	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
