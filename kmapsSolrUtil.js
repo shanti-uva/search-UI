@@ -10,7 +10,7 @@ Usage:
 
  */
 
-const DEBUG=false
+const DEBUG = false;
 
 class KmapsSolrUtil {
 
@@ -85,7 +85,7 @@ class KmapsSolrUtil {
                 "type": "terms",
                 "field": "node_lang"
             },
-            "collections" : {
+            "collections": {
                 "limit": 300,
                 "type": "terms",
                 "field": "collection_idfacet"
@@ -156,12 +156,12 @@ class KmapsSolrUtil {
 
 
         this.facetAdvancedJSON = {
-            related:{
-                domain:{blockChildren:"block_type:parent"},
-                type:"terms",
-                field:"related_subjects_relation_code_s",
-                limit:-1,
-                facet:{
+            related: {
+                domain: {blockChildren: "block_type:parent"},
+                type: "terms",
+                field: "related_subjects_relation_code_s",
+                limit: -1,
+                facet: {
                     related_subject: {
                         type: "terms",
                         field: "related_subjects_id_s",
@@ -223,7 +223,7 @@ class KmapsSolrUtil {
         // argument form [ facetname:filterstring ]
         if (filter_facet) {
             if (filter_facet.length > 0) {
-                for (var m=0; m < filter_facet.length; m++) {
+                for (var m = 0; m < filter_facet.length; m++) {
                     var split = filter_facet[m].split(':');
                     var facet_name = split[0];
                     var facet_filter = split[1];
@@ -242,17 +242,18 @@ class KmapsSolrUtil {
         }
 
         function escapeSearchString(str) {
-            str = str.replace(/ /g,'\\ '); // escape spaces
-            str = str.replace('(','\\(');
-            str = str.replace(')','\\)');
-            str = str.replace(':','\\:');
-            str = str.replace('+','\\+');
-            str = str.replace('-','\\-');
-            str = str.replace('"','\\\"');
-            str = str.replace('?','\\?');
+            str = str.replace(/ /g, '\\ '); // escape spaces
+            str = str.replace('(', '\\(');
+            str = str.replace(')', '\\)');
+            str = str.replace(':', '\\:');
+            str = str.replace('+', '\\+');
+            str = str.replace('-', '\\-');
+            str = str.replace('"', '\\\"');
+            str = str.replace('?', '\\?');
 
             return str;
         }
+
         // create request object
 
         var searchstring = state.query.text || "";
@@ -263,17 +264,17 @@ class KmapsSolrUtil {
         if (facet_fqs.length > 0) pageSize = 0;  // zero pagesize if this is a facet filtering situation
 
         // console.log (JSON.stringify(state));
-        var starts = (searchstring.length)?searchstring + "*":"*";
-        var search = (searchstring.length)?"*" + searchstring + "*":"*";
+        var starts = (searchstring.length) ? searchstring + "*" : "*";
+        var search = (searchstring.length) ? "*" + searchstring + "*" : "*";
         var slashy = searchstring + "/";
-         if ($.type(searchstring) === "undefined" || searchstring.length === 0 ) {
-             searchstring = search = slashy = "*";
-         }
-         var start = page * pageSize;
+        if ($.type(searchstring) === "undefined" || searchstring.length === 0) {
+            searchstring = search = slashy = "*";
+        }
+        var start = page * pageSize;
 
-         var fq_array = [];
+        var fq_array = [];
 
-         // places
+        // places
         if (state.query.places && state.query.places.length) {
             fq_array.push(this.buildFq(state.query.places, "kmapid"));
         }
@@ -315,7 +316,7 @@ class KmapsSolrUtil {
 
                 // console.log("asset id = " + state.query.assets[i].id);
                 if (state.query.assets[i].id === "all") {
-                    state.query.assets =   ALL_ASSETS;
+                    state.query.assets = ALL_ASSETS;
                 }
             }
 
@@ -385,17 +386,19 @@ class KmapsSolrUtil {
         };
 
         var all_req = {
-          "q": "*"
+            "q": "*"
         };
 
         var kmapid_req = {
-            "q":        "(uid:${kmapid}^100 kmapid:${kmapid})",
-            "kmapid":   kmapid
+            "q": "(uid:${kmapid}^100 kmapid:${kmapid})",
+            "kmapid": kmapid
         };
 
-        if (searchstring === "*" || searchstring === "") { basic_req = all_req; }
+        if (searchstring === "*" || searchstring === "") {
+            basic_req = all_req;
+        }
 
-        var reqbase = (kmapid.length)?kmapid_req:basic_req;
+        var reqbase = (kmapid.length) ? kmapid_req : basic_req;
         var req = $.extend(
             {},
             {
@@ -433,24 +436,24 @@ class KmapsSolrUtil {
         // process the fq's
 
         for (var i = 0; i < fq_array.length; i++) {
-            params.append("fq",fq_array[i]);
+            params.append("fq", fq_array[i]);
         }
 
-        for (var p = 0; p < facet_fqs.length; p++ ) {
-            params.append( "fq",facet_fqs[p]);
+        for (var p = 0; p < facet_fqs.length; p++) {
+            params.append("fq", facet_fqs[p]);
         }
 
         var url = new URL(baseurl + "?" + params.toString());
         return url;
     }
 
-    createKmapQuery(kmapid, atype, page, pageSize ) {
+    createKmapQuery(kmapid, atype, page, pageSize) {
 
         const ALL_ASSETS = this.allAssets();
-        pageSize = (pageSize)?pageSize:10;
-        page = (page)?page:0;
-        var alist = (atype)?[  {id: atype, title: atype, bool: "OR"} ]:ALL_ASSETS;
-        return this.createBasicQuery (
+        pageSize = (pageSize) ? pageSize : 10;
+        page = (page) ? page : 0;
+        var alist = (atype) ? [{id: atype, title: atype, bool: "OR"}] : ALL_ASSETS;
+        return this.createBasicQuery(
             {
                 page: page,
                 pageSize: pageSize,
@@ -459,25 +462,27 @@ class KmapsSolrUtil {
                     assets: alist
                 }
             },
-            [ 'asset_counts']
-            );
+            ['asset_counts']
+        );
     }
 
     createAssetsByCollectionQuery(collection_uid, page, pageSize) {
         return this.createBasicQuery(
             {
-                page:page,
-                pageSize:pageSize,
+                page: page,
+                pageSize: pageSize,
                 query: {
-                    collections: [ { title: collection_uid, id: collection_uid, bool: "OR"}]
+                    collections: [{title: collection_uid, id: collection_uid, bool: "OR"}]
                 }
             }
         );
     }
 
     buildFq(facets, facet_field, type, tag) {
-        if (!type) { type = "id"; }
-        var bangtag = (tag)?"{!tag=" + tag+ "}":"";
+        if (!type) {
+            type = "id";
+        }
+        var bangtag = (tag) ? "{!tag=" + tag + "}" : "";
         // console.log("Got facet values: " + JSON.stringify(facets));
         var st = "";
         for (var i = 0; i < facets.length; i++) {
@@ -508,7 +513,7 @@ class KmapsSolrUtil {
     createAdvancedFacetQuery(state) {
         state = $.extend(true, {}, this.defaultState, state);
 
-        state.solrUrl= "https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmterms_dev/select"
+        state.solrUrl = "https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmterms_dev/select"
 
         // create request object
 
@@ -519,7 +524,7 @@ class KmapsSolrUtil {
         var starts = searchstring + "*";
         var search = "*" + searchstring + "*";
         var slashy = searchstring + "/";
-        if ($.type(searchstring) === "undefined" || searchstring.length === 0 ) {
+        if ($.type(searchstring) === "undefined" || searchstring.length === 0) {
             searchstring = search = slashy = "*";
         }
 
@@ -574,75 +579,85 @@ class KmapsSolrUtil {
         var url = new URL(baseurl + "?" + params.toString());
         return url;
     }
-	
-	buildQuery(termIndexRoot, type, path, lvla, lvlb) 
-	{
-		var SOLR_ROW_LIMIT=2000;
-		path = path.replace(/^\//, "").replace(/\s\//, " ");  // remove root slashes
-		if (path === "") {
-			path = "*";
-		}
 
-		var levelField = "level_i";
-		var ancestorField = "ancestor_id_path";
-		if (type === "terms") {
-		  levelField = "level_tib.alpha_i";
-		  ancestorField = "ancestor_id_tib.alpha_path";
-		}
+    buildQuery(termIndexRoot, type, path, lvla, lvlb, fl) {
+        var SOLR_ROW_LIMIT = 2000;
+        path = path.replace(/^\//, "").replace(/\s\//, " ");  // remove root slashes
+        if (path === "") {
+            path = "*";
+        }
 
-		var jsonfacetblob = {
+        var levelField = "level_i";
+        var ancestorField = "ancestor_id_path";
+        if (type === "terms") {
+            levelField = "level_tib.alpha_i";
+            ancestorField = "ancestor_id_tib.alpha_path";
+        }
+
+        var jsonfacetblob = {
             "child_counts": {
                 "limit": 300,
-                "mincount":2,
+                "mincount": 2,
                 "type": "terms",
                 "field": ancestorField,
-                "domain":{ "excludeTags":"hoot" }
+                "domain": {"excludeTags": "hoot"}
             }
         };
 
-	  var fieldList = [
-			"header",
-			"id",
-			"ancestor*",
-			"caption_eng",
-			"position*",
-			levelField
-		].join(",");
+        // noinspection ConditionalExpressionJS
+        var fieldList = (fl) ? fl : ([
+            "header",
+            "id",
+            "ancestor*",
+            "caption_eng",
+            "position*",
+            levelField
+        ].join(","));
 
-		var result =
-			termIndexRoot + "/select?" +
-			"df=" + ancestorField+
-			"&q=" + path +
-			"&wt=json" +
-			"&indent=true" +
-			"&limit=" + SOLR_ROW_LIMIT +
-			"&facet=true" +
-			"&fl=" + fieldList +
-			"&indent=true" +
+        var level_fqlist = [];
 
-			"&fq=tree:" + type +
-			"&fq=" + levelField + ":[" + lvla + "+TO+" + (lvlb + 1) + "]" +
-			"&fq={!tag=hoot}" + levelField + ":[" + lvla + "+TO+" + lvlb + "]" +
+        for ( var lvl = lvlb + 1; lvl > lvla; lvl--) {
+            var short_path = path.split("/").slice(0,lvl-1).join("/");
+            console.log("shorty: " + lvl +": " + JSON.stringify(short_path));
+            let path_filter = (short_path.length)?" AND " + ancestorField + ":" + short_path: "";
+            level_fqlist.push("(" + levelField + ":" + (lvl - 1) + path_filter +")");
+        }
+        const level_fqs = level_fqlist.join(" ");  // space separated list (OR)
+        let top_path = path.split("/").slice(0,lvla).join("/");
+        console.dir(level_fqs);
+        console.log("top_path = " + top_path)
 
-			"&facet.mincount=2" +
-			"&facet.limit=-1" +
-		    // "&sort=" + levelField + "+ASC" +
-			"&sort=position_i+asc,header+asc" +
-			"&facet.sort=" + ancestorField +"+ASC" +
-			"&facet.field={!ex=hoot}" + ancestorField +
+        var req_url =
+            termIndexRoot + "/select?" +
+            "df=" + ancestorField +
+            "&q=" + top_path +
+            "&wt=json" +
+            "&indent=true" +
+            "&limit=" + SOLR_ROW_LIMIT +
+            "&facet=true" +
+            "&fl=" + fieldList +
+            "&indent=true" +
+
+            "&fq=tree:" + type +
+            "&fq=" + levelField + ":[" + lvla + "+TO+" + (lvlb + 1) + "]" +
+            "&fq={!tag=hoot}" + level_fqs +
+            "&facet.mincount=2" +
+            "&facet.limit=-1" +
+            "&sort=" + levelField + "+asc,position_i+asc,header+asc" +
+            "&facet.sort=" + ancestorField + "+ASC" +
+            "&facet.field={!ex=hoot}" + ancestorField +
             "&json.facet=" + JSON.stringify(jsonfacetblob) +
-			"&wt=json" +
-			"&json.wrf=?" +
-			"&rows=" + SOLR_ROW_LIMIT;
-		return result;
-	}
+            "&wt=json" +
+            "&json.wrf=?" +
+            "&rows=" + SOLR_ROW_LIMIT;
+        return req_url;
+    }
 
-	buildAssetQuery(queryObj)
-	{
-	   var url = this.createBasicQuery(queryObj);
+    buildAssetQuery(queryObj) {
+        var url = this.createBasicQuery(queryObj);
         // console.log("Returning " + url);
-		return url;
-	}
+        return url;
+    }
 
 
 }
