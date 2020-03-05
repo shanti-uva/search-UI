@@ -159,7 +159,7 @@
 .sui-relatedRecentItem:hover{ background-color:#a4baec; }	
 
 /* SOURCES PAGE */
-.sui-sources 	 {	max-width:900px; margin:8px auto 8px 192px; background-color: #f7f7f7; border:1px solid #999;border-radius:6px; padding:50px; font-weight:400; color:#000; }
+.sui-sources 	 {	max-width:900px; margin:8px auto 8px 0; background-color: #f7f7f7; border:1px solid #999;border-radius:6px; padding:50px; font-weight:400; color:#000; }
 .sui-sourceText	 {	font-family:"EB Garamond",serif,shanticon; font-weight:400; line-height:24px; font-size:17px; }
 .sui-sourceTitle {	font-family:"EB Garamond",serif; font-weight:500; line-height:24px; font-size:20px; }
 .sui-sourceSec   {	font-size:18px; font-weight:400; }
@@ -223,9 +223,9 @@
 					.sui-transPlay:hover { background-color: #999;	}
 					
 /* SUBJECTS & PLACES TAB MENUS */
-.sui-spCat 		{	background-color:#cc4c39;width:calc(100% - 12px);color:#fff; padding:2px 0; text-align:center; text-transform: capitalize;
-					font-weight:600; cursor:pointer; margin:0 8px; } .sui-spCat:hover {  background-color:#a53d2d;
-					}
+.sui-spCat 		{	width:calc(100% - 36px); color:#fff; padding:2px 12px; text-transform:capitalize;
+					font-weight:600; cursor:pointer; margin:0 8px 12px 0; } .sui-spCat:hover {  background-color:#a53d2d;	}
+.sui-spHead		{	font-weight:600; color:#777; margin:6px 0 14px 0px; font-size:16px; }
 .sui-spSubCat 	{	color:#5b66cb; text-transform:uppercase; font-size:15px; }
 .sui-spDot 		{	display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:14px;
 					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin-right:6px; }
@@ -235,7 +235,7 @@
 .sui-spSub {		background-color:#ddd; padding:0 8px; width:120px; font-weight:600; cursor:pointer; border-radius:16px; 
 					border:1px solid #aaa; margin:4px 0 4px -32px; } .sui-spSub:hover {  border-color:#333; 	}
 /* TABS */
-.sui-tabTab 	{	display:inline-block; background-color:#999; text-align:center; user-select:none; padding-top:10px; font-weight:500; font-size:12px; color:#fff; cursor:pointer; border-left:1px solid #eee; border-right:1px solid #eee; height:26px; }
+.sui-tabTab 	{	display:inline-block; background-color:#999; text-align:center; user-select:none; padding-top:8px; font-weight:500; font-size:12px; color:#fff; cursor:pointer; border-left:1px solid #eee; border-right:1px solid #eee; height:24px; }
 .sui-tabContent {	background-color: #eee; width:calc(100% - 50px); color:#333; padding:0 24px; line-height:22px;	}
  
 /* CAROUSEL */

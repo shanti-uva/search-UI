@@ -40,13 +40,15 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
-		this.content=["...loading","...loading","...loading","<br>","<br>",""];
+		this.content=["","...loading","...loading"];
+		this.content2=["<br>","<br>"];
 	}
 
-	Draw(kmap, openTab)
+	Draw(kmap, related)																		// DRAW MAP PAGE
 	{
 		var _this=this;																			// Save context
 		this.kmap=kmap;																			// Save kmap
+		this.DrawMetadata(related);																// Draw metadata
 		this.GeoLocate();																		// Get extent
 		sui.LoadingIcon(true,64);																// Show loading icon
 		var app={ container:"plc-main",															// Holds startup parameters													
@@ -72,7 +74,6 @@ class Places  {
 */
 
 		this.app=app;	   
-		this.DrawMetadata(openTab);																// Draw metadata
 		
 		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");								// Scalebar if spec'd
 		if (app.opt&2)	 app.reqs.push("esri/widgets/Search");									// Search
@@ -141,7 +142,6 @@ class Places  {
 			});
 		app.ShowOptions();																			// Hide/show options		
 			
-		
 		if (app.kml) {																				// Add KML/KMZ if spec'd	
 			app.kml=new KMLLayer({ url:app.kml });													// Make new layer
 			app.map.add(app.kml);																	// Add it to map
@@ -270,27 +270,24 @@ class Places  {
 // META DATA
 /////////////////////////////////////////////////////////////////////////////////////////////////
 
-	DrawMetadata(openTab)																	// SHOW PLACES METADATA
+	DrawContent()																		// DRAW TABS AND CAPTION INFO
 	{
-		let i,str="<div style='margin-left:192px'><div>";
-		if (this.kmap.feature_types_ss && this.kmap.feature_types_ss.length) {					// If features
-			str+="<div style='margin: 6px 0 8px 0'><b>FEATURE TYPE:</b>";						// Add header
-			for (i=0;i<this.kmap.feature_types_ss.length;++i) 									// For each type
-				str+=" <i>"+this.kmap.feature_types_idfacet[i].split("|")[0]+"</i>"+sui.pages.AddPop(this.kmap.feature_types_idfacet[i].split("|")[1]);  // Add
-			if (this.kmap.caption) str+="<div class='sui-sourceText'>"+this.kmap.caption+"</div>";	// Add caption
-			str+="</div>";																		// Close top of map div
-			}
-		str+=sui.pages.DrawTabMenu(["NAMES","LOCATION","CONTEXT","PLACES","SUBJECTS","MAP"])+"</div></div>";	// Add tab menu
-		str+="<div class='plc-main' id='plc-main'></div>";										// Map holder
-		str+="</div>";																			// Close total div
-		$(this.app.div).html(str.replace(/\t|\n|\r|/g,""));										// Add to div
-		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
-		this.ShowTab(5);																		// Open on map
+		let str="<div id='sui-topCon' style='margin-left:192px'>";							// Top content div
+		if (this.kmap.caption) str+="<div style='margin:5px 0 13px 0' class='sui-sourceText'>"+this.kmap.caption+"</div>";	// Add caption
+		str+=sui.pages.DrawTabMenu(["MAP","NAMES","LOCATION"]);									// Add tab menu
+		str+="</div><div class='plc-main' id='plc-main'></div>";								// Map holder
+		$(this.div).html(str.replace(/\t|\n|\r|/g,""));											// Add to div
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
 			});
+		}
 
+	DrawMetadata(related)																	// SHOW PLACES METADATA
+	{
+		this.DrawContent();																		// Draw tabset and captions is not related subject/places
+		this.ShowTab(related ? related : 0);													// Show tab contents
+		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
 		sui.GetChildNamesFromID("places", this.kmap.id, (d)=> {									// Get name from children
 			let i,o,oo,l=[];
 			let str=`<div style='display:inline-block;width:50%'><br>
@@ -324,7 +321,7 @@ class Places  {
 			for (i=0;i<l.length;++i) 															// For each one
 				if (l[i].ety)	str+=`<div>Etymology for ${l[i].lab}: &nbsp; ${l[i].ety}</div>`; // Text
 			str+="</div><br>";
-			this.content[0]=str.replace(/\t|\n|\r|/g,"");										// Set tab											
+			this.content[1]=str.replace(/\t|\n|\r|/g,"");										// Set tab											
 			});
 	
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
@@ -336,29 +333,47 @@ class Places  {
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
 				$("#sui-relatedImg").prop("src",data.illustration_mms_url[0]);					// Show it
 				}
-			this.AddSummary(this.kmap,data._childDocuments_);									// Add summary html
-			this.AddContext(this.kmap,data);													// Add context html
-			this.AddSubjects(this.kmap,data._childDocuments_);									// Add subjects html
-			if (openTab)	this.ShowTab(openTab-1);											// Open tab up	
-		});
-		
+			this.AddRelatedTabs();																// Add related places/context tab controls
+			this.AddRelatedContext(this.kmap,data._childDocuments_);							// Add related places html
+			this.AddRelatedPlaces(this.kmap,data);												// Add related context html
+			this.AddRelatedSubjects(this.kmap,data._childDocuments_);							// Add related subjects html
+			});
 	}	
 
 	ShowTab(which)																			// OPEN TAB
 	{	
-		let _this=this;																			// Context
-		$("[id^=sui-spDot-]").off("click");														// Kill handler
-		$("[id^=sui-spItem-]").off("click");													// Kill handler
-		$("[id^=sui-togCat-]").off("click");													// Kill handler
-		$("[id^=sui-spCatUL-]").off("click");													// Kill handler
 		$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });					// Reset all tabs
 		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
-		$("#sui-tabContent").html(this.content[which]);											// Set content
-		if (which == 5)		$("#plc-main").slideDown();											// Show map
+		if (which == 0)		$("#plc-main").slideDown();											// Show map
 		else				$("#plc-main").slideUp();											// Hide map
-		if (which == 1)	{																		// If summary, add events
+		if (which > 2)		$("#sui-topCon").html(this.content[which]);							// If related subjects/places
+		else				$("#sui-tabContent").html(this.content[which]);						// Set content
+		if (which == 4) {																		// Related places
+			$("#sui-tabContent").css({display:"block","background-color":"#eee"});				// Show content
+			$("#sui-tabTabB0").css({"background-color":"#eee",color:"#000"});					// Active tab
+			$("#sui-tabTabB0").css({"background-color":"#eee",color:"#000"});					// Active tab
+			$("#sui-tabContent").html(this.content2[0]);										// Set content
+			}
+	}
+
+	AddRelatedTabs()																		// ADD TAB CONTROLS FOR RELATED PLACES/SUBJECTS
+	{
+		let str=drawTabB(["PLACE CONTEXT","RELATED PLACES"]);									// Add tab menu
+		this.content[4]=str.replace(/\t|\n|\r|/g,"");											// Set content for related places
+		$("[id^=sui-tabTabB]").on("click", (e)=> {												// ON TAB CLICK
+			let which=e.currentTarget.id.substring(11);											// Get index of tab	and draw it
+			$("[id^=sui-spDot-]").off("click");													// Kill handler
+			$("[id^=sui-spItem-]").off("click");												// Kill handler
+			$("[id^=sui-togCat-]").off("click");												// Kill handler
+			$("[id^=sui-spCatUL-]").off("click");												// Kill handler
+			$("[id^=sui-tabTabB]").css({"background-color":"#999",color:"#fff" });				// Reset all tabs
+			$("#sui-tabContent").css({display:"block","background-color":"#eee"});				// Show content
+			$("#sui-tabTabB"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
+			$("#sui-tabTabB"+which).css({"background-color":"#eee",color:"#000"});				// Active tab
+			$("#sui-tabContent").html(this.content2[which]);									// Set content
+		
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
@@ -367,9 +382,7 @@ class Places  {
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
 			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
-			}
-		else if (which > 2) {																	// If context/relationships, add events
-			$("[id^=sui-spLab-]").on("click", function(e) {	return false;		});				// ON CONEXT LINE CLICK, INHIBIT
+			$("[id^=sui-spLab-]").on("click",  function(e) {	return false;		});			// ON CONTEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spItem-]").on("click", function(e) {	return false;		});			// ON LINE CLICK, INHIBIT
 			$("[id^=sui-spCatUL-]").slideDown();												// All down
 			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
@@ -387,24 +400,36 @@ class Places  {
 					$("#sui-spSubUL"+id).slideUp();												// Hide
 				});
 			$("#sui-togCatA").on("click", ()=> {												// ON EXPAND ALL
+				trace(13)
 				$("[id^=sui-spCatUL-]").slideDown();											// All down
 				});
 			$("#sui-togCatN").on("click", ()=> {												// ON COLLAPSE ALL
 				$("[id^=sui-spCatUL-]").slideUp();												// All down
 				});
-			}
-	}
 
-	AddSubjects(o,c)																		// ADD SUMMARY TAB CONTENTS 	
+
+		});
+
+		function drawTabB(tabs)	{																// DRAW TAB MENU
+			let i, str="";														
+			for (i=0;i<tabs.length;++i) 														// For each tab	
+				str+=`<div class='sui-tabTab' id='sui-tabTabB${i}' style='width:calc(${100/tabs.length}% - 2px)'>${tabs[i]}&nbsp;&#xe609</div>`;
+			str+="<div class='sui-tabContent' id='sui-tabContent'></div>";						// Tab contents
+			return str.replace(/\t|\n|\r|/g,"");												// Return tab markup
+			}		
+		}
+
+	AddRelatedSubjects(o,c)																		// ADD RELATED SUBJECTS CONTENT 	
 	{	
 		let i,s=[],ss;
-		let str=`<br><div style='width:50%;vertical-align:top'>`;
+		let str=`<div style='width:50%;vertical-align:top'>
+			<div class='sui-spHead'>Subjects related to ${o.title}</div>`;
 		if (o.feature_types_ss && o.feature_types_ss.length) {									// If feature types
-			str+=`<div class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px'>
+			str+=`<div class='sui-spCat' style='background-color:#6faaf1'>
 			Feature Types</div>
 			<div style='margin-left:24px'>`;													// Header
 			for (i=0;i<o.feature_types_ss.length;++i) 											// For each feature
-				str+=o.feature_types_idfacet[i].split("|")[0]+sui.pages.AddPop(o.feature_types_idfacet[i].split("|")[1])+"<br>";  // Add
+				str+="<li>"+o.feature_types_idfacet[i].split("|")[0]+sui.pages.AddPop(o.feature_types_idfacet[i].split("|")[1])+"</li>";  // Add
 			str+="</div><br>"
 			}
 		for (i=0;i<c.length;++i) {																// For each subject get data  
@@ -415,18 +440,17 @@ class Places  {
 			s.push({ title:ss, id:c[i].related_subjects_id_s });								// Add title and id
 			}											
 		if (s.length) {																			// If subjects
-			str+=`<div class='sui-spCat' style='background-color:#6faaf1;margin-bottom:4px'>
+			str+=`<div class='sui-spCat' style='background-color:#6faaf1'>
 				Related subjects</div>
 				<div style='margin-left:24px'>`;												// Header
 			for (i=0;i<s.length;++i) 															// For each subject  
-				str+=s[i].title+sui.pages.AddPop(s[i].id)+"<br>"; 								// Add
-			str+="</div><br>"
+				str+="<li>"+s[i].title+sui.pages.AddPop(s[i].id)+"</li>";						// Add it
 			}
 		str+="</div>";																			// End half div
-		this.content[4]=str.replace(/\t|\n|\r|/g,"");											// Set summary tab
+		this.content[3]=str.replace(/\t|\n|\r|/g,"");											// Set summary tab
 	}
 
-	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
+	AddRelatedContext(o,c)																	// ADD PLACE CONTEXT CONTENT 	
 	{	
 		let f,i,s=[],n=0;
 		for (i=0;i<c.length;++i) {																// For each subject get data as 's=[category[{title,id}]]' 
@@ -447,13 +471,13 @@ class Places  {
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
-		this.content[2]=str;																	// Set summary tab
+		this.content2[1]=str;																	// Set summary tab
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			let sub="xxx";
 			s[f]=s[f].sort((a,b)=>{ return a.sub < b.sub ? -1 : 1;});							// Sort by sub category
 			let str=`<div id='sui-spCat-${f.replace(/ /g,"_")}' 
-			class='sui-spCat' style='background-color:#6faaf1;margin:0 0 4px 32px'> ${o.title} ${f}</div>
+			class='sui-spCat' style='background-color:#6faaf1'> ${o.title} ${f}</div>
 			<ul id='sui-spCatUL-${f.replace(/ /g,"_")}'><ul>`;
 			for (i=0;i<s[f].length;++i)	{														// For each item
 				if (sub != s[f][i].sub) {														// A new sub category
@@ -471,7 +495,7 @@ class Places  {
 			}
 	}
 
-	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
+	AddRelatedPlaces(o,d)																	// ADD RELATED PLACES CONTENTS 
 	{	
 		let n=0;
 		let str=`<br><b>${o.title[0]}</b> has <b> ~~ </b> immediately subordinate places. 
@@ -483,6 +507,7 @@ class Places  {
 			str+="<ul style='list-style-type:none'>";											// Add header
 			str+=this.AddTreeLine(d.ancestors[n+1],d.ancestor_uids_generic[n+1],"&ndash;",null); // Add it 
 			}
+
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
 			let i,j,re,m,path;
 			let counts=[];
@@ -503,7 +528,7 @@ class Places  {
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[3]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
+			this.content2[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
 			});
 	}
 

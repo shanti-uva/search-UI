@@ -156,11 +156,11 @@ class Pages  {
 			this.relatedType=e.currentTarget.id.substring(7);									// Get asset type		
 			if (this.relatedType == "Home")	{													// Home asset
 				if (sui.ss.mode == "related")	sui.ss.mode=this.lastMode;						// Get out of related
-				this.Draw(this.relatedBase);													// Show
+				this.Draw(this.relatedBase ? this.relatedBase : o);								// Show
 				this.relatedBase=null;															// No base and set to home
 				}
-			else if ((p.asset_type == "places")   && (this.relatedType == "places")) 	sui.plc.Draw(o,4);		// If place in places, open PLACES TAB
-			else if ((p.asset_type == "places")   && (this.relatedType == "subjects")) 	sui.plc.Draw(o,5);		// If subject in places, open SUBJECTS TAB
+			else if ((p.asset_type == "places")   && (this.relatedType == "places")) 	sui.plc.Draw(o,4);		// If place in places, show places
+			else if ((p.asset_type == "places")   && (this.relatedType == "subjects")) 	sui.plc.Draw(o,3);		// If subject in places, show subjects
 			else if ((p.asset_type == "subjects") && (this.relatedType == "subjects")) 	sui.sub.Draw(o,1);		// If subject in subjects
 				else{
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
