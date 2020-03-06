@@ -57,8 +57,8 @@ class Pages  {
 				this.recentPages.splice(i,1);													// Remove it 
 				break;																			// Quit looking
 				}
-		if (sui.ss.mode != "related")		this.DrawHeader(kmap);								// Draw header if not showing relateds
-		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px", display:"none"});	// Reset to normal size and hide
+		if (sui.ss.mode != "related")			this.DrawHeader(kmap);							// Draw header if not showing relateds
+		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size and hide
 		$(this.div).css({ display:"block",color:"#000"});										// Show page
 		if (sui.ss.mode == "related") {															// If browsing related pages
 			if (!kmap.asset_type.match(/places|subjects|terms/))								// Need to add space for these types
@@ -145,9 +145,11 @@ class Pages  {
 		if (!this.relatedType) 	$("#sui-rl-Home").css({ "background-color":"#f7f7f7"});			// Hilite Home
 		else					$("#sui-rl-"+this.relatedType).css({ "background-color":"#f7f7f7"}); // Hilite current
 
-		$("[id^=sui-rcItem-]").off("click");													// KILL RCENTS HANDLER
+		$("[id^=sui-rcItem-]").off("click");													// KILL RECENTS HANDLER
 		$("[id^=sui-rcItem-]").on("click",(e)=> {												// ON RECENTS CLICK
 			let id=e.currentTarget.id.substring(11);											// Get id		
+			if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;							// Get out of related 
+			this.relatedBase=null;																// Remove umbrella
 			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
 			return false;																		// Stop propagation
 			});
@@ -162,6 +164,7 @@ class Pages  {
 			else if ((p.asset_type == "places")   && (this.relatedType == "places")) 	sui.plc.Draw(o,4);		// If place in places, show places
 			else if ((p.asset_type == "places")   && (this.relatedType == "subjects")) 	sui.plc.Draw(o,3);		// If subject in places, show subjects
 			else if ((p.asset_type == "subjects") && (this.relatedType == "subjects")) 	sui.sub.Draw(o,1);		// If subject in subjects
+			else if ((p.asset_type == "subjects") && (this.relatedType == "places")) 	sui.sub.Draw(o,3);		// If places in subjects
 				else{
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
 				this.DrawRelatedResults(o);														// Related asset browsing
@@ -319,6 +322,143 @@ class Pages  {
 	}
 	
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RELATED PLACES/SUBJECTS DISPLAY
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+	AddRelatedPlaces(o, d, content)																// ADD RELATED PLACES CONTENTS 
+	{	
+		let n=0;
+		let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
+		<b>${o.title[0]}</b> has <b> ~~ </b> immediately subordinate places. 
+		You can browse these subordinate places as well as its superordinate categories with the tree below. 
+		See the SUMMARY tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as places non-hierarchically related to it.<br><br>
+		<ul class='sui-spLin' id='sui-spRows'>`;
+		if (o.asset_type == "subjects") {														// If subjects assets
+				content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set 1st content array member with html
+			return	
+			}
+		if (!d.ancestors)	return;																// No ancestors
+		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor (skipping Earth)
+			str+="<ul style='list-style-type:none'>";											// Add header
+			str+=addRelTreeLine(d.ancestors[n+1],d.ancestor_uids_generic[n+1],"&ndash;",null); 	// Add it 
+			}
+		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
+			let i,j,re,m,path;
+			let counts=[];
+			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
+			res=res.response.docs;																// Point at docs
+			for (i=0;i<res.length;++i) {														// For each child
+				path="";	m=null;																// Assume a loner												
+				re=new RegExp(res[i].id.split("-")[1]);											// Get id to search on
+				for (j=0;j<counts.length;++j) {													// For each count
+					if (counts[j].val.match(re)) {												// In this one
+						m="+";																	// Got kids
+						path=counts[j].val;														// Add path
+						}
+					}												
+				str+="<ul style='list-style-type:none'>";										// Header
+				str+=addRelTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 				// Add it
+				}
+			
+			str=str.replace(/~~/,n+res.length);													// Set total count
+			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
+			content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";									// Set 1st content array member with html
+			});
+		
+			this.AddRelatedContext(o,d._childDocuments_,content);								// Get context
+	
+			function addBranch(facet, path, dot) {												// LAZY LOAD BRANCH
+				sui.GetTreeChildren(facet,path,(res)=>{											// Get children
+					let str="";
+					let i,j,re,m,path;
+					let counts=[];
+					try { counts=res.facets.child_counts.buckets; } catch(e) {}					// Get child counts
+					res=res.response.docs;														// Point at docs
+					for (i=0;i<res.length;++i) {												// For each child
+						path="";	m=null;														// Assume a loner												
+						re=new RegExp(res[i].id.split("-")[1]);									// Get id to search on
+						for (j=0;j<counts.length;++j) {											// For each count
+							if (counts[j].val.match(re)) {										// In this one
+								m="+";															// Got kids
+								path=counts[j].val;												// Add path
+								}
+							}												
+						str+="<ul style='list-style-type:none'>";								// Header
+						str+=addRelTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 		// Add it
+						}
+					$(dot).prop("id","sui-spDot-null");											// Inhibit reloading
+					dot.parent().append(str);													// Append branch
+		
+					$("[id^=sui-spDot-]").off("click");											// Kill handler
+					$("[id^=sui-spDot-]").on("click", function(e) {								// ON RELATIONSHIP TREE DOT CLICK
+						let firstChild=$(this).parent().find("ul")[0];							// Get first child
+						let path=e.currentTarget.id.substring(10);								// Get id
+						if (path != "null") addBranch(facet,path,$(this));						// Lazy load branch
+						$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); // Change label
+						$(this).parent().find('ul').slideToggle();            					// Slide into place
+						});
+					});
+				}
+	
+			function addRelTreeLine(lab, id, marker, path) 	{									// ADD LINE TO TREE
+				let s=`<li style='margin:2px 0 2px ${-32}px'>`;									// Header
+				if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;	// If a dot, add it
+				else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
+				s+=`<a class='sui-noA' href='#p=${id}' id='sui-spLab-${id}'>${lab}
+				${sui.pages.AddPop(id)}</a>`;		
+				return s;																		// Return line
+			}
+	}
+
+	AddRelatedContext(o, c, content)															// ADD PLACE CONTEXT CONTENT 	
+	{	
+			let f,i,s=[],n=0;
+			for (i=0;i<c.length;++i) {																// For each subject get data as 's=[category[{title,id}]]' 
+				if (c[i].block_child_type != "related_places") continue;							// Add only related places
+				if (c[i].related_places_header_s == "Earth")   continue;							// Skip earth
+				++n;																				// Add to count
+				if (!s[c[i].related_places_relation_label_s])										// If first one of this category 
+						s[c[i].related_places_relation_label_s]=[];									// Alloc category array
+				s[c[i].related_places_relation_label_s].push({										// Add subject to category 
+					title:c[i].related_places_header_s,												// Add title
+					sub:c[i].related_places_feature_type_s,											// Sub category
+					id:c[i].related_uid_s });														// Add id
+				}											
+			
+			let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
+			let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
+			<b>${o.title[0]}</b> has <b>${n}</b> other place${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+			See the PLACE RELATIONSHIPS tab if you instead prefer to browse all subordinate and superordinate places for ${o.title[0]}.
+			<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
+			str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
+			for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
+			str+="</div></div>";
+			content[1]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";										// Set 2nd content array member with html
+
+			function drawCat(f) {																	// DRAW CATEGORY
+				let sub="xxx";
+				s[f]=s[f].sort((a,b)=>{ return a.sub < b.sub ? -1 : 1;});							// Sort by sub category
+				let str=`<div id='sui-spCat-${f.replace(/ /g,"_")}' 
+				class='sui-spCat' style='background-color:${sui.assets[o.asset_type].c}'> ${o.title} ${f}</div>
+				<ul id='sui-spCatUL-${f.replace(/ /g,"_")}'><ul>`;
+				for (i=0;i<s[f].length;++i)	{														// For each item
+					if (sub != s[f][i].sub) {														// A new sub category
+						sub=s[f][i].sub;															// New sub
+						str+="</ul><div class='sui-spSubCat'>";										// End last sub container ul, add sub container div
+						str+="<div style='background-color:#999' class='sui-spDot' id='sui-spSub-"+s[f][i].id+"'>&ndash;</div>";	// Add folding dot
+						str+="<b>"+sub+"</b></div>";												// Add sub title
+						str+="<ul id='sui-spSubUL-"+s[f][i].id+"' style='list-style-type:none'>";	// Add new container ul
+						}
+					str+="<li style='list-style-type:none'><a class='sui-noA' id='sui-spItem-"+s[f][i].id;
+					str+="' href='#p="+s[f][i].id+"'>";												// Add url
+					str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					//Add title it with popover
+					}
+				return str+"</ul></ul>";															// Close category and sub container ul
+				}
+		}
+	
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -370,7 +510,7 @@ class Pages  {
 				for (i=0;i<content.length;++i) 													// For each panel
 					str+=`<div class='sui-caroDot' id='sui-caroDot-${i}'></div>`;				// Add dot
 		str+="</div></div>";
-		$("#sui-pages").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
+		$("#sui-results").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div	
 		clearInterval(this.carouselTimer);														// Kill timer
 		this.carouselTimer=setInterval(()=> { $("#sui-caroButR").trigger("click"); },8000);		// Change panel every 8 secs
 		setPanel(curCon);																		// Set 1st pane;

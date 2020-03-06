@@ -223,11 +223,11 @@
 					.sui-transPlay:hover { background-color: #999;	}
 					
 /* SUBJECTS & PLACES TAB MENUS */
-.sui-spCat 		{	width:calc(100% - 36px); color:#fff; padding:2px 12px; text-transform:capitalize;
-					font-weight:600; cursor:pointer; margin:0 8px 12px 0; } .sui-spCat:hover {  background-color:#a53d2d;	}
-.sui-spHead		{	font-weight:600; color:#777; margin:6px 0 14px 0px; font-size:16px; }
+.sui-spCat 		{	width:calc(100% - 36px); color:#fff; padding:2px 12px; text-transform:capitalize; background-color:#cc4c39;
+					font-weight:600; cursor:pointer; margin:0 8px 12px 0; } .sui-spCat:hover { opacity:.75;	}
+.sui-spHead		{	font-weight:600; color:#777; margin:6px 0 14px 0px; font-size:16px; text-transform:uppercase; }
 .sui-spSubCat 	{	color:#5b66cb; text-transform:uppercase; font-size:15px; }
-.sui-spDot 		{	display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff;line-height:14px;
+.sui-spDot 		{	display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff; line-height:14px;
 					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin-right:6px; }
 					.sui-spDot:hover {  opacity: .66;	}
 .sui-spLin 		{ 	margin:4px 0; list-style-type:none; padding:0;	}

@@ -25,15 +25,23 @@ class Subjects  {
 	constructor()   																		// CONSTRUCTOR
 	{
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
-		this.content=["...loading","...loading"];												// Content pages
+		this.content=["...loading","...loading"];												// Content pages for relateds
+		this.content2=["<br>","<br>"];
 		this.kmap=null;																			// Holds kmap
 		this.subTab=0;
 	}
 
-	Draw(o, subTab)																			// DRAW SOURCE PAGE FROM KMAP
+	Draw(o, related)																			// DRAW SOURCE PAGE FROM KMAP
 	{
 		this.kmap=o;																			// Save kmap
-		this.subTab=subTab;
+		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
+		this.GetSubjectData(o);																	// Get related subjects content	
+		this.DrawContent(o,related);															// Draw content
+		sui.pages.DrawRelatedAssets(o);															// Draw related assets men
+	}
+
+	DrawContent(o, related)																	// DRAW CONTENT
+	{
 		let str=`<div class='sui-subjects'>
 		<div><span class='sui-subIcon'>${sui.assets[o.asset_type].g}</span>
 		<span class='sui-subText'>${o.title[0]}</span>
@@ -49,17 +57,12 @@ class Subjects  {
 					}
 				}
 		str+="</table><br>";		
-		str+=sui.pages.DrawTabMenu(["SUBJECT CONTEXT","SUBJECT RELATIONSHIPS"])+"</div>";		// Add tab menu
-		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
-
+		if (related) str="<div style='margin-left:192px'>"+sui.pages.DrawTabMenu(["SUBJECT CONTEXT","RELATED SUBJECTS"]);  // Add tab menu
+		$(this.div).html(str+"</div>".replace(/\t|\n|\r/g,""));									// Remove format and add to div				
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(10);											// Get index of tab	
-			this.ShowTab(id);																		// Draw it
+			this.ShowTab(id);																	// Draw it
 			});
-			
-
-		this.GetTabData(o);																		// Get relationship/summary tab content	
-		sui.pages.DrawRelatedAssets(o);															// Draw related assets men
 	}
 
 	ShowTab(which) 																			// SHOW TAB
@@ -86,7 +89,7 @@ class Subjects  {
 			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
 			}
 		else if (which == 1) {																	// If summary, add events
-			$("[id^=sui-spItem-]").on("click", function(e) {return false;	});					// ON CONEXT LINE CLICK, INHIBIT
+			$("[id^=sui-spItem-]").on("click", function(e) {return false;	});					// ON CONtEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spCatUL-]").slideDown();												// All down
 			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
 				let id=e.currentTarget.id.substring(9);											// Get id
@@ -105,7 +108,7 @@ class Subjects  {
 			}
 	}
 
-	GetTabData(o)																			// GET TAB DATA FOR CONTEXT / SUMMARY
+	GetSubjectData(o)																		// GET TAB DATA FOR CONTEXT / SUMMARY
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
 			if (!data)	return;																	// Quit if no data
@@ -124,7 +127,6 @@ class Subjects  {
 		});
 	}
 
-
 	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
 	{	
 		let f,i,s=[];
@@ -138,14 +140,14 @@ class Subjects  {
 				id:c[i].related_uid_s });														// Add id
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
-		let str=`<br><b>${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
+		${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
 		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
 		this.content[1]=str;																	// Set summary tab
-		this.ShowTab(this.subTab ? 0 : 1);														// Draw it (if subTab, show context tab)
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
@@ -162,7 +164,8 @@ class Subjects  {
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
 		let n=0;
-		let str=`<br><b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
+		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
+		<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
@@ -170,6 +173,7 @@ class Subjects  {
 			str+="<ul style='list-style-type:none'>";											// Add header
 			str+=this.AddTreeLine(d.ancestors[n],d.ancestor_uids_gen[n],"&ndash;",null);		// Add it 
 			}
+		
 		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
 			let i,j,re,m,path;
 			let counts=[];
@@ -191,7 +195,8 @@ class Subjects  {
 			str=str.replace(/~~/,n+res.length);													// Set total count
 			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
 			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
-			});
+			this.ShowTab(0);																	// Draw it
+		});
 	}
 
 	AddTreeLine(lab, id, marker, path) 														// ADD LINE TO TREE
@@ -237,7 +242,7 @@ class Subjects  {
 				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
-		});
+			});
 		}
 
 } // CLASS CLOSURE
