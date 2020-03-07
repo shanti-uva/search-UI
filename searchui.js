@@ -401,6 +401,18 @@ class SearchUI  {
 			}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 
+	GetRelatedPlaces(id, callback)																// GET RELATED THINGS FROM ID
+	{
+		this.LoadingIcon(true,64);																	// Show loading icon
+		url=this.solrUtil.createKmapQuery(id,"places",0,10000);										// Make query url
+		trace(id,"places",0,10000)
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
+			this.MassageKmapData(data);																// Normalize for display
+			this.LoadingIcon(false);																// Hide loading icon
+			callback(data.response.docs);															// Return data
+			}).fail((msg)=> { trace(msg); this.LoadingIcon(false);  this.Popup("Related query error"); });	// Failure message
+	}
+
 	GetChildNamesFromID(facet,id, callback) 													// GET NAMES/ETYMOLGY DATA FROM ID
 	{
 		let url=`${this.solrBase}kmterms_dev/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;

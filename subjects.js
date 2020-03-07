@@ -57,7 +57,8 @@ class Subjects  {
 					}
 				}
 		str+="</table><br>";		
-		if (related) str="<div style='margin-left:192px'>"+sui.pages.DrawTabMenu(["SUBJECT CONTEXT","RELATED SUBJECTS"]);  // Add tab menu
+		if (related == 1) 		str="<div style='margin-left:192px'>"+sui.pages.DrawTabMenu(["SUBJECT CONTEXT","RELATED SUBJECTS"]);  // If subjects, add tab menu
+		else if (related == 2)	str="<div id='sui-topCon' style='margin-left:216px'>"+this.GetPlaceData(o);		  // If places, get data
 		$(this.div).html(str+"</div>".replace(/\t|\n|\r/g,""));									// Remove format and add to div				
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(10);											// Get index of tab	
@@ -88,7 +89,7 @@ class Subjects  {
 				});
 			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
 			}
-		else if (which == 1) {																	// If summary, add events
+		else if (which == 1) {																	// If subjects
 			$("[id^=sui-spItem-]").on("click", function(e) {return false;	});					// ON CONtEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spCatUL-]").slideDown();												// All down
 			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
@@ -106,6 +107,57 @@ class Subjects  {
 				$("[id^=sui-spCatUL-]").slideUp();												// All down
 				});
 			}
+	}
+
+	GetPlaceData(o)																			// GET RELATED PLACES
+	{
+		sui.GetRelatedPlaces(o.uid, (d)=>{														// Get related place data
+			let i,t,numLev=0,ps=[],levs=[];
+			let n=d.length;
+			for (i=0;i<n;++i) {																	// For each related place
+				ps[i]={};																		// Make place object			
+				ps[i].p1=d[i].ancestor_ids_is;													// Save original
+				ps[i].p2=d[i].ancestor_ids_is.join("x");										// Put into a combined string
+				ps[i].lev=d[i].ancestor_ids_is.length;											// Set levels
+				ps[i].t=d[i].ancestors_txt;														// Save text
+				numLev=Math.max(numLev,d[i].ancestor_ids_is.length);							// Get max number of levels
+				}
+			ps=ps.sort((a,b)=>{return a.p2 < b.p2 ? -1 : 1;})									// Sort by level descending
+			t=""
+			for (i=0;i<numLev-1;++i) {															// For each level
+				t+=ps[0].p1[i]+"x";																// Point at level test
+				trace(t)
+				levs[i]=ps.filter((a)=>{ return ((""+a.p2).match(t)) });			// Get only ones at this level
+				}
+trace(levs)			
+let str=`<div class='sui-spHead' style='margin-left:-24px'>Places related to ${o.title}</div>`			
+			for (i=0;i<numLev-1;++i) {															// For each level
+				str+=`<ul id='sui-spPdot-${levs[i][0].p2}' style='list-style-type:none;padding-left:12px'><li>`;		// Add header
+				str+=addNode(levs[i][0].t[i], "Places-"+levs[i][0].p1[i],"&plus;",levs[i][0].p2)+"</li>";	// Add top node
+				}
+			for (i=0;i<numLev-1;++i) str+="</ul>"												// Close <ul> for each level
+			$("#sui-topCon").html(str+"</div>");											// Draw it
+
+			$("[id^=sui-spPdot-]").on("click", function(e) {									// ON TREE DOT CLICK
+				let firstChild=$(this).parent().find("ul")[0];									// Get first child
+				trace(e.currentTarget.id.substring(11));										// Get id
+//				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+//				$(this).parent().find('ul').slideToggle();            							// Slide into place
+				});
+
+			});							
+		return "";
+
+		function addNode(lab, id, marker, path) {												// ADD NODE
+			let s=`<li style='margin:2px 0 2px ${-32}px'>`;										// Header
+			if (marker)	s+=`<div class='sui-spDot'>${marker}</div>`;	// If a dot, add it
+			else		s+="<div class='sui-spDdot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
+			s+=`<a class='sui-noA' id='sui-spPlab-${id}' href='#p=${id}'>${lab}${sui.pages.AddPop(id)}</a>`;		
+			return s;																			// Return node html
+		}
+	
+
+
 	}
 
 	GetSubjectData(o)																		// GET TAB DATA FOR CONTEXT / SUMMARY
@@ -212,7 +264,6 @@ class Subjects  {
 	{
 		let _this=this;
 		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
-			trace(1)
 			let str="";
 			let i,j,re,m,path;
 			let counts=[];

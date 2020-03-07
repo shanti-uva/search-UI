@@ -164,8 +164,8 @@ class Pages  {
 			else if ((p.asset_type == "places")   && (this.relatedType == "places")) 	sui.plc.Draw(o,4);		// If place in places, show places
 			else if ((p.asset_type == "places")   && (this.relatedType == "subjects")) 	sui.plc.Draw(o,3);		// If subject in places, show subjects
 			else if ((p.asset_type == "subjects") && (this.relatedType == "subjects")) 	sui.sub.Draw(o,1);		// If subject in subjects
-			else if ((p.asset_type == "subjects") && (this.relatedType == "places")) 	sui.sub.Draw(o,3);		// If places in subjects
-				else{
+			else if ((p.asset_type == "subjects") && (this.relatedType == "places")) 	sui.sub.Draw(o,2);		// If places in subjects
+			else{																				// Regular results
 				if (!this.relatedBase)	 this.relatedBase=o;									// If starting fresh
 				this.DrawRelatedResults(o);														// Related asset browsing
 				if (!fromHistory)																// If not from history API
