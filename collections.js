@@ -23,16 +23,17 @@ class Collections  {
 	Draw(o)																					// DRAW SOURCE PAGE FROM KMAP
 	{
 		let a=sui.assets[o.asset_subtype.toLowerCase()];
-		var str=`<div class='sui-sources' id='sui-collections'>
-		<span style='font-size:24px;color:${a.c};vertical-align:-4px'>${a.g}</span>
-		&nbsp;&nbsp;<span class='sui-sourceTitle'>${o.title[0]}</span>
-		&nbsp;&nbsp;(${o.asset_subtype.toUpperCase()})
-		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
-		<div class='sui-sourceSec' id='sui-srcSec'></div><br>`;
+		var str=`<div id='sui-topCon' style='margin-left:192px'>
+		<div class='sui-sources'  id='sui-collections'>
+			<span style='font-size:24px;color:${a.c};vertical-align:-4px'>${a.g}</span>
+			&nbsp;&nbsp;<span class='sui-sourceTitle'>${o.title[0]}</span>
+			&nbsp;&nbsp;(${o.asset_subtype.toUpperCase()})
+			<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
+			<div class='sui-sourceSec' id='sui-srcSec'></div><br>`;
 		if (o.url_thumb && !o.url_thumb.match(/gradient.jpg/)) str+="<img src='"+o.url_thumb+"' style='width:33%;padding-right:12px;vertical-align:top'>";
 		if (o.summary)
-			str+=`<div class='sui-sourceText' style='display:inline-block;width:calc(66% - 12px)'>${o.summary}</div><br><br>`;
-		str+=sui.pages.DrawTabMenu(["RELATED COLLECTIONS","MEMBERS","DETAILS"])+"</div>";		// Add tab menu
+			str+=`<div class='sui-sourceText' style='display:inline-block;width:calc(66% - 12px)'>${o.summary}</div>`;
+		str+="<br><br>"+sui.pages.DrawTabMenu(["RELATED COLLECTIONS","MEMBERS","DETAILS"])+"</div>";	// Add tab menu
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
