@@ -112,18 +112,113 @@ class Subjects  {
 	GetPlaceData(o)																			// GET RELATED PLACES
 	{
 		sui.GetRelatedPlaces(o.uid, (d)=>{														// Get related place data
-			let i,t,numLev=0,ps=[],levs=[];
-			let n=d.length;
-			for (i=0;i<n;++i) {																	// For each related place
-				ps[i]={};																		// Make place object			
+			let i,j,k,id,tops=[],str="<ul>";
+			let n=d.length;																		// Number of places
+			for (i=0;i<n;++i) {																	// For each related place	
+				id="places-";																	// Start id
+				for (j=0;j<d[i].ancestor_ids_is.length;++j) {									// For each level	
+					id+=d[i].ancestor_ids_is[j]+"/";											// Add levels
+					tops.push({ lab:d[i].ancestors_txt[j], level:j, id:id.slice(0,-1) });		// Add to list
+					}
+				}
+			tops=tops.sort((a,b)=>{ return a.id < b.id ? -1 : 1 })								// Sort by path
+			tops=tops.filter((a,ind)=>{ try { return a.id != tops[ind+1].id } catch(e){} })		// Only uniques
+			trace(tops)
+			n=tops.length;																		// New n
+			for (i=0;i<n;++i) {																	// For place	
+				if (tops[i].level == 0) {														// Add top row
+					str+="<ul><li class='parent'><a id='"+tops[i].id+"'";						// Start row
+					str+="' data-path='"+tops[i].id+"'>"+tops[i].lab;							// Add path/header
+					str+="</a></li>";															// Add label
+					}
+				}
+			$("#sui-topCon").html(str+"</ul></div>");											// Draw it
+			for (i=0;i<n;++i) {																	// For place	
+				if (tops[i].level == 0) 														// Add top row
+				addChildren(i);																	// Add levels below
+			}
+
+			function addChildren(index) {														// ADD CHILDREN TO NODE
+				let str="";
+				let t=tops[index].id+"/";														// Child trst
+				let level=tops[index].level+1;													// Point at next level
+				for (i=0;i<n;++i) {																// For each place
+					if (tops[i].id.match(t) && (tops[i].level == level)) {						// A child
+						str="<ul><li class='parent'><a id='"+tops[i].id;						// Start row
+						str+="' data-path='"+tops[i].id+"'>"+tops[i].lab;						// Add path/header
+						str+="</a></li></ul>";													// Add label
+						trace(str)
+						$("#"+tops[index].id).parent().parent().append(str);					// Add it
+						trace($("#"+tops[index].id))
+//						addChildren(1)
+						}
+					}
+				
+				
+
+
+				
+					}
+			});	
+		}
+
+/*			for (k in tops) {																	// For each top row
+				id="places-"+tops[k];															// Id
+				str+="<li class='parent'><a id='"+id+"'";										// Start row
+				str+="' data-path='"+tops[k]+"'>"+k;											// Add path/header
+				str+="</a></li>";																// Add label
+				for (i=0;i<n;++i) {																// For each place
+					if (d[i].ancestor_ids_is[0] == tops[k])	{									// If a child
+						id="places-";															// Start id
+						for (j=0;j<=level;++j) id+=d[i].ancestor_ids_is[j]+"/";					// Add levels
+						id=id.slice(0,-1);														// Remove last slash
+						str+="<ul><li class='parent'><a id='"+id+"'";							// Start row
+						str+="' data-path='"+tops[k]+"'>"+k;									// Add path/header
+						str+="</a></li>";														// Add label
+						
+				}
+				$('.sui-tree li > a').off();														// Clear handlers
+			$('.sui-tree li > a').on("click",function(e) { handleClick($(this),e); }); 			// Restore handler
+
+			let i,j,id,str="";
+			let level,numLevels=0;
+			let n=d.length;																		// Number of places
+			for (i=0;i<n;++i) {																	// For each related place	
+				d[i].path=d[i].ancestor_ids_is.join("/");										// Add path as a combined string
+				d[i].level=d[i].ancestor_ids_is.length;											// Set level
+				numLevels=Math.max(numLevels,d[i].ancestor_ids_is.length);						// Get max levels
+				d=d.sort((a,b)=>{return a.path < b.path ? -1 : 1;})								// Sort by path
+				}
+			numLevels=1
+			
+			for (level=0;level<numLevels;++level) {												// For each level
+				for (i=0;i<n;++i) {																// For each related place	
+					id="places-";																// Start id
+					for (j=0;j<=level;++j) id+=d[i].ancestor_ids_is[j]+"/";						// Add levels
+					id=id.slice(0,-1);															// Remove last slash
+					
+					if (!$("#sui-spPlab-"+id).length)	
+						str+=addNode(d[i].ancestor_txt,id,"&plus;")+"</li>";					// Add node
+				}
+			}
+				}
+		
+				for (i=0;i<n;++i) {																	// For each related place	
+				d[i].index=i;																	// Save index
+				tops[d[i].ancestor_ids_is[4]]=d[i]												// Get topmost
+				}
+			for (p in tops) {																	// For each top row
+			ps[i]={};																		// Make place object			
 				ps[i].p1=d[i].ancestor_ids_is;													// Save original
 				ps[i].p2=d[i].ancestor_ids_is.join("x");										// Put into a combined string
 				ps[i].lev=d[i].ancestor_ids_is.length;											// Set levels
 				ps[i].t=d[i].ancestors_txt;														// Save text
-				numLev=Math.max(numLev,d[i].ancestor_ids_is.length);							// Get max number of levels
 				}
-			ps=ps.sort((a,b)=>{return a.p2 < b.p2 ? -1 : 1;})									// Sort by level descending
 			t=""
+			
+			
+			
+			
 			for (i=0;i<numLev-1;++i) {															// For each level
 				t+=ps[0].p1[i]+"x";																// Point at level test
 				trace(t)
@@ -132,6 +227,7 @@ class Subjects  {
 trace(levs)			
 let str=`<div class='sui-spHead' style='margin-left:-24px'>Places related to ${o.title}</div>`			
 			for (i=0;i<numLev-1;++i) {															// For each level
+				if (!levs[i].length)	continue;
 				str+=`<ul id='sui-spPdot-${levs[i][0].p2}' style='list-style-type:none;padding-left:12px'><li>`;		// Add header
 				str+=addNode(levs[i][0].t[i], "Places-"+levs[i][0].p1[i],"&plus;",levs[i][0].p2)+"</li>";	// Add top node
 				}
@@ -144,21 +240,8 @@ let str=`<div class='sui-spHead' style='margin-left:-24px'>Places related to ${o
 //				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
 //				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
-
-			});							
-		return "";
-
-		function addNode(lab, id, marker, path) {												// ADD NODE
-			let s=`<li style='margin:2px 0 2px ${-32}px'>`;										// Header
-			if (marker)	s+=`<div class='sui-spDot'>${marker}</div>`;	// If a dot, add it
-			else		s+="<div class='sui-spDdot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-			s+=`<a class='sui-noA' id='sui-spPlab-${id}' href='#p=${id}'>${lab}${sui.pages.AddPop(id)}</a>`;		
-			return s;																			// Return node html
-		}
+*/
 	
-
-
-	}
 
 	GetSubjectData(o)																		// GET TAB DATA FOR CONTEXT / SUMMARY
 	{
