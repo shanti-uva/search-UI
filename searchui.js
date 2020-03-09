@@ -405,7 +405,6 @@ class SearchUI  {
 	{
 		this.LoadingIcon(true,64);																	// Show loading icon
 		url=this.solrUtil.createKmapQuery(id,"places",0,10000);										// Make query url
-		trace(id,"places",0,10000)
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.MassageKmapData(data);																// Normalize for display
 			this.LoadingIcon(false);																// Hide loading icon

@@ -178,9 +178,10 @@ class Pages  {
 	DrawRelatedResults(o)																	// SHOW RELATED ASSETS
 	{
 		sui.ss.mode="related";																	// Go to related mode
+			trace(this.relatedType,o.asset_type,o.uid)
 		if (!this.relatedBase)	 this.relatedBase=o;											// If starting fresh
 		this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;						// Set id
-		sui.Query(false, o.asset_type == "collections" ? o.uid : "");							// Query and show resultsadd id if a collection to trigger collection search
+		sui.Query(false, o.asset_type == "collections" ? o.uid : "");							// Query and show results add id if a collection to trigger collection search
 		sui.DrawFooter();																		// Draw footer
 		sui.ss.page=0;																			// Start at beginning
 	}
@@ -290,6 +291,7 @@ class Pages  {
 				let d=data.facets.asset_counts.buckets;											// Point at bucket array
 				for (i=0;i<d.length;++i) {														// For each bucket
 					n=d[i].count;																// Get count													
+					if (d[i].val == "texts:pages") continue;									// Ignore pages of texts
 					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
 					str+=`<a class='sui-popItem' href='#v=${id}=${d[i].val}'>
 					<p id='sui-pop-${id}-${d[i].val}' style='cursor:pointer;text-transform:capitalize'>
