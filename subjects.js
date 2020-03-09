@@ -172,7 +172,7 @@ class Subjects  {
 				});
 			
 			for (i=0;i<n;++i)																	// For each place	
-				if (tops[i].level == 1) {														// If 2nd level
+				if (tops[i].level < 3) {														// If 2nd level
 					$("#sui-rpDot-"+tops[i].id).parent().parent().css("display","block");		// Show			
 					$("#sui-rpDot-"+tops[i].id).html("+"); 										// Change label
 					}
