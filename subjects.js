@@ -134,13 +134,18 @@ class Subjects  {
 			for (i=0;i<n;++i)																	// For place	
 				if (tops[i].level == 0) addChildren(tops[i].id,1);								// Add top row children and recurse
 
-				
+			function hasChildren(id) {															// DOES NODE HAVE ANY CHILDREN?
+				for (i=0;i<n;++i)																// For each place	
+					if (tops[i].id.match(id+"-"))	return true;								// Has them
+				return false;																	// Not
+			}
+
 			function addChildren(id, level) {													// ADD CHILDREN TO NODE RECURSIVELY
 				let i,str="";
 				for (i=0;i<n;++i) {																// For each place
 					if (tops[i].id.match(id) && (tops[i].level == level)) {						// A child
 						str="<ul style='list-style-type:none;display:none;padding:2px 0 0 24px'>";	// Enclosing <ul>
-						str+=addTreeLine(tops[i].lab,tops[i].id,"&ndash;");						// Add tree line
+						str+=addTreeLine(tops[i].lab,tops[i].id,hasChildren(tops[i].id) ? "&ndash;" : "");	// Add tree line
 						str+="</ul>";															// Close <ul>
 						$("#sui-rpDot-"+id).parent().parent().append(str);						// Add it
 						addChildren(tops[i].id,level+1);										// Recurse
@@ -159,13 +164,11 @@ class Subjects  {
 				return s;																		// Return line
 			}
 			
-
 			$("[id^=sui-rpDot-]").off("click");													// Kill old handlers
 			$("[id^=sui-rpDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
-				trace(123)
 				let container=$(this).parent().parent();										// Point a container
 				$(this).html($(container).css("display") == "none" ? "&ndash;" : "+"); 			// Change label
-				$(container).find('ul').slideToggle();            								// Slide into place
+				$(container).children('ul').slideToggle();            							// Slide into place
 				});
 			
 			for (i=0;i<n;++i)																	// For each place	
