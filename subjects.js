@@ -113,7 +113,8 @@ class Subjects  {
 	{
 		sui.GetRelatedPlaces(o.uid, (d)=>{														// Get related place data
 			let i,j,id,tops=[];
-			let str="<ul style='list-style-type:none'>";										// Top-most <ul>
+			let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
+				<ul style='list-style-type:none;margin-left:-24px'>`;							// Top-most <ul>
 			let n=d.length;																		// Number of places
 			for (i=0;i<n;++i) {																	// For each related place	
 				id="places-";																	// Start id
@@ -127,25 +128,27 @@ class Subjects  {
 			n=tops.length;																		// New n
 			for (i=0;i<n;++i) 																	// For place	
 				if (tops[i].level == 0) 														// Add top row
-					str+=addTreeLine(tops[i].lab,tops[i].id,"&ndash;");							// Add tree line
+					str+=addTreeLine(tops[i].lab,tops[i].id,tops[i].id,"&ndash;");				// Add tree line
 
 			$("#sui-topCon").html(str+"</ul></div>");											// Draw it
 	
 			for (i=0;i<n;++i)																	// For place	
 				if (tops[i].level == 0) addChildren(tops[i].id,1);								// Add top row children and recurse
 
+
 			function hasChildren(id) {															// DOES NODE HAVE ANY CHILDREN?
+				let i;
 				for (i=0;i<n;++i)																// For each place	
 					if (tops[i].id.match(id+"-"))	return true;								// Has them
 				return false;																	// Not
 			}
 
 			function addChildren(id, level) {													// ADD CHILDREN TO NODE RECURSIVELY
-				let i,str="";
+				let c,i,str="";
 				for (i=0;i<n;++i) {																// For each place
 					if (tops[i].id.match(id) && (tops[i].level == level)) {						// A child
 						str="<ul style='list-style-type:none;display:none;padding:2px 0 0 24px'>";	// Enclosing <ul>
-						str+=addTreeLine(tops[i].lab,tops[i].id,hasChildren(tops[i].id) ? "&ndash;" : "");	// Add tree line
+						str+=addTreeLine(tops[i].lab,tops[i].id,tops[i].uid,hasChildren(tops[i].id) ? "+" : "");	// Add tree line
 						str+="</ul>";															// Close <ul>
 						$("#sui-rpDot-"+id).parent().parent().append(str);						// Add it
 						addChildren(tops[i].id,level+1);										// Recurse
@@ -153,11 +156,9 @@ class Subjects  {
 					}
 				}
 	
-			function addTreeLine(lab, id, marker) 											// ADD LINE TO TREE
+			function addTreeLine(lab, id, uid, marker) 											// ADD LINE TO TREE
 			{	
 				let s=`<li>`;																	// Header
-				let v=id.split("-");
-				let uid="places-"+v[v.length-1];												// Solitary id
 				if (marker)	s+=`<div class='sui-spDot' id='sui-rpDot-${id}'>${marker}</div>`;	// If a dot, add it
 				else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
 				s+=`<a class='sui-noA' href='#p=${uid}'>${lab}${sui.pages.AddPop(uid)}</a>`;	// Add line
@@ -167,14 +168,13 @@ class Subjects  {
 			$("[id^=sui-rpDot-]").off("click");													// Kill old handlers
 			$("[id^=sui-rpDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let container=$(this).parent().parent();										// Point a container
-				$(this).html($(container).css("display") == "none" ? "&ndash;" : "+"); 			// Change label
-				$(container).children('ul').slideToggle();            							// Slide into place
+				$(this).html($(container).children('ul').css("display") == "none" ? "&ndash;" : "+"); 	// Change label
+				$(container).children('ul').slideToggle();            						// Slide into place
 				});
 			
 			for (i=0;i<n;++i)																	// For each place	
 				if (tops[i].level < 3) {														// If 2nd level
-					$("#sui-rpDot-"+tops[i].id).parent().parent().css("display","block");		// Show			
-					$("#sui-rpDot-"+tops[i].id).html("+"); 										// Change label
+					$("#sui-rpDot-"+tops[i].id).parent().parent().css("display","block");		// Show	
 					}
 			});	
 	
