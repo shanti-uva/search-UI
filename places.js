@@ -276,9 +276,9 @@ class Places  {
 		let str="<div id='sui-topCon' style='margin-left:192px'>";							// Top content div
 		if (this.kmap.caption) str+="<div style='margin:5px 0 13px 0' class='sui-sourceText'>"+this.kmap.caption+"</div>";	// Add caption
 		str+=sui.pages.DrawTabMenu(["MAP","NAMES","LOCATION"]);									// Add tab menu
-		str+="</div><div class='plc-main' id='plc-main'></div>";								// Map holder
+		str+="</div><div class='plc-main' id='plc-main' ></div>";								// Map holder
 		$(this.div).html(str.replace(/\t|\n|\r|/g,""));											// Add to div
-
+		$("#plc-main").css("height",$("#sui-main").height()*.667+"px");							// Fill 2/3rds
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
 			});

@@ -78,7 +78,7 @@ class SearchUI  {
 		
 		window.onresize=()=> { 																		// ON RESIZE
 			if (this.ss.mode == "advanced") 														// Advanced search
-				$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width() });				// Size results area
+				$("#sui-left").css({ width:$("#sui-main").width()-$("#sui-adv").width() });			// Size results area
 		};
 		
 		window.addEventListener("popstate", (h)=> { 												// ON PAGE STATE CHANGE
@@ -132,7 +132,7 @@ class SearchUI  {
 		<div id='sui-footer' class='sui-footer'></div></div>
 		<div class='sui-hamburger' id='sui-hamburger'></div>`;
 	
-		$("#sui-main").html(str.replace(/\t|\n|\r/g,""));											// Remove formatting and add framework to body
+		$("#sui-main").html(str.replace(/\t|\n|\r/g,""));											// Remove formatting and add framework to main div
 		$("#sui-advHeader-assets").html($("#sui-advHeader-assets").html().replace(/Assets/i,"ITEM TYPE"));  // Rename assets
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
 		$("#sui-clear, sui-clear2").on("mouseout", function() { $(this).html("&#xe610"); });		// Normal						
@@ -1296,7 +1296,7 @@ class SearchUI  {
 			}
 		var str="<img src='loading.gif' width='"+size+"' ";											// Img
 		str+="id='sui-loadingIcon' style='position:absolute;top:calc(50% - "+size/2+"px);left:calc(50% - "+size/2+"px);z-index:5000'>";	
-		$("body").append(str);																// Add icon to results
+		$("#sui-main").append(str);																	// Add icon to results
 	}
 
 	SendMessage(msg, kmap)																		// SEND MESSAGE TO HOST

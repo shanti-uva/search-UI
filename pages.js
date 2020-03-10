@@ -221,7 +221,7 @@ class Pages  {
 		if (id && id.match(/collections-/))	return;												// No maps for collections yet
 		$("[id^=sui-popover-]").remove();														// Remove old one
 		var pos=$(event.target).position();														// Get position of icon
-		let x=Math.max(12,Math.min(pos.left,$("body").width()-162));							// Cap sides
+		let x=Math.max(12,Math.min(pos.left,$("#sui-main").width()-162));						// Cap sides
 		let str=`<div id='sui-popover-${id}' class='sui-popover' 
 		style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
 		<div style='width:0;height:0;border-left:10px solid transparent;
