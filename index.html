@@ -30,12 +30,18 @@
 	let suiSite="Mandala";																		// Assume Mandala
 	let url=window.location.search;						   										// Get query string
 	if (url && url.match(/^\?b/i))	suiSite="Bhutan";											// Bhutan
+	else if (url && url.match(/^\?c/i))	suiSite="CU";											// Comtemplative University
 	var sui=new SearchUI(suiSite);																// Alloc main program
 	if (suiSite == "Bhutan") 	sui.ss.project_filter="kmapid: (places-427 subjects-8260)"		// Site specific constant query
+	else if (suiSite == "CU")	;
 	sui.pages=new Pages();																		// Alloc pages 
 
 	function DrawLandingPage()																// DRAW SITE SPECIFIC LANDING PAGE
 	{
+		if (suiSite == "CU") {	
+			$("#sui-search").focus();															// Focus on search input
+			return;
+			}
 		let title="Mandala"; 
 		if (suiSite == "Bhutan")	title="Bhutan Cultural Library";							// Set title
 		$("#sui-pages").css({ display:"block", top:"52px" });									// Hide results page	

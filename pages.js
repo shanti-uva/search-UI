@@ -91,6 +91,7 @@ class Pages  {
 					if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length) { // If valid data
 					let d=data.facets.asset_counts.buckets;										// Point at bucket array
 					for (i=0;i<d.length;++i) {													// For each bucket
+						if (d[i].val == "texts:pages")	continue;								// Skip it
 						n=d[i].count;															// Get count													
 						tot+=n;																	// Add to total
 						if (n > 1000)	n=Math.floor(n/1000)+"K";								// Shorten
@@ -234,7 +235,6 @@ class Pages  {
 
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
 			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
-
 			$("[id^=sui-popover-]").remove();													// Remove old one
 			let str=`<div id='sui-popover-${id}' class='sui-popover' 
 			style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>

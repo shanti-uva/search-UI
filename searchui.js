@@ -66,6 +66,7 @@ class SearchUI  {
 		this.searches=[];																			// Saves recent searches
 		this.showBool=false;																		// Where to show Boolean in advanced
 
+		this.noTop=(site == "CU") ? true : false;													// Has a top
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"searchui.css" }).appendTo("head"); 	// Load CSS
 		this.InitSearchState();																		// Init search state to default
@@ -92,11 +93,9 @@ class SearchUI  {
 	{
 		let key;
 		this.showBool=this.GetCookie("showBool") == "true";
-		var str=`<div id='sui-main' class='sui-main'>
-		<div class='sui-topBar'>
-			<img src="img/bhutanleft.gif" style='cursor:pointer' onclick='DrawLandingPage()' title='Home page'>
-		</div>
-		<div id='sui-top' class='sui-top'>
+		var str="<div id='sui-main' class='sui-main'>";
+		if (this.site != "CU") str+=`<div class='sui-topBar'><img src='img/bhutanleft.gif' style='cursor:pointer' onclick='DrawLandingPage()' title='Home page'></div>
+			<div id='sui-top' class='sui-top'>
 			<div style='display:inline-block'>
 			<div class='sui-search1'>
 					<input type='text' id='sui-search' class='sui-search2' placeholder='Enter Search'>
@@ -107,8 +106,8 @@ class SearchUI  {
 				<div id='sui-hamBut' class='sui-hamBut' title='Help + options'>&#xe627</div>	
 				</div>
 			</div>
-		<div>
-			<div id='sui-left' class='sui-left'>
+		<div>`;
+		str+=`<div id='sui-left' class='sui-left'>
 			<div id='sui-header' class='sui-header'>
 				<div id='sui-headLeft' class='sui-headLeft'></div>
 			</div>
@@ -193,6 +192,7 @@ class SearchUI  {
 
 		$("#sui-results").on("click",()=>{$("[id^=sui-popover-]").remove(); });						// ON CLICK OF RESULTS PAGE 
 		$("#sui-hamBut").on("click",()=>{ this.ShowHamburger() });									// SHOW HAMBURGER MENU
+		if (this.noTop)	$("#sui-left").css({ top:0, height:"calc(100% - 30px)" });
 	}
 
 	Draw(mode)																					// DRAW SEARCH COMPONENTS
@@ -354,13 +354,14 @@ class SearchUI  {
 	{
 		let url;
 		this.LoadingIcon(true,64);																	// Show loading icon
-		if (collectionId)	{																		// If getting collection members
+		if (collectionId) {																			// If getting collection members
 			let ts=JSON.parse(JSON.stringify(this.ss));												// Clone search
-			ts.query={ text:"", places:[], assets:[], languages:[],	features:[],subjects:[],															
+			ts.query={ text:"", places:[], assets:[{ id:this.pages.relatedType, bool:"AND"}], languages:[],	features:[],subjects:[],															
 					  terms:[], relationships:[], users:[], perspectives:[],	
 					  collections:[{ title:"all", id:collectionId, bool: "AND" }] };				// Set new search
 			url=this.solrUtil.buildAssetQuery(ts);													// Set url
-			}
+		trace(ts)	
+		}
 		else if (this.ss.mode == "related")		url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
 		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
 		if ((this.ss.mode != "related") && !fromHistory) 											// These set their own states and not from history API

@@ -51,9 +51,9 @@ class Subjects  {
 		if (o.names_txt && o.names_txt.length) {												// If names
 			for (var i=0;i<o.names_txt.length;++i) {											// For each name
 				if (o.names_txt[i].match(/lang="bo"/i))											// Language id - bo
-					str+="<tr><td style='color:#000099;font-size:20px'>"+o.names_txt[i]+"&nbsp;&nbsp;&nbsp;</td><td><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
+					str+="<tr><td style='color:#000099;font-size:20px'><b>"+o.names_txt[i]+"</b>&nbsp;&nbsp;&nbsp;</td><td><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
 				else 																			// Unknown
-					str+="<tr><td></td><td>> "+o.names_txt[i]+"</td></tr>";						// Add it
+					str+="<tr><td></td><td>><b> "+o.names_txt[i]+"</b></td></tr>";				// Add it
 					}
 				}
 		str+="</table><br>";		
@@ -114,7 +114,8 @@ class Subjects  {
 		sui.GetRelatedPlaces(o.uid, (d)=>{														// Get related place data
 			let i,j,id,tops=[];
 			let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
-				<ul style='list-style-type:none;margin-left:-24px'>`;							// Top-most <ul>
+			<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>
+			<ul style='list-style-type:none;margin-left:-24px'>`;							// Top-most <ul>
 			let n=d.length;																		// Number of places
 			for (i=0;i<n;++i) {																	// For each related place	
 				id="places-";																	// Start id
@@ -169,15 +170,29 @@ class Subjects  {
 			$("[id^=sui-rpDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let container=$(this).parent().parent();										// Point a container
 				$(this).html($(container).children('ul').css("display") == "none" ? "&ndash;" : "+"); 	// Change label
-				$(container).children('ul').slideToggle();            						// Slide into place
+				$(container).children('ul').slideToggle();            							// Slide into place
 				});
-			
-			for (i=0;i<n;++i)																	// For each place	
-				if (tops[i].level < 3) {														// If 2nd level
+			$("#sui-togCatA").on("click", ()=> {												// ON EXPAND ALL
+				let i;
+				for (i=0;i<n;++i) {																// For each place	
+					$("#sui-rpDot-"+tops[i].id).html("&ndash;"); 								// Change label
 					$("#sui-rpDot-"+tops[i].id).parent().parent().css("display","block");		// Show	
 					}
+				});
+			$("#sui-togCatN").on("click", ()=> {												// ON COLLAPSE, INIT TOS TARTING STATE
+				let i,p;
+				for (i=0;i<n;++i) {																// For each place	
+					p=$("#sui-rpDot-"+tops[i].id);												// Point at dot
+					p.html("+"); 																// Change label
+					p.parent().parent().css("display","none");									// Hide	
+					if (tops[i].level < 3) {													// If 2nd level
+						if (tops[i].level < 2)	p.html("&ndash;" ); 							// Change label is past 1st rows
+						p.parent().parent().css("display","block");								// Show	
+						}
+					}
+				});
+			$("#sui-togCatN").trigger("click");													// Collapse to starting point
 			});	
-	
 		return "Loading...";																	// Say we're loading...
 		}
 

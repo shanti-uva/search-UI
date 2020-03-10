@@ -315,12 +315,12 @@ class Places  {
 			for (i=0;i<l.length;++i) {															// For each one
 				str+=`<div style='margin-left:${l[i].tab*16}px'>`;								// Header
 				if (i) str+="&bull; ";															// Add bullet
-				str+=`${l[i].lab} &nbsp; (${l[i].lang}, ${l[i].write}, ${l[i].rel})</div>`;		// Text
+				str+=`<b>${l[i].lab} </b>&nbsp; (${l[i].lang}, ${l[i].write}, ${l[i].rel})</div>`;	// Text
 				}
 			str+=`<br></div><div style='display:inline-block;width:calc(50% - 24px);vertical-align:top;border-left:1px solid #ccc; padding-left:12px;margin-top:22px'>
 			<div style='font-weight:bold;color:#6faaf1;margin-bottom:8px'>ETYMOLOGY</div>`;
 			for (i=0;i<l.length;++i) 															// For each one
-				if (l[i].ety)	str+=`<div>Etymology for ${l[i].lab}: &nbsp; ${l[i].ety}</div>`; // Text
+				if (l[i].ety)	str+=`<div>Etymology for <b>${l[i].lab}</b>: &nbsp; ${l[i].ety}</div>`; // Text
 			str+="</div><br>";
 			this.content[1]=str.replace(/\t|\n|\r|/g,"");										// Set tab											
 			});
