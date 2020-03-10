@@ -146,7 +146,7 @@
 .sui-tree ul li ul li { position: relative; }
 
 /* PLACES */
-#plc-main 		{   height:66vh; width:calc(100% - 193px); margin-left:192px; }
+#plc-main 		{   height:66%; width:calc(100% - 193px); margin-left:192px; }
 #plc-infoDiv 	{ 	position: absolute; top:292px; left:219px; }
 #plc-infoDiv input{	border: none; box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 2px; }
 
@@ -188,8 +188,8 @@
 .sui-images 	{	max-width:900px;margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
 					padding:50px; font-weight:400; padding-top:0; border-top:4px solid #b49c59; border-bottom:4px solid #b49c59;}
 /* TEXT PAGE*/
-.sui-texts 		 {	display:inline-block; width:66%; margin:0; padding:0; overflow:hidden; height:100vh; max-height:calc(100vh - 154px); }
-.sui-textContent {	background-color: #fff; width:calc(100% - 46px); overflow-y:auto; max-height:calc(100vh - 241px); color:#666; 
+.sui-texts 		 {	display:inline-block; width:66%; margin:0; padding:0; overflow:hidden; height:100%; max-height:calc(100% - 154px); }
+.sui-textContent {	background-color: #fff; width:calc(100% - 46px); overflow-y:auto; max-height:calc(100% - 241px); color:#666; 
 					padding:22px; border-bottom:1px solid #999; border-left:1px solid #999; border-right:1px solid #999; line-height:22px; }
 .sui-textTop 	 {	background-color: #fff; width:100%; overflow-x:hidden; white-space:nowrap; user-select:none; }
 .sui-textTab 	 {	display:inline-block; height:26px; width:calc(33.33% - 2px); text-align:center; user-select:none; padding-top:10px; 

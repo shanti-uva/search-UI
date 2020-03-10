@@ -73,7 +73,6 @@ class SearchUI  {
 		this.AddFrame();																			// Add div framework
 		
 		if (!location.hash)	{ 																		// Normal startup
-			this.Query(true);																		// Load search data
 			this.Draw(); 																			// Draw
 			}										
 		
@@ -111,7 +110,6 @@ class SearchUI  {
 			<div id='sui-header' class='sui-header'>
 				<div id='sui-headLeft' class='sui-headLeft'></div>
 			</div>
-			<div id='sui-pages' class='sui-results scrollbar'></div>
 			<div id='sui-results' class='sui-results scrollbar' style='color:#000'></div>
 		</div>
 		<div id='sui-adv' class='sui-adv'>`;
@@ -160,10 +158,7 @@ class SearchUI  {
 			});	
 		
 		$("#sui-mode").on("click",()=> { 															// ON CHANGE MODE
-			if (this.ss.mode == "advanced") this.ss.mode="simple";									// Go to simple mode
-			else							this.ss.mode="advanced";								// Go to advanced mode
-			this.DrawResults(true);																	// Draw results page if active
-			this.DrawAdvanced();																	// Draw search UI if active
+			this.ShowAdvanced((this.ss.mode == "advanced") ? false : true);							// Toggle advanced menu
 			});	
 
 		$("#sui-showBool").on("click",()=> { 														// ON CHANGE BOOLEAN
@@ -201,6 +196,18 @@ class SearchUI  {
 		this.DrawResults();																			// Draw results page if active
 		this.DrawAdvanced();																		// Draw search UI if active
 	}
+
+	ShowAdvanced(mode)																			// HIDE/SHOW ADVANCED MENU
+	{
+
+		this.ss.mode=(mode) ? "advanced" : "simple";												// Set mode
+		$("#sui-adv").css({ display:mode ? "block" : "none"});										// Hide/show adv ui
+		if (mode) $("#sui-left").css({ width:($("#sui-main").width()-$("#sui-adv").width())+"px"});	// Size results area to fit advanced
+		else	 $("#sui-left").css({ width:$("#sui-main").width()+"px" });							// 100%
+		trace($("#sui-adv").width()+"px")
+		this.DrawAdvanced();																		// Draw search UI if active
+	}
+	
 
 	ShowHamburger()																				// SHOW HAMBURGER MENU
 	{
@@ -262,7 +269,6 @@ class SearchUI  {
 			sui.ss.mode="simple";																	// Simple display mode	
 			sui.ss.page=0;																			// Start at beginning
 			$("#sui-results").scrollTop(0);															// Scroll to top
-			$("#sui-pages").scrollTop(0);															// Scroll to top
 			$("#sui-left").scrollTop(0);															// Scroll to top
 			$("#plc-infoDiv").remove();																// Remove map buttons
 			$("#sui-left").css({ width:"100%", display:"inline-block" });							// Size and show results area
@@ -526,7 +532,10 @@ class SearchUI  {
 	DrawResults(noRefresh)																		// DRAW RESULTS SECTION
 	{
 		$("#sui-left").scrollTop(0); 		$("#sui-results").scrollTop(0);							// Scroll to top
+		$("#sui-results").css({ "background-image":""});											// Remove any backgeound image										
+		$("#sui-results").css({ display:"block" });													// Show results page	
 		$("#plc-infoDiv").remove();																	// Remove map buttons
+
 		if (this.ss.mode == "related")		this.numItems=this.assets[this.pages.relatedType].n;	// Set number of items based on related type
 		else								this.numItems=this.assets[this.ss.query.assets[0].id].n; // Set number of items based on current asset being shown  ***ASSETS1
 		if (this.ss.mode == "input") {																// Just the search box
@@ -534,7 +543,6 @@ class SearchUI  {
 			$("#sui-header").css({display:"inline-block","background-color":"#4d59ca"} );			// Show header
 			$("#sui-left").css({ display:"block",width:"100%" });									// Size and show left side
 			$("#sui-adv").css({ display:"none"});													// Hide search ui
-			$("#sui-pages").css({ display:"block",color:"#000" });									// Show pages page	
 			$("#sui-results").css({ display:"none" });												// Hide results page	
 			$("#sui-adv").css({ display:"none" });													// Hide adv search ui
 			return;																					// Quit
@@ -543,16 +551,12 @@ class SearchUI  {
 			$("#sui-left").css({ width:"100%" });													// Size and show results area
 			$("#sui-adv").css({ display:"none"});													// Hide search ui
 			$("#sui-left").slideDown();																// Slide down
-			$("#sui-pages").css({ display:"none" });												// Hide pages page	
-			$("#sui-results").css({ display:"block" });												// Show results page	
+			$("#sui-left").css({ width:$("#sui-main").width() });									// Size and results area 100%
 			}
 		else if (this.ss.mode == "advanced") {														// Advanced search
-			$("#sui-left").css({ width:$("body").width()-$("#sui-adv").width(),display:"inline-block"});	// Size and show results area
 			$("#sui-adv").css({ display:"block" });													// Show search ui
-			$("#sui-pages").css({ display:"none" });												// Hide pages page	
-			$("#sui-results").css({ display:"block" });												// Show results page	
+			$("#sui-left").css({ width:$("#sui-main").width()-$("#sui-adv").width() });				// Size results area to fit advanced
 			}
-		$("#sui-headLeft").css({ display:"inline-block" });											// Show left header
 		$("#sui-mode").prop({"title": this.ss.mode == "advanced" ? "Basic search" : "Advanced search" } );	// Set tooltip
 		$("#sui-mode").html(this.ss.mode == "advanced" ? "BASIC<br>SEARCH" : "ADVANCED<br>SEARCH" );		// Set mode icon	
 		$("#sui-header").css({display:"block"} );													// Show header
@@ -561,7 +565,6 @@ class SearchUI  {
 		this.DrawItems();																			// Draw items
 		this.DrawFooter();																			// Draw footer
 	}
-
 
 	DrawHeader()																				// DRAW RESULTS HEADER
 	{
@@ -855,6 +858,7 @@ class SearchUI  {
 	{
 		let i,o,str;
 		let _this=this;
+		if (this.noTop)	$("#sui-adv").css({ top:0, height:"calc(100% - 50px)" })					// Scale to fit
 		for (let key in this.facets) {																// For each facet
 			if ($("#sui-advEdit-"+key).css("display") == "block") {									// Refresh list results if open
 				this.DrawFacetItems(key,true);														// Draw proper facets menu

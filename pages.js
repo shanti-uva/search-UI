@@ -39,13 +39,13 @@ class Pages  {
 		sui.vis=new Visuals();																	// Alloc Visuals (standalone)
 		sui.trm=new Terms();																	// Alloc Terms (standalone)
 		sui.col=new Collections();																// Alloc Collections (standalone)
-		DrawLandingPage();																		// Draw landing page
 		this.recentPages=[];																	// Hold recent pages (title|id)
 		if (location.hash) sui.PageRouter(location.hash);										// Go to particular page
 		}
 
 	Draw(kmap, fromHistory)																	// DRAW KMAP PAGE
 	{
+		$("#sui-results").css({ "background-image":""});										// Remove any backgeound image										
 		clearInterval(this.carouselTimer);														// Kill carousel timer
 		if (!kmap)	return;																		// Quit if no kmap
 		if (!fromHistory)	sui.SetState(`p=${kmap.uid}`);										// This is the active page
