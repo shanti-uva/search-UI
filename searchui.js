@@ -93,7 +93,7 @@ class SearchUI  {
 	{
 		let key;
 		this.showBool=this.GetCookie("showBool") == "true";
-		var str="<div id='sui-main' class='sui-main'>";
+		var str="";
 		if (this.site != "CU") str+=`<div class='sui-topBar'><img src='img/bhutanleft.gif' style='cursor:pointer' onclick='DrawLandingPage()' title='Home page'></div>
 			<div id='sui-top' class='sui-top'>
 			<div style='display:inline-block'>
@@ -134,7 +134,7 @@ class SearchUI  {
 		<div id='sui-footer' class='sui-footer'></div></div>
 		<div class='sui-hamburger' id='sui-hamburger'></div>`;
 	
-		$("body").append(str.replace(/\t|\n|\r/g,""));												// Remove formatting and add framework to body
+		$("#sui-main").html(str.replace(/\t|\n|\r/g,""));											// Remove formatting and add framework to body
 		$("#sui-advHeader-assets").html($("#sui-advHeader-assets").html().replace(/Assets/i,"ITEM TYPE"));  // Rename assets
 		$("#sui-clear, sui-clear2").on("mouseover",function() { $(this).html("&#xe60d"); });		// Highlight						
 		$("#sui-clear, sui-clear2").on("mouseout", function() { $(this).html("&#xe610"); });		// Normal						
