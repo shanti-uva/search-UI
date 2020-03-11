@@ -821,11 +821,11 @@ class SearchUI  {
 
 	DrawCardItem(num)																			// DRAW CARD ITEM
 	{
-		var o=this.curResults[num];																	// Point at item
-		var g="&#xe633";																			// Collections glyph
-		var c="#9e894d";																			// Color
-		var label=o.collection_title;																// Set label
-		var str="<div class='sui-card'>";															// Overall container
+		let i,o=this.curResults[num];																// Point at item
+		let g="&#xe633";																			// Collections glyph
+		let c="#9e894d";																			// Color
+		let label=o.collection_title;																// Set label
+		let str="<div class='sui-card'>";															// Overall container
 		str+="<div style='width:100%;height:100px;overflow:hidden;display:inline-block;margin:0;padding:0'>";			// Div container
 		str+="<a href='#p="+o.uid+"'>";																// Add href for right click
 		str+="<img src='"+o.url_thumb+"' class='sui-cardPic' id='sui-itemPic-"+num+"'></a></div>";	// Add pic
@@ -837,6 +837,10 @@ class SearchUI  {
 			 str+=`<div class='sui-cardGlyph' style='color:${this.assets[o.asset_type].c}'>${this.assets[o.asset_type].g}</div>`;
 		str+="<div class='sui-cardInfo'><div class='sui-cardTitle' id='sui-itemTitle-"+num+"'><b>"+o.title+"</b><br></div>";	// Add title
 		str+="<div style='border-top:.5px solid "+c+";height:1px;width:100%;margin:6px 0 6px 0'></div>";	// Dividing line
+		if (o.ancestors_txt && o.ancestors_txt.length > 3)	{										// If has an ancestors trail
+			str+="&#xe638&nbsp;&nbsp;..."
+			str+=this.ShortenString(o.ancestors_txt[o.ancestors_txt.length-3]+"/"+o.ancestors_txt[o.ancestors_txt.length-2]+"/",24)+"<br>";	// Add last two			
+			}
 		if (o.feature_types_ss) str+="&#xe62b&nbsp;&nbsp;"+o.feature_types_ss.join(", ")+"<br>";	// Add feature, if a place
 		if (o.data_phoneme_ss)  str+="&#xe635&nbsp;&nbsp;"+o.data_phoneme_ss.join(", ")+"<br>";		// Add phoneme if a term
 		if (o.creator)  		str+="&#xe600&nbsp;&nbsp;"+o.creator[0]+"<br>";						// Add creator 
