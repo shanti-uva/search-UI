@@ -218,8 +218,11 @@ class Pages  {
 			});
 		
 		$("#sui-editBut").on("click",()=> {														// ON EDIT BUTTON CLICK
+			let str="http://"+o.asset_type+".";													// URL head
 			sui.Popup("Editing this item in Rails now!");										// Show we're editing
-			window.open("//viseyes.org?id="+o.uid,"_blank");									// Open in new window
+			if (o.asset_type.match(/subjects|places|terms/i))	str+="kmaps.virginia.edu/admin/features/"+o.uid;
+			else												str+="shanti.virginia.edu/node/"+o.id+"/edit";
+			window.open(str,"_blank");															// Open in new window
 			});
 			
 		}
