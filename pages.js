@@ -40,6 +40,7 @@ class Pages  {
 		sui.trm=new Terms();																	// Alloc Terms (standalone)
 		sui.col=new Collections();																// Alloc Collections (standalone)
 		this.recentPages=[];																	// Hold recent pages (title|id)
+		this.editing=false;																		// Show editing interface?
 		if (location.hash) sui.PageRouter(location.hash);										// Go to particular page
 		}
 
@@ -201,7 +202,9 @@ class Pages  {
 				${o.ancestors_txt[i]}</a>`;											
 				if (i < o.ancestors_txt.length-1)	str+=" > ";									// Add separator
 				}
+			str+="</div>";																		// Cloase breadcrumbs div
 			}
+		if (this.editing)	str+="<div id='sui-editBut' class='sui-editBut' title='Edit this item'>&#xe688</div>";		// Add editing button
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 		$("#sui-footer").html(`<div style='float:right;font-size:14px;margin-right:16px'>${o.asset_type.toUpperCase()} ID: ${o.id}</div>`);	// Set footer
 		$("#sui-header").css("background-color",sui.assets[o.asset_type].c);					// Color header
@@ -213,7 +216,13 @@ class Pages  {
 			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
 			return false;																		// Don't propagate
 			});
-	}
+		
+		$("#sui-editBut").on("click",()=> {														// ON EDIT BUTTON CLICK
+			sui.Popup("Editing this item in Rails now!");										// Show we're editing
+			window.open("//viseyes.org?id="+o.uid,"_blank");									// Open in new window
+			});
+			
+		}
 
 	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
 	{

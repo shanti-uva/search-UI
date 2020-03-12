@@ -835,7 +835,9 @@ class SearchUI  {
 		str+="<div class='sui-cardType'>"+gg+"</div>";												// Show icon
 		if (o.url_thumb.match(/gradient.jpg/))														// If a generic
 			 str+=`<div class='sui-cardGlyph' style='color:${this.assets[o.asset_type].c}'>${this.assets[o.asset_type].g}</div>`;
-		str+="<div class='sui-cardInfo'><div class='sui-cardTitle' id='sui-itemTitle-"+num+"'><b>"+o.title+"</b><br></div>";	// Add title
+		str+="<div class='sui-cardInfo'><div class='sui-cardTitle' id='sui-itemTitle-"+num+"'";
+		if (o.ancestors_txt && o.ancestors_txt.length > 2) str+="title='"+o.ancestors_txt.join("/")+"'";	// Add tooltip showing path
+		str+="><b>"+o.title+"</b><br></div>";														// Add title
 		str+="<div style='border-top:.5px solid "+c+";height:1px;width:100%;margin:6px 0 6px 0'></div>";	// Dividing line
 		if (o.ancestors_txt && o.ancestors_txt.length > 3)	{										// If has an ancestors trail
 			str+="&#xe638&nbsp;&nbsp;..."

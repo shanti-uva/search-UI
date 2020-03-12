@@ -37,6 +37,7 @@
 	if (suiSite == "Bhutan") 	sui.ss.project_filter="kmapid: (places-427 subjects-8260)"		// Site specific constant query
 	else if (suiSite == "CU")	;
 	sui.pages=new Pages();																		// Alloc pages 
+	if (url && url.match(/^\?.e/i))	sui.pages.editing=true;										// 'e' turns on editing
 	if (suiSite != "CU") DrawLandingPage();														// Draw Mandala/Bhutan landing
 	
 
