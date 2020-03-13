@@ -159,10 +159,10 @@ class Subjects  {
 				});
 			return;																				// Quit
 			}
-		str+=` | <a class='sui-advEditBut' style='cursor:pointer;vertical-align:0' 
-		id='sui-togCatA' title='Expand all'<b>&#x2295</b></a> | 
-		<a class='sui-advEditBut' style='cursor:pointer;vertical-align:0'
-		id='sui-togCatN' title='Collapse all'><b>&#x2296</b></a> 
+		str+=` | <span class='sui-advEditBut' style='vertical-align:0' 
+		id='sui-togCatA' title='Expand all'<b>&#x2295</b></span> | 
+		<span class='sui-advEditBut' style='vertical-align:0'
+		id='sui-togCatN' title='Collapse all'><b>&#x2296</b></span> 
 		</p><div style='width:100%'><div style='width:50%;display:inline-block'>
 		<ul style='list-style-type:none;margin-left:-24px'>`;									// Top-most <ul>
 		let n=d.length;																			// Number of places
@@ -284,8 +284,9 @@ class Subjects  {
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
 		${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-		See the CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
-		<p><a style='cursor:pointer' id='sui-togCatA'>Expand all</a> / <a style='cursor:pointer' id='sui-togCatN'>Collapse all</a></p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
+		See the SUBJECT CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
+		<p><a class='sui-advEditBut' id='sui-togCatA'>Expand all</a> / <a class='sui-advEditBut' id='sui-togCatN'>Collapse all</a>
+		</p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
