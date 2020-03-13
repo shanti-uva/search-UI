@@ -116,7 +116,7 @@ class Subjects  {
 			this.DrawRelatedPlaces("tree",1);													// Display related places
 			});	
 		return "Loading...";																	// Say we're loading...
-		}	
+	}	
 			
 	DrawRelatedPlaces(mode, sortMode)														// DRAW RELATED PLACES
 	{			
@@ -135,10 +135,12 @@ class Subjects  {
 			j=$("#sui-footer").offset().top-$("#sui-results").offset().top-150;					// Fill space
 			str+=` | <span class='sui-advEditBut' id='sui-rpSort' title='Sort'>
 			${(sortMode == 1) ? "&#xe653" : "&#xe652"}</span>		
-			</p><div class='sui-rpList' style='height:${j}px'>`;					
+			</p><div class='sui-rpList' style='height:${j}px'>`;								// Add container			
 			d=d.sort((a,b)=>{ return a.title < b.title ? -sortMode : sortMode })				// Sort by title acending
-			for (i=0;i<d.length;++i) 															// For each related place
-				str+=`<div id='sui-rpLine-${i}' style='width:300px' title='${d[i].ancestors_txt.join("/")}'>${d[i].title}</div>`; // Add it
+			for (i=0;i<d.length;++i) {															// For each related place
+				str+=`<div id='sui-rpLine-${i}' style='width:300px' title='${d[i].ancestors_txt.join("/")}'>${d[i].title}
+				${sui.pages.AddPop(d[i].uid)}</div>`; 											// Add line
+				}
 			$("#sui-topCon").html(str+"</div>");												// Draw as list
 
 			$("#sui-rpTree").on("click", ()=> {	this.DrawRelatedPlaces("tree",sortMode); });	// HANDLE TREE CLICK
@@ -155,12 +157,12 @@ class Subjects  {
 					else						line.css("display","none");						// Hide
 					}
 				});
-	
 			return;																				// Quit
 			}
-		str+=` | <a class='sui-advEditBut' style='cursor:pointer' 
-		id='sui-togCatA' title='Expand all'>&#xe650</a> | 
-		<a class='sui-advEditBut' style='cursor:pointer' id='sui-togCatN' title='Collapse all'>&#xe651</a>
+		str+=` | <a class='sui-advEditBut' style='cursor:pointer;vertical-align:0' 
+		id='sui-togCatA' title='Expand all'<b>&#x2295</b></a> | 
+		<a class='sui-advEditBut' style='cursor:pointer;vertical-align:0'
+		id='sui-togCatN' title='Collapse all'><b>&#x2296</b></a> 
 		</p><div style='width:100%'><div style='width:50%;display:inline-block'>
 		<ul style='list-style-type:none;margin-left:-24px'>`;									// Top-most <ul>
 		let n=d.length;																			// Number of places
@@ -307,7 +309,7 @@ class Subjects  {
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
 		<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
-		See the SUMMARY tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
+		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		for (n=0;n<d.ancestors.length;++n) {													// For each ancestor
 			str+="<ul style='list-style-type:none'>";											// Add header

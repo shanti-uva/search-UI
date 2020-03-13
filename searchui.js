@@ -821,7 +821,7 @@ class SearchUI  {
 
 	DrawCardItem(num)																			// DRAW CARD ITEM
 	{
-		let i,o=this.curResults[num];																// Point at item
+		let i,s="",o=this.curResults[num];																// Point at item
 		let g="&#xe633";																			// Collections glyph
 		let c="#9e894d";																			// Color
 		let label=o.collection_title;																// Set label
@@ -839,9 +839,12 @@ class SearchUI  {
 		if (o.ancestors_txt && o.ancestors_txt.length > 2) str+="title='"+o.ancestors_txt.join("/")+"'";	// Add tooltip showing path
 		str+="><b>"+o.title+"</b><br></div>";														// Add title
 		str+="<div style='border-top:.5px solid "+c+";height:1px;width:100%;margin:6px 0 6px 0'></div>";	// Dividing line
-		if (o.ancestors_txt && o.ancestors_txt.length > 3)	{										// If has an ancestors trail
-			str+="&#xe638&nbsp;&nbsp;..."
-			str+=this.ShortenString(o.ancestors_txt[o.ancestors_txt.length-3]+"/"+o.ancestors_txt[o.ancestors_txt.length-2]+"/",24)+"<br>";	// Add last two			
+		if (o.ancestors_txt && o.ancestors_txt.length > 1) {										// If has an ancestors trail
+			str+="&#xe638&nbsp;&nbsp;";																// Add icon
+			for (i=0;i<o.ancestors_txt.length-2;++i) s+=o.ancestors_txt[i]+"/";						// Build front
+			i=o.ancestors_txt.length-2;																// Last index
+			s=this.ShortenString(s.slice(0,-1),24-o.ancestors_txt[i].length);						// Shorten
+			str+=s+" "+o.ancestors_txt[i]+"<br>";													// Make final string
 			}
 		if (o.feature_types_ss) str+="&#xe62b&nbsp;&nbsp;"+o.feature_types_ss.join(", ")+"<br>";	// Add feature, if a place
 		if (o.data_phoneme_ss)  str+="&#xe635&nbsp;&nbsp;"+o.data_phoneme_ss.join(", ")+"<br>";		// Add phoneme if a term
@@ -1320,11 +1323,13 @@ class SearchUI  {
 		$("#sui-popupDiv").fadeIn(500).delay(time ? time*1000 : 3000).fadeOut(500);					// Animate in and out		
 	}
 
-	ShortenString(str, len)																		// SHORTEN A STRING TO LENGTH
+	ShortenString(str, len, middle)																// SHORTEN A STRING TO LENGTH
 	{
 		if (typeof str == "object")	str=str[0];														// Get 1st member if an array
-		if (str && str.length > len)																// Too long
-			str=str.substr(0,(len-3))+"...";														// Shorten	
+		if (str && str.length > len) {																// Too long
+			if (middle) str=str.substr(0,(len-3)/2)+"..."+str.slice((len-3)/-2);					// Shorten middle
+			else		str=str.substr(0,(len-3))+"...";											// Shorten end	
+			}
 		return str;																					// Return string
 	}
 
