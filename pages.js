@@ -180,7 +180,6 @@ class Pages  {
 	DrawRelatedResults(o)																	// SHOW RELATED ASSETS
 	{
 		sui.ss.mode="related";																	// Go to related mode
-			trace(this.relatedType,o.asset_type,o.uid)
 		if (!this.relatedBase)	 this.relatedBase=o;											// If starting fresh
 		this.relatedId=this.relatedBase.asset_type+"-"+this.relatedBase.id;						// Set id
 		sui.Query(false, o.asset_type == "collections" ? o.uid : "");							// Query and show results add id if a collection to trigger collection search

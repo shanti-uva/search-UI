@@ -204,7 +204,6 @@ class SearchUI  {
 		$("#sui-adv").css({ display:mode ? "block" : "none"});										// Hide/show adv ui
 		if (mode) $("#sui-left").css({ width:($("#sui-main").width()-$("#sui-adv").width())+"px"});	// Size results area to fit advanced
 		else	 $("#sui-left").css({ width:$("#sui-main").width()+"px" });							// 100%
-		trace($("#sui-adv").width()+"px")
 		this.DrawAdvanced();																		// Draw search UI if active
 	}
 	
@@ -366,8 +365,7 @@ class SearchUI  {
 					  terms:[], relationships:[], users:[], perspectives:[],	
 					  collections:[{ title:"all", id:collectionId, bool: "AND" }] };				// Set new search
 			url=this.solrUtil.buildAssetQuery(ts);													// Set url
-		trace(ts)	
-		}
+			}
 		else if (this.ss.mode == "related")		url=this.solrUtil.createKmapQuery(this.pages.relatedId.toLowerCase(),this.pages.relatedType.toLowerCase(),this.ss.page,this.ss.pageSize);		// Get assets related to relatedId
 		else									url=this.solrUtil.buildAssetQuery(this.ss);			// Get assets that match query
 		if ((this.ss.mode != "related") && !fromHistory) 											// These set their own states and not from history API
@@ -821,7 +819,7 @@ class SearchUI  {
 
 	DrawCardItem(num)																			// DRAW CARD ITEM
 	{
-		let i,s="",o=this.curResults[num];																// Point at item
+		let i,o=this.curResults[num];																// Point at item
 		let g="&#xe633";																			// Collections glyph
 		let c="#9e894d";																			// Color
 		let label=o.collection_title;																// Set label
@@ -840,11 +838,8 @@ class SearchUI  {
 		str+="><b>"+o.title+"</b><br></div>";														// Add title
 		str+="<div style='border-top:.5px solid "+c+";height:1px;width:100%;margin:6px 0 6px 0'></div>";	// Dividing line
 		if (o.ancestors_txt && o.ancestors_txt.length > 1) {										// If has an ancestors trail
-			str+="&#xe638&nbsp;&nbsp;";																// Add icon
-			for (i=0;i<o.ancestors_txt.length-2;++i) s+=o.ancestors_txt[i]+"/";						// Build front
-			i=o.ancestors_txt.length-2;																// Last index
-			s=this.ShortenString(s.slice(0,-1),24-o.ancestors_txt[i].length);						// Shorten
-			str+=s+" "+o.ancestors_txt[i]+"<br>";													// Make final string
+			str+="&#xe638&nbsp;&nbsp;"+o.ancestors_txt[0]+"/...<br>";								// Add start
+			str+="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;.../"+o.ancestors_txt[o.ancestors_txt.length-2]+"<br>";// Add antecedant
 			}
 		if (o.feature_types_ss) str+="&#xe62b&nbsp;&nbsp;"+o.feature_types_ss.join(", ")+"<br>";	// Add feature, if a place
 		if (o.data_phoneme_ss)  str+="&#xe635&nbsp;&nbsp;"+o.data_phoneme_ss.join(", ")+"<br>";		// Add phoneme if a term
