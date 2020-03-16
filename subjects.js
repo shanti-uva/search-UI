@@ -163,7 +163,7 @@ class Subjects  {
 		id='sui-togCatA' title='Expand all'<b>&#x2295</b></span> | 
 		<span class='sui-advEditBut' style='vertical-align:0'
 		id='sui-togCatN' title='Collapse all'><b>&#x2296</b></span> 
-		</p><div style='width:100%'><div style='width:50%;display:inline-block'>
+		</p><div style='width:100%'><div style='display:inline-block'>
 		<ul style='list-style-type:none;margin-left:-24px'>`;									// Top-most <ul>
 		let n=d.length;																			// Number of places
 		for (i=0;i<n;++i) {																		// For each related place	
@@ -171,6 +171,7 @@ class Subjects  {
 			for (j=0;j<d[i].ancestor_ids_is.length;++j) {										// For each level	
 				id+=d[i].ancestor_ids_is[j]+"-";												// Add levels
 				tops.push({ lab:d[i].ancestors_txt[j], level:j, id:id.slice(0,-1), uid:"places-"+d[i].ancestor_ids_is[j]});		// Add to list
+				tops[tops.length-1].parent=id.split("-").slice(0,-2).pop();						// Add parent
 				}
 			}
 		tops=tops.sort((a,b)=>{ return a.id < b.id ? -1 : 1 })									// Sort by path
@@ -190,22 +191,25 @@ class Subjects  {
 			$("#sui-rpSearch").trigger("keydown",{ keyCode:13 });								// Filter matches
 			});
 
-		for (i=0;i<n;++i)																		// For place	
-			if (tops[i].level == 0) addChildren(tops[i].id,1);									// Add top row children and recurse
+		for (i=0;i<n;++i) tops[i].n=countChildren(tops[i].id);									// For each place, count children
+		for (i=0;i<n;++i) if (tops[i].level == 0) addChildren(tops[i].id,1);					// For each place, add top row children and recurse
 
-		function hasChildren(id) {																// DOES NODE HAVE ANY CHILDREN?
-			let i;
-			for (i=0;i<n;++i)																	// For each place	
-				if (tops[i].id.match(id+"-"))	return true;									// Has them
-			return false;																		// Not
-		}
+		function countChildren(id) {															// COUNT NODE'S CHILDREN
+			let i,num=0;
+			id=id.split("-").pop();																// Get last id
+			for (i=0;i<n;++i) 																	// For each place	
+				if (tops[i].parent == id)	++num;												// Has them
+			return num;																			// Return count
+			}
+
 
 		function addChildren(id, level) {														// ADD CHILDREN TO NODE RECURSIVELY
-			let c,i,str="";
+			let i,marker,str="";
 			for (i=0;i<n;++i) {																	// For each place
 				if (tops[i].id.match(id) && (tops[i].level == level)) {							// A child
-					str="<ul style='list-style-type:none;display:none;padding:2px 0 0 24px'>";	// Enclosing <ul>
-					str+=addTreeLine(tops[i].lab,tops[i].id,tops[i].uid,hasChildren(tops[i].id) ? "+" : "");	// Add tree line
+					marker=tops[i].n > 0 ? "+" : "&bull;";										// Set marker type
+					str="<ul style='list-style-type:none;display:none;padding:2px 0 0 24px'>";	// Enclosing <ul> if not a loner
+					str+=addTreeLine(tops[i].lab,tops[i].id,tops[i].uid,marker);				// Add tree line
 					str+="</ul>";																// Close <ul>
 					$("#sui-rpDot-"+id).parent().parent().append(str);							// Add it
 					addChildren(tops[i].id,level+1);											// Recurse
@@ -213,36 +217,40 @@ class Subjects  {
 				}
 			}
 
-		function addTreeLine(lab, id, uid, marker) 												// ADD LINE TO TREE
-		{	
+		function addTreeLine(lab, id, uid, marker) {											// ADD LINE TO TREE
 			let s=`<li>`;																		// Header
-			if (marker)	s+=`<div class='sui-spDot' id='sui-rpDot-${id}'>${marker}</div>`;		// If a dot, add it
-			else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-			s+=`<a class='sui-noA' href='#p=${uid}'>${lab}${sui.pages.AddPop(uid)}</a>`;		// Add line
+			if (marker != "&bull;")	s+=`<div class='sui-spDot' id='sui-rpDot-${id}'>${marker}</div>`;		// If a dot, add it
+			else					s+=`<div class='sui-spDot' id='sui-rpDot-${id}' style='display:none;color:#5b66cb'><b>&bull;</div>&ndash;&nbsp;&nbsp;`;	// If a loner
+			s+=`<a class='sui-noA' href='#p=${uid}'>${lab}</b>${sui.pages.AddPop(uid)}</a>`;	// Add line
 			return s;																			// Return line
-		}
+			}
 		
 		$("[id^=sui-rpDot-]").off("click");														// Kill old handlers
 		$("[id^=sui-rpDot-]").on("click", function(e) {											// ON RELATIONSHIP TREE DOT CLICK
 			let container=$(this).parent().parent();											// Point a container
-			$(this).html($(container).children('ul').css("display") == "none" ? "&ndash;" : "+"); 	// Change label
+			let c=$(this).html();																// Get char
+			$(this).html(c == "+" ? "&ndash;" : "+"); 											// Toggle label
 			$(container).children('ul').slideToggle();            								// Slide into place
 			});
+
 		$("#sui-togCatA").on("click", ()=> {													// ON EXPAND ALL
-			let i;
+			let i,container;
 			for (i=0;i<n;++i) {																	// For each place	
-				$("#sui-rpDot-"+tops[i].id).html("&ndash;"); 									// Change label
-				$("#sui-rpDot-"+tops[i].id).parent().parent().css("display","block");			// Show	
+				container=$("#sui-rpDot-"+tops[i].id).parent();									// Point a container
+				$("#sui-rpDot-"+tops[i].id).html("&ndash;");									// If not a loner, change label 
+				container.parent().css("display","block");										// Show	parent ul
+				container.css("display","block");												// Show	
 				}
 			});
-		$("#sui-togCatN").on("click", ()=> {													// ON COLLAPSE, INIT TOS TARTING STATE
+
+		$("#sui-togCatN").on("click", ()=> {													// ON COLLAPSE, INIT TO STARTING STATE
 			let i,p;
 			for (i=0;i<n;++i) {																	// For each place	
 				p=$("#sui-rpDot-"+tops[i].id);													// Point at dot
-				p.html("+"); 																	// Change label
+				if (p.html() != "&bull;")	p.html("+"); 										// Change label
 				p.parent().parent().css("display","none");										// Hide	
 				if (tops[i].level < 3) {														// If 2nd level
-					if (tops[i].level < 2)	p.html("&ndash;" ); 								// Change label is past 1st rows
+					if (tops[i].level < 2) p.html("&ndash;" ); 									// Change label is past 1st rows
 					p.parent().parent().css("display","block");									// Show	
 					}
 				}
