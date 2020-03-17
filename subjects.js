@@ -29,6 +29,7 @@ class Subjects  {
 		this.content2=["<br>","<br>"];
 		this.kmap=null;																			// Holds kmap
 		this.relatedPlaceData=null;																// Holds related places
+		this.relatedSubjectData=null;															// Holds related subjects
 		}
 
 	Draw(o, related)																			// DRAW SOURCE PAGE FROM KMAP
@@ -37,29 +38,20 @@ class Subjects  {
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
 		this.GetSubjectData(o);																	// Get related subjects content	
 		this.DrawContent(o,related);															// Draw content
-		sui.pages.DrawRelatedAssets(o);															// Draw related assets men
+		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu
 	}
 
 	DrawContent(o, related)																	// DRAW CONTENT
 	{
-		let str=`<div class='sui-subjects'>
+		let str=`<div class='sui-subjects' id='sui-subConDiv'>
 		<div><span class='sui-subIcon'>${sui.assets[o.asset_type].g}</span>
 		<span class='sui-subText'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>`;
 		if (o.caption)	str+="<p id='sui-spCap'>"+o.caption+"</p></div>";
-		str+="<table>";
-		if (o.names_txt && o.names_txt.length) {												// If names
-			for (var i=0;i<o.names_txt.length;++i) {											// For each name
-				if (o.names_txt[i].match(/lang="bo"/i))											// Language id - bo
-					str+="<tr><td style='color:#000099;font-size:20px'><b>"+o.names_txt[i]+"</b>&nbsp;&nbsp;&nbsp;</td><td><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
-				else 																			// Unknown
-					str+="<tr><td></td><td>><b> "+o.names_txt[i]+"</b></td></tr>";				// Add it
-					}
-				}
-		str+="</table><br>";		
 		if (related == 1) 		str="<div style='margin-left:192px'>"+sui.pages.DrawTabMenu(["SUBJECT CONTEXT","RELATED SUBJECTS"]);  // If subjects, add tab menu
-		else if (related == 2)	str="<div id='sui-topCon' style='margin-left:216px'>"+this.GetPlaceData(o);		  // If places, get data
+		else if (related == 2)	str="<div id='sui-topCon' style='margin-left:216px'>"+this.GetPlaceData(o);							  // If places, get data
 		$(this.div).html(str+"</div>".replace(/\t|\n|\r/g,""));									// Remove format and add to div				
+		;
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(10);											// Get index of tab	
 			this.ShowTab(id);																	// Draw it
@@ -78,7 +70,7 @@ class Subjects  {
 		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
-		if (which == 0)	{																		// If summary, add events
+		if (which == 0)	{																		// Add events
 			$("[id^=sui-spLab-]").on("click", function(e) {return false;	});					// ON CONEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
@@ -175,7 +167,9 @@ class Subjects  {
 				}
 			}
 		tops=tops.sort((a,b)=>{ return a.id < b.id ? -1 : 1 })									// Sort by path
+		i=tops[tops.length-1];																	// Save last
 		tops=tops.filter((a,ind)=>{ try { return a.id != tops[ind+1].id } catch(e){} })			// Only uniques
+		tops.push(i);																			// Add it back
 		n=tops.length;																			// New n
 		for (i=0;i<n;++i) 																		// For place	
 			if (tops[i].level == 0) 															// Add top row
@@ -201,7 +195,6 @@ class Subjects  {
 				if (tops[i].parent == id)	++num;												// Has them
 			return num;																			// Return count
 			}
-
 
 		function addChildren(id, level) {														// ADD CHILDREN TO NODE RECURSIVELY
 			let i,marker,str="";
@@ -258,11 +251,13 @@ class Subjects  {
 		$("#sui-togCatN").trigger("click");														// Collapse to starting point
 	}
 
-	GetSubjectData(o)																		// GET TAB DATA FOR CONTEXT / SUMMARY
+	GetSubjectData(o)																		// GET TAB DATA FOR CONTEXT
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
+			let d,i,str="<table>";
 			if (!data)	return;																	// Quit if no data
-			if (data.illustration_external_url && data.illustration_external_url[0]) {			// If an image spec'd
+			this.relatedSubjectData=data;														// Save subject data
+				if (data.illustration_external_url && data.illustration_external_url[0]) {		// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
 				$("#sui-relatedImg").prop("src",data.illustration_external_url[0]);				// Show it
 				}
@@ -271,15 +266,29 @@ class Subjects  {
 				$("#sui-relatedImg").prop("src",data.illustration_mms_url[0]);					// Show it
 				}
 			if (data.summary_eng && data.summary_eng[0]) 										// If an summary spec'd
-				$("#sui-spCap").html(data.summary_eng[0]);										// Replace caption
-			this.AddSummary(o,data._childDocuments_);											// Add summary html
+			$("#sui-spCap").html(data.summary_eng[0]);											// Replace caption
+			if (o.names_txt && o.names_txt.length) {											// If names
+				for (i=0;i<o.names_txt.length;++i) 												// For each name
+					if (o.names_txt[i].match(/lang="bo"/i))										// Language id - bo
+						str+="<tr><td style='color:#000099;font-size:20px'><b>"+o.names_txt[i]+"</b>&nbsp;&nbsp;&nbsp;</td><td span='2'><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
+				}
+			for (i=0;i<data._childDocuments_.length;++i) {										// For each chuild doc
+				d=data._childDocuments_[i];														// Point at it
+				if (d.block_child_type != "related_names")	continue;							// Not a name
+				str+=`<tr><td>>&nbsp;<b>${d.related_names_header_s}&nbsp;&nbsp;&nbsp;</b></td><td>
+				<i>${d.related_names_language_s}, ${d.related_names_writing_system_s}, ${d.related_names_relationship_s}
+				</i></td></tr>`;																// Add it
+				}
+			str+="</table><br>";		
+			$("#sui-subConDiv").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div				
+			this.AddRelatedSubjects(o,data._childDocuments_);									// Add related subjects html
 			this.AddContext(o,data);															// Add context html
 		});
 	}
 
-	AddSummary(o,c)																			// ADD SUMMARY TAB CONTENTS 	
+	AddRelatedSubjects(o,c)																	// ADD RELATED SUBJECTS TAB CONTENTS 	
 	{	
-		let f,i,s=[];
+		let f,i,subs=0,s=[];
 		let n=c.length;																			// Get number of subjects
 		for (i=0;i<n;++i) {																		// For each subject get data as 's=[category[{title,id}]]' 
 			if (c[i].block_child_type != "related_subjects") continue;							// Add only related subjects
@@ -291,14 +300,15 @@ class Subjects  {
 			}											
 		let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
-		${o.title[0]}</b> has <b>${n-1}</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
+		${o.title[0]}</b> has <b>~|~</b> other subject${(n > 1) ? "s": ""} directly related to it, which is presented here. 
 		See the SUBJECT CONTEXT tab if you instead prefer to browse all subordinate and superordinate categories for ${o.title[0]}.
 		<p><a class='sui-advEditBut' id='sui-togCatA'>Expand all</a> / <a class='sui-advEditBut' id='sui-togCatN'>Collapse all</a>
 		</p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 		str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
 		for (f in s) if (f != biggest)	str+=drawCat(f);										// For each other category, draw it in 2nd column
 		str+="</div></div>";
-		this.content[1]=str;																	// Set summary tab
+		str=str.replace(/~\|~/,subs);															// Set subjects count
+		this.content[1]=str;																	// Set tab
 
 		function drawCat(f) {																	// DRAW CATEGORY
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
@@ -307,47 +317,29 @@ class Subjects  {
 				str+="<li><a class='sui-noA' id='sui-spItem-"+s[f][i].id;						// Line
 				str+="' href='#p="+s[f][i].id+"'>";												// Href
 				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					// Add popover
-				}
+				++subs;
+			}
 			return str+"</ul>";																	// Close category
 			}
 	}
 
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
-		let n=0;
+		let i;
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
-		<b>${o.title[0]}</b> has <b> ~~ </b>subordinate subjects. 
+		<b>${o.title[0]}</b> has <b> 0 </b>subordinate subjects. 
+		and <b> ~|~ </b>superordinate subjects. 
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
-		for (n=0;n<d.ancestors.length;++n) {													// For each ancestor
+		for (i=0;i<d.ancestors.length;++i) {													// For each ancestor
 			str+="<ul style='list-style-type:none'>";											// Add header
-			str+=this.AddTreeLine(d.ancestors[n],d.ancestor_uids_gen[n],"&ndash;",null);		// Add it 
+			str+=this.AddTreeLine(d.ancestors[i],d.ancestor_uids_gen[i],"&ndash;",null);		// Add it 
 			}
-		
-		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
-			let i,j,re,m,path;
-			let counts=[];
-			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
-			res=res.response.docs;																// Point at docs
-			for (i=0;i<res.length;++i) {														// For each child
-				path="";	m=null;																// Assume a loner												
-				re=new RegExp(res[i].id.split("-")[1]);											// Get id to search on
-				for (j=0;j<counts.length;++j) {													// For each count
-					if (counts[j].val.match(re)) {												// In this one
-						m="+";																	// Got kids
-						path=counts[j].val;														// Add path
-						}
-					}												
-				str+="<ul style='list-style-type:none'>";										// Header
-				str+=this.AddTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
-				}
-			
-			str=str.replace(/~~/,n+res.length);													// Set total count
-			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
-			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set context tab
-			this.ShowTab(0);																	// Draw it
-		});
+		str=str.replace(/~\|~/,d.ancestors.length-1);											// Set superordinate count
+		for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";									// Close chain
+		this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set context tab
+		this.ShowTab(0);																		// Draw it
 	}
 
 	AddTreeLine(lab, id, marker, path) 														// ADD LINE TO TREE

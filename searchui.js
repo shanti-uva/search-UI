@@ -399,11 +399,12 @@ class SearchUI  {
 
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
 	{
+
 		let url=`${this.solrBase}kmterms_dev/query`;												// Base url
-		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]";		// Add query url
+		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]&indent=true";		// Add query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs[0]);														// Return data
-			}).fail((msg)=> { trace(msg); });														// Failure message
+		}).fail((msg)=> { trace(msg); });														// Failure message
 	}
 
 	GetRelatedPlaces(id, callback)																// GET RELATED THINGS FROM ID
