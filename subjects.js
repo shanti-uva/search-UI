@@ -114,6 +114,8 @@ class Subjects  {
 	{			
 		let i,j,id,tops=[];
 		let d=this.relatedPlaceData;															// Point at realte placev data
+		trace(d)
+
 		let o=this.kmap;																		// Point at kmap
 		let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
 		<p style='color:#666'>
@@ -166,7 +168,8 @@ class Subjects  {
 				tops[tops.length-1].parent=id.split("-").slice(0,-2).pop();						// Add parent
 				}
 			}
-		tops=tops.sort((a,b)=>{ return a.id < b.id ? -1 : 1 })									// Sort by path
+		
+			tops=tops.sort((a,b)=>{ return a.id < b.id ? -1 : 1 })									// Sort by path
 		i=tops[tops.length-1];																	// Save last
 		tops=tops.filter((a,ind)=>{ try { return a.id != tops[ind+1].id } catch(e){} })			// Only uniques
 		tops.push(i);																			// Add it back
@@ -213,7 +216,7 @@ class Subjects  {
 		function addTreeLine(lab, id, uid, marker) {											// ADD LINE TO TREE
 			let s=`<li>`;																		// Header
 			if (marker != "&bull;")	s+=`<div class='sui-spDot' id='sui-rpDot-${id}'>${marker}</div>`;		// If a dot, add it
-			else					s+=`<div class='sui-spDot' id='sui-rpDot-${id}' style='display:none;color:#5b66cb'><b>&bull;</div>&ndash;&nbsp;&nbsp;`;	// If a loner
+			else					s+=`<div class='sui-spDot' id='sui-rpDot-${id}' style='display:none;color:#5b66cb'><b>&bull;</div>&bull;&nbsp;&nbsp;`;	// If a loner
 			s+=`<a class='sui-noA' href='#p=${uid}'>${lab}</b>${sui.pages.AddPop(uid)}</a>`;	// Add line
 			return s;																			// Return line
 			}
@@ -254,8 +257,9 @@ class Subjects  {
 	GetSubjectData(o)																		// GET TAB DATA FOR CONTEXT
 	{
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
-			let d,i,str="<table>";
+			let d,i,k=0,str="<table>";
 			if (!data)	return;																	// Quit if no data
+
 			this.relatedSubjectData=data;														// Save subject data
 				if (data.illustration_external_url && data.illustration_external_url[0]) {		// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
@@ -272,10 +276,13 @@ class Subjects  {
 					if (o.names_txt[i].match(/lang="bo"/i))										// Language id - bo
 						str+="<tr><td style='color:#000099;font-size:20px'><b>"+o.names_txt[i]+"</b>&nbsp;&nbsp;&nbsp;</td><td span='2'><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
 				}
-			for (i=0;i<data._childDocuments_.length;++i) {										// For each chuild doc
+			for (i=0;i<data._childDocuments_.length;++i) {										// For each child doc
 				d=data._childDocuments_[i];														// Point at it
 				if (d.block_child_type != "related_names")	continue;							// Not a name
-				str+=`<tr><td>>&nbsp;<b>${d.related_names_header_s}&nbsp;&nbsp;&nbsp;</b></td><td>
+				if (!k) d.related_names_level_i=0;
+				str+=`<tr><td style='padding-left:${d.related_names_level_i*16}px'>
+				${k++ ? ">&nbsp;" : ""}
+				<b>${d.related_names_header_s}&nbsp;&nbsp;&nbsp;</b></td><td>
 				<i>${d.related_names_language_s}, ${d.related_names_writing_system_s}, ${d.related_names_relationship_s}
 				</i></td></tr>`;																// Add it
 				}
@@ -325,18 +332,22 @@ class Subjects  {
 
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
-		let i;
+		let i,subs=0,sups=0;
+		for (i=0;i<d._childDocuments_.length;++i) {												// For each child
+			if (d._childDocuments_[i].related_subjects_relation_code_s == "is.as.a.part") 	++sups; // Count subordinates
+			if (d._childDocuments_[i].related_subjects_relation_code_s == "has.as.a.part") 	++sups; // Count superordinates
+			}
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
-		<b>${o.title[0]}</b> has <b> 0 </b>subordinate subjects. 
-		and <b> ~|~ </b>superordinate subjects. 
+		<b>${o.title[0]}</b> has <b> ${subs} </b>subordinate subjects. 
+		and <b> ${sups} </b>superordinate subjects. 
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
+
 		for (i=0;i<d.ancestors.length;++i) {													// For each ancestor
 			str+="<ul style='list-style-type:none'>";											// Add header
 			str+=this.AddTreeLine(d.ancestors[i],d.ancestor_uids_gen[i],"&ndash;",null);		// Add it 
 			}
-		str=str.replace(/~\|~/,d.ancestors.length-1);											// Set superordinate count
 		for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";									// Close chain
 		this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set context tab
 		this.ShowTab(0);																		// Draw it
