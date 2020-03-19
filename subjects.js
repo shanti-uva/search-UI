@@ -114,8 +114,6 @@ class Subjects  {
 	{			
 		let i,j,id,tops=[];
 		let d=this.relatedPlaceData;															// Point at realte placev data
-		trace(d)
-
 		let o=this.kmap;																		// Point at kmap
 		let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
 		<p style='color:#666'>

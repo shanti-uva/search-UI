@@ -1,4 +1,4 @@
-.sui-main 		{	all:initial; position:absolute; left:0; top:0; z-index:1000; line-height: normal; 
+.sui-main 		{	all:initial; position:absolute; left:0; top:0; line-height: normal; 
 					font-size:14px; box-sizing:initial; padding:0; margin:0; -moz-box-sizing:initial; -webkit-box-sizing:initial;
 					width:100vw; height:100vh; font-family:"Open Sans","Segoe UI",Tahoma,sans-serif,shanticon;
 					} .sui-main b { font-weight:600; }				
@@ -266,7 +266,7 @@
 .sui-crumb:hover { 	text-decoration:underline;	} 
 .sui-popItem	 {  color:#ddd; 	
 					} .sui-popItem:hover{ color:#a4baec; }	
-.sui-popover 	 { 	position:absolute; width:300px; min-height: 100px; padding:12px; font-size:13px; border-radius:4px;
+.sui-popover 	 { 	position:absolute; width:300px; min-height: 100px; padding:12px; font-size:13px; border-radius:4px; z-index:1001;
 					border: 1px solid #999; background-color:#fff; box-shadow: 0 5px 10px rgb(0,0,0,.2); }					
 .sui-pageLab	 { 	font-weight:400; letter-spacing: 0.0475rem; font-size:13px;	}
 .sui-pageVal	 { 	word-wrap:break-word; font-family:"EB Garamond",serif; font-weight:400; font-size:17px; 		}

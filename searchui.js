@@ -65,6 +65,7 @@ class SearchUI  {
 		this.assets.collections=   	{ c:"#5b66cb", g:"&#xe633" };									// Collections
 		this.searches=[];																			// Saves recent searches
 		this.showBool=false;																		// Where to show Boolean in advanced
+		this.showSearch=true;																		// Clicl to search or add facet
 
 		this.noTop=(site == "CU") ? true : false;													// Has a top
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
@@ -185,7 +186,7 @@ class SearchUI  {
 			this.DrawFacetItems(id);																// Draw appropriate tree, list, or input
 			});
 
-		$("#sui-results").on("click",()=>{$("[id^=sui-popover-]").remove(); });						// ON CLICK OF RESULTS PAGE 
+		$("#sui-main").on("click",()=>{$("[id^=sui-popover-]").remove(); });						// ON CLICK OF RESULTS PAGE 
 		$("#sui-hamBut").on("click",()=>{ this.ShowHamburger() });									// SHOW HAMBURGER MENU
 		if (this.noTop)	$("#sui-left").css({ top:0, height:"calc(100% - 30px)" });
 	}
@@ -199,7 +200,6 @@ class SearchUI  {
 
 	ShowAdvanced(mode)																			// HIDE/SHOW ADVANCED MENU
 	{
-
 		this.ss.mode=(mode) ? "advanced" : "simple";												// Set mode
 		$("#sui-adv").css({ display:mode ? "block" : "none"});										// Hide/show adv ui
 		if (mode) $("#sui-left").css({ width:($("#sui-main").width()-$("#sui-adv").width())+"px"});	// Size results area to fit advanced
@@ -207,7 +207,6 @@ class SearchUI  {
 		this.DrawAdvanced();																		// Draw search UI if active
 	}
 	
-
 	ShowHamburger()																				// SHOW HAMBURGER MENU
 	{
 		let str=`<span id='sui-help' class='sui-hamItem'>&#xe67e&nbsp;&nbsp;HELP GUIDE</span>
@@ -1000,18 +999,18 @@ class SearchUI  {
 			if (k > 1000)	k=Math.floor(k/1000)+"K";												// Shorten
 			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>` 
 			if (facet == "assets")  str+=`<span style='color:${this.assets[this.facets[facet].data[i].id].c}'>${this.assets[this.facets[facet].data[i].id].g}</span> &nbsp;`;
-			else 					str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
-			str+=`${this.facets[facet].data[i].title} (${k}) </div>`;								// Add item to list
+			str+=`${this.facets[facet].data[i].title} (${k}) 
+			${this.pages.AddPop(this.facets[facet].data[i].id,true)}</div>`;						// Add item to list
 			}
 		$("#sui-advEditList-"+facet).html("</div>"+str.replace(/\t|\n|\r/g,""));					// Add to div
 		$("[id^=sui-advEditLine-]").off("click");													// KILL OLD HANDLERS
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			let v=e.target.id.split("-");															// Get ids		
 			let items=this.facets[facet].data;														// Point at items
-			if (v[0].match(/ViewListPage/))	this.GetKmapFromID(items[v[1]].id,(kmap)=>{ this.SendMessage("page="+items[v[1]].url,kmap); }); // Get kmap and show page
-			else{																					// Add term
+			if (this.showSearch)
+				this.GetKmapFromID(items[v[2]].id,(kmap)=>{ this.SendMessage("page="+items[v[2]].url,kmap); }); // Get kmap and show page
+			else	
 				this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND", facet);					// Add to search state
-				}
 			});
 		$("#sui-advListNum").html((n < 300) ? n : "300+");											// Set number
 	}
@@ -1019,6 +1018,7 @@ class SearchUI  {
 	DrawFacetList(facet, open, searchItem)														// DRAW LIST FACET PICKER
 	{
 		let i,sorted=0;
+		var _this=this;																				// Save context
 		if (!open && ($("#sui-advEdit-"+facet).css("display") != "none")) {							// If open
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
@@ -1030,11 +1030,14 @@ class SearchUI  {
 		if (this.facets[facet].type == "tree") {
 			str+=`<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
 			<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>
-			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp`;
+			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`;
 			}
 		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
-		<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}</div>
-		<hr style='border: .5px solid #a4baec'>
+		<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}`;
+		if (facet.match(/places|terms|subjects/))													// Show mode icon					
+			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
+			style='float:right;font-size:14px;margin:-2px 4px 0 8px''>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
+		str+=`</div><hr style='border: .5px solid #a4baec'>
 		<div class='sui-advEditList' id='sui-advEditList-${facet}'></div>`;
 		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add to div
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
@@ -1065,8 +1068,6 @@ class SearchUI  {
 				$(".sui-advEditList").empty();														// Remove items from list
 				for (i=0;i<n;++i) {																	// For each one
 					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
-					// if (items[i].id.split("-")[1] != 0) 
-					str+=`<div class='sui-advViewListPage' id='advViewListPage-${i}' title='View page'>&#xe67c&nbsp;</div>`;					
 					str+=`${items[i].title}</div>`;													// Add item to list
 					}
 				$(".sui-advEditList").html(str);													// Add back
@@ -1082,9 +1083,16 @@ class SearchUI  {
 				else				return 0;														// The same
 				});
 			itms.detach().appendTo($(".sui-advEditList"));
-			$("#sui-advEditSort-"+facet).css("color","#668eec");									// On
+			$("#sui-advEditSort-"+facet).css("color","#668eec");									// On	
 			});                  
 		
+		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
+		$("[id^=sui-showSearch-]").on("click", function() {											// ON CLICK CHANGE CLICK MODE
+			_this.showSearch=!_this.showSearch;														// Toggle flag
+			$(this).html(_this.showSearch ? "&#xe67c" : "&#xe62f");	 								// Flip icon
+			$(this).prop("title",`${_this.showSearch ? "Browse" : "Add to search"}`); 				// Flip title	
+			});      
+
 		$("[id^=sui-advListMap-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
 			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
@@ -1102,7 +1110,7 @@ class SearchUI  {
 		o[num].title=title;																			// Get title
 		o[num].id=id ? id.replace(/collections-/,"") : "";											// Id (remove collections- prefix)
 		o[num].bool=bool;																			// Bool
-		if (facet == "assets") 	this.ss.query.assets=[ {title:title, id:id, bool:bool} ];			// Only one	************************** ASSETS1							
+		if (facet == "assets") 	this.ss.query.assets=[ {title:title, id:id, bool:bool} ];			// Only one						
 		this.DrawAdvanced();																		// Redraw
 		this.Query();																				// Run query and show results
 	}
@@ -1113,6 +1121,7 @@ class SearchUI  {
 
 	DrawFacetTree(facet, open, searchItem)  													// DRAW FACET TREE
 	{
+		var _this=this;																				// Save context
 		if (!open && ($("#sui-advEdit-"+facet).css("display") != "none")) {							// If open
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
@@ -1120,40 +1129,50 @@ class SearchUI  {
 		this.facets[facet].mode="tree";																// Tree mode active
 		this.curTree=facet;
 		var div="#sui-tree"+facet;																	// Tree div
+
+		var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
+		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'> &nbsp; 
+		<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
+		<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>`;
+		if (facet.match(/places|terms|subjects/))													// Show mode icon					
+			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
+			style='float:right;margin-right:4px'>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
+		str+=`<hr style='border: .5px solid #a4baec'>
+		<div id='sui-tree${facet}' class='sui-tree'></div>`;		
+		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add tree frame to div
+		
+		if (facet == "places") 		 	this.LazyLoad(div,null,facet,13735);						// Embedded top layer for places
+		else if (facet == "features") 	this.LazyLoad(div,null,facet,20);							// Features
+		else if (facet == "languages") 	this.LazyLoad(div,null,facet,301);							// Languages
+		else 							this.GetTopRow(div,facet);									// Constructed top layers
+
+		$("#sui-advListMap-"+facet).css({ color: "#668eec" });										// Highlight tree
+
+		$("[id^=sui-advTreeMap-]").off("click");													// KILL OLD HANDLER
+		$("#sui-advTreeMap-"+facet).on("click", ()=> {												// ON CLICK LIST BUTTON
+			this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());								// Close it and open as list
+			});      
+
+		$("[id^=sui-advTreeFilter-]").off("click");													// KILL OLD HANDLER
+		$("#sui-advTreeFilter").on("keydown", (e)=> {												// ON TYPING IN TEXT BOX
+			this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());								// Close it and open as list
+			$("#sui-advEditFilter-"+facet).focus();													// Focus on input in list
+			});      
+
+		$('.sui-advViewTreePage').off("click");														// Kill old handlers
+		$('.sui-advViewTreePage').on("click", (e)=> {												// ON CLICK VIEW BUTTON
+			var v=e.target.id.split("-");															// Get id
+			sui.GetKmapFromID(v[1]+"-"+v[2],(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+			e.stopPropagation();																	// Stop propagation
+			});      
+
+		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
+		$("[id^=sui-showSearch-]").on("click", function() {											// ON CLICK CHANGE CLICK MODE
+			_this.showSearch=!_this.showSearch;														// Toggle flag
+			$(this).html(_this.showSearch ? "&#xe67c" : "&#xe62f");	 								// Flip icon
+			$(this).prop("title",`${_this.showSearch ? "Browse" : "Add to search"}`); 				// Flip title	
+			});      
 	
-		if (!$(div).length) {																		// If doesn't exist
-			var str=`<input id='sui-advTreeFilter' placeholder='Search this list' value='${searchItem ? searchItem : ""}' 
-			style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'> &nbsp; 
-			<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
-			<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>
-			<hr style='border: .5px solid #a4baec'>
-			<div id='sui-tree${facet}' class='sui-tree'></div>`;		
-			$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));								// Add tree frame to div
-			if (facet == "places") 		 	this.LazyLoad(div,null,facet,13735);					// Embedded top layer for places
-			else if (facet == "features") 	this.LazyLoad(div,null,facet,20);						// Features
-			else if (facet == "languages") 	this.LazyLoad(div,null,facet,301);						// Languages
-			else 							this.GetTopRow(div,facet);								// Constructed top layers
-
-			$("#sui-advListMap-"+facet).css({ color: "#668eec" });									// Highlight tree
-
-			$("[id^=sui-advTreeMap-]").off("click");												// KILL OLD HANDLER
-			$("#sui-advTreeMap-"+facet).on("click", ()=> {											// ON CLICK LIST BUTTON
-				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
-				});      
-
-			$("[id^=sui-advTreeFilter-]").off("click");												// KILL OLD HANDLER
-			$("#sui-advTreeFilter").on("keydown", (e)=> {											// ON TYPING IN TEXT BOX
-				this.DrawFacetList(facet,1,$("#sui-advTreeFilter").val());							// Close it and open as list
-				$("#sui-advEditFilter-"+facet).focus();												// Focus on input in list
-				});      
-
-			$('.sui-advViewTreePage').off("click");													// Kill old handlers
-			$('.sui-advViewTreePage').on("click", (e)=> {											// ON CLICK VIEW BUTTON
-				var v=e.target.id.split("-");														// Get id
-				sui.GetKmapFromID(v[1]+"-"+v[2],(kmap)=>{ sui.SendMessage("",kmap); });				// Get kmap and show page
-				e.stopPropagation();																// Stop propagation
-				});      
-			}
 		$(div).css("max-height",$("#sui-main").height()-$("#sui-advTerm-"+facet).offset().top-$("#sui-advTerm-"+facet).height()-102+"px");	// Fill space
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
 	}
@@ -1161,6 +1180,7 @@ class SearchUI  {
 	GetTopRow(div, facet)																			// GET TOP-MOST TREE LEVEL
 	{
 		var _this=this;																					// Save context
+		let prefix=(div.match(/sui-btree-/)) ? "b" : "";												// Id prefix to prevent confusion between trees
 		var id,k,tops=[],str="<ul>";
 		if (facet == "terms") {
 			tops.ka=1;			tops.kha=14263;		tops.ga=24465;		tops.nga=45101;	tops.ca=51638;		tops.cha=55178;		
@@ -1181,10 +1201,9 @@ class SearchUI  {
 			}
 		for (k in tops) {																				// For each top row
 			id=facet+"-"+tops[k];																		// id
-			str+="<li class='parent'><a id='"+id+"'";													// Start row
+			str+="<li class='parent'><a id='"+prefix+id+"'";											// Start row
 			str+="' data-path='"+tops[k]+"'>"+k;														// Add path/header
-			if (!div.match(/sui-btree-/))																// If in advanced search
-				str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+id+"' title='View page'>&#xe67c</div>";					
+			str+=this.pages.AddPop(id,true);															// Add popover
 			str+="</a></li>";																			// Add label
 			}
 		$(div).html(str+"</ul>");																		// If initing 1st level
@@ -1202,16 +1221,17 @@ class SearchUI  {
 					}
 				}
 			else{
-				let s=$("#"+e.target.id).text().slice(0,-1);											// Get term
-				if (!div.match(/sui-btree-/))															// If in advanced search
-					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND", _this.curTree);// Add term to search state and refresh
-				else{					
-					_this.pages.relatedBase=_this.pages.relatedType=_this.pages.relatedBase=_this.pages.relatedId="";	// No related
+				if ((e.clientX < 200) || _this.showSearch) {											// If browsing		
+					_this.pages.relatedBase=_this.pages.relatedId="";									// No related
 					if (_this.ss.mode == "related") _this.ss.mode=_this.ss.lastMode;					// Get back to search mode
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
 					}
+				else{																					// Adding facet to query
+					let s=$("#"+e.target.id).text();										// Get term
+					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree); // Add term to search state and refresh
+					}
 				}
-		}
+			}
 	}
 	
 	LazyLoad(div, row, facet, init) 																		// ADD NEW NODES TO TREE
@@ -1219,6 +1239,7 @@ class SearchUI  {
 		var path;
 		var _this=this;																					// Save context
 		if (init || row.parent().children().length == 1) {												// If no children, lazy load 
+			let prefix=(div.match(/sui-btree-/)) ? "b" : "";											// Id prefix to prevent confustion between trees
 			if (init) 	path=""+init;																	// Force path as string
 			else 		path=""+row.data().path;														// Get path	as string										
 			this.GetTreeChildren(facet, path, (res)=> {													// Get children
@@ -1237,14 +1258,13 @@ class SearchUI  {
 					re=new RegExp("\/"+o.id.split("-")[1]);												// Id
 					str+="<li";																			// Start row
 					if ((f && f.match(re)) || init)	str+=" class='parent'";								// If has children or is top, add parent class
-					str+="><a id='"+o.id;																// Add id
+					str+="><a id='"+prefix+o.id;														// Add id
 					if (facet == "terms")																// If terms
 						str+="' data-path='"+o["ancestor_id_tib.alpha_path"]+"'>";						// Add path
 					else																				// All others
 						str+="' data-path='"+o.ancestor_id_path+"'>";									// Add path
 					str+=o.header;																		// Add label
-					if (!div.match(/sui-btree-/))														// If in advanced search
-						str+="<div class='sui-advViewTreePage' id='advViewTreePage-"+o.id+"' title='View page'>&#xe67c</div>";					
+					str+=this.pages.AddPop(o.id,true);													// Add popover
 					str+="</a></li>";																	// Add label
 					}
 				if (res.response.docs.length) {
@@ -1277,13 +1297,14 @@ class SearchUI  {
 					}
 				}
 			else{
-				let s=$("#"+e.target.id).text().slice(0,-1);											// Get ter
-				if (!div.match(/sui-btree-/))															// If in advanced search
-					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree); // Add term to search state and refresh
-				else{	
+				if ((e.clientX < 200) || _this.showSearch) {											// If browsing		
 					_this.pages.relatedBase=_this.pages.relatedId="";									// No related
 					if (_this.ss.mode == "related") _this.ss.mode=_this.ss.lastMode;					// Get back to search mode
 					sui.GetKmapFromID(_this.curTree+"-"+e.target.id.split("-")[1],(kmap)=>{ sui.SendMessage("",kmap); });	// Get kmap and show page
+					}
+				else{																					// Adding facet to query
+					let s=$("#"+e.target.id).text();													// Get term
+					sui.AddNewFilter(s,_this.curTree+"-"+e.target.id.split("-")[1],"AND",_this.curTree); // Add term to search state and refresh
 					}
 				}
 			}
