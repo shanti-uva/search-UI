@@ -348,7 +348,7 @@ class Subjects  {
 				p=d._childDocuments_[j];														// Point at it
 				v=p.id.split("_");																// Get parts
 				if ((v[1] == "has.as.a.part") && (p.origin_uid_s == d.ancestor_uids_generic[i]))			// If a child
-					str+=this.AddTreeLine(p.related_subjects_header_s,d.ancestor_uids_gen[i],"&bull;",null);	// Add it 
+					str+=this.AddTreeLine(p.related_subjects_header_s+" ("+p.related_subjects_relation_label_s+")",p.related_uid_s,"&bull;",null);	// Add it 
 				}
 			}
 		for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";									// Close chain
@@ -359,9 +359,9 @@ class Subjects  {
 	AddTreeLine(lab, id, marker, path) 														// ADD LINE TO TREE
 	{	
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
-		if (marker != "&bull;")	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
-		else					s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-		s+=`<a class='sui-noA' id='sui-spLab-${id}' href='#p=${id}'>${lab}${sui.pages.AddPop(id)}</a>`;		
+		if (marker != "&bull;")	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div><b>`;			// If a dot, add it
+		else					s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</div>";	// If a loner
+		s+=`<a class='sui-noA' id='sui-spLab-${id}' href='#p=${id}'>${lab}</b>${sui.pages.AddPop(id)}</a>`;		
 		return s;																				// Return line
 	}
 
