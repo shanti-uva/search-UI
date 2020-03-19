@@ -330,7 +330,7 @@ class Subjects  {
 
 	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
 	{	
-		let i,subs=0,sups=0;
+		let i,j,v,p,subs=0,sups=0;
 		for (i=0;i<d._childDocuments_.length;++i) {												// For each child
 			if (d._childDocuments_[i].related_subjects_relation_code_s == "is.as.a.part") 	++sups; // Count subordinates
 			if (d._childDocuments_[i].related_subjects_relation_code_s == "has.as.a.part") 	++sups; // Count superordinates
@@ -341,10 +341,15 @@ class Subjects  {
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
-
 		for (i=0;i<d.ancestors.length;++i) {													// For each ancestor
 			str+="<ul style='list-style-type:none'>";											// Add header
 			str+=this.AddTreeLine(d.ancestors[i],d.ancestor_uids_gen[i],"&ndash;",null);		// Add it 
+			for (j=0;j<d._childDocuments_.length;++j) {											// For each child
+				p=d._childDocuments_[j];														// Point at it
+				v=p.id.split("_");																// Get parts
+				if ((v[1] == "has.as.a.part") && (p.origin_uid_s == d.ancestor_uids_generic[i]))			// If a child
+					str+=this.AddTreeLine(p.related_subjects_header_s,d.ancestor_uids_gen[i],"&bull;",null);	// Add it 
+				}
 			}
 		for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";									// Close chain
 		this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set context tab
@@ -354,8 +359,8 @@ class Subjects  {
 	AddTreeLine(lab, id, marker, path) 														// ADD LINE TO TREE
 	{	
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
-		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
-		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
+		if (marker != "&bull;")	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
+		else					s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
 		s+=`<a class='sui-noA' id='sui-spLab-${id}' href='#p=${id}'>${lab}${sui.pages.AddPop(id)}</a>`;		
 		return s;																				// Return line
 	}
