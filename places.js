@@ -258,7 +258,7 @@ class Places  {
 			for (let i=this.kmap.ancestors_txt.length-1;i>0;--i)								// For each ancestor backwards
 			loc+=this.kmap.ancestors_txt[i]+"%20";												// Add name
 			if (this.kmap.ancestors_txt.length == 1) loc=this.kmap.ancestors_txt[0];			// Top level places
-			let url="http://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=pjson&SingleLine="+loc;
+			let url="//geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=pjson&SingleLine="+loc;
 			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
 				_this.extent=res.candidates[0].extent;											// Extract extent
 				_this.extent.spatialReference=res.spatialReference.wkid;						// Set ref
