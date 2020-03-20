@@ -332,12 +332,12 @@ class Subjects  {
 	{	
 		let i,j,v,p,subs=0,sups=0;
 		for (i=0;i<d._childDocuments_.length;++i) {												// For each child
-			if (d._childDocuments_[i].related_subjects_relation_code_s == "is.as.a.part") 	++sups; // Count subordinates
-			if (d._childDocuments_[i].related_subjects_relation_code_s == "has.as.a.part") 	++sups; // Count superordinates
+			if (d._childDocuments_[i].related_subjects_relation_code_s == "has.as.a.part") 	++subs; // Count subordinates
+			if (d._childDocuments_[i].related_subjects_relation_code_s == "is.part.of") 	++sups; // Count superordinates
 			}
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
-		<b>${o.title[0]}</b> has <b> ${subs} </b>subordinate subjects. 
-		and <b> ${sups} </b>superordinate subjects. 
+		<b>${o.title[0]}</b> has <b> ${sups} </b>superordinate subjects 
+		and <b> ${subs} </b>subordinate subjects. 
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
