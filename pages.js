@@ -89,11 +89,15 @@ class Pages  {
 			var url=sui.solrUtil.createKmapQuery(o.uid);										// Get query url
 			$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {		// Get related assets
 					var i,n,tot=0;
+					trace(data)
 					if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length) { // If valid data
 					let d=data.facets.asset_counts.buckets;										// Point at bucket array
 					for (i=0;i<d.length;++i) {													// For each bucket
 						if (d[i].val == "texts:pages")	continue;								// Skip it
 						n=d[i].count;															// Get count													
+						try { if (d[i].val == "places") 	n=data.response.docs[0].ancestor_ids_is.length-1;			// Count places
+							  if (d[i].val == "subjects") n=data.response.docs[0].kmapid_subjects_idfacet.length+1;	// Count subject
+							 }catch(e){}
 						tot+=n;																	// Add to total
 						if (n > 1000)	n=Math.floor(n/1000)+"K";								// Shorten
 						$("#sui-rln-"+d[i].val).html(n);										// Set number
