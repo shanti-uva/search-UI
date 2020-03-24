@@ -186,7 +186,10 @@ class SearchUI  {
 			this.DrawFacetItems(id);																// Draw appropriate tree, list, or input
 			});
 
-		$("#sui-main").on("click",()=>{$("[id^=sui-popover-]").remove(); });						// ON CLICK OF RESULTS PAGE 
+		$("#sui-main").on("click",(e)=>{															// ON CLICK OF RESULTS PAGE 
+			$("[id^=sui-popover-]").remove(); 														// Remove any open popovers
+			if (e.target.id != "sui-hamBut") $("#sui-hamburger").slideUp();							// Hide hanburderv menu if open
+			});
 		$("#sui-hamBut").on("click",()=>{ this.ShowHamburger() });									// SHOW HAMBURGER MENU
 		if (this.noTop)	$("#sui-left").css({ top:0, height:"calc(100% - 30px)" });
 	}
@@ -567,12 +570,36 @@ class SearchUI  {
 	DrawHeader()																				// DRAW RESULTS HEADER
 	{
 		if (this.ss.mode == "related") 	return;														// Quit for special search modes
+		var lastPage=Math.floor(this.numItems/this.ss.pageSize);									// Calc last page
 		var s=this.ss.page*this.ss.pageSize+1;														// Starting item number
 		var e=Math.min(s+this.ss.pageSize,this.numItems);											// Ending number
-		var str=`<span style='vertical-align:-10px'>${this.ss.query.assets[0].title.toUpperCase()} search results &nbsp; <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}`;	// Header
+		var str=`<span style='vertical-align:-10px'>${this.ss.query.assets[0].title.toUpperCase()} search results &nbsp; <span style='font-size:12px'> (${s}-${e}) of ${this.numItems}	
+		<div style='float:right;font-size:11px;margin:12px -48px 0 0'>
+			<div id='sui-page1T' class='sui-resDisplay' title='Go to first page'>&#xe63c</div>
+			<div id='sui-pagePT' class='sui-resDisplay' title='Go to previous page'>&#xe63f</div>
+			<div class='sui-resDisplay'> PAGE <input type='text' id='sui-typePageT' 
+			style='border:0;border-radius:4px;width:30px;text-align:center;vertical-align:1px;font-size:10px;padding:2px'
+			title='Enter page, then press Return'> OF ${lastPage+1}</div>
+			<div id='sui-pageNT' class='sui-resDisplay' title='Go to next page'>&#xe63e</div>
+			<div id='sui-pageLT' class='sui-resDisplay' title='Go to last page'>&#xe63d</div>
+			</div>`;	
 		$("#sui-headLeft").html(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 		$("#sui-header").css("background-color","#888");											// Set b/g color
-		}
+
+		$("#sui-typePageT").val(this.ss.page+1);													// Set page number
+		$("[id^=sui-page]").css("color","#fff");													// Reset pagers
+		if (this.ss.page == 0) 		  	  { $("#sui-page1T").css("color","#ddd"); $("#sui-pagePT").css("color","#ddd"); }	// No back
+		if (this.ss.page == lastPage)     { $("#sui-pageNT").css("color","#ddd"); $("#sui-pageLT").css("color","#ddd"); }	// No forward
+		$("#sui-page1T").on("click",()=> { this.ss.page=0; this.Query(); });						// ON FIRST CLICK
+		$("#sui-pagePT").on("click", ()=> { this.ss.page=Math.max(this.ss.page-1,0);  this.Query(); });	 // ON PREVIOUS CLICK
+		$("#sui-pageNT").on("click", ()=> { this.ss.page=Math.min(this.ss.page+1,lastPage); this.Query(); });// ON NEXT CLICK
+		$("#sui-pageLT").on("click", ()=> { this.ss.page=lastPage; this.Query(); });				// ON LAST CLICK
+		$("#sui-typePageT").on("change", ()=> {														// ON TYPE PAGE
+			var p=$("#sui-typePageT").val();														// Get value
+			if (!isNaN(p))   this.ss.page=Math.max(Math.min(p-1,lastPage),0);						// If a number, cap 0-last	
+			this.Query(); 																			// Get new results
+			});							
+	}
 
 	DrawFooter()																				// DRAW RESULTS FOOTER
 	{
@@ -999,15 +1026,16 @@ class SearchUI  {
 			if (k > 1000)	k=Math.floor(k/1000)+"K";												// Shorten
 			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>` 
 			if (facet == "assets")  str+=`<span style='color:${this.assets[this.facets[facet].data[i].id].c}'>${this.assets[this.facets[facet].data[i].id].g}</span> &nbsp;`;
-			str+=`${this.facets[facet].data[i].title} (${k}) 
-			${this.pages.AddPop(this.facets[facet].data[i].id,true)}</div>`;						// Add item to list
+			str+=`${this.facets[facet].data[i].title} (${k})`; 										// Add item to list
+			if (facet != "assets")	str+=this.pages.AddPop(this.facets[facet].data[i].id,true);		// Add popover		
+			str+="</div>"
 			}
 		$("#sui-advEditList-"+facet).html("</div>"+str.replace(/\t|\n|\r/g,""));					// Add to div
 		$("[id^=sui-advEditLine-]").off("click");													// KILL OLD HANDLERS
 		$("[id^=sui-advEditLine-]").on("click",(e)=> {												// ON ITEM CLICK
 			let v=e.target.id.split("-");															// Get ids		
 			let items=this.facets[facet].data;														// Point at items
-			if (this.showSearch)
+			if (this.showSearch && (facet != "assets"))												// Show page
 				this.GetKmapFromID(items[v[2]].id,(kmap)=>{ this.SendMessage("page="+items[v[2]].url,kmap); }); // Get kmap and show page
 			else	
 				this.AddNewFilter(items[v[2]].title,items[v[2]].id,"AND", facet);					// Add to search state
@@ -1032,8 +1060,9 @@ class SearchUI  {
 			<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>
 			&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;`;
 			}
-		str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>
-		<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}`;
+		if (facet != "assets")
+			str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>`;
+		str+=`<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}`;
 		if (facet.match(/places|terms|subjects/))													// Show mode icon					
 			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
 			style='float:right;font-size:14px;margin:-2px 4px 0 8px''>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
