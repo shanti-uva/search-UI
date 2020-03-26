@@ -416,7 +416,7 @@ class SearchUI  {
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.MassageKmapData(data);																// Normalize for display
 			this.LoadingIcon(false);																// Hide loading icon
-			callback(data.response.docs);															// Return data
+			callback(data);																			// Return data
 			}).fail((msg)=> { trace(msg); this.LoadingIcon(false);  this.Popup("Related query error"); });	// Failure message
 	}
 
@@ -1097,7 +1097,7 @@ class SearchUI  {
 				$(".sui-advEditList").empty();														// Remove items from list
 				for (i=0;i<n;++i) {																	// For each one
 					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
-					str+=`${items[i].title}</div>`;													// Add item to list
+					str+=`${items[i].title+this.pages.AddPop(items[i].id,true)}</div>`;				// Add item to list
 					}
 				$(".sui-advEditList").html(str);													// Add back
 				$("#sui-advEditSort-"+facet).css("color","#666");									// Off
@@ -1105,8 +1105,8 @@ class SearchUI  {
 				}
 			var itms=$(".sui-advEditLine");															// Items to sort
 			itms.sort(function(a,b) {																// Sort
-				var an=$(a).text().substr(2);														// A name past icon and space
-				var bn=$(b).text().substr(2);														// B name
+				var an=$(a).text();																	// A name
+				var bn=$(b).text();																	// B
 				if (an > bn) 		return 1;														// Higher
 				else if (an < bn) 	return -1;														// Lower
 				else				return 0;														// The same
