@@ -65,7 +65,7 @@ class SearchUI  {
 		this.assets.collections=   	{ c:"#5b66cb", g:"&#xe633" };									// Collections
 		this.searches=[];																			// Saves recent searches
 		this.showBool=false;																		// Where to show Boolean in advanced
-		this.showSearch=true;																		// Clicl to search or add facet
+		this.showSearch=false;																		// Click to search or add facet
 
 		this.noTop=(site == "CU") ? true : false;													// Has a top
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
@@ -1063,9 +1063,9 @@ class SearchUI  {
 		if (facet != "assets")
 			str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>`;
 		str+=`<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}`;
-		if (facet.match(/places|terms|subjects/))													// Show mode icon					
-			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
-			style='float:right;font-size:14px;margin:-2px 4px 0 8px''>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
+//		if (facet.match(/places|terms|subjects/))													// Show mode icon					
+//			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
+//			style='float:right;font-size:14px;margin:-2px 4px 0 8px''>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
 		str+=`</div><hr style='border: .5px solid #a4baec'>
 		<div class='sui-advEditList' id='sui-advEditList-${facet}'></div>`;
 		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add to div
@@ -1115,13 +1115,13 @@ class SearchUI  {
 			$("#sui-advEditSort-"+facet).css("color","#668eec");									// On	
 			});                  
 		
-		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
+/*		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
 		$("[id^=sui-showSearch-]").on("click", function() {											// ON CLICK CHANGE CLICK MODE
 			_this.showSearch=!_this.showSearch;														// Toggle flag
 			$(this).html(_this.showSearch ? "&#xe67c" : "&#xe62f");	 								// Flip icon
 			$(this).prop("title",`${_this.showSearch ? "Browse" : "Add to search"}`); 				// Flip title	
 			});      
-
+*/
 		$("[id^=sui-advListMap-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
 			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
@@ -1163,9 +1163,9 @@ class SearchUI  {
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'> &nbsp; 
 		<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
 		<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>`;
-		if (facet.match(/places|terms|subjects/))													// Show mode icon					
-			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
-			style='float:right;margin-right:4px'>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
+//		if (facet.match(/places|terms|subjects/))													// Show mode icon					
+//			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
+//			style='float:right;margin-right:4px'>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
 		str+=`<hr style='border: .5px solid #a4baec'>
 		<div id='sui-tree${facet}' class='sui-tree'></div>`;		
 		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add tree frame to div
@@ -1195,13 +1195,13 @@ class SearchUI  {
 			e.stopPropagation();																	// Stop propagation
 			});      
 
-		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
+/*		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
 		$("[id^=sui-showSearch-]").on("click", function() {											// ON CLICK CHANGE CLICK MODE
 			_this.showSearch=!_this.showSearch;														// Toggle flag
 			$(this).html(_this.showSearch ? "&#xe67c" : "&#xe62f");	 								// Flip icon
 			$(this).prop("title",`${_this.showSearch ? "Browse" : "Add to search"}`); 				// Flip title	
 			});      
-	
+*/	
 		$(div).css("max-height",$("#sui-main").height()-$("#sui-advTerm-"+facet).offset().top-$("#sui-advTerm-"+facet).height()-102+"px");	// Fill space
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
 	}

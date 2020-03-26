@@ -232,8 +232,14 @@ class Pages  {
 	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
 	{
 		var i;
-		if (id && id.match(/collections-/))	return;												// No maps for collections yet
 		$("[id^=sui-popover-]").remove();														// Remove old one
+		if (event.type == "mousedown") {														// Click on popover
+			if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;							// Get out of related and collections
+			this.relatedBase=null;																// No base and set to home
+			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
+			return;																				// Quit
+			}
+		if (id && id.match(/collections-/))	return;												// No maps for collections yet
 		var pos=$(event.target).offset();														// Get position of icon
 		let x=Math.max(12,Math.min(pos.left,$("#sui-main").width()-200));						// Cap sides
 		let str=`<div id='sui-popover-${id}' class='sui-popover' 
