@@ -342,6 +342,7 @@ class SearchUI  {
 	{
 		$("#sui-search").val("");																	// Clear input field
 		if (this.pages) this.pages.relatedBase=this.pages.relatedId="";								// Clear relateds
+		this.ss.page=0;																				// Start of page 0
 		this.ss.query={ 																			// Current query
 			text:"",																				// Search word 
 			places:[],																				// Places
@@ -1140,6 +1141,7 @@ class SearchUI  {
 		o[num].id=id ? id.replace(/collections-/,"") : "";											// Id (remove collections- prefix)
 		o[num].bool=bool;																			// Bool
 		if (facet == "assets") 	this.ss.query.assets=[ {title:title, id:id, bool:bool} ];			// Only one						
+		this.ss.page=0;																				// Start at 1st page in results
 		this.DrawAdvanced();																		// Redraw
 		this.Query();																				// Run query and show results
 	}
