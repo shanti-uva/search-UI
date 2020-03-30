@@ -131,8 +131,7 @@ class Subjects  {
 			</p><div class='sui-rpList' style='height:${j}px'>`;								// Add container			
 			d=d.sort((a,b)=>{ return a.title < b.title ? -sortMode : sortMode })				// Sort by title acending
 			for (i=0;i<d.length;++i) {															// For each related place
-				str+=`<div id='sui-rpLine-${i}' style='width:300px' title='${d[i].ancestors_txt.join("/")}'>${d[i].title}
-				${sui.pages.AddPop(d[i].uid)}</div>`; 											// Add line
+				str+=`<div id='sui-rpLine-${i}' style='width:300px' title='${d[i].ancestors_txt.join("/")}'>${d[i].title}</div>`; 	// Add line
 				}
 			$("#sui-topCon").html(str+"</div>");												// Draw as list
 			$("#sui-rpTree").on("click", ()=> {	this.DrawRelatedPlaces("tree",sortMode); });	// HANDLE TREE CLICK
@@ -177,13 +176,7 @@ class Subjects  {
 				str+=addTreeLine(tops[i].lab,tops[i].id,tops[i].id,"&ndash;");					// Add tree line
 
 		$("#sui-topCon").html(str+"</ul></div>");												// Draw it
-		
-/*		$('#sui-topCon').find('li').each(function() { 										// For each line
-			j=$(this).parent().find('li').find('b').length;									// Get count
-			if (j && !$(this).find('b').length)												// If something
-				$(this).append(" <span>("+j+")</span>"); 									// Add it
-			});
-*/
+
 		$("#sui-rpList").on("click", ()=> {	this.DrawRelatedPlaces("list",sortMode); });		// HANDLE LIST CLICK
 		$("#sui-rpSearch").on("keyup", ()=> {													// HANDLE SEARCH WORD ENTRY
 			let t=$("#sui-rpSearch").val();														// Get value entered
@@ -195,7 +188,13 @@ class Subjects  {
 
 		for (i=0;i<n;++i) tops[i].n=countChildren(tops[i].id);									// For each place, count children
 		for (i=0;i<n;++i) if (tops[i].level == 0) addChildren(tops[i].id,1);					// For each place, add top row children and recurse
-
+	
+		$('#sui-topCon').find('li').each(function() { 											// For each line
+			j=$(this).parent().find('li').find('b').length;										// Get count
+			if (j && !$(this).find('b').length)													// If something
+				$(this).find('img').before("("+j/2+") "); 										// Add it before popover
+			});
+	
 		function countChildren(id) {															// COUNT NODE'S CHILDREN
 			let i,num=0;
 			id=id.split("-").pop();																// Get last id
