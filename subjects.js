@@ -112,6 +112,7 @@ class Subjects  {
 			
 	DrawRelatedPlaces(mode, sortMode)														// DRAW RELATED PLACES
 	{			
+	
 		let i,j,id,tops=[];
 		let d=this.relatedPlaceData;															// Point at realte placev data
 		let o=this.kmap;																		// Point at kmap
@@ -134,7 +135,6 @@ class Subjects  {
 				${sui.pages.AddPop(d[i].uid)}</div>`; 											// Add line
 				}
 			$("#sui-topCon").html(str+"</div>");												// Draw as list
-
 			$("#sui-rpTree").on("click", ()=> {	this.DrawRelatedPlaces("tree",sortMode); });	// HANDLE TREE CLICK
 			$("#sui-rpSort").on("click", ()=> {	this.DrawRelatedPlaces("list",sortMode*-1);	});	// HANDLE SORT
 			$("#sui-rpSearch").on("keydown",(e)=> {												// ON SEARCH
@@ -167,7 +167,7 @@ class Subjects  {
 				}
 			}
 		
-			tops=tops.sort((a,b)=>{ return a.id < b.id ? -1 : 1 })									// Sort by path
+		tops=tops.sort((a,b)=>{ return a.id < b.id ? -1 : 1 })									// Sort by path
 		i=tops[tops.length-1];																	// Save last
 		tops=tops.filter((a,ind)=>{ try { return a.id != tops[ind+1].id } catch(e){} })			// Only uniques
 		tops.push(i);																			// Add it back
@@ -177,6 +177,13 @@ class Subjects  {
 				str+=addTreeLine(tops[i].lab,tops[i].id,tops[i].id,"&ndash;");					// Add tree line
 
 		$("#sui-topCon").html(str+"</ul></div>");												// Draw it
+		
+/*		$('#sui-topCon').find('li').each(function() { 										// For each line
+			j=$(this).parent().find('li').find('b').length;									// Get count
+			if (j && !$(this).find('b').length)												// If something
+				$(this).append(" <span>("+j+")</span>"); 									// Add it
+			});
+*/
 		$("#sui-rpList").on("click", ()=> {	this.DrawRelatedPlaces("list",sortMode); });		// HANDLE LIST CLICK
 		$("#sui-rpSearch").on("keyup", ()=> {													// HANDLE SEARCH WORD ENTRY
 			let t=$("#sui-rpSearch").val();														// Get value entered

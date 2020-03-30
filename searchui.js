@@ -407,7 +407,7 @@ class SearchUI  {
 		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]&indent=true";		// Add query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs[0]);														// Return data
-		}).fail((msg)=> { trace(msg); });														// Failure message
+		}).fail((msg)=> { trace(msg); });															// Failure message
 	}
 
 	GetRelatedPlaces(id, callback)																// GET RELATED THINGS FROM ID
@@ -417,7 +417,7 @@ class SearchUI  {
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
 			this.MassageKmapData(data);																// Normalize for display
 			this.LoadingIcon(false);																// Hide loading icon
-			callback(data);																			// Return data
+			callback(data.response.docs);															// Return data
 			}).fail((msg)=> { trace(msg); this.LoadingIcon(false);  this.Popup("Related query error"); });	// Failure message
 	}
 
@@ -1047,7 +1047,6 @@ class SearchUI  {
 	DrawFacetList(facet, open, searchItem)														// DRAW LIST FACET PICKER
 	{
 		let i,sorted=0;
-		var _this=this;																				// Save context
 		if (!open && ($("#sui-advEdit-"+facet).css("display") != "none")) {							// If open
 			$("#sui-advEdit-"+facet).slideUp();														// Close it 
 			return;																			
@@ -1064,9 +1063,6 @@ class SearchUI  {
 		if (facet != "assets")
 			str+=`<div class='sui-advEditBut' id='sui-advEditSort-${facet}' title='Sort'>&#xe652</div>`;
 		str+=`<div class='sui-advEditNums'> <span id='sui-advListNum'></span> ${facet}`;
-//		if (facet.match(/places|terms|subjects/))													// Show mode icon					
-//			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
-//			style='float:right;font-size:14px;margin:-2px 4px 0 8px''>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
 		str+=`</div><hr style='border: .5px solid #a4baec'>
 		<div class='sui-advEditList' id='sui-advEditList-${facet}'></div>`;
 		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add to div
@@ -1092,13 +1088,15 @@ class SearchUI  {
 		$("#sui-advEditSort-"+facet).on("click",()=> {												// ON SORT BUTTON CLICK
 			str="";
 			let items=this.facets[facet].data;														// Point at items
-			var n=Math.min(300,items.length);														// Cap at 300
+			var i,k,n=Math.min(300,items.length);													// Cap at 300
 			sorted=1-sorted;																		// Toggle flag	
 			if (!sorted) {																			// If not sorted
 				$(".sui-advEditList").empty();														// Remove items from list
 				for (i=0;i<n;++i) {																	// For each one
+					k=this.facets[facet].data[i].n;													// Number of assets
+					if (k > 1000)	k=Math.floor(k/1000)+"K";										// Shorten
 					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
-					str+=`${items[i].title+this.pages.AddPop(items[i].id,true)}</div>`;				// Add item to list
+					str+=`${items[i].title} (${k})${this.pages.AddPop(items[i].id,true)}</div>`;	// Add item to list
 					}
 				$(".sui-advEditList").html(str);													// Add back
 				$("#sui-advEditSort-"+facet).css("color","#666");									// Off
@@ -1116,13 +1114,6 @@ class SearchUI  {
 			$("#sui-advEditSort-"+facet).css("color","#668eec");									// On	
 			});                  
 		
-/*		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
-		$("[id^=sui-showSearch-]").on("click", function() {											// ON CLICK CHANGE CLICK MODE
-			_this.showSearch=!_this.showSearch;														// Toggle flag
-			$(this).html(_this.showSearch ? "&#xe67c" : "&#xe62f");	 								// Flip icon
-			$(this).prop("title",`${_this.showSearch ? "Browse" : "Add to search"}`); 				// Flip title	
-			});      
-*/
 		$("[id^=sui-advListMap-]").off("click");													// KILL OLD HANDLER
 		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
 			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
