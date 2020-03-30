@@ -254,6 +254,7 @@ class Pages  {
 		$("#sui-main").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
 
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
+			let v;
 			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
 			$("[id^=sui-popover-]").remove();													// Remove old one
 			let str=`<div id='sui-popover-${id}' class='sui-popover' 
@@ -278,6 +279,15 @@ class Pages  {
 						href='#p=${o.asset_type}-${o.ancestor_ids_is[i]}'>${o.ancestors_txt[i]}</a>`;											
 						if (i < o.ancestors_txt.length-2)	str+=" / ";							// Add separator
 						}
+				if (o.feature_types_idfacet && (o.asset_type == "places")) {					// Show Feature types in places
+					str+="<br><b>Feature types: </b>";											// Add title
+					for (i=0;i<o.feature_types_idfacet.length;++i) {							// For each feature
+						v=o.feature_types_idfacet[i].split("|");								// Split title and id
+						str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${v[1]}'
+						href='#p=${v[1]}'>${v[0]}</a>`;											
+						if (i < o.feature_types_idfacet.length-1)	str+=", ";					// Add separator
+						}
+					}
 				str+=`</p></span><br>
 				<div id='sui-popbot' style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
 				border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
