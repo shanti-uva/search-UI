@@ -388,7 +388,7 @@ class SearchUI  {
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
 			this.DrawAdvanced();																	// Draw advanced search if active
-			}).fail((msg)=> { trace(msg); this.LoadingIcon(false);  this.Popup("Query error"); });	// Failure message
+			}).fail((msg)=> { console.log(msg); this.LoadingIcon(false);  this.Popup("Query error"); });	// Failure message
 		}
 	   
 	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
@@ -397,7 +397,7 @@ class SearchUI  {
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			data=this.MassageKmapData(data);														// Normalize kmap
 			callback(data.response.docs[0]);														// Return kmap
-			}).fail((msg)=> { trace(msg); });														// Failure message
+			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
@@ -407,7 +407,7 @@ class SearchUI  {
 		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]&indent=true";		// Add query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs[0]);														// Return data
-		}).fail((msg)=> { trace(msg); });															// Failure message
+		}).fail((msg)=> { console.log(msg); });														// Failure message
 	}
 
 	GetRelatedPlaces(id, callback)																// GET RELATED THINGS FROM ID
@@ -418,7 +418,7 @@ class SearchUI  {
 			this.MassageKmapData(data);																// Normalize for display
 			this.LoadingIcon(false);																// Hide loading icon
 			callback(data.response.docs);															// Return data
-			}).fail((msg)=> { trace(msg); this.LoadingIcon(false);  this.Popup("Related query error"); });	// Failure message
+			}).fail((msg)=> { console.log(msg); this.LoadingIcon(false);  this.Popup("Related query error"); });	// Failure message
 	}
 
 	GetChildNamesFromID(facet,id, callback) 													// GET NAMES/ETYMOLGY DATA FROM ID
@@ -426,7 +426,7 @@ class SearchUI  {
 		let url=`${this.solrBase}kmterms_dev/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
-			}).fail((msg)=> { trace(msg); });														// Failure message
+			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 	
 	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
@@ -434,18 +434,18 @@ class SearchUI  {
 		let url=`${this.solrBase}kmterms_dev/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
-			}).fail((msg)=> { trace(msg); });														// Failure message
+			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 
 	GetTreeChildren(facet, path, callback)
 	{
-		let base=`${this.solrBase}kmterms_dev`;													// Base url
+		let base=`${this.solrBase}kmterms_dev`;														// Base url
 		let lvla=Math.max(path.split("/").length+1,2);												// Set level
 		if ((facet == "features") ||  (facet == "languages")) facet="subjects";						// Features and languages are in subjects
 		var url=sui.solrUtil.buildQuery(base,facet,path,lvla,lvla);									// Build query using Yuji's builder
 		$.ajax( { url: url, dataType: 'jsonp' } ).done((res)=> {									// Get children
 			callback(res);																			// Return dats																					
-			}).fail((msg)=> { trace(msg); });														// Failure message
+			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 	
 	GetAudioFromID(id, callback)																// GET AUDIO FILE FROM ID
@@ -455,7 +455,7 @@ class SearchUI  {
 			try{ for (i=0;i<d.recordings.length;++i)												// For each recording
 					r.push(d.recordings[i].audio_file);												// Add to array
 				callback(r); } 	catch(e){}															// Return audio file urls as array
-			}).fail((msg)=> { trace(msg); });														// Failure message
+			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 
 	GetJSONFromKmap(kmap, callback)																// GET JSON FROM KMAP
@@ -1088,21 +1088,21 @@ class SearchUI  {
 		$("#sui-advEditSort-"+facet).on("click",()=> {												// ON SORT BUTTON CLICK
 			str="";
 			let items=this.facets[facet].data;														// Point at items
-			var i,k,n=Math.min(300,items.length);													// Cap at 300
+			let i,k,n=Math.min(300,items.length);													// Cap at 300
 			sorted=1-sorted;																		// Toggle flag	
 			if (!sorted) {																			// If not sorted
-				$(".sui-advEditList").empty();														// Remove items from list
+				$("#sui-advEditList-"+facet).empty();												// Remove items from list
 				for (i=0;i<n;++i) {																	// For each one
 					k=this.facets[facet].data[i].n;													// Number of assets
 					if (k > 1000)	k=Math.floor(k/1000)+"K";										// Shorten
 					str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>`;
 					str+=`${items[i].title} (${k})${this.pages.AddPop(items[i].id,true)}</div>`;	// Add item to list
 					}
-				$(".sui-advEditList").html(str);													// Add back
+				$("#sui-advEditList-"+facet).html(str);												// Add back
 				$("#sui-advEditSort-"+facet).css("color","#666");									// Off
 				return;																				// Quit
 				}
-			var itms=$(".sui-advEditLine");															// Items to sort
+			let itms=$(".sui-advEditLine");															// Items to sort
 			itms.sort(function(a,b) {																// Sort
 				var an=$(a).text();																	// A name
 				var bn=$(b).text();																	// B
@@ -1110,7 +1110,7 @@ class SearchUI  {
 				else if (an < bn) 	return -1;														// Lower
 				else				return 0;														// The same
 				});
-			itms.detach().appendTo($(".sui-advEditList"));
+			$("#sui-advEditList-"+facet).html(itms);
 			$("#sui-advEditSort-"+facet).css("color","#668eec");									// On	
 			});                  
 		
@@ -1118,7 +1118,7 @@ class SearchUI  {
 		$("#sui-advListMap-"+facet).on("click", ()=> {												// ON CLICK TREE BUTTON
 			this.DrawFacetTree(facet,1,$("#sui-advEditFilter-"+facet).val());						// Close it and open as tree
 			});      
-		$(".sui-advEditList").css("max-height",$("#sui-main").height()-$("#sui-advTerm-"+facet).offset().top-$("#sui-advTerm-"+facet).height()-102+"px");	// Fill space
+		$("#sui-advEditList-"+facet).css("max-height",$("#sui-main").height()-$("#sui-advTerm-"+facet).offset().top-$("#sui-advTerm-"+facet).height()-102+"px");	// Fill space
 		}
 
 	AddNewFilter(title, id, bool, facet)														// ADD NEW TERM TO SEARCH STATE

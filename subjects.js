@@ -293,7 +293,7 @@ class Subjects  {
 			str+="</table><br>";		
 			$("#sui-subConDiv").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div				
 			this.AddRelatedSubjects(o,data._childDocuments_);									// Add related subjects html
-			this.AddContext(o,data);															// Add context html
+			this.AddSubjectContext(o,data);														// Add context html
 		});
 	}
 
@@ -334,7 +334,7 @@ class Subjects  {
 			}
 	}
 
-	AddContext(o,d)																			// ADD CONTEXT TAB CONTENTS 	
+	AddSubjectContext(o,d)																	// ADD SUNJECYCONTEXT TAB CONTENTS 	
 	{	
 		let i,j,v,p,subs=0,sups=0;
 		for (i=0;i<d._childDocuments_.length;++i) {												// For each child
@@ -347,13 +347,14 @@ class Subjects  {
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
+		trace(d)
 		for (i=0;i<d.ancestors.length;++i) {													// For each ancestor
 			str+="<ul style='list-style-type:none'>";											// Add header
 			str+=this.AddTreeLine(d.ancestors[i],d.ancestor_uids_gen[i],"&ndash;",null);		// Add it 
 			for (j=0;j<d._childDocuments_.length;++j) {											// For each child
 				p=d._childDocuments_[j];														// Point at it
 				v=p.id.split("_");																// Get parts
-				if ((v[1] == "has.as.a.part") && (p.origin_uid_s == d.ancestor_uids_generic[i]))			// If a child
+				if ((v[1] == "has.as.a.part") && (p.origin_uid_s == d.ancestor_uids_generic[i])) // If a child
 					str+=this.AddTreeLine(p.related_subjects_header_s+" ("+p.related_subjects_relation_label_s+")",p.related_uid_s,"&bull;",null);	// Add it 
 				}
 			}
