@@ -265,23 +265,23 @@ class Subjects  {
 			if (!data)	return;																	// Quit if no data
 
 			this.relatedSubjectData=data;														// Save subject data
-				if (data.illustration_external_url && data.illustration_external_url[0]) {		// If an image spec'd
+				if (data[0].illustration_external_url && data[0].illustration_external_url[0]) { // If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
-				$("#sui-relatedImg").prop("src",data.illustration_external_url[0]);				// Show it
+				$("#sui-relatedImg").prop("src",data[0].illustration_external_url[0]);			// Show it
 				}
-			else if (data.illustration_mms_url && data.illustration_mms_url[0]) {				// If an image spec'd
+			else if (data[0].illustration_mms_url && data[0].illustration_mms_url[0]) {			// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
-				$("#sui-relatedImg").prop("src",data.illustration_mms_url[0]);					// Show it
+				$("#sui-relatedImg").prop("src",data[0].illustration_mms_url[0]);				// Show it
 				}
-			if (data.summary_eng && data.summary_eng[0]) 										// If an summary spec'd
-			$("#sui-spCap").html(data.summary_eng[0]);											// Replace caption
+			if (data[0].summary_eng && data[0].summary_eng[0]) 									// If an summary spec'd
+			$("#sui-spCap").html(data[0].summary_eng[0]);										// Replace caption
 			if (o.names_txt && o.names_txt.length) {											// If names
 				for (i=0;i<o.names_txt.length;++i) 												// For each name
 					if (o.names_txt[i].match(/lang="bo"/i))										// Language id - bo
 						str+="<tr><td style='color:#000099;font-size:20px'><b>"+o.names_txt[i]+"</b>&nbsp;&nbsp;&nbsp;</td><td span='2'><i>Dzongkha, Tibetan script, Original</i></td></tr>";	// Add it
 				}
-			for (i=0;i<data._childDocuments_.length;++i) {										// For each child doc
-				d=data._childDocuments_[i];														// Point at it
+			for (i=0;i<data.length;++i) {														// For each doc
+				d=data[i];																		// Point at it
 				if (d.block_child_type != "related_names")	continue;							// Not a name
 				if (!k) d.related_names_level_i=0;
 				str+=`<tr><td style='padding-left:${d.related_names_level_i*16}px'>
@@ -292,7 +292,7 @@ class Subjects  {
 				}
 			str+="</table><br>";		
 			$("#sui-subConDiv").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div				
-			this.AddRelatedSubjects(o,data._childDocuments_);									// Add related subjects html
+			this.AddRelatedSubjects(o,data);													// Add related subjects html
 			this.AddSubjectContext(o,data);														// Add context html
 		});
 	}
@@ -337,9 +337,9 @@ class Subjects  {
 	AddSubjectContext(o,d)																	// ADD SUNJECYCONTEXT TAB CONTENTS 	
 	{	
 		let i,j,v,p,subs=0,sups=0;
-		for (i=0;i<d._childDocuments_.length;++i) {												// For each child
-			if (d._childDocuments_[i].related_subjects_relation_code_s == "has.as.a.part") 	++subs; // Count subordinates
-			if (d._childDocuments_[i].related_subjects_relation_code_s == "is.part.of") 	++sups; // Count superordinates
+		for (i=0;i<d.length;++i) {																// For each child
+			if (d[i].related_subjects_relation_code_s == "has.as.a.part") 	++subs; 			// Count subordinates
+			if (d[i].related_subjects_relation_code_s == "is.part.of") 		++sups; 			// Count superordinates
 			}
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
 		<b>${o.title[0]}</b> has <b> ${sups} </b>superordinate subjects 
@@ -347,18 +347,18 @@ class Subjects  {
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
-		trace(d)
-		for (i=0;i<d.ancestors.length;++i) {													// For each ancestor
+		
+		for (i=0;i<d[0].ancestors.length;++i) {													// For each ancestor
 			str+="<ul style='list-style-type:none'>";											// Add header
-			str+=this.AddTreeLine(d.ancestors[i],d.ancestor_uids_gen[i],"&ndash;",null);		// Add it 
-			for (j=0;j<d._childDocuments_.length;++j) {											// For each child
-				p=d._childDocuments_[j];														// Point at it
+			str+=this.AddTreeLine(d[0].ancestors[i],d[0].ancestor_uids_gen[i],"&ndash;",null);	// Add it 
+			for (j=0;j<d.length;++j) {															// For each child
+				p=d[j];																			// Point at it
 				v=p.id.split("_");																// Get parts
-				if ((v[1] == "has.as.a.part") && (p.origin_uid_s == d.ancestor_uids_generic[i])) // If a child
+				if ((v[1] == "has.as.a.part") && (p.origin_uid_s == d[0].ancestor_uids_generic[i]))		// If a child
 					str+=this.AddTreeLine(p.related_subjects_header_s+" ("+p.related_subjects_relation_label_s+")",p.related_uid_s,"&bull;",null);	// Add it 
 				}
 			}
-		for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";									// Close chain
+		for (i=0;i<d[0].ancestors.length;++i) str+="</li></ul>";								// Close chain
 		this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set context tab
 		this.ShowTab(0);																		// Draw it
 	}

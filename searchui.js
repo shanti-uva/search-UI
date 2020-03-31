@@ -402,14 +402,15 @@ class SearchUI  {
 
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
 	{
-
 		let url=`${this.solrBase}kmterms_dev/query`;												// Base url
-		url+="?q=uid:"+id+"&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]&indent=true";		// Add query url
+		url+="?child_count.fq=related_kmaps_node_type:child&child_count.fl=uid";
+		url+="&child_count.rows=0&fl=child_count:[subquery],*&child_count.q={!child%20of='block_type:parent'}";
+		url+="{!term%20f=uid%20v=$row.related_subjects_id_s}&rows=2000&q=id:"+id+"%20OR%20{!child%20of=block_type:parent}id:"+id+"%20&sort=block_type%20DESC,%20related_subjects_header_s%20ASC";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
-			callback(data.response.docs[0]);														// Return data
+			callback(data.response.docs);															// Return data
 		}).fail((msg)=> { console.log(msg); });														// Failure message
 	}
-
+	
 	GetRelatedPlaces(id, callback)																// GET RELATED THINGS FROM ID
 	{
 		this.LoadingIcon(true,64);																	// Show loading icon

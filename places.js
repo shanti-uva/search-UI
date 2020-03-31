@@ -326,17 +326,17 @@ class Places  {
 			});
 	
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
-			if (data.illustration_external_url && data.illustration_external_url[0]) {			// If an image spec'd
+			if (data[0].illustration_external_url && data.illustration_external_url[0]) {		// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
-				$("#sui-relatedImg").prop("src",data.illustration_external_url[0]);				// Show it
+				$("#sui-relatedImg").prop("src",data[0].illustration_external_url[0]);			// Show it
 				}
-			else if (data.illustration_mms_url && data.illustration_mms_url[0]) {				// If an image spec'd
+			else if (data[0].illustration_mms_url && data[0].illustration_mms_url[0]) {			// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
-				$("#sui-relatedImg").prop("src",data.illustration_mms_url[0]);					// Show it
+				$("#sui-relatedImg").prop("src",data[0].illustration_mms_url[0]);				// Show it
 				}
 			this.AddRelatedTabs();																// Add related places/context tab controls
 			this.AddRelatedPlaces(this.kmap,data,this.content2,0);								// Add related place context html
-			this.AddRelatedSubjects(this.kmap,data._childDocuments_);							// Add related subjects html
+			this.AddRelatedSubjects(this.kmap,data);											// Add related subjects html
 			});
 	}	
 
@@ -430,12 +430,14 @@ class Places  {
 				content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set 1st content array member with html
 			return	
 			}
-		if (!d.ancestors)	return;																// No ancestors
-		for (n=0;n<d.ancestors.length-1;++n) {													// For each ancestor (skipping Earth)
+		if (!d[0].ancestors)	return;															// No ancestors
+
+		for (n=0;n<d[0].ancestors.length-1;++n) {												// For each ancestor (skipping Earth)
 			str+="<ul style='list-style-type:none'>";											// Add header
-			str+=addRelTreeLine(d.ancestors[n+1],d.ancestor_uids_generic[n+1],"&ndash;",null); 	// Add it 
+			str+=addRelTreeLine(d[0].ancestors[n+1],d[0].ancestor_uids_generic[n+1],"&ndash;",null); // Add it 
 			}
-		sui.GetTreeChildren(o.asset_type,d.ancestor_id_path,(res)=>{							// Get children
+
+		sui.GetTreeChildren(o.asset_type,d[0].ancestor_id_path,(res)=>{							// Get children
 			let i,j,re,m,path;
 			let counts=[];
 			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
@@ -454,54 +456,21 @@ class Places  {
 				}
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
-			for (i=0;i<d.ancestors.length;++i) str+="</li></ul>";								// Close chain
+			for (i=0;i<d[0].ancestors.length;++i) str+="</li></ul>";							// Close chain
 			content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";									// Set 1st content array member with html
 			});
 		
-			this.AddRelatedContext(o,d._childDocuments_,content);								// Get context
-	
-			function addBranch(facet, path, dot) {												// LAZY LOAD BRANCH
-				sui.GetTreeChildren(facet,path,(res)=>{											// Get children
-					let str="";
-					let i,j,re,m,path;
-					let counts=[];
-					try { counts=res.facets.child_counts.buckets; } catch(e) {}					// Get child counts
-					res=res.response.docs;														// Point at docs
-					for (i=0;i<res.length;++i) {												// For each child
-						path="";	m=null;														// Assume a loner												
-						re=new RegExp(res[i].id.split("-")[1]);									// Get id to search on
-						for (j=0;j<counts.length;++j) {											// For each count
-							if (counts[j].val.match(re)) {										// In this one
-								m="+";															// Got kids
-								path=counts[j].val;												// Add path
-								}
-							}												
-						str+="<ul style='list-style-type:none'>";								// Header
-						str+=addRelTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 		// Add it
-						}
-					$(dot).prop("id","sui-spDot-null");											// Inhibit reloading
-					dot.parent().append(str);													// Append branch
-		
-					$("[id^=sui-spDot-]").off("click");											// Kill handler
-					$("[id^=sui-spDot-]").on("click", function(e) {								// ON RELATIONSHIP TREE DOT CLICK
-						let firstChild=$(this).parent().find("ul")[0];							// Get first child
-						let path=e.currentTarget.id.substring(10);								// Get id
-						if (path != "null") addBranch(facet,path,$(this));						// Lazy load branch
-						$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); // Change label
-						$(this).parent().find('ul').slideToggle();            					// Slide into place
-						});
-					});
-				}
-	
-			function addRelTreeLine(lab, id, marker, path) 	{									// ADD LINE TO TREE
-				let s=`<li style='margin:2px 0 2px ${-32}px'>`;									// Header
-				if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;	// If a dot, add it
-				else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-				s+=`<a class='sui-noA' href='#p=${id}' id='sui-spLab-${id}'>${lab}
-				${sui.pages.AddPop(id)}</a>`;		
-				return s;																		// Return line
+		this.AddRelatedContext(o,d,content);													// Get context
+
+		function addRelTreeLine(lab, id, marker, path) 	{										// ADD LINE TO TREE
+			let s=`<li style='margin:2px 0 2px ${-32}px'>`;										// Header
+			if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;		// If a dot, add it
+			else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
+			s+=`<a class='sui-noA' href='#p=${id}' id='sui-spLab-${id}'>${lab}
+			${sui.pages.AddPop(id)}</a>`;		
+			return s;																			// Return line
 			}
-	}
+		}
 
 	AddRelatedContext(o, c, content)															// ADD PLACE CONTEXT CONTENT 	
 	{	
