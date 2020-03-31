@@ -377,7 +377,7 @@ class Places  {
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") _this.AddBranch(_this.kmap.asset_type,path,$(this));		// Lazy load branch
+				if (path != "null") sui.pages.AddRelBranch(_this.kmap.asset_type,path,$(this));	// Lazy load branch
 				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
@@ -427,16 +427,15 @@ class Places  {
 		See the RELATED PLACES tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as places non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		if (o.asset_type == "subjects") {														// If subjects assets
-				content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set 1st content array member with html
-			return	
+			content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set 1st content array member with html
+			return;		
 			}
 		if (!d[0].ancestors)	return;															// No ancestors
-
 		for (n=0;n<d[0].ancestors.length-1;++n) {												// For each ancestor (skipping Earth)
 			str+="<ul style='list-style-type:none'>";											// Add header
-			str+=addRelTreeLine(d[0].ancestors[n+1],d[0].ancestor_uids_generic[n+1],"&ndash;",null); // Add it 
+			str+=sui.pages.AddRelTreeLine(d[0].ancestors[n+1],d[0].ancestor_uids_generic[n+1],"&ndash;",null); // Add it 
 			}
-
+	
 		sui.GetTreeChildren(o.asset_type,d[0].ancestor_id_path,(res)=>{							// Get children
 			let i,j,re,m,path;
 			let counts=[];
@@ -452,7 +451,7 @@ class Places  {
 						}
 					}												
 				str+="<ul style='list-style-type:none'>";										// Header
-				str+=addRelTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 				// Add it
+				str+=sui.pages.AddRelTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 	// Add it
 				}
 			
 			str=str.replace(/~~/,n+res.length);													// Set total count
@@ -461,15 +460,6 @@ class Places  {
 			});
 		
 		this.AddRelatedContext(o,d,content);													// Get context
-
-		function addRelTreeLine(lab, id, marker, path) 	{										// ADD LINE TO TREE
-			let s=`<li style='margin:2px 0 2px ${-32}px'>`;										// Header
-			if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;		// If a dot, add it
-			else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</b></div>";	// If a loner
-			s+=`<a class='sui-noA' href='#p=${id}' id='sui-spLab-${id}'>${lab}
-			${sui.pages.AddPop(id)}</a>`;		
-			return s;																			// Return line
-			}
 		}
 
 	AddRelatedContext(o, c, content)															// ADD PLACE CONTEXT CONTENT 	

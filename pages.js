@@ -349,7 +349,54 @@ class Pages  {
 				}
 			});
 	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RELATED TREE TOOLS
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	
+	AddRelTreeLine(lab, id, marker, path) 													// ADD LINE TO TREE
+	{	
+		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
+		if (marker)	s+=`<div class='sui-spDot' id='sui-ssDot-${path}'>${marker}</div>`;			// If a dot, add it
+		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</div>";	// If a loner
+		s+=`<a class='sui-noA' href='#p=${id}' id='sui-ssLab-${id}'>${lab}</b>${sui.pages.AddPop(id)}</a>`;		
+		return s;																				// Return line
+	}
+
+	AddRelBranch(facet, path, dot) 															// LAZY LOAD BRANCH
+	{
+		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
+			let str="";
+			let i,j,re,m,path;
+			let counts=[];
+			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
+			res=res.response.docs;																// Point at docs
+			for (i=0;i<res.length;++i) {														// For each child
+				path="";	m=null;																// Assume a loner												
+				re=new RegExp(res[i].id.split("-")[1]);											// Get id to search on
+				for (j=0;j<counts.length;++j) {													// For each count
+					if (counts[j].val.match(re)) {												// In this one
+						m="+";																	// Got kids
+						path=counts[j].val;														// Add path
+						}
+					}												
+				str+="<ul style='list-style-type:none'>";										// Header
+				str+=this.AddRelTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
+				}
+			$(dot).prop("id","sui-spDot-null");													// Inhibit reloading
+			dot.parent().append(str);															// Append branch
+
+			$("[id^=sui-spDot-]").off("click");													// Kill handler
+			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
+				let firstChild=$(this).parent().find("ul")[0];									// Get first child
+				let path=e.currentTarget.id.substring(10);										// Get id
+				if (path != "null") this.AddRelBranch(facet,path,$(this));							// Lazy load branch
+				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+				$(this).parent().find('ul').slideToggle();            							// Slide into place
+				});
+			});
+		}
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS

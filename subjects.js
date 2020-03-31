@@ -71,11 +71,11 @@ class Subjects  {
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
 		if (which == 0)	{																		// Add events
-			$("[id^=sui-spLab-]").on("click", function(e) {return false;	});					// ON CONEXT LINE CLICK, INHIBIT
-			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
+			$("[id^=sui-ssLab-]").on("click", function(e) {return false;	});					// ON CONtEXT LINE CLICK, INHIBIT
+			$("[id^=sui-ssDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") _this.AddBranch(_this.kmap.asset_type,path,$(this));		// Lazy load branch
+				if (path != "null") sui.pages.AddRelBranch(_this.kmap.asset_type,path,$(this));		// Lazy load branch
 				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
@@ -112,7 +112,6 @@ class Subjects  {
 			
 	DrawRelatedPlaces(mode, sortMode)														// DRAW RELATED PLACES
 	{			
-	
 		let i,j,id,tops=[];
 		let d=this.relatedPlaceData;															// Point at realte placev data
 		let o=this.kmap;																		// Point at kmap
@@ -336,7 +335,7 @@ class Subjects  {
 
 	AddSubjectContext(o,d)																	// ADD SUNJECYCONTEXT TAB CONTENTS 	
 	{	
-		let i,j,v,p,subs=0,sups=0;
+		let i,n=0,subs=0,sups=0;
 		for (i=0;i<d.length;++i) {																// For each child
 			if (d[i].related_subjects_relation_code_s == "has.as.a.part") 	++subs; 			// Count subordinates
 			if (d[i].related_subjects_relation_code_s == "is.part.of") 		++sups; 			// Count superordinates
@@ -348,35 +347,12 @@ class Subjects  {
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.<br><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		
-		for (i=0;i<d[0].ancestors.length;++i) {													// For each ancestor
+		for (n=0;n<d[0].ancestors.length-1;++n) {												// For each ancestor (skipping Earth)
 			str+="<ul style='list-style-type:none'>";											// Add header
-			str+=this.AddTreeLine(d[0].ancestors[i],d[0].ancestor_uids_gen[i],"&ndash;",null);	// Add it 
-			for (j=0;j<d.length;++j) {															// For each child
-				p=d[j];																			// Point at it
-				v=p.id.split("_");																// Get parts
-				if ((v[1] == "has.as.a.part") && (p.origin_uid_s == d[0].ancestor_uids_generic[i]))		// If a child
-					str+=this.AddTreeLine(p.related_subjects_header_s+" ("+p.related_subjects_relation_label_s+")",p.related_uid_s,"&bull;",null);	// Add it 
-				}
+			str+=sui.pages.AddRelTreeLine(d[0].ancestors[n+1],d[0].ancestor_uids_generic[n+1],"&ndash;",null); // Add it 
 			}
-		for (i=0;i<d[0].ancestors.length;++i) str+="</li></ul>";								// Close chain
-		this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set context tab
-		this.ShowTab(0);																		// Draw it
-	}
 
-	AddTreeLine(lab, id, marker, path) 														// ADD LINE TO TREE
-	{	
-		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
-		if (marker != "&bull;")	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div><b>`;			// If a dot, add it
-		else					s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</div>";	// If a loner
-		s+=`<a class='sui-noA' id='sui-spLab-${id}' href='#p=${id}'>${lab}</b>${sui.pages.AddPop(id)}</a>`;		
-		return s;																				// Return line
-	}
-
-	AddBranch(facet, path, dot)																// LAZY LOAD BRANCH
-	{
-		let _this=this;
-		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
-			let str="";
+		sui.GetTreeChildren(o.asset_type,d[0].ancestor_id_path,(res)=>{							// Get children
 			let i,j,re,m,path;
 			let counts=[];
 			try { counts=res.facets.child_counts.buckets; } catch(e) {}							// Get child counts
@@ -391,20 +367,13 @@ class Subjects  {
 						}
 					}												
 				str+="<ul style='list-style-type:none'>";										// Header
-				str+=this.AddTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
+				str+=sui.pages.AddRelTreeLine(res[i].header,res[i].id,m,path)+"</li></ul>"; 			// Add it
 				}
-			$(dot).prop("id","sui-spDot-null");													// Inhibit reloading
-			$(dot).html("&ndash;"); 															// Change label to 'open'
-			dot.parent().append(str);															// Append branch
-
-			$("[id^=sui-spDot-]").off("click");													// Kill handler
-			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
-				let firstChild=$(this).parent().find("ul")[0];									// Get first child
-				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") _this.AddBranch(facet,path,$(this));						// Lazy load branch
-				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
-				$(this).parent().find('ul').slideToggle();            							// Slide into place
-				});
+			
+			str=str.replace(/~~/,n+res.length);													// Set total count
+			for (i=0;i<d[0].ancestors.length;++i) str+="</li></ul>";							// Close chain
+			this.content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";							// Set 1st content array member with html
+			this.ShowTab(0);																	// Draw it
 			});
 		}
 
