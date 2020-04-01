@@ -190,7 +190,7 @@
 .sui-images 	{	max-width:900px;margin:8px auto 8px auto; background-color: #f7f7f7; border:1px solid #999;
 					padding:50px; font-weight:400; padding-top:0; border-top:4px solid #b49c59; border-bottom:4px solid #b49c59;}
 /* TEXT PAGE*/
-.sui-texts 		 {	display:inline-block; width:66%; margin:0; padding:0; overflow:hidden; height:100%; max-height:calc(100% - 154px); }
+.sui-texts 		 {	display:inline-block; max-width:900px; width:66%; margin:0; padding:0; overflow:hidden; height:100%; max-height:calc(100% - 154px); }
 .sui-textContent {	background-color: #fff; width:calc(100% - 46px); overflow-y:auto; max-height:calc(100% - 241px); color:#666; 
 					padding:22px; border-bottom:1px solid #999; border-left:1px solid #999; border-right:1px solid #999; line-height:22px; }
 .sui-textTop 	 {	background-color: #fff; width:100%; overflow-x:hidden; white-space:nowrap; user-select:none; }

@@ -422,9 +422,11 @@ class Places  {
 	{	
 		let n=0;
 		let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
+		<div style='max-width:900px'>
 		<b>${o.title[0]}</b> has <b> ~~ </b> immediately subordinate places. 
 		You can browse these subordinate places as well as its superordinate categories with the tree below. 
-		See the RELATED PLACES tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, as well as places non-hierarchically related to it.<br><br>
+		See the RELATED PLACES tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, 
+		as well as places non-hierarchically related to it.</div><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		if (o.asset_type == "subjects") {														// If subjects assets
 			content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set 1st content array member with html
@@ -479,8 +481,9 @@ class Places  {
 			
 			let biggest=Object.keys(s).sort((a,b)=>{return a.length > b.length ? -1 : 1;})[0];		// Find category with most elements	 
 			let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
+			<div style='max-width:900px'>
 			<b>${o.title[0]}</b> has <b>${n}</b> other place${(n > 1) ? "s": ""} directly related to it, which is presented here. 
-			See the PLACE CONTEXT tab if you instead prefer to browse all subordinate and superordinate places for ${o.title[0]}.
+			See the PLACE CONTEXT tab if you instead prefer to browse all subordinate and superordinate places for ${o.title[0]}.</div>
 			<p><a class='sui-advEditBut' id='sui-togCatA'>Expand all</a> / <a class='sui-advEditBut' id='sui-togCatN'>Collapse all</a>
 			</p><div style='width:100%'><div style='width:50%;display:inline-block'>`;
 			str+=drawCat(biggest)+"</div><div style='display:inline-block;width:50%;vertical-align:top'>";	// Add biggest to 1st column, set up 2nd	 
