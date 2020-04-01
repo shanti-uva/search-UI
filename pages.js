@@ -76,6 +76,135 @@ class Pages  {
 		else if (kmap.asset_type == "collections") 	sui.col.Draw(kmap);							// Collections
 	}
 
+
+	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
+	{
+		var i;
+		$("[id^=sui-popover-]").remove();														// Remove old one
+		if (event.type == "mousedown") {														// Click on popover
+			if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;							// Get out of related and collections
+			this.relatedBase=null;																// No base and set to home
+			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
+			return;																				// Quit
+			}
+		if (id && id.match(/collections-/))	return;												// No maps for collections yet
+		var pos=$(event.target).offset();														// Get position of icon
+		let x=Math.max(160,Math.min(pos.left,$("#sui-main").width()-200));						// Cap sides
+		let str=`<div id='sui-popover-${id}' class='sui-popover' 
+		style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
+		<div style='width:0;height:0;border-left:10px solid transparent;
+		border-right:10px solid transparent;border-bottom:10px solid #999;
+		margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
+		<div style='width:0;height:0;border-left:8px solid transparent;
+		border-right:8px solid transparent;border-bottom:10px solid #fff;
+		margin-left:calc(50% - 8px)'</div>
+		</div>`;
+		$("#sui-main").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
+
+		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
+			let v;
+			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
+			$("[id^=sui-popover-]").remove();													// Remove old one
+			let str=`<div id='sui-popover-${id}' class='sui-popover' 
+			style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
+			<div style='width:0;height:0;border-left:10px solid transparent;z-index:10001
+			border-right:10px solid transparent;border-bottom:10px solid #999;
+			margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
+			<div style='width:0;height:0;border-left:8px solid transparent;
+			border-right:8px solid transparent;border-bottom:10px solid #fff;
+			margin-left:calc(50% - 8px)'</div>
+			</div>`;
+			$("#sui-main").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
+	
+			str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
+			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
+			<span style='font-size:12px;text-transform:capitalize'>
+			For more information about this ${o.asset_type.slice(0,-1)}, see Full Entry below.<p>`;
+			if (o.feature_types_idfacet && (o.asset_type == "places")) {						// Show Feature types in places
+				str+="<b>Feature types: </b>";													// Add title
+				for (i=0;i<o.feature_types_idfacet.length;++i) {								// For each feature
+					v=o.feature_types_idfacet[i].split("|");									// Split title and id
+					str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${v[1]}'
+					href='#p=${v[1]}'>${v[0]}</a>`;											
+					if (i < o.feature_types_idfacet.length-1)	str+=", ";						// Add separator
+					else str+="<br>"
+					}
+				}
+			str+=`<b>${o.asset_type}: </b>`;
+			if (o.ancestors_txt)
+				for (i=0;i<o.ancestors_txt.length-1;++i) {										// For each trail member
+					str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i]}'
+					href='#p=${o.asset_type}-${o.ancestor_ids_is[i]}'>${o.ancestors_txt[i]}</a>`;											
+					if (i < o.ancestors_txt.length-2)	str+=" / ";								// Add separator
+					}
+			str+=`</p></span><br>
+			<div id='sui-popbot' style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
+			border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
+			<a class='sui-popItem' href='#p=${o.uid}'>
+			<p id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p></a>
+			</div>`;
+			$("#sui-popover-"+id).append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
+
+			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
+				if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;						// Get out of related and collections
+				this.relatedBase=null;															// No base and set to home
+				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				return false;																	// Don't propagate
+				});
+			
+			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
+				if (sui.ss.mode == "related")	 sui.ss.mode=this.lastMode;						// Get out of related and collections
+				this.relatedBase=null;															// No base and set to home
+				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
+				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
+				return false;																	// Don't propagate
+				});
+			});
+
+		var url=sui.solrUtil.createKmapQuery(id,null,null,300);									// Get query url
+		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
+			let i,n,str="";
+			if ($("[id^=sui-pop-]")[0])	return; 												// Quit if already loaded
+			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
+				let d=data.facets.asset_counts.buckets;											// Point at bucket array
+				for (i=0;i<d.length;++i) {														// For each bucket
+					n=d[i].count;																// Get count													
+					if (d[i].val == "texts:pages") continue;									// Ignore pages of texts
+					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
+					str+=`<a class='sui-popItem' href='#v=${id}=${d[i].val}'>
+					<p id='sui-pop-${id}-${d[i].val}' style='cursor:pointer;text-transform:capitalize'>
+					<span style='color:${sui.assets[d[i].val].c}'>${sui.assets[d[i].val].g}</span>
+					&nbsp;&nbsp;Related ${d[i].val} (${n})</p></a>`;
+					}
+				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
+				
+				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
+					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
+					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
+					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url
+					$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=>{ // Get related places
+						sui.MassageKmapData(data);												// Normalize for display
+						sui.curResults=data.response.docs;										// Save current results
+						sui.DrawItems();														// Draw items																
+						sui.DrawFooter();														// Draw footer															
+						sui.ss.page=0;															// Start at beginning
+					});
+					sui.GetKmapFromID(id,(o)=>{													// Get kmap
+						 this.relatedBase=o;													// Set new base
+							this.relatedId=o.asset_type+"-"+o.id;								// Set id
+							this.DrawHeader(o);													// Set header
+							});
+					return false;																// Don't propagate
+					});
+				}
+			});
+	}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+// RELATED SIDEBAR
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 	DrawRelatedAssets(o, fromHistory)														// DRAW RELATED ASSETS MENU
 	{
 		let i,v,k,sk,str="",browse=true;
@@ -226,140 +355,15 @@ class Pages  {
 			
 		}
 
-	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
-	{
-		var i;
-		$("[id^=sui-popover-]").remove();														// Remove old one
-		if (event.type == "mousedown") {														// Click on popover
-			if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;							// Get out of related and collections
-			this.relatedBase=null;																// No base and set to home
-			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
-			return;																				// Quit
-			}
-		if (id && id.match(/collections-/))	return;												// No maps for collections yet
-		var pos=$(event.target).offset();														// Get position of icon
-		let x=Math.max(160,Math.min(pos.left,$("#sui-main").width()-200));						// Cap sides
-		let str=`<div id='sui-popover-${id}' class='sui-popover' 
-		style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
-		<div style='width:0;height:0;border-left:10px solid transparent;
-		border-right:10px solid transparent;border-bottom:10px solid #999;
-		margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
-		<div style='width:0;height:0;border-left:8px solid transparent;
-		border-right:8px solid transparent;border-bottom:10px solid #fff;
-		margin-left:calc(50% - 8px)'</div>
-		</div>`;
-		$("#sui-main").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-
-		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
-			let v;
-			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
-			$("[id^=sui-popover-]").remove();													// Remove old one
-			let str=`<div id='sui-popover-${id}' class='sui-popover' 
-			style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
-			<div style='width:0;height:0;border-left:10px solid transparent;z-index:10001
-			border-right:10px solid transparent;border-bottom:10px solid #999;
-			margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
-			<div style='width:0;height:0;border-left:8px solid transparent;
-			border-right:8px solid transparent;border-bottom:10px solid #fff;
-			margin-left:calc(50% - 8px)'</div>
-			</div>`;
-			$("#sui-main").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
-	
-			str=`<div style='float:right;margin-top:-8px;font-size:10px'>${o.id}</div>
-			<b>${o.title[0]}</b><hr style='border-top:1px solid #ccc'>
-			<span style='font-size:12px;text-transform:capitalize'>
-			For more information about this ${o.asset_type.slice(0,-1)}, see Full Entry below.<p>`;
-			if (o.feature_types_idfacet && (o.asset_type == "places")) {						// Show Feature types in places
-				str+="<b>Feature types: </b>";													// Add title
-				for (i=0;i<o.feature_types_idfacet.length;++i) {								// For each feature
-					v=o.feature_types_idfacet[i].split("|");									// Split title and id
-					str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${v[1]}'
-					href='#p=${v[1]}'>${v[0]}</a>`;											
-					if (i < o.feature_types_idfacet.length-1)	str+=", ";						// Add separator
-					else str+="<br>"
-					}
-				}
-			str+=`<b>${o.asset_type}: </b>`;
-			if (o.ancestors_txt)
-				for (i=0;i<o.ancestors_txt.length-1;++i) {										// For each trail member
-					str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i]}'
-					href='#p=${o.asset_type}-${o.ancestor_ids_is[i]}'>${o.ancestors_txt[i]}</a>`;											
-					if (i < o.ancestors_txt.length-2)	str+=" / ";								// Add separator
-					}
-			str+=`</p></span><br>
-			<div id='sui-popbot' style='width:100%;padding:1px 12px;background-color:#333;font-size:14px;
-			border-radius:0 0 6px 6px;color:#ddd;margin:-12px;cursor:pointer'>
-			<a class='sui-popItem' href='#p=${o.uid}'>
-			<p id='sui-full-${o.uid}'>&#xe629&nbsp;&nbsp;FULL ENTRY</p></a>
-			</div>`;
-			$("#sui-popover-"+id).append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
-
-			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
-				if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;						// Get out of related and collections
-				this.relatedBase=null;															// No base and set to home
-				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
-				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
-				return false;																	// Don't propagate
-				});
-			
-			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
-				if (sui.ss.mode == "related")	 sui.ss.mode=this.lastMode;						// Get out of related and collections
-				this.relatedBase=null;															// No base and set to home
-				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
-				sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });					// Get kmap and show page
-				return false;																	// Don't propagate
-				});
-			});
-
-		var url=sui.solrUtil.createKmapQuery(id,null,null,300);									// Get query url
-		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {			// Get related places
-			let i,n,str="";
-			if ($("[id^=sui-pop-]")[0])	return; 												// Quit if already loaded
-			if (data.facets.asset_counts.buckets && data.facets.asset_counts.buckets.length){	// If valid data
-				let d=data.facets.asset_counts.buckets;											// Point at bucket array
-				for (i=0;i<d.length;++i) {														// For each bucket
-					n=d[i].count;																// Get count													
-					if (d[i].val == "texts:pages") continue;									// Ignore pages of texts
-					if (n > 1000)	n=Math.floor(n/1000)+"K";									// Shorten
-					str+=`<a class='sui-popItem' href='#v=${id}=${d[i].val}'>
-					<p id='sui-pop-${id}-${d[i].val}' style='cursor:pointer;text-transform:capitalize'>
-					<span style='color:${sui.assets[d[i].val].c}'>${sui.assets[d[i].val].g}</span>
-					&nbsp;&nbsp;Related ${d[i].val} (${n})</p></a>`;
-					}
-				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
-				
-				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
-					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
-					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
-					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url
-					$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=>{ // Get related places
-						sui.MassageKmapData(data);												// Normalize for display
-						sui.curResults=data.response.docs;										// Save current results
-						sui.DrawItems();														// Draw items																
-						sui.DrawFooter();														// Draw footer															
-						sui.ss.page=0;															// Start at beginning
-					});
-					sui.GetKmapFromID(id,(o)=>{													// Get kmap
-						 this.relatedBase=o;													// Set new base
-							this.relatedId=o.asset_type+"-"+o.id;								// Set id
-							this.DrawHeader(o);													// Set header
-							});
-					return false;																// Don't propagate
-					});
-				}
-			});
-	}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // RELATED TREE TOOLS
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
 	
 	AddRelTreeLine(lab, id, marker, path) 													// ADD LINE TO TREE
 	{	
 		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
 		if (marker)	s+=`<div class='sui-spDot' id='sui-ssDot-${path}'>${marker}</div>`;			// If a dot, add it
-		else		s+="<div class='sui-spDot' style='background:none;color:#5b66cb'><b>&bull;</div>";	// If a loner
+		else		s+="<div class='sui-spLoner'><b>&bull;&nbsp;&nbsp;</b></div>";				// If a loner
 		s+=`<a class='sui-noA' href='#p=${id}' id='sui-ssLab-${id}'>${lab}</b>${sui.pages.AddPop(id)}</a>`;		
 		return s;																				// Return line
 	}

@@ -232,6 +232,7 @@
 .sui-spDot 		{	display:inline-block; background-color:#4d59ca; width:16px; height:16px; color:#fff; line-height:14px;
 					font-weight:900; cursor:pointer; border-radius:12px; text-align:center; font-size:16px; margin-right:6px; }
 					.sui-spDot:hover {  opacity: .66;	}
+.sui-spLoner	{	display:inline-block; color:#5b66cb; margin-left:12px;  }
 .sui-spLin 		{ 	margin:4px 0; list-style-type:none; padding:0;	}
 .sui-spImg 		{	float:left; width:160px; margin:0 16px 16px 4px; border-radius:2px; outline:1px solid #999; outline-offset:4px;	}
 .sui-spSub 		{	background-color:#ddd; padding:0 8px; width:120px; font-weight:600; cursor:pointer; border-radius:16px; 

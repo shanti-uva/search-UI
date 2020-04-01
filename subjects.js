@@ -70,8 +70,9 @@ class Subjects  {
 		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
-		if (which == 0)	{																		// Add events
-			$("[id^=sui-ssLab-]").on("click", function(e) {return false;	});					// ON CONtEXT LINE CLICK, INHIBIT
+		if (which == 0)	{																		// If SUBJECT CONTEXT
+			$("#sui-ssLab-"+this.kmap.uid).css({ "font-weight":"bold" });						// Highlight current one	
+			$("[id^=sui-ssLab-]").on("click", function(e) {return false;	});					// ON CONTEXT LINE CLICK, INHIBIT
 			$("[id^=sui-ssDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
@@ -79,10 +80,9 @@ class Subjects  {
 				$(this).html("&ndash;"); 														// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
-			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
 			}
-		else if (which == 1) {																	// If subjects
-			$("[id^=sui-spItem-]").on("click", function(e) {return false;	});					// ON CONtEXT LINE CLICK, INHIBIT
+		else if (which == 1) {																	// If RELATED SUBJECTS
+			$("[id^=sui-spItem-]").on("click", function(e) {return false;	});					// ON CONTEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spCatUL-]").slideDown();												// All down
 			$("[id^=sui-spCat-]").on("click", (e)=> {											// ON CATEGORY CLICK
 				let id=e.currentTarget.id.substring(9);											// Get id
@@ -262,7 +262,6 @@ class Subjects  {
 		sui.GetRelatedFromID(o.uid,(data)=> { 													// Load data
 			let d,i,k=0,str="<table>";
 			if (!data)	return;																	// Quit if no data
-
 			this.relatedSubjectData=data;														// Save subject data
 				if (data[0].illustration_external_url && data[0].illustration_external_url[0]) { // If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
@@ -329,16 +328,16 @@ class Subjects  {
 				str+=s[f][i].title+"</a>"+sui.pages.AddPop(s[f][i].id)+"</li>";					// Add popover
 				++subs;
 			}
-			return str+"</ul>";																	// Close category
-			}
+		return str+"</ul>";																		// Close category
+		}
 	}
 
 	AddSubjectContext(o,d)																	// ADD SUNJECYCONTEXT TAB CONTENTS 	
 	{	
 		let i,n=0,subs=0,sups=0;
 		for (i=0;i<d.length;++i) {																// For each child
-			if (d[i].related_subjects_relation_code_s == "has.as.a.part") 	++subs; 			// Count subordinates
 			if (d[i].related_subjects_relation_code_s == "is.part.of") 		++sups; 			// Count superordinates
+			subs+=d[i].child_count.numFound;													// Add children
 			}
 		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
 		<b>${o.title[0]}</b> has <b> ${sups} </b>superordinate subjects 
