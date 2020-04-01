@@ -75,8 +75,8 @@ class Subjects  {
 			$("[id^=sui-ssDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") sui.pages.AddRelBranch(_this.kmap.asset_type,path,$(this));		// Lazy load branch
-				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+				if (path != "null") sui.pages.AddRelBranch(_this.kmap.asset_type,path,$(this));	// Lazy load branch
+				$(this).html("&ndash;"); 														// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
 			$("#sui-spLab-"+this.kmap.uid).css({ "border-bottom":"1px solid #999" });			// Highlight current one	
