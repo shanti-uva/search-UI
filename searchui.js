@@ -942,6 +942,7 @@ class SearchUI  {
 	
 	DrawFacetItems(facet, open)																	// DRAW FACETS ITEMS
 	{
+		if ((facet == "assets") && !this.curResults) 	this.Query();								// If no results, run query
 		if (facet == "recent") 							this.RecentSearches();						// Show recent searches			
 		else if (this.facets[facet].type == "input") 	this.DrawInput(facet,open);					// Draw input editor			
 		else if (this.facets[facet].type == "tree") {												// If base type is a tree
@@ -1026,6 +1027,7 @@ class SearchUI  {
 		$("[id^=sui-advEditLine-]").remove();														// Remove old members, in all facets
 		for (i=0;i<n;++i) {																			// Add items
 			k=this.facets[facet].data[i].n;															// Number of assets
+			if (k == undefined) k="";																// Hide if undefined
 			if (k > 1000)	k=Math.floor(k/1000)+"K";												// Shorten
 			str+=`<div class='sui-advEditLine' id='sui-advEditLine-${i}'>` 
 			if (facet == "assets")  str+=`<span style='color:${this.assets[this.facets[facet].data[i].id].c}'>${this.assets[this.facets[facet].data[i].id].g}</span> &nbsp;`;
@@ -1158,9 +1160,6 @@ class SearchUI  {
 		style='width:90px;border:1px solid #999;border-radius:12px;font-size:11px;padding-left:6px'> &nbsp; 
 		<div class='sui-advEditBut' id='sui-advListMap-${facet}' title='Tree view'>&#xe638</div> | 
 		<div class='sui-advEditBut' id='sui-advTreeMap-${facet}' title='List view'>&#xe61f</div>`;
-//		if (facet.match(/places|terms|subjects/))													// Show mode icon					
-//			str+=`<div class='sui-advEditBut' id='sui-showSearch-${facet}' title='${this.showSearch ? "Browse" : "Add to search"}'
-//			style='float:right;margin-right:4px'>${this.showSearch ? "&#xe67c" : "&#xe62f"}</div>`;
 		str+=`<hr style='border: .5px solid #a4baec'>
 		<div id='sui-tree${facet}' class='sui-tree'></div>`;		
 		$("#sui-advEdit-"+facet).html(str.replace(/\t|\n|\r/g,""));									// Add tree frame to div
@@ -1190,13 +1189,6 @@ class SearchUI  {
 			e.stopPropagation();																	// Stop propagation
 			});      
 
-/*		$("[id^=sui-showSearch-]").off("click");													// KILL OLD HANDLER
-		$("[id^=sui-showSearch-]").on("click", function() {											// ON CLICK CHANGE CLICK MODE
-			_this.showSearch=!_this.showSearch;														// Toggle flag
-			$(this).html(_this.showSearch ? "&#xe67c" : "&#xe62f");	 								// Flip icon
-			$(this).prop("title",`${_this.showSearch ? "Browse" : "Add to search"}`); 				// Flip title	
-			});      
-*/	
 		$(div).css("max-height",$("#sui-main").height()-$("#sui-advTerm-"+facet).offset().top-$("#sui-advTerm-"+facet).height()-102+"px");	// Fill space
 		$("#sui-advEdit-"+facet).slideDown();														// Show it
 	}
