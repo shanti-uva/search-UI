@@ -361,15 +361,16 @@ class Pages  {
 	
 	AddRelTreeLine(lab, id, marker, path) 													// ADD LINE TO TREE
 	{	
-		let s=`<li style='margin:2px 0 2px ${-32}px'>`;											// Header
-		if (marker)	s+=`<div class='sui-spDot' id='sui-ssDot-${path}'>${marker}</div>`;			// If a dot, add it
+		let s=`<li style='margin:2px 0 2px ${-24}px'>`;											// Header
+		if (marker)	s+=`<div class='sui-spDot' id='sui-spDot-${path}'>${marker}</div>`;			// If a dot, add it
 		else		s+="<div class='sui-spLoner'><b>&bull;&nbsp;&nbsp;</b></div>";				// If a loner
-		s+=`<a class='sui-noA' href='#p=${id}' id='sui-ssLab-${id}'>${lab}</b>${sui.pages.AddPop(id)}</a>`;		
+		s+=`<a class='sui-noA' href='#p=${id}' id='sui-spLab-${id}'>${lab}</b>${sui.pages.AddPop(id)}</a>`;		
 		return s;																				// Return line
 	}
 
 	AddRelBranch(facet, path, dot) 															// LAZY LOAD BRANCH
 	{
+		let _this=this;																			// Save context
 		sui.GetTreeChildren(facet,path,(res)=>{													// Get children
 			let str="";
 			let i,j,re,m,path;
@@ -395,7 +396,7 @@ class Pages  {
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") this.AddRelBranch(facet,path,$(this));							// Lazy load branch
+				if (path != "null") _this.AddRelBranch(facet,path,$(this));						// Lazy load branch
 				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});

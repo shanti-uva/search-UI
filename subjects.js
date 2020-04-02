@@ -71,10 +71,9 @@ class Subjects  {
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
 		if (which == 0)	{																		// If SUBJECT CONTEXT
-			$("#sui-ssLab-"+this.kmap.uid).css({ "font-weight":"bold" });						// Highlight current one	
-			$("[id^=sui-ssLab-]").on("click", function(e) {return false;	});					// ON CONTEXT LINE CLICK, INHIBIT
-			$("[id^=sui-ssDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
-				let firstChild=$(this).parent().find("ul")[0];									// Get first child
+			$("#sui-spLab-"+this.kmap.uid).css({ "font-weight":"bold" });						// Highlight current one	
+			$("[id^=sui-spLab-]").on("click", function(e) {return false;	});					// ON CONTEXT LINE CLICK, INHIBIT
+			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let path=e.currentTarget.id.substring(10);										// Get id
 				if (path != "null") sui.pages.AddRelBranch(_this.kmap.asset_type,path,$(this));	// Lazy load branch
 				$(this).html("&ndash;"); 														// Change label
@@ -335,23 +334,25 @@ class Subjects  {
 
 	AddSubjectContext(o,d)																	// ADD SUNJECYCONTEXT TAB CONTENTS 	
 	{	
-		let i,n=0,subs=0,sups=0;
+		let i,n=0,subs=0;
 		for (i=0;i<d.length;++i) {																// For each child
-			if (d[i].related_subjects_relation_code_s == "is.part.of") 		++sups; 			// Count superordinates
 			subs+=d[i].child_count.numFound;													// Add children
 			}
-		let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
+trace(d)
+subs="(TBD)"
+
+	let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>
 		<div style='max-width:900px'>
-		<b>${o.title[0]}</b> has <b> ${sups} </b>superordinate subjects 
+		<b>${o.title[0]}</b> has <b> ${d[0].ancestors.length-1} </b>superordinate subjects 
 		and <b> ${subs} </b>subordinate subjects. 
 		You can browse these subordinate subjects as well as its superordinate categories with the tree below. 
 		See the RELATED SUBJECTS tab if you instead prefer to view only its immediately 
 		subordinate subjects grouped together in useful ways, as well as subjects non-hierarchically related to it.</div><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		
-		for (n=0;n<d[0].ancestors.length-1;++n) {												// For each ancestor (skipping Earth)
+		for (n=0;n<d[0].ancestors.length;++n) {													// For each ancestor 
 			str+="<ul style='list-style-type:none'>";											// Add header
-			str+=sui.pages.AddRelTreeLine(d[0].ancestors[n+1],d[0].ancestor_uids_generic[n+1],"&ndash;",null); // Add it 
+			str+=sui.pages.AddRelTreeLine(d[0].ancestors[n],d[0].ancestor_uids_generic[n],"&ndash;",null); // Add it 
 			}
 
 		sui.GetTreeChildren(o.asset_type,d[0].ancestor_id_path,(res)=>{							// Get children
