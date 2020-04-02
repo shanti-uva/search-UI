@@ -396,8 +396,11 @@ class Pages  {
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let firstChild=$(this).parent().find("ul")[0];									// Get first child
 				let path=e.currentTarget.id.substring(10);										// Get id
-				if (path != "null") _this.AddRelBranch(facet,path,$(this));						// Lazy load branch
-				$(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 		// Change label
+				if (path != "null") {															// Not loaded yet
+					$(this).html("&ndash;");													// Show it's open
+					_this.AddRelBranch(facet,path,$(this));										// Lazy load branch
+					}
+				else $(this).html($(firstChild).css("display") == "none" ? "&ndash;" : "+"); 	// Change label
 				$(this).parent().find('ul').slideToggle();            							// Slide into place
 				});
 			});
