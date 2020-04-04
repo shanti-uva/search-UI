@@ -77,42 +77,51 @@ class Pages  {
 	}
 
 
-	ShowPopover(id, event)																	// ADD KMAP DROP DOWN
+	ShowPopover(id, event)																	// DISPLAY KMAP DROP DOWN FROM EVENT
 	{
-		var i;
-		$("[id^=sui-popover-]").remove();														// Remove old one
+		if (this.PopoverTimer && (event.type == "mousemove") ) {								// Already in
+			clearTimeout(this.PopoverTimer);													// Kill timer
+			this.PopoverTimer=null;																// Kill flag
+			$("[id^=sui-popover-]").remove();													// Remove old one
+			return;																				// Quit	
+			}
+		if (event.type == "mousemove") {														// Already in
+			clearTimeout(this.PopoverTimer);													// Kill timer
+			this.PopoverTimer=null;																// Kill flag
+			return;
+			}
 		if (event.type == "mousedown") {														// Click on popover
+			clearTimeout(this.PopoverTimer);													// Kill timer
+			this.PopoverTimer=null;																// Kill flag
 			if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;							// Get out of related and collections
 			this.relatedBase=null;																// No base and set to home
-			sui.GetKmapFromID(id,(kmap)=>{ sui.SendMessage("",kmap); });						// Get kmap and show page
+			sui.GetKmapFromID(id,(kmap)=>{ this.Draw(kmap); });									// Get kmap and show page
+			$("[id^=sui-popover-]").remove();													// Remove old one
 			return;																				// Quit
 			}
 		if (id && id.match(/collections-/))	return;												// No maps for collections yet
-		var pos=$(event.target).offset();														// Get position of icon
+		setTimeout(()=>{ this.DisplayPopover(id,event)},500);									// Draw it	
+		}
+		
+	DisplayPopover(id, event)																// ACTUALLY DISPLAY KMAP DROP DOWN
+	{
+		var i,pos=$(event.target).offset();														// Get position of icon
 		let x=Math.max(160,Math.min(pos.left,$("#sui-main").width()-200));						// Cap sides
-		let str=`<div id='sui-popover-${id}' class='sui-popover' 
-		style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
-		<div style='width:0;height:0;border-left:10px solid transparent;
-		border-right:10px solid transparent;border-bottom:10px solid #999;
-		margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
-		<div style='width:0;height:0;border-left:8px solid transparent;
-		border-right:8px solid transparent;border-bottom:10px solid #fff;
-		margin-left:calc(50% - 8px)'</div>
-		</div>`;
-		$("#sui-main").append(str.replace(/\t|\n|\r/g,""));										// Remove format and add to div
-
+		let offset=pos.left-x+150;																// Offset for triangle
+		clearTimeout(this.PopoverTimer);														// Kill timer
+		this.PopoverTimer=null;																	// Kill flag
+		if (!pos.top)	return;																	// Race condition 
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
 			let v;
-			if (!o)  { $("[id^=sui-popover-]").remove(); return; }								// Quit if nothing
 			$("[id^=sui-popover-]").remove();													// Remove old one
+			if (!o)  return; 																	// Quit if nothing
 			let str=`<div id='sui-popover-${id}' class='sui-popover' 
 			style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
-			<div style='width:0;height:0;border-left:10px solid transparent;z-index:10001
-			border-right:10px solid transparent;border-bottom:10px solid #999;
-			margin-left:calc(50% - 12px); margin-top:-22px; margin-bottom:12px'</div>
-			<div style='width:0;height:0;border-left:8px solid transparent;
-			border-right:8px solid transparent;border-bottom:10px solid #fff;
-			margin-left:calc(50% - 8px)'</div>
+			<div style='position:absolute;width:0;height:0;border-left:8px solid transparent;
+			border-right:8px solid transparent;border-bottom:10px solid #999;top:-10px;
+			left:${offset}px'</div>
+			<div style='position:absolute;width:0;height:0;border-left:8px solid transparent;
+			border-right:8px solid transparent;border-bottom:10px solid white;left:-8px;top:2px;'</div>
 			</div>`;
 			$("#sui-main").append(str.replace(/\t|\n|\r/g,""));									// Remove format and add to div
 	
@@ -529,6 +538,7 @@ class Pages  {
 	{
 		let str=`&nbsp;<img src='popover.png' ${small ? "style='width:13px'" : ""}
 		onmouseenter='sui.pages.ShowPopover("${id}",event)' 
+		onmousemove='sui.pages.ShowPopover("${id}",event)' 
 		onmousedown='sui.pages.ShowPopover("${id}",event)'>`;									// Make image call to show popover
 		return str.replace(/\t|\n|\r|/g,"");													// Return markup
 	}
