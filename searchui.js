@@ -405,7 +405,6 @@ class SearchUI  {
 		url+="&child_count.rows=0&fl=child_count:[subquery],*&child_count.q={!child%20of='block_type:parent'}";
 		url+="{!term%20f=uid%20v=$row.related_subjects_id_s}&rows=2000&q=id:"+id+"%20OR%20{!child%20of=block_type:parent}id:"+id+"%20&sort=block_type%20DESC,%20related_subjects_header_s%20ASC";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
-			trace(data)
 			callback(data.response.docs);															// Return data
 		}).fail((msg)=> { console.log(msg); });														// Failure message
 	}
@@ -450,7 +449,7 @@ class SearchUI  {
 	
 	GetAudioFromID(id, callback)																// GET AUDIO FILE FROM ID
 	{
-		$.getJSON("https://terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {			// Get info
+		$.getJSON("//terms.kmaps.virginia.edu/features/"+id+"/recordings", (d)=> {			// Get info
 			let i,r=[];
 			try{ for (i=0;i<d.recordings.length;++i)												// For each recording
 					r.push(d.recordings[i].audio_file);												// Add to array

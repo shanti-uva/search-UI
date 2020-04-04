@@ -69,6 +69,7 @@ class Terms  {
 			});
 
 		sui.GetAudioFromID(o.id, (d)=>{ 														// Get audio info
+			trace(123,d)
 			audioURLs=d; 																		// Get urls
 			if (d.length)	$("#sui-player").slideDown();										// If any recording,show structure
 			if (d.length == 2)	$("#sui-termGroup").append("<option>KHAM-HOR GROUP</option>");	// Add 2nd group if there
@@ -122,12 +123,12 @@ class Terms  {
 				if (str2.length > 30) str2+="<br>";												// Space
 				} catch(e) {}
 
+			addSubjects("PHONEME",o.data_phoneme_ss);											
+			addSubjects("GRAMMARS",o.data_grammars_ss);											
+			addSubjects("TOPICS",o.data_tibet_and_himalayas_ss);											
 			addSubjects("LITERARY PERIOD",o.data_literary_period_ss);							// Add subject types
 			addSubjects("REGISTER",o.data_register_ss);											
 			addSubjects("LANGUAGE CONTEXT",o.data_language_context_ss);											
-			addSubjects("GRAMMARS",o.data_grammars_ss);											
-			addSubjects("PHONEME",o.data_phoneme_ss);											
-			addSubjects("TOPICS",o.data_tibet_and_himalayas_ss);											
 			if (str3.length > 30) str3+="<br>";													// Space
 				
 			this.content[0]=str2.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
