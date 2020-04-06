@@ -31,7 +31,7 @@
 
 class SearchUI  {																					
 
-	constructor(site)   																		// CONSTRUCTOR
+	constructor(site, useProdIndex)   															// CONSTRUCTOR
 	{
 		sui=this;																					// Save ref to class as global
 		this.curResults="";																			// Returns results
@@ -68,7 +68,18 @@ class SearchUI  {
 		this.noTop=(site == "CU") ? true : false;													// Has a top
 		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"searchui.css" }).appendTo("head"); 	// Load CSS
-		this.InitSearchState();																		// Init search state to default
+
+		this.solrId=useProdIndex ? "_prod" : "_dev";												// Set solrId
+		this.solrBase="https://"+(useProdIndex ? "ss395824" : "ss251856")+"-us-east-1-aws.measuredsearch.com/solr/"; // Solr base	
+		this.ss.solrUrl=this.solrBase+"kmassets"+this.solrId+"/select";								// Full url
+		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
+		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
+		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author
+		this.ss.page=0;																				// Current page being shown
+		this.ss.pageSize=100;																		// Results per page	
+		this.ss.site="Mandala";																		// Site
+		this.ss.numResults=0;																		// Number of resulrts found																							
+		this.ClearQuery();																			// Cleae our all search elements in query
 		this.AddFrame();																			// Add div framework
 		
 		if (!location.hash)	{ 																		// Normal startup
@@ -245,7 +256,6 @@ class SearchUI  {
 	{
 		const here=window.location.href.split("#")[0];												// Remove any hashes
 		let id;
-	//	if (hash)	hash=hash.replace(/dev_shanti_/,"stage_shanti_");								// Not dev!
 		if ((id=hash.match(/#p=(.+)/))) {															// If a page
 			id=id[1].toLowerCase();																	// Isolate kmap id
 			setupPage();																			// Prepare page's <div> environment
@@ -321,20 +331,7 @@ class SearchUI  {
 
 //////////////////////////////////////////////////////////////////////////////////////////////  */
 
-	InitSearchState()																			// INIIALIZE SEARCH STATE
-	{
-//		this.solrBase="https://ss395824-us-east-1-aws.measuredsearch.com/solr/";					// Staging base
-		this.solrBase="https://ss251856-us-east-1-aws.measuredsearch.com/solr/";					// Dev base	
-		this.ss.solrUrl=this.solrBase+"kmassets_dev/select";										// Full url
-		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
-		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
-		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author
-		this.ss.page=0;																				// Current page being shown
-		this.ss.pageSize=100;																		// Results per page	
-		this.ss.site="Mandala";																		// Site
-		this.ss.numResults=0;																		// Number of resulrts found																							
-		this.ClearQuery();																			// Cleae our all search elements in query
-		}
+
 
 	ClearQuery()																				// CLEAR SEARCH QUERY STATE TO START
 	{
@@ -400,7 +397,7 @@ class SearchUI  {
 
 	GetRelatedFromID(id, callback)																// GET RELATED THINGS FROM ID
 	{
-		let url=`${this.solrBase}kmterms_dev/query`;												// Base url
+		let url=`${this.solrBase}kmterms${this.solrId}/query`;										// Base url
 		url+="?child_count.fq=related_kmaps_node_type:child&child_count.fl=uid&fq=!related_kmaps_node_type:parent";
 		url+="&child_count.rows=0&fl=child_count:[subquery],*&child_count.q={!child%20of='block_type:parent'}";
 		url+="{!term%20f=uid%20v=$row.related_subjects_id_s}&rows=2000&q=id:"+id+"%20OR%20{!child%20of=block_type:parent}id:"+id+"%20&sort=block_type%20DESC,%20related_subjects_header_s%20ASC";
@@ -422,7 +419,7 @@ class SearchUI  {
 
 	GetChildNamesFromID(facet,id, callback) 													// GET NAMES/ETYMOLGY DATA FROM ID
 	{
-		let url=`${this.solrBase}kmterms_dev/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
+		let url=`${this.solrBase}kmterms${this.solrId}/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
 			}).fail((msg)=> { console.log(msg); });													// Failure message
@@ -430,7 +427,7 @@ class SearchUI  {
 	
 	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
 	{
-		let url=`${this.solrBase}kmterms_dev/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
+		let url=`${this.solrBase}kmterms${this.solrId}/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
 			callback(data.response.docs);															// Return data
 			}).fail((msg)=> { console.log(msg); });													// Failure message
@@ -438,7 +435,7 @@ class SearchUI  {
 
 	GetTreeChildren(facet, path, callback)
 	{
-		let base=`${this.solrBase}kmterms_dev`;														// Base url
+		let base=`${this.solrBase}kmterms${this.solrId}`;														// Base url
 		let lvla=Math.max(path.split("/").length+1,2);												// Set level
 		if ((facet == "features") ||  (facet == "languages")) facet="subjects";						// Features and languages are in subjects
 		var url=sui.solrUtil.buildQuery(base,facet,path,lvla,lvla);									// Build query using Yuji's builder
