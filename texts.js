@@ -46,7 +46,8 @@ class Texts  {
 		sui.LoadingIcon(true,64);																// Show loading icon
 		$.ajax( { url:url, dataType:'jsonp'}).done((data)=> {									// Get json
 			sui.LoadingIcon(false);																// Hide loading icon
-			$("#sui-textCon").html(data);								// Add text content															
+			$("#sui-textCon").html(data);														// Add text content															
+			$("#shanti-texts-container").height($("#sui-left").height()-80);					// Reset text height
 			this.content[0]=$("#shanti-texts-toc").html();										// Save TOC
 			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
 			showTab(0);																			// Show TOC
