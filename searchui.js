@@ -425,11 +425,11 @@ class SearchUI  {
 			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 	
-	GetChildDataFromID(facet, id, callback) 													// GET CHILD DATA FROM ID
+	GetChildDataFromID(uid, callback) 															// GET CHILD DATA FROM ID
 	{
-		let url=`${this.solrBase}kmterms${this.solrId}/select?q=%7B!child%20of=block_type:parent%7Did:${facet}-${id}&fl=*&wt=json&rows=300`;
+		let url=`${this.solrBase}kmterms${this.solrId}/query?q=uid:${uid}&wt=json&fl=*,[child%20parentFilter=block_type:parent%20limit=300]`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
-			callback(data.response.docs);															// Return data
+			callback(data.response.docs[0]);														// Return data
 			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 

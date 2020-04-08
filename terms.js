@@ -40,14 +40,12 @@ class Terms  {
 	Draw(o)																					// DRAW TERM PAGE FROM KMAP
 	{
 		let audioURLs=[""];
-		var latin=(typeof(o.name_latin) == "string" ) ? o.name_latin : o.name_latin.join(", ");
 		var str=`<div class='sui-terms' id='sui-terms' style=''>
 		<span class='sui-termIcon'>${sui.assets[o.asset_type].g}</span>
-		<span class='sui-termTitle'>${o.title[0]}</span>
+		<span class='sui-termTitle' id='sui-termTitle'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
-		<p>TIBETAN:&nbsp;&nbsp<span class='sui-sourceText'>${o.name_tibt}&nbsp;&nbsp;(Tibetan script, original)</span></p>
-		<p>LATIN:&nbsp;&nbsp<span class='sui-sourceText'>${latin}</span></p>`;
-		str+=`<div id='sui-player' style='display:none'>
+		<p id='sui-termNames'>Names</p>
+		<div id='sui-player' style='display:none'>
 		<p><span class='sui-termPlay' id='sui-termPlay'>&#xe60a</span>
 		<select class='sui-termSpeak' id='sui-termGroup'><option>AMDO GROUP</option></select></p></div>`;
 		str+=sui.pages.DrawTabMenu(["DEFINITIONS","DETAILS","OTHER DICTIONARIES"])+"</div>";	// Add tab menu
@@ -69,10 +67,10 @@ class Terms  {
 			});
 
 		sui.GetAudioFromID(o.id, (d)=>{ 														// Get audio info
-			trace(123,d)
 			audioURLs=d; 																		// Get urls
-			if (d.length)	$("#sui-player").slideDown();										// If any recording,show structure
-			if (d.length == 2)	$("#sui-termGroup").append("<option>KHAM-HOR GROUP</option>");	// Add 2nd group if there
+			if (d.length)		$("#sui-player").slideDown();									// If any recording, show structure
+			if (d.length > 1)	$("#sui-termGroup").append("<option>KHAM-HOR GROUP</option>");	// Add 2nd group if there
+			if (d.length > 2)	$("#sui-termGroup").append("<option>CENTRAL TIBET DIALECT</option>");	// Add 3rd group if there
 			});											
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu
 	}
@@ -92,15 +90,17 @@ class Terms  {
 
 	SetTabContent(o)																		// FILL TABS																
 	{
-		sui.GetChildDataFromID("terms",o.id,(data)=> { 											// LOAD CHILD DATA
-			let i,k=1,str,str2,str3;
+		sui.GetChildDataFromID(o.uid,(odata)=> { 												// LOAD CHILD DATA
+			let i,k=1,str,str2,str3,str4="<table>";
 			str2=str3=str="<div style='height:2px'/>";											// Spacer
+			let firstName="";																	// First name listed
 			try { 
+				let data=odata._childDocuments_
 				for (i=0;i<data.length;++i) {													// For each doc
 					if (data[i].id.match(/_definitions-/)) {									// If a definition
 						if (data[i].related_definitions_source_s) {								// If 'another dictionary'
 							str+="<div class='sui-termOther'>"+(k++)+". <i>"+data[i].related_definitions_source_s+"</i></div>";	// Add title
-							str+="<div class='sui-tesrmData'>"+data[i].related_definitions_content_s+"</div>";					// Add text
+							str+=data[i].related_definitions_content_s;															// Add text
 							str+="<div class='sui-termData'>LANGUAGE: "+data[i].related_definitions_language_s;					// Add language
 							str+="</div><hr style='border-top: 1px solid #a2733f'>";											// End rule
 							}
@@ -118,6 +118,14 @@ class Terms  {
 							str2+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule
 							}
 						}
+					if (data[i].id.match(/_names-/)) {											// If a name
+						if (!firstName) firstName=data[i].related_names_header_s;				// Save first name listed
+						str4+=`<tr><td>> <b>${data[i].related_names_header_s}&nbsp;&nbsp;&nbsp;</b></td><td>
+						<i>${data[i].related_names_language_s}, ${data[i].related_names_writing_system_s}, ${data[i].related_names_relationship_s}
+						</i></td></tr>`;														// Add it
+						}
+					$("#sui-termNames").html(str4+"</table>");									// Add names
+					$("#sui-termTitle").html(`${firstName}&nbsp;&nbsp;&nbsp;${o.title[0]}`);		// Add first
 					}
 				if (str.length > 30)  str+="<br>";												// Space
 				if (str2.length > 30) str2+="<br>";												// Space

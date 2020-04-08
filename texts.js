@@ -62,35 +62,37 @@ class Texts  {
 				let i,str="";
 				if (o.summary) str+=o.summary+"<hr>";											// Add summary
 				try { s=`<a title='Collection' id='sui-txtCol' href='#p=${o.collection_uid_s}'>${o.collection_title}</a>${sui.pages.AddPop(o.collection_uid_s)}`;
-				str+=sui.pages.DrawItem("&#xe633","COLLECTION",s) } catch(e) {}
+				if (o.collection_title)	str+=sui.pages.DrawItem("&#xe633","COLLECTION",s) } catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe600","AUTHOR",d.field_book_author.und,"","sui-pageLab",1); } catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","YEAR PUBLISHED", d.field_dc_date_publication_year.und[0].value.substr(0,4),"","sui-pageLab",1); }		catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe633","ORIGINAL YEAR PUBLISHED", d.field_dc_date_orginial_year.und[0].value.substr(0,4),"","sui-pageLab",1); }	catch(e) {}
-				if (o.kmapid_strict_ss) {														// If subjects and/or places
-					str+="<p class='sui-pageLab'>&#xe62b&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;";// Add subjects header
-					for (i=0;i<o.kmapid_strict_ss.length;++i) {									// For each item
-						if (!o.kmapid_strict[i].match(/subjects/i)) continue;					// Only looking for subjects
-						str+=o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]);		// Add name and drop
-						if (i < o.kmapid_strict_ss.length-1)	str+=", ";						// Add separator
-						}
-					str+="</p>";																// End SUBJECTS
-					str+="<p class='sui-pageLab'>&#xe634&nbsp;&nbsp<b>PLACES</b>:&nbsp;&nbsp;";	// Add places header
-					for (i=0;i<o.kmapid_strict_ss.length;++i) {									// For each item
-						if (!o.kmapid_strict[i].match(/places/i)) continue;						// Only looking for places
-						str+=o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]);		// Add name and drop
-						if (i < o.kmapid_strict_ss.length-1)	str+=", ";						// Add separator
-						}
-					str+="</p>";																// End PLACES
+					if (d.field_kmap_places && d.field_kmap_places.und) {						// If places
+						str+="<p class='sui-pageLab'>&#xe62b&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;";// Add subjects header
+						for (i=0;i<d.field_kmap_places.und.length;++i) {						// For each item
+							str+=d.field_kmap_places.und[i].header;								// Add name
+							str+=sui.pages.AddPop(d.field_kmap_places.und[i].domain+"-"+d.field_kmap_places.und[i].id);	// Add drop
+							if (i < d.field_kmap_places.und.length-1)	str+=", ";				// Add separator
+							}
+					str+="</p>";															
 					}
-				str+="<p class='sui-pageLab'>&#xe635&nbsp;&nbsp<b>TERMS</b>:&nbsp;&nbsp;";		// Add TERMS header
-				if (d.field_kmap_terms && d.field_kmap_terms.und) {								// If terms
+				if (d.field_kmap_subjects && d.field_kmap_subjects.und) {						// If subjects
+					str+="<p class='sui-pageLab'>&#xe634&nbsp;&nbsp<b>SUBJECTS</b>:&nbsp;&nbsp;";// Add header
+					for (i=0;i<d.field_kmap_subjects.und.length;++i) {							// For each item
+						str+=d.field_kmap_subjects.und[i].header;								// Add name
+						str+=sui.pages.AddPop(d.field_kmap_subjects.und[i].domain+"-"+d.field_kmap_subjects.und[i].id);	// Add drop
+						if (i < d.field_kmap_subjects.und.length-1)	str+=", ";					// Add separator
+						}
+					str+="</p>";																	
+					}
+					if (d.field_kmap_terms && d.field_kmap_terms.und) {								// If terms
+					str+="<p class='sui-pageLab'>&#xe635&nbsp;&nbsp<b>TERMS</b>:&nbsp;&nbsp;";	// Add header
 					for (i=0;i<d.field_kmap_terms.und.length;++i) {								// For each item
 						str+=d.field_kmap_terms.und[i].header;									// Add name
 						str+=sui.pages.AddPop(d.field_kmap_terms.und[i].domain+"-"+d.field_kmap_terms.und[i].id);	// Add drop
 						if (i < d.field_kmap_terms.und.length-1)	str+=", ";					// Add separator
 						}
+					str+="</p>";																	
 					}
-				str+="</p>";																	// End TERMS
 				try { str+=sui.pages.DrawItem("&#xe675","EDITOR",d.field_book_editor.und,"","sui-pageLab",1); }				catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe674","TRANSLATOR",d.field_book_translator.und,"","sui-pageLab",1); }		catch(e) {}
 				try { str+=sui.pages.DrawItem("&#xe670","LANGUAGE",d.field_dc_language_original.und,"","sui-pageLab",1); }	catch(e) {}
