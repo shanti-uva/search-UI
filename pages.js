@@ -536,7 +536,7 @@ class Pages  {
 
 	AddPop(id, small)																		// ADD KMAP POPOVER
 	{
-		let str=`&nbsp;<img src='popover.png' ${small ? "style='width:13px'" : ""}
+		let str=`&nbsp;<img style='display:inline-block' src='popover.png' ${small ? "style='width:13px'" : ""}
 		onmouseenter='sui.pages.ShowPopover("${id}",event)' 
 		onmousemove='sui.pages.ShowPopover("${id}",event)' 
 		onmousedown='sui.pages.ShowPopover("${id}",event)'>`;									// Make image call to show popover

@@ -52,6 +52,16 @@ class Texts  {
 			$("#shanti-texts-sidebar").remove();												// Remove original sidebar
 			showTab(0);																			// Show TOC
 	
+			$(".kmap-tag-group").each(function() {												// For each tag group
+				let facet=$(this).data("kmdomain");												// Get facet
+				let id=facet+"-"+$(this).data("kmid");											// Make id
+				let str=`<span style='font-family:"Open Sans",shanticon;color:${sui.assets[facet].c}'>
+					${sui.assets[facet].g}&nbsp;</span>
+					${$(this.children[0]).text()}
+					${sui.pages.AddPop(id)}&nbsp;&nbsp;`;
+				$(this.children[0]).html(str.replace(/\t|\n|\r/g,""));
+				})
+
 			let s=`<p><b>ALTERNATIVE FORMATS</b></p>
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/book_pubreader/${o.id}'>&#xe678&nbsp;&nbsp;View in PubReader</a></p>
 			<p>&nbsp;&nbsp;&nbsp;&nbsp;<a target='_blank' href='https://texts.shanti.virginia.edu/shanti_texts/voyant/${o.id}'>&#xe678&nbsp;&nbsp;View in Voyant</a></p>

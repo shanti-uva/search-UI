@@ -48,7 +48,6 @@ class SearchUI  {
 		this.facets.collections=	{ type:"list",  icon:"&#xe633", mode:null, data:[] };			// Collections 
 		this.facets.languages=		{ type:"tree",  icon:"&#xe670", mode:null, data:[] };			// Languages 
 		this.facets.users=			{ type:"input", icon:"&#xe600", mode:null, data:[] };			// Terms 
-//		this.facets.relationships=	{ type:"list",  icon:"&#xe638", mode:null, data:[] };			// Relationships
 	
 		this.assets={};
 		this.assets.all=	 		{ c:"#5b66cb", g:"&#xe60b" };									// All assets
@@ -71,7 +70,7 @@ class SearchUI  {
 
 		this.solrId=useProdIndex ? "_prod" : "_dev";												// Set solrId
 		this.solrBase="https://"+(useProdIndex ? "ss395824" : "ss251856")+"-us-east-1-aws.measuredsearch.com/solr/"; // Solr base	
-		this.ss.solrUrl=this.solrBase+"kmassets"+this.solrId+"/select";								// Full url
+		this.ss.solrUrl=this.solrBase+"kmassets"+(useProdIndex ?  "" : "_dev")+"/select";			// Full url
 		this.ss.mode="input";																		// Current mode - can be input, simple, or advanced
 		this.ss.view="Card";																		// Dispay mode - can be List, Grid, or Card
 		this.ss.sort="Alpha";																		// Sort mode - can be Alpha, Date, or Author
