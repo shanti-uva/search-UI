@@ -48,7 +48,9 @@ class Terms  {
 		<div id='sui-player' style='display:none'>
 		<p><span class='sui-termPlay' id='sui-termPlay'>&#xe60a</span>
 		<select class='sui-termSpeak' id='sui-termGroup'><option>AMDO GROUP</option></select></p></div>`;
-		str+=sui.pages.DrawTabMenu(["DEFINITIONS","DETAILS","OTHER DICTIONARIES"])+"</div>";	// Add tab menu
+		str+=sui.pages.DrawTabMenu(["DEFINITIONS","DETAILS"]);									// Add tab menu
+		str+="<br><div class='sui-termOHead'>OTHER DICTIONARIES</div>";							// Add other header
+		str+="<div id='sui-termOther' class='sui-termOther'></div></div>";						// Add div for other dictionaries
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 		this.SetTabContent(o);																	// Fill tab contents
 
@@ -91,31 +93,44 @@ class Terms  {
 	SetTabContent(o)																		// FILL TABS																
 	{
 		sui.GetChildDataFromID(o.uid,(odata)=> { 												// LOAD CHILD DATA
-			let i,k=1,str,str2,str3,str4="<table>";
-			str2=str3=str="<div style='height:2px'/>";											// Spacer
+			let i,k=1,l=1;
+			let str="";
+			let str2="<br>";
+			let str3="<div style='height:2px'/>";												// Spacer
+			let str4="<table>";
 			let firstName="";																	// First name listed
 			try { 
+				trace(odata)
 				let data=odata._childDocuments_
 				for (i=0;i<data.length;++i) {													// For each doc
 					if (data[i].id.match(/_definitions-/)) {									// If a definition
-						if (data[i].related_definitions_source_s) {								// If 'another dictionary'
-							str+="<div class='sui-termOther'>"+(k++)+". <i>"+data[i].related_definitions_source_s+"</i></div>";	// Add title
-							str+=data[i].related_definitions_content_s;															// Add text
-							str+="<div class='sui-termData'>LANGUAGE: "+data[i].related_definitions_language_s;					// Add language
-							str+="</div><hr style='border-top: 1px solid #a2733f'>";											// End rule
+						if (data[i].related_definitions_source_s) {								// If another dictionary
+							str+="<div>"+(k++)+". <i>"+data[i].related_definitions_source_s+"</i></div>";	// Add title
+							str+="<p style='font-size:14px;padding:0 24px;line-height:22px'>";
+							str+=data[i].related_definitions_content_s;							// Add text
+							str+="</p><div class='sui-termData'>";
+							str+="<div class='sui-termData'>LANGUAGE: "+data[i].related_definitions_language_s;	// Add language
+							str+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule and div
 							}
-						else{																									// A primary definition
-							str2+="<div style='font-size:14px;padding:0 24px;'>"+data[i].related_definitions_content_s+"";		// Add text
-							if (data[i]["related_definitions_branch_subjects-185_header_s"]) {									// If a header
+						else{																	// A primary definition
+							str2+="<div>"+(l++)+".<i> Definition</i></div>";					// Header
+							str2+="<div style='font-size:14px;padding:0 24px'>";
+							str2+=data[i].related_definitions_content_s;						// Add text
+							if (data[i]["related_definitions_branch_subjects-185_header_s"]) {	// If a header
 								str2+=data[i]["related_definitions_branch_subjects-185_header_s"].toUpperCase();				// Add label
 								str2+=": <i>"+data[i]["related_definitions_branch_subjects-185_subjects_headers_t"]+"</i>";		// Add value
-								str2+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0]);	// Add popover
+								str2+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br><br>";	// Add popover
 								}
+							str2+="<span class='sui-termTagged'>RESOURCES TAGGED: ";
+							str2+="<span style='cursor:pointer;color:"+sui.assets["texts"].c+"' title='See texts tagged with this definition'>"+sui.assets["texts"].g+"</span> ";
+							str2+="<span style='cursor:pointer;color:"+sui.assets["images"].c+"' title='See images tagged with this definition'>"+sui.assets["images"].g+"</span> ";
+							str2+="<span style='cursor:pointer;color:"+sui.assets["places"].c+"' title='See places tagged with this definition'>"+sui.assets["places"].g+"</span>";
+							str+="</span>"
 							str2+="<div class='sui-termData'>";
 							if (data[i].related_definitions_author_s) str2+="AUTHOR: "+data[i].related_definitions_author_s+" | ";						
 							if (data[i].related_definitions_tense_s)  str2+="TENSE: "+data[i].related_definitions_tense_s+" | ";						
 							str2+=" LANGUAGE: "+data[i].related_definitions_language_s;			// Add language
-							str2+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule
+							str2+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule and
 							}
 						}
 					if (data[i].id.match(/_names-/)) {											// If a name
@@ -139,12 +154,10 @@ class Terms  {
 			addSubjects("LANGUAGE CONTEXT",o.data_language_context_ss);											
 			if (str3.length > 30) str3+="<br>";													// Space
 				
-			this.content[0]=str2.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
-			this.content[1]=str3.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
-			this.content[2]=str.replace(/\t|\n|\r/g,"");										// Remove format and add to div	
-			if (this.content[0].length > 30) 	  this.ShowTab(0);								// Open definitions tab if something there
-			else if (this.content[2].length > 30) this.ShowTab(2);								// Try others
-			else if (this.content[1].length > 30) this.ShowTab(1);								// Try details
+			this.content[0]=str2.replace(/\t|\n|\r/g,"");										// Remove format and add defs to div	
+			this.content[1]=str3.replace(/\t|\n|\r/g,"");										// Remove format and add details to div	
+			$("#sui-termOther").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add others to div	
+			this.ShowTab(0);																	// Open definitions tab if something there
 			
 			function addSubjects(title, val) {													// ADD SUBJECTS
 				let i=0;
