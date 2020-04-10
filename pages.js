@@ -231,6 +231,7 @@ class Pages  {
 					let d=data.facets.asset_counts.buckets;										// Point at bucket array
 					for (i=0;i<d.length;++i) {													// For each bucket
 						if (d[i].val == "texts:pages")	continue;								// Skip it
+						if ((o.asset_type == "terms") && (d[i].val == "terms"))	continue;		// Skip
 						n=d[i].count;															// Get count													
 						tot+=n;																	// Add to total
 						if (n > 1000)	n=Math.floor(n/1000)+"K";								// Shorten

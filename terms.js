@@ -33,8 +33,8 @@ class Terms  {
 	{
 		sui.trm=this;																			// Save context
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
-		this.content=["...loading","...loading","...loading"];									// Content pages
 		this.recordingGroup=0;																	// Which group
+		this.tabs=[];																			// Tab contents
 	}
 
 	Draw(o)																					// DRAW TERM PAGE FROM KMAP
@@ -48,16 +48,12 @@ class Terms  {
 		<div id='sui-player' style='display:none'>
 		<p><span class='sui-termPlay' id='sui-termPlay'>&#xe60a</span>
 		<select class='sui-termSpeak' id='sui-termGroup'><option>AMDO GROUP</option></select></p></div>`;
-		str+=sui.pages.DrawTabMenu(["DEFINITIONS","DETAILS"]);									// Add tab menu
+		str+="<div id='sui-termDefs' class='sui-termOther'></div>";								// Add div for primary defs
 		str+="<br><div class='sui-termOHead'>OTHER DICTIONARIES</div>";							// Add other header
-		str+="<div id='sui-termOther' class='sui-termOther'></div></div>";						// Add div for other dictionaries
+		str+="<div id='sui-termOther' class='sui-termOther' style='padding:0 24px'></div></div>";	// Add div for other dictionaries
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
 		this.SetTabContent(o);																	// Fill tab contents
 
-		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
-			var id=e.currentTarget.id.substring(10);											// Get index of tab	
-			this.ShowTab(id);																	// Draw it
-			});
 		$("#sui-termPlay").on("click", (e)=>{													// ON TERM PLAY
 			let snd=new Audio();																// Init audio object
 			snd=new Audio(audioURLs[this.recordingGroup]);										// Load it				
@@ -77,30 +73,15 @@ class Terms  {
 		sui.pages.DrawRelatedAssets(o);															// Draw related assets menu
 	}
 
-	ShowTab(which) 																			// SHOW TAB
-	{
-		$("[id^=sui-spLab-]").off("click");														// Kill handler
-		$("[id^=sui-spDot-]").off("click");														// Kill handler
-		$("[id^=sui-spItem-]").off("click");													// Kill handler
-		$("[id^=sui-togCat-]").off("click");													// Kill handler
-		$("[id^=sui-spCatUL-]").off("click");													// Kill handler
-		$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });					// Reset all tabs
-		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
-		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
-		$("#sui-tabContent").html(this.content[which]);											// Set content
-	}
-
 	SetTabContent(o)																		// FILL TABS																
 	{
 		sui.GetChildDataFromID(o.uid,(odata)=> { 												// LOAD CHILD DATA
-			let i,k=1,l=1;
-			let str="";
-			let str2="<br>";
+			let i,k=1,l=0,t;
+			let str="<br>",str2="";
 			let str3="<div style='height:2px'/>";												// Spacer
 			let str4="<table>";
 			let firstName="";																	// First name listed
 			try { 
-				trace(odata)
 				let data=odata._childDocuments_
 				for (i=0;i<data.length;++i) {													// For each doc
 					if (data[i].id.match(/_definitions-/)) {									// If a definition
@@ -113,24 +94,31 @@ class Terms  {
 							str+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule and div
 							}
 						else{																	// A primary definition
-							str2+="<div>"+(l++)+".<i> Definition</i></div>";					// Header
-							str2+="<div style='font-size:14px;padding:0 24px'>";
-							str2+=data[i].related_definitions_content_s;						// Add text
+							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES","TBD"]);	// Add tab menu
+							t=["","<br>","<br>","<br>Waiting for data from Derik<br>"] ;		// New tab
+							t[0]+="<div style='font-size:14px;padding:0 24px'>";
+							t[0]+=data[i].related_definitions_content_s;						// Add text
+							t[0]+="</div><div class='sui-termData'>";
+							if (data[i].related_definitions_author_s) t[0]+="AUTHOR: "+data[i].related_definitions_author_s+" | ";						
+							t[0]+="LANGUAGE: "+data[i].related_definitions_language_s+"</div><br><br>"; // Add language
+							
 							if (data[i]["related_definitions_branch_subjects-185_header_s"]) {	// If a header
-								str2+=data[i]["related_definitions_branch_subjects-185_header_s"].toUpperCase();				// Add label
-								str2+=": <i>"+data[i]["related_definitions_branch_subjects-185_subjects_headers_t"]+"</i>";		// Add value
-								str2+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br><br>";	// Add popover
+								t[1]+=data[i]["related_definitions_branch_subjects-185_header_s"].toUpperCase();						// Add label
+								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-185_subjects_headers_t"]+"</i>";				// Add value
+								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
-							str2+="<span class='sui-termTagged'>RESOURCES TAGGED: ";
-							str2+="<span style='cursor:pointer;color:"+sui.assets["texts"].c+"' title='See texts tagged with this definition'>"+sui.assets["texts"].g+"</span> ";
-							str2+="<span style='cursor:pointer;color:"+sui.assets["images"].c+"' title='See images tagged with this definition'>"+sui.assets["images"].g+"</span> ";
-							str2+="<span style='cursor:pointer;color:"+sui.assets["places"].c+"' title='See places tagged with this definition'>"+sui.assets["places"].g+"</span>";
-							str+="</span>"
-							str2+="<div class='sui-termData'>";
-							if (data[i].related_definitions_author_s) str2+="AUTHOR: "+data[i].related_definitions_author_s+" | ";						
-							if (data[i].related_definitions_tense_s)  str2+="TENSE: "+data[i].related_definitions_tense_s+" | ";						
-							str2+=" LANGUAGE: "+data[i].related_definitions_language_s;			// Add language
-							str2+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule and
+							t[1]+="LANGUAGE: <i>"+data[i].related_definitions_language_s+"</i>";	
+							t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-184_subjects_uids_t"][0])+"<br>";	// Add popover
+							if (data[i]["related_definitions_branch_subjects-5855_header_s"]) {	// If a header
+								t[1]+=data[i]["related_definitions_branch_subjects-5855_header_s"].toUpperCase();						// Add label
+								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
+								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
+								}
+								t[1]+="<br><b>Resources tagged with this definition: </b>"; 
+							t[1]+="<span style='vertical-align:-4px;font-size:20px;cursor:pointer;color:"+sui.assets["texts"].c+"' title='See texts tagged with this definition'>"+sui.assets["texts"].g+"</span> (2) &nbsp;&nbsp;";
+							t[1]+="<span style='vertical-align:-4px;font-size:20px;cursor:pointer;color:"+sui.assets["images"].c+"' title='See images tagged with this definition'>"+sui.assets["images"].g+"</span> (1) &nbsp;&nbsp;";
+							t[1]+="<span style='vertical-align:-4px;font-size:20px;cursor:pointer;color:"+sui.assets["places"].c+"' title='See places tagged with this definition'>"+sui.assets["places"].g+"</span> (3)<br><br>";
+							this.tabs.push(t);													// Add tab data for this def
 							}
 						}
 					if (data[i].id.match(/_names-/)) {											// If a name
@@ -140,10 +128,8 @@ class Terms  {
 						</i></td></tr>`;														// Add it
 						}
 					$("#sui-termNames").html(str4+"</table>");									// Add names
-					$("#sui-termTitle").html(`${firstName}&nbsp;&nbsp;&nbsp;${o.title[0]}`);		// Add first
+					$("#sui-termTitle").html(`${firstName}&nbsp;&nbsp;&nbsp;${o.title[0]}`);	// Add first
 					}
-				if (str.length > 30)  str+="<br>";												// Space
-				if (str2.length > 30) str2+="<br>";												// Space
 				} catch(e) {}
 
 			addSubjects("PHONEME",o.data_phoneme_ss);											
@@ -152,12 +138,9 @@ class Terms  {
 			addSubjects("LITERARY PERIOD",o.data_literary_period_ss);							// Add subject types
 			addSubjects("REGISTER",o.data_register_ss);											
 			addSubjects("LANGUAGE CONTEXT",o.data_language_context_ss);											
-			if (str3.length > 30) str3+="<br>";													// Space
-				
-			this.content[0]=str2.replace(/\t|\n|\r/g,"");										// Remove format and add defs to div	
-			this.content[1]=str3.replace(/\t|\n|\r/g,"");										// Remove format and add details to div	
+			$("#sui-termDefs").html(str2.replace(/\t|\n|\r/g,""));								// Remove format and add primary defs to div	
 			$("#sui-termOther").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add others to div	
-			this.ShowTab(0);																	// Open definitions tab if something there
+			for (i=0;i<l;++i) this.ShowTab(i,0)													// Open 1st tab	in each def	
 			
 			function addSubjects(title, val) {													// ADD SUBJECTS
 				let i=0;
@@ -175,6 +158,31 @@ class Terms  {
 					str3+=sui.pages.AddPop(o.related_uid_ss[i])+"</p>";							// Add popover
 				}	
 		});
+	}
+
+	DrawTabMenu(num, tabs)																	// DRAW TAB MENU
+	{
+		let i,str="";														
+		for (i=0;i<tabs.length;++i)	{															// For each tab	
+			str+=`<div class='sui-tabTab' id='sui-tabTab-${num}-${i}' style='display:inline-block;text-align:left;padding-left:24px;width:calc(33.333% - 26px)'>
+			${tabs[i]}&nbsp;&#xe609</div>`;														// Add it
+			}
+		str+=`<div class='sui-tabContent' id='sui-tabContent-${num}'>hhh</div>`;				// Tab contents
+		return str.replace(/\t|\n|\r|/g,"");													// Return tab markup
+	}
+
+	ShowTab(num, which) 																	// SHOW TAB
+	{
+		$("[id^=sui-tabTab-"+num).css({"background-color":"#999",color:"#fff","border-top":"2px solid #999"});				// Reset all tabs
+		$("#sui-tabContent-"+num).css({display:"block","background-color":"#eee"});				// Show content
+		$("#sui-tabTab-"+num+"-"+which).css({"background-color":"#eee",color:"#000","border-top":"2px solid #a2733f"});			// Active tab
+		$("#sui-tabContent-"+num).html(this.tabs[num][which]);									// Set content
+		$("[id^=sui-tabTab]").off();															// Kill old handlers
+		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
+			var id=e.currentTarget.id.substring(11);											// Get index of tab	
+			let v=id.split("-");																// Get num and which
+			this.ShowTab(v[0],v[1]);															// Draw it
+			});
 	}
 
 
