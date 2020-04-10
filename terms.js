@@ -48,6 +48,8 @@ class Terms  {
 		<div id='sui-player' style='display:none'>
 		<p><span class='sui-termPlay' id='sui-termPlay'>&#xe60a</span>
 		<select class='sui-termSpeak' id='sui-termGroup'><option>AMDO GROUP</option></select></p></div>`;
+		str+="<div id='sui-termDetails'></div>";												// Add div for details
+
 		str+="<div id='sui-termDefs' class='sui-termOther'></div>";								// Add div for primary defs
 		str+="<br><div class='sui-termOHead'>OTHER DICTIONARIES</div>";							// Add other header
 		str+="<div id='sui-termOther' class='sui-termOther' style='padding:0 24px'></div></div>";	// Add div for other dictionaries
@@ -82,7 +84,7 @@ class Terms  {
 			let str4="<table>";
 			let firstName="";																	// First name listed
 			try { 
-				let data=odata._childDocuments_
+				let data=odata._childDocuments_;												// Point at data
 				for (i=0;i<data.length;++i) {													// For each doc
 					if (data[i].id.match(/_definitions-/)) {									// If a definition
 						if (data[i].related_definitions_source_s) {								// If another dictionary
@@ -132,12 +134,17 @@ class Terms  {
 					}
 				} catch(e) {}
 
+			str3="<table style='width:100%'><tr>"												// Add subject types
 			addSubjects("PHONEME",o.data_phoneme_ss);											
 			addSubjects("GRAMMARS",o.data_grammars_ss);											
+			str3+="</tr><tr>"
 			addSubjects("TOPICS",o.data_tibet_and_himalayas_ss);											
-			addSubjects("LITERARY PERIOD",o.data_literary_period_ss);							// Add subject types
+			addSubjects("LITERARY PERIOD",o.data_literary_period_ss);							
+			str3+="</tr><tr>"
 			addSubjects("REGISTER",o.data_register_ss);											
-			addSubjects("LANGUAGE CONTEXT",o.data_language_context_ss);											
+			addSubjects("LANGUAGE CONTEXT",o.data_language_context_ss);
+			str3+="</tr></table>";
+			$("#sui-termDetails").html(str3+"<br>");											// Add Details
 			$("#sui-termDefs").html(str2.replace(/\t|\n|\r/g,""));								// Remove format and add primary defs to div	
 			$("#sui-termOther").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add others to div	
 			for (i=0;i<l;++i) this.ShowTab(i,0)													// Open 1st tab	in each def	
@@ -151,11 +158,11 @@ class Terms  {
 							break;																// Quit
 					i=Math.min(o.kmapid_subjects_idfacet.length-1,i);							// Cap
 					}
-				str3+=`<p>${title}: <i>${val}</i>`;												// Add title
+				str3+=`<td>${title}: <i>${val}</i>`;											// Add title
 				if (o.kmapid_subjects_idfacet)													// If data
-					str3+=sui.pages.AddPop(o.kmapid_subjects_idfacet[i].split("|")[1])+"</p>";	// Add popover
+					str3+=sui.pages.AddPop(o.kmapid_subjects_idfacet[i].split("|")[1])+"</td>";	// Add popover
 				else
-					str3+=sui.pages.AddPop(o.related_uid_ss[i])+"</p>";							// Add popover
+					str3+=sui.pages.AddPop(o.related_uid_ss[i])+"</td>";						// Add popover
 				}	
 		});
 	}
