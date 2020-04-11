@@ -96,8 +96,8 @@ class Terms  {
 							str+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule and div
 							}
 						else{																	// A primary definition
-							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES","TBD"]);	// Add tab menu
-							t=["","<br>","<br>","<br>Waiting for data from Derik<br>"] ;		// New tab
+							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES","PASSAGES"]);	// Add tab menu
+							t=["","<br>","<br>Waiting for data from Derik...<br><br><br><br>"] ;// New tab
 							t[0]+="<div style='font-size:14px;padding:0 24px'>";
 							t[0]+=data[i].related_definitions_content_s;						// Add text
 							t[0]+="</div><div class='sui-termData'>";
@@ -110,7 +110,7 @@ class Terms  {
 								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
 							t[1]+="LANGUAGE: <i>"+data[i].related_definitions_language_s+"</i>";	
-							t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-184_subjects_uids_t"][0])+"<br>";	// Add popover
+							t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-184_subjects_uids_t"][0])+"<br>";		// Add popover
 							if (data[i]["related_definitions_branch_subjects-5855_header_s"]) {	// If a header
 								t[1]+=data[i]["related_definitions_branch_subjects-5855_header_s"].toUpperCase();						// Add label
 								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
@@ -180,9 +180,9 @@ class Terms  {
 
 	ShowTab(num, which) 																	// SHOW TAB
 	{
-		$("[id^=sui-tabTab-"+num).css({"background-color":"#999",color:"#fff","border-top":"2px solid #999"});				// Reset all tabs
+		$("[id^=sui-tabTab-"+num).css({"background-color":"#999",color:"#fff","border-top":"1px solid #999"});				// Reset all tabs
 		$("#sui-tabContent-"+num).css({display:"block","background-color":"#eee"});				// Show content
-		$("#sui-tabTab-"+num+"-"+which).css({"background-color":"#eee",color:"#000","border-top":"2px solid #a2733f"});			// Active tab
+		$("#sui-tabTab-"+num+"-"+which).css({"background-color":"#eee",color:"#000","border-top":"1px solid #a2733f"});			// Active tab
 		$("#sui-tabContent-"+num).html(this.tabs[num][which]);									// Set content
 		$("[id^=sui-tabTab]").off();															// Kill old handlers
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
