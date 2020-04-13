@@ -177,10 +177,10 @@
 .sui-termSpeak  {	border-radius:16px; background-color:#f8f8f8; border:1px-solid #999; padding:4px; color:#000; }
 .sui-termOHead  {	background-color:#a2733f; font-weight:900; padding:4px 16px; color:#fff; font-size:18px; }
 .sui-termOther  { 	background-color: #eee}
-
 .sui-termData   {	font-size:12px; float:right; color:#a2733f; margin-right:16px}
 .sui-termPlay   {	font-size:20px; vertical-align:-4px; color:#a2733f; font-weight:bold; margin-right:12px; cursor:pointer; }
-.sui-termIcon   {	font-size:24px; color:#a2733f; vertical-align:-4px; margin-right:12px; }
+.sui-termAssetBut { display:inline-block; text-transform:uppercase; cursor:pointer; padding:6px 18px 6px 12px; 
+					color:#fff; margin: 8px 16px 24px 0; width:auto; font-size:13px;}
 
 /* IMAGES PAGE */
 .sui-imagesBox {	background-color:#000; width:calc(100% + 24px); padding: 60px 0 12px 0; color:#eee; text-align:center; 

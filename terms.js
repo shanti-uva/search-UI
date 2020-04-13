@@ -116,10 +116,10 @@ class Terms  {
 								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
 								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
-								t[1]+="<br><b>Resources tagged with this definition: </b>"; 
-							t[1]+="<span style='vertical-align:-4px;font-size:20px;cursor:pointer;color:"+sui.assets["texts"].c+"' title='See texts tagged with this definition'>"+sui.assets["texts"].g+"</span> (2) &nbsp;&nbsp;";
-							t[1]+="<span style='vertical-align:-4px;font-size:20px;cursor:pointer;color:"+sui.assets["images"].c+"' title='See images tagged with this definition'>"+sui.assets["images"].g+"</span> (1) &nbsp;&nbsp;";
-							t[1]+="<span style='vertical-align:-4px;font-size:20px;cursor:pointer;color:"+sui.assets["places"].c+"' title='See places tagged with this definition'>"+sui.assets["places"].g+"</span> (3)<br><br>";
+							t[1]+="<br><b>Resources tagged with this definition: </b><br>"; 
+							t[1]+=drawAssetButton("texts", l-1,2);
+							t[1]+=drawAssetButton("places", l-1,2);
+							t[1]+=drawAssetButton("images", l-1,2);
 							this.tabs.push(t);													// Add tab data for this def
 							}
 						}
@@ -134,6 +134,19 @@ class Terms  {
 					}
 				} catch(e) {}
 
+			function drawAssetButton(facet, defNum, num) {
+				let str=`<div id='sui-termAssetBut-${defNum}-${facet}'
+					class='sui-termAssetBut' style='background-color:${sui.assets[facet].c}'>
+					<span style='font-size:20px; vertical-align:-4px'>${sui.assets[facet].g}&nbsp;</span>${facet}&nbsp;&nbsp;
+					(${num})</div>`;
+					return str.replace(/\t|\n|\r/g,"");
+				}
+				
+			sui.GetDefinitionAssets(o.uid, (data)=> {
+				trace(data)
+				});
+
+			
 			str3="<table style='width:100%'><tr>"												// Add subject types
 			addSubjects("PHONEME",o.data_phoneme_ss);											
 			addSubjects("GRAMMARS",o.data_grammars_ss);											
