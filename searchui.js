@@ -394,11 +394,11 @@ class SearchUI  {
 			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 
-	GetDefinitionAssets(id,callback)															// GET TAGGED ASSETS TO TERM
+	GetDefinitionAssets(id, callback)															// GET TAGGED ASSETS TO TERM
 	{
-		let url=`${this.solrBase}kmterms${this.solrId}/select?q=id:${id}_definitions-1&wt=json`;	// Make URL
+		let url=this.ss.solrUrl+"?q=kmapid:"+id.toLowerCase()+"&wt=json";							// Set query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
-			callback(data);																			// Return data
+			callback(data.response.docs);															// Return kmaps
 		}).fail((msg)=> { console.log(msg); });														// Failure message
 	}
 

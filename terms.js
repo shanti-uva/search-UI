@@ -116,10 +116,6 @@ class Terms  {
 								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
 								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
-							t[1]+="<br><b>Resources tagged with this definition: </b><br>"; 
-							t[1]+=drawAssetButton("texts", l-1,2);
-							t[1]+=drawAssetButton("places", l-1,2);
-							t[1]+=drawAssetButton("images", l-1,2);
 							this.tabs.push(t);													// Add tab data for this def
 							}
 						}
@@ -142,8 +138,34 @@ class Terms  {
 					return str.replace(/\t|\n|\r/g,"");
 				}
 				
-			sui.GetDefinitionAssets(o.uid, (data)=> {
+			sui.GetDefinitionAssets(o.uid, (data)=> {											// FILL RESORCES TAGGED DATA
 				trace(data)
+				let i,j,d,t,def;
+				this.tagged=[];																	// Init tagged array
+				if (!data) 			return "";													// Quit if nothing tagged
+				if (!data.length) 	return "";													// Quit if nothing tagged
+				let s="<br><b>Resources tagged with this definition: </b><br>"; 
+				for (i=0;i<data.length;++i) {													// For each resuly
+					d=data[i];																	// Point at it
+					if (d.asset_type == "terms")	continue;									// Skip terms
+					t=[];																		// Init tagged array
+					t.subjects=[];		t.places=t.images=[];	t.sources=[];
+					t.visuals=[];		t.collections=[];		t.texts=[];		t["audio-video"]=[];
+					this.tagged.push(t);														// Set in def array
+					}
+				for (i=0;i<data.length;++i) {													// For each result
+					d=data[i];																	// Point at it
+					if (d.asset_type == "terms")	continue;									// Skip terms
+					def=d.kmapid.join().match(/_definitions-(\d*)/i)[1]-1;						// Get def #
+					this.tagged[def][d.asset_type].push(d);										// Add kmap	
+						}
+				for (i=0;i<this.tagged.length;++i) {											// For each type
+				}
+
+	s+=drawAssetButton("texts", l-1,2);
+	s+=drawAssetButton("places", l-1,2);
+	s+=drawAssetButton("images", l-1,2);
+				this.tabs[0][1]=s;
 				});
 
 			
