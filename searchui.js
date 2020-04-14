@@ -376,8 +376,7 @@ class SearchUI  {
 			this.searches.push(JSON.parse(JSON.stringify(this.ss)));								// Add to recent searches
 			}
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
-			this.curResults=data.response.docs;														// Save current results
-			this.MassageKmapData(data);																// Normalize for display
+			this.curResults=this.MassageKmapData(data.response.docs);								// Normalize for display
 			this.GetFacetData(data);																// Get facet data counts
 			this.LoadingIcon(false);																// Hide loading icon
 			this.DrawResults();																		// Draw results page if active
@@ -389,8 +388,8 @@ class SearchUI  {
 	{
 		var url=this.ss.solrUrl+"?q=uid:"+id.toLowerCase()+"&wt=json";								// Set query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
-			data=this.MassageKmapData(data);														// Normalize kmap
-			callback(data.response.docs[0]);														// Return kmap
+			data=this.MassageKmapData(data.response.docs[0]);										// Normalize kmap
+			callback(data);																			// Return kmap
 			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 
@@ -398,7 +397,8 @@ class SearchUI  {
 	{
 		let url=this.ss.solrUrl+"?q=kmapid:"+id.toLowerCase()+"&wt=json";							// Set query url
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
-			callback(data.response.docs);															// Return kmaps
+			data=this.MassageKmapData(data.response.docs);											// Normalize kmap
+			callback(data);																			// Return kmaps
 		}).fail((msg)=> { console.log(msg); });														// Failure message
 	}
 
@@ -418,9 +418,9 @@ class SearchUI  {
 		this.LoadingIcon(true,64);																	// Show loading icon
 		url=this.solrUtil.createKmapQuery(id,"places",0,10000);										// Make query url
 		$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=> {				// Get data from SOLR
-			this.MassageKmapData(data);																// Normalize for display
+			data=this.MassageKmapData(data.response.docs);											// Normalize for display
 			this.LoadingIcon(false);																// Hide loading icon
-			callback(data.response.docs);															// Return data
+			callback(data);																			// Return data
 			}).fail((msg)=> { console.log(msg); this.LoadingIcon(false);  this.Popup("Related query error"); });	// Failure message
 	}
 
@@ -476,8 +476,8 @@ class SearchUI  {
 	MassageKmapData(data)																		// MASSAGE KMAP RESPONSE FOR DISPLAY
 	{
 		var i,o;
-		for (i=0;i<data.response.docs.length;++i) {													// For each result, massage data
-			o=data.response.docs[i];																// Point at item
+		for (i=0;i<data.length;++i) {																// For each result, massage data
+			o=data[i];																				// Point at item
 			if (o.asset_subtype) o.asset_subtype=o.asset_subtype.charAt(0).toUpperCase()+o.asset_subtype.slice(1);	
 			if (o.url_thumb)	 o.url_thumb=o.url_thumb.replace(/images-test/i,"images");			// Force to prod
 			if (o.asset_type =="places") {															// If places

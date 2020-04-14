@@ -238,6 +238,7 @@ class Terms  {
 			sui.pages.relatedType=v[1];															// Set asset type
 			sui.pages.relatedBase=this.kmap;													// Set base									
 			sui.pagesrelatedId=sui.pages.relatedBase.asset_type+"-"+sui.pages.relatedBase.id;	// Set id
+			
 			if (v[1] == "all")	sui.curResults=this.tagged[v[0]];								// Show all
 			else {																				// Just one
 				sui.curResults=[];																// Clear

@@ -193,8 +193,7 @@ class Pages  {
 					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
 					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url
 					$.ajax( { url: url,  dataType: 'jsonp', jsonp: 'json.wrf' }).done((data)=>{ // Get related places
-						sui.MassageKmapData(data);												// Normalize for display
-						sui.curResults=data.response.docs;										// Save current results
+						sui.curResults=sui.MassageKmapData(data.response.docs);					// Normalize for display
 						sui.DrawItems();														// Draw items																
 						sui.DrawFooter();														// Draw footer															
 						sui.ss.page=0;															// Start at beginning
