@@ -35,11 +35,14 @@ class Terms  {
 		this.div=sui.pages.div;																	// Div to hold page (same as Pages class)
 		this.recordingGroup=0;																	// Which group
 		this.tabs=[];																			// Tab contents
+		this.tagged=[];																			// Kmaps of tagged definitions
+		this.kmap=null;																			// Current kmap
 	}
 
 	Draw(o)																					// DRAW TERM PAGE FROM KMAP
 	{
 		let audioURLs=[""];
+		this.kmap=o;
 		var str=`<div class='sui-terms' id='sui-terms' style=''>
 		<span class='sui-termIcon'>${sui.assets[o.asset_type].g}</span>
 		<span class='sui-termTitle' id='sui-termTitle'>${o.title[0]}</span>
@@ -116,6 +119,7 @@ class Terms  {
 								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
 								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
+							t[1]+="<br>";
 							this.tabs.push(t);													// Add tab data for this def
 							}
 						}
@@ -138,37 +142,42 @@ class Terms  {
 					return str.replace(/\t|\n|\r/g,"");
 				}
 				
-			sui.GetDefinitionAssets(o.uid, (data)=> {											// FILL RESORCES TAGGED DATA
-				trace(data)
-				let i,j,d,t,def;
-				this.tagged=[];																	// Init tagged array
+			sui.GetDefinitionAssets(o.uid, (data)=> {											// MAKE TAGGED RESOUCES BUTTONS
+				let i,j,d,s,def,t=[];
 				if (!data) 			return "";													// Quit if nothing tagged
 				if (!data.length) 	return "";													// Quit if nothing tagged
-				let s="<br><b>Resources tagged with this definition: </b><br>"; 
-				for (i=0;i<data.length;++i) {													// For each resuly
+				this.tagged=[];																	// Init tagged array
+				for (i=0;i<this.tabs.length;++i) this.tagged.push([])							// For each def, add array
+			
+				for (i=0;i<data.length;++i) {													// For each result, get list of tagged assets
 					d=data[i];																	// Point at it
 					if (d.asset_type == "terms")	continue;									// Skip terms
-					t=[];																		// Init tagged array
-					t.subjects=[];		t.places=t.images=[];	t.sources=[];
-					t.visuals=[];		t.collections=[];		t.texts=[];		t["audio-video"]=[];
-					this.tagged.push(t);														// Set in def array
+					def=d.kmapid.join().match(/_definitions-(\d*)/i);							// Get def #
+					if (def) this.tagged[def[1]-1].push(d);										// Add kmap	if tied to a tag
 					}
-				for (i=0;i<data.length;++i) {													// For each result
-					d=data[i];																	// Point at it
-					if (d.asset_type == "terms")	continue;									// Skip terms
-					def=d.kmapid.join().match(/_definitions-(\d*)/i)[1]-1;						// Get def #
-					this.tagged[def][d.asset_type].push(d);										// Add kmap	
+	
+				for (i=0;i<this.tabs.length;++i) {												// For each def, make button panel
+					t.all=t.subjects=t.places=t.images=t.sources=t.visuals=t.collections=t.texts=t["audio-video"]=0;	// Reset counts
+					for (j=0;j<this.tagged[i].length;++j) {										// For each tagged kmap in def
+						t[this.tagged[i][j].asset_type]++;										// Update count
+						t["all"]++;																// Update total count
 						}
-				for (i=0;i<this.tagged.length;++i) {											// For each type
-				}
-
-	s+=drawAssetButton("texts", l-1,2);
-	s+=drawAssetButton("places", l-1,2);
-	s+=drawAssetButton("images", l-1,2);
-				this.tabs[0][1]=s;
+					s="";																		// Null title 
+					for (j in t) {																// For each asset type	
+						if (t[j]) {																// If anything tagged
+							s="<b>Resources tagged with this definition: </b><br>"; 			// Add title
+							break;																// Quit looking
+							}
+						}
+					for (j in t) {																// For each asset type	
+						if (t[j]) {																// If anything tagged
+							s+=drawAssetButton(j,i,t[j]);										// Make button
+							}
+						}
+					this.tabs[i][1]+=s;															// Add to definition tab
+					}
 				});
 
-			
 			str3="<table style='width:100%'><tr>"												// Add subject types
 			addSubjects("PHONEME",o.data_phoneme_ss);											
 			addSubjects("GRAMMARS",o.data_grammars_ss);											
@@ -215,11 +224,30 @@ class Terms  {
 
 	ShowTab(num, which) 																	// SHOW TAB
 	{
-		$("[id^=sui-tabTab-"+num).css({"background-color":"#999",color:"#fff","border-top":"1px solid #999"});				// Reset all tabs
+		$("[id^=sui-tabTab-"+num).css({"background-color":"#999",color:"#fff","border-top":"1px solid #999"});	// Reset all tabs
 		$("#sui-tabContent-"+num).css({display:"block","background-color":"#eee"});				// Show content
-		$("#sui-tabTab-"+num+"-"+which).css({"background-color":"#eee",color:"#000","border-top":"1px solid #a2733f"});			// Active tab
+		$("#sui-tabTab-"+num+"-"+which).css({"background-color":"#eee",color:"#000","border-top":"1px solid #a2733f"});	// Active tab
 		$("#sui-tabContent-"+num).html(this.tabs[num][which]);									// Set content
+
 		$("[id^=sui-tabTab]").off();															// Kill old handlers
+		$("[id^=sui-termAssetBut-]").off();														
+	
+		$("[id^=sui-termAssetBut-]").on("click", (e)=> {										// ON TAGGED BUTTON CLICK
+			let i,v=e.currentTarget.id.substring(17).split("-");								// Get def and facet type
+			sui.ss.mode="related";																// Go to related mode
+			sui.pages.relatedType=v[1];															// Set asset type
+			sui.pages.relatedBase=this.kmap;													// Set base									
+			sui.pagesrelatedId=sui.pages.relatedBase.asset_type+"-"+sui.pages.relatedBase.id;	// Set id
+			if (v[1] == "all")	sui.curResults=this.tagged[v[0]];								// Show all
+			else {																				// Just one
+				sui.curResults=[];																// Clear
+				for (i=0;i<this.tagged[v[0]].length;++i)										// For each asset
+					if (this.tagged[v[0]][i].asset_type == v[1])								// If it matches
+						sui.curResults.push(this.tagged[v[0]][i]);								// Add it
+				}
+			sui.DrawResults();																	// Draw results
+			});
+
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			var id=e.currentTarget.id.substring(11);											// Get index of tab	
 			let v=id.split("-");																// Get num and which
