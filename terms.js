@@ -57,6 +57,7 @@ class Terms  {
 		str+="<br><div class='sui-termOHead'>OTHER DICTIONARIES</div>";							// Add other header
 		str+="<div id='sui-termOther' class='sui-termOther' style='padding:0 24px'></div></div>";	// Add div for other dictionaries
 		$(this.div).html(str.replace(/\t|\n|\r/g,""));											// Remove format and add to div	
+		this.tabs=[];																			// Start fresh
 		this.SetTabContent(o);																	// Fill tab contents
 
 		$("#sui-termPlay").on("click", (e)=>{													// ON TERM PLAY
@@ -152,8 +153,10 @@ class Terms  {
 				for (i=0;i<data.length;++i) {													// For each result, get list of tagged assets
 					d=data[i];																	// Point at it
 					if (d.asset_type == "terms")	continue;									// Skip terms
-					def=d.kmapid.join().match(/_definitions-(\d*)/i);							// Get def #
-					if (def) this.tagged[def[1]-1].push(d);										// Add kmap	if tied to a tag
+					for (j=0;j<d.kmapid.length;++j) {											// Look through kmapids
+						def=d.kmapid[j].match(/_definitions-(\d*)/i);							// A def?
+						if (def) this.tagged[def[1]-1].push(d);									// Add kmap	if tied to a tag
+						}
 					}
 	
 				for (i=0;i<this.tabs.length;++i) {												// For each def, make button panel
