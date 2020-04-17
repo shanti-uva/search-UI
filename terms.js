@@ -44,7 +44,7 @@ class Terms  {
 		let audioURLs=[""];
 		this.kmap=o;
 		var str=`<div class='sui-terms' id='sui-terms' style=''>
-		<span class='sui-termIcon'>${sui.assets[o.asset_type].g}</span>
+		<span class='sui-termIcon'>${sui.assets[o.asset_type].g}</span>&nbsp;&nbsp;&nbsp;
 		<span class='sui-termTitle' id='sui-termTitle'>${o.title[0]}</span>
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p id='sui-termNames'>Names</p>
@@ -93,16 +93,17 @@ class Terms  {
 					if (data[i].id.match(/_definitions-/)) {									// If a definition
 						if (data[i].related_definitions_source_s) {								// If another dictionary
 							str+="<div>"+(k++)+". <i>"+data[i].related_definitions_source_s+"</i></div>";	// Add title
-							str+="<p style='font-size:14px;padding:0 24px;line-height:22px'>";
+							str+="<p class='termDefs'>";
 							str+=data[i].related_definitions_content_s;							// Add text
 							str+="</p><div class='sui-termData'>";
-							str+="<div class='sui-termData'>LANGUAGE: "+data[i].related_definitions_language_s;	// Add language
-							str+="</div><hr style='border-top: 1px solid #a2733f'></div>";		// End rule and div
+							if (data[i].related_definitions_author_s) str+="AUTHOR: "+data[i].related_definitions_author_s+" | ";						
+							str+="LANGUAGE: "+data[i].related_definitions_language_s;			// Add language
+							str+="</div><br><hr style='border-top:1px solid #a2733f'>";			// End rule and div
 							}
 						else{																	// A primary definition
-							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES","PASSAGES"]);	// Add tab menu
+							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES (0)","PASSAGES (0)"]);	// Add tab menu
 							t=["","<br>","<br>Waiting for data from Derik...<br><br><br><br>"] ;// New tab
-							t[0]+="<div style='font-size:14px;padding:0 24px'>";
+							t[0]+="<div class='termDefs'>";
 							t[0]+=data[i].related_definitions_content_s;						// Add text
 							t[0]+="</div><div class='sui-termData'>";
 							if (data[i].related_definitions_author_s) t[0]+="AUTHOR: "+data[i].related_definitions_author_s+" | ";						
@@ -126,9 +127,10 @@ class Terms  {
 						}
 					if (data[i].id.match(/_names-/)) {											// If a name
 						if (!firstName) firstName=data[i].related_names_header_s;				// Save first name listed
-						str4+=`<tr><td>> <b>${data[i].related_names_header_s}&nbsp;&nbsp;&nbsp;</b></td><td>
+						str4+=`<tr><td <td style='padding-left:${data[i].related_names_level_i*16}px'>> <b>${data[i].related_names_header_s}&nbsp;&nbsp;&nbsp;</b></td><td>
 						<i>${data[i].related_names_language_s}, ${data[i].related_names_writing_system_s}, ${data[i].related_names_relationship_s}
 						</i></td></tr>`;														// Add it
+						str+="</table><br>";		
 						}
 					$("#sui-termNames").html(str4+"</table>");									// Add names
 					$("#sui-termTitle").html(`${firstName}&nbsp;&nbsp;&nbsp;${o.title[0]}`);	// Add first
@@ -177,6 +179,7 @@ class Terms  {
 							s+=drawAssetButton(j,i,t[j]);										// Make button
 							}
 						}
+					$("#sui-tabTab-"+i+"-1").text("RESOURCES ("+t["all"]+")");					// Set number of resources
 					this.tabs[i][1]+=s;															// Add to definition tab
 					}
 				});
@@ -238,10 +241,10 @@ class Terms  {
 		$("[id^=sui-termAssetBut-]").on("click", (e)=> {										// ON TAGGED BUTTON CLICK
 			let i,v=e.currentTarget.id.substring(17).split("-");								// Get def and facet type
 			sui.ss.mode="related";																// Go to related mode
+			if (v[1] == "audio")	v[1]="audio-video";											// Compensate for extra '-'
 			sui.pages.relatedType=v[1];															// Set asset type
 			sui.pages.relatedBase=this.kmap;													// Set base									
 			sui.pagesrelatedId=sui.pages.relatedBase.asset_type+"-"+sui.pages.relatedBase.id;	// Set id
-			
 			if (v[1] == "all")	sui.curResults=this.tagged[v[0]];								// Show all
 			else {																				// Just one
 				sui.curResults=[];																// Clear

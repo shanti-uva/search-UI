@@ -195,7 +195,7 @@ class SearchUI  {
 			});
 
 		$("#sui-main").on("click",(e)=>{															// ON CLICK OF RESULTS PAGE 
-			$("[id^=sui-popover-]").remove(); 														// Remove any open popovers
+			this.pages.ClearPopover();																// Clear popover	
 			if (e.target.id != "sui-hamBut") $("#sui-hamburger").slideUp();							// Hide hanburderv menu if open
 			});
 		$("#sui-hamBut").on("click",()=>{ this.ShowHamburger() });									// SHOW HAMBURGER MENU

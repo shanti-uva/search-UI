@@ -25,7 +25,7 @@ class Images  {
 
 	Draw(o)																					// DRAW IMAGE PAGE FROM KMAP
 	{
-		var i,mid;
+		var i,j,mid;
 		var asp=o.url_thumb_height/o.url_thumb_width;
 		var w=$(this.div).width()/2;
 		var h=w*asp;
@@ -54,11 +54,26 @@ class Images  {
 		sui.pages.DrawRelatedAssets();															// Draw related assets menu if active
 		$("#sui-imageGal").scrollLeft($("#sui-pageThumb-"+mid).offset().left-w+25);				// Scroll to center
 
-		var places=[],subjects=[];
+		let s, places=[],subjects=[],terms=[];
 		try{
 			for (i=0;i<o.kmapid_strict.length;++i) {
 				if (o.kmapid_strict[i].match(/places/))		places.push(o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]));
 				if (o.kmapid_strict[i].match(/subjects/))	subjects.push(o.kmapid_strict_ss[i]+sui.pages.AddPop(o.kmapid_strict[i]));
+				if (o.kmapid_strict[i].match(/terms/))	{										// If a term
+					s=o.kmapid_strict_ss[i];													// Add term
+					let r=RegExp(o.kmapid_strict[i]+"_definitions-(\d*)","g");					// Get any definitions for this term
+					r=o.kmapid.join().match(r);													// Count
+					if (r) {																	// If any
+						s+="<span><i><sup> (";													// Start superscript
+						for (j=1;j<=r.length;++j) {												// For each def
+							s+=j;																// Add number
+							if (j < r.length) s+=",";											// Add comma
+							}
+						s+=")</sup></i></span>";												// End super
+						}
+					s+=sui.pages.AddPop(o.kmapid_strict[i]);									// Add popover
+					terms.push(s);																// Add term
+					}
 				}
 		} catch(e) {}
 	
@@ -78,7 +93,12 @@ class Images  {
 				str+="<span style='color:#cc4c39'>&#xe62b</span>&nbsp;&nbsp";					// Add icon
 				for (i=0;i<places.length;++i) str+=places[i]+", ";								// Add item
 				str=str.slice(0,-2)+"<br>";														// Remove last comma
-			}	
+				}	
+			if (terms.length) {																	// If terms	
+				str+="<span style='color:#cc4c39'>&#xe635</span>&nbsp;&nbsp";					// Add icon
+				for (i=0;i<terms.length;++i) str+=terms[i]+", ";								// Add item
+				str=str.slice(0,-2)+"<br>";														// Remove last comma
+				}	
 			str+="</td></tr></table>";
 
 		var d=sui.pages.DrawItem;																	// Point at item drawer

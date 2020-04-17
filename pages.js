@@ -80,10 +80,7 @@ class Pages  {
 	ShowPopover(id, event)																	// DISPLAY KMAP DROP DOWN FROM EVENT
 	{
 		if (this.PopoverTimer && (event.type == "mousemove") ) {								// Already in
-			clearTimeout(this.PopoverTimer);													// Kill timer
-			this.PopoverTimer=null;																// Kill flag
-			$("[id^=sui-popover-]").remove();													// Remove old one
-			return;																				// Quit	
+			return;																				// Quit
 			}
 		if (event.type == "mousemove") {														// Already in
 			clearTimeout(this.PopoverTimer);													// Kill timer
@@ -91,18 +88,23 @@ class Pages  {
 			return;
 			}
 		if (event.type == "mousedown") {														// Click on popover
-			clearTimeout(this.PopoverTimer);													// Kill timer
-			this.PopoverTimer=null;																// Kill flag
 			if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;							// Get out of related and collections
 			this.relatedBase=null;																// No base and set to home
 			sui.GetKmapFromID(id,(kmap)=>{ this.Draw(kmap); });									// Get kmap and show page
-			$("[id^=sui-popover-]").remove();													// Remove old one
+			this.ClearPopover();																// Clear popover	
 			return;																				// Quit
 			}
 		if (id && id.match(/collections-/))	return;												// No maps for collections yet
 		setTimeout(()=>{ this.DisplayPopover(id,event)},500);									// Draw it	
 		}
-		
+
+	ClearPopover()																			// CLEAR KMAP DROP DOWN
+	{
+		clearTimeout(this.PopoverTimer);														// Kill timer
+		this.PopoverTimer=null;																	// Kill flag
+		$("[id^=sui-popover-]").remove();														// Remove old one
+	}
+
 	DisplayPopover(id, event)																// ACTUALLY DISPLAY KMAP DROP DOWN
 	{
 		var i,pos=$(event.target).offset();														// Get position of icon
@@ -113,8 +115,8 @@ class Pages  {
 		if (!pos.top)	return;																	// Race condition 
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
 			let v;
-			$("[id^=sui-popover-]").remove();													// Remove old one
 			if (!o)  return; 																	// Quit if nothing
+			$("[id^=sui-popover-]").remove();													// Remove old one
 			let str=`<div id='sui-popover-${id}' class='sui-popover' 
 			style='top:${pos.top+24+$(this.div).scrollTop()}px;left:${x-150}px'>
 			<div style='position:absolute;width:0;height:0;border-left:8px solid transparent;
@@ -139,8 +141,8 @@ class Pages  {
 					else str+="<br>"
 					}
 				}
-			str+=`<b>${o.asset_type}: </b>`;
-			if (o.ancestors_txt)
+			if (o.ancestors_txt && o.ancestors_txt.length > 1)	str+=`<b>${o.asset_type}: </b>`; // Show header if any breadcrumbs
+			if (o.ancestors_txt)																// If breadcrumbs
 				for (i=0;i<o.ancestors_txt.length-1;++i) {										// For each trail member
 					str+=`<a class='sui-crumb' style='color:#000;text-transform:none' id='sui-crumb-${o.asset_type}-${o.ancestor_ids_is[i]}'
 					href='#p=${o.asset_type}-${o.ancestor_ids_is[i]}'>${o.ancestors_txt[i]}</a>`;											
