@@ -89,6 +89,7 @@ class Terms  {
 			let firstName="";																	// First name listed
 			try { 
 				let data=odata._childDocuments_;												// Point at data
+				trace(odata)
 				for (i=0;i<data.length;++i) {													// For each doc
 					if (data[i].id.match(/_definitions-/)) {									// If a definition
 						if (data[i].related_definitions_source_s) {								// If another dictionary
@@ -132,10 +133,15 @@ class Terms  {
 						</i></td></tr>`;														// Add it
 						str+="</table><br>";		
 						}
+					if (odata.etymologies_ss && odata.etymologies_ss.length) {					// If etymologies
+						str+="<b>Etymology</b><br>";											// Add header
+						for (i=0;i<odata.etymologies_ss.length;++i) 							// For each onr
+							str+=odata.etymologies_ss[i];										// Add it
+						}
 					$("#sui-termNames").html(str4+"</table>");									// Add names
 					$("#sui-termTitle").html(`${firstName}&nbsp;&nbsp;&nbsp;${o.title[0]}`);	// Add first
 					}
-				} catch(e) {}
+				} catch(e) {trace(e)}
 
 			function drawAssetButton(facet, defNum, num) {
 				let str=`<div id='sui-termAssetBut-${defNum}-${facet}'
