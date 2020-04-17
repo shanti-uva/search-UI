@@ -89,7 +89,6 @@ class Terms  {
 			let firstName="";																	// First name listed
 			try { 
 				let data=odata._childDocuments_;												// Point at data
-				trace(odata)
 				for (i=0;i<data.length;++i) {													// For each doc
 					if (data[i].id.match(/_definitions-/)) {									// If a definition
 						if (data[i].related_definitions_source_s) {								// If another dictionary
@@ -132,11 +131,6 @@ class Terms  {
 						<i>${data[i].related_names_language_s}, ${data[i].related_names_writing_system_s}, ${data[i].related_names_relationship_s}
 						</i></td></tr>`;														// Add it
 						str+="</table><br>";		
-						}
-					if (odata.etymologies_ss && odata.etymologies_ss.length) {					// If etymologies
-						str+="<b>Etymology</b><br>";											// Add header
-						for (i=0;i<odata.etymologies_ss.length;++i) 							// For each onr
-							str+=odata.etymologies_ss[i];										// Add it
 						}
 					$("#sui-termNames").html(str4+"</table>");									// Add names
 					$("#sui-termTitle").html(`${firstName}&nbsp;&nbsp;&nbsp;${o.title[0]}`);	// Add first
@@ -200,6 +194,12 @@ class Terms  {
 			addSubjects("REGISTER",o.data_register_ss);											
 			addSubjects("LANGUAGE CONTEXT",o.data_language_context_ss);
 			str3+="</tr></table>";
+			if (odata.etymologies_ss && odata.etymologies_ss.length) {							// If etymologies
+				str3+="<br><b>Etymology</b><br><div class='sui-termDefs'>";						// Add header
+				for (i=0;i<odata.etymologies_ss.length;++i) 									// For each one
+					str3+=odata.etymologies_ss[i];												// Add it
+				str+="</div>";																	// Close div
+				}
 			$("#sui-termDetails").html(str3+"<br>");											// Add Details
 			$("#sui-termDefs").html(str2.replace(/\t|\n|\r/g,""));								// Remove format and add primary defs to div	
 			$("#sui-termOther").html(str.replace(/\t|\n|\r/g,""));								// Remove format and add others to div	
