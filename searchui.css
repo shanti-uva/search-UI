@@ -178,8 +178,8 @@
 .sui-termOHead  {	background-color:#a2733f; font-weight:900; padding:4px 16px; color:#fff; font-size:18px; }
 .sui-termOther  { 	background-color: #eee}
 .sui-termData   {	font-size:12px; float:right; color:#a2733f; margin-right:16px}
-.sui-termPlay   {	font-size:16px; color: #fff; vertical-align:-4px; background-color:#a2733f; padding:4px 5px; vertical-align:-1px;
-					margin-right:12px; cursor:pointer; border-radius:32px;}
+.sui-termPlay   {	display:inline-block; font-size:15px; color: #fff; vertical-align:-4px; background-color:#a2733f; padding:5px; vertical-align:-1px;
+					margin-right:12px; cursor:pointer; border-radius:32px; width:18px; height:18px; box-shadow: 0 0 0 1px #fff,0 0 0 2px #a2733f ; }
 .sui-termAssetBut { display:inline-block; text-transform:uppercase; cursor:pointer; padding:6px 18px 6px 12px; 
 					color:#fff; margin: 8px 16px 24px 0; width:auto; font-size:13px;}
 .sui-termDefs	{	font-size:1em; padding:0 24px; font-weight:400; text-rendering:optimizeLegibility; line-height:1.56em; color:#222; letter-spacing:normal; }				

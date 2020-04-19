@@ -356,7 +356,7 @@ class Places  {
 			$("#sui-tabTabB0").css({"background-color":"#eee",color:"#000"});					// Active tab
 			$("#sui-tabContent").html(this.content2[0]);										// Set content
 			}
-		$("#sui-spLab-"+this.kmap.uid).css({ "font-weight":"bold" });							// Highlight current one	
+		$("#sui-spLab-"+this.kmap.uid).css({ "font-weight":"bold", "text-decoration": "underline" });	// Highlight current one	
 	}
 
 	AddRelatedTabs()																		// ADD TAB CONTROLS FOR RELATED PLACES/SUBJECTS
@@ -423,13 +423,13 @@ class Places  {
 		let n=0;
 		let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
 		<div style='max-width:900px'>
-		<b>${o.title[0]}</b> has <b> TBD </b> immediately subordinate places. 
+		<b>${o.title[0]}</b> has <b>${d[0].ancestors.length-2}</b> superordinate places and<b> TBD </b> immediately subordinate places. 
 		You can browse these subordinate places as well as its superordinate categories with the tree below. 
 		See the RELATED PLACES tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, 
 		as well as places non-hierarchically related to it.</div><br>
 		<ul class='sui-spLin' id='sui-spRows'>`;
 		if (o.asset_type == "subjects") {														// If subjects assets
-			content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";								// Set 1st content array member with html
+			content[0]=str.replace(/\t|\n|\r/g,"")+"</ul><br>";									// Set 1st content array member with html
 			return;		
 			}
 		if (!d[0].ancestors)	return;															// No ancestors

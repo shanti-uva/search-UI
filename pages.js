@@ -157,6 +157,7 @@ class Pages  {
 			$("#sui-popover-"+id).append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 
 			$("#sui-full-"+id).on("click",(e)=> {												// ON FULL ENTRY CLICK
+				this.ClearPopover();															// Clear popover	
 				if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;						// Get out of related and collections
 				this.relatedBase=null;															// No base and set to home
 				var id=e.currentTarget.id.substring(9).toLowerCase();							// Get id
@@ -165,6 +166,7 @@ class Pages  {
 				});
 			
 			$("[id^=sui-crumb-]").on("click",(e)=> {											// ON BREAD CRUMB CLICK
+				this.ClearPopover();															// Clear popover	
 				if (sui.ss.mode == "related")	 sui.ss.mode=this.lastMode;						// Get out of related and collections
 				this.relatedBase=null;															// No base and set to home
 				var id=e.currentTarget.id.substring(10).toLowerCase();							// Get id
@@ -191,6 +193,7 @@ class Pages  {
 				$("#sui-popbot").append(str.replace(/\t|\n|\r/g,""));							// Remove format and add to div
 				
 				$("[id^=sui-pop-]").on("click",(e)=> {											// ON ITEM CLICK
+					this.ClearPopover();																// Clear popover	
 					let v=e.currentTarget.id.toLowerCase().split("-");							// Get id
 					if (v[4] == "audio") v[4]="audio-video";									// Rejoin AV
 					let url=sui.solrUtil.createKmapQuery(v[2]+"-"+v[3],v[4],0,1000);			// Get query url

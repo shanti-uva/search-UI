@@ -71,7 +71,7 @@ class Subjects  {
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
 		$("#sui-tabContent").html(this.content[which]);											// Set content
 		if (which == 0)	{																		// If SUBJECT CONTEXT
-			$("#sui-spLab-"+this.kmap.uid).css({ "font-weight":"bold" });						// Highlight current one	
+			$("#sui-spLab-"+this.kmap.uid).css({ "font-weight":"bold", "text-decoration": "underline"  });	// Highlight current one	
 			$("[id^=sui-spLab-]").on("click", function(e) {return false;	});					// ON CONTEXT LINE CLICK, INHIBIT
 			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
 				let path=e.currentTarget.id.substring(10);										// Get id

@@ -49,7 +49,7 @@ class Terms  {
 		<hr style='border-top: 1px solid ${sui.assets[o.asset_type].c}'>
 		<p id='sui-termNames'>Names</p>
 		<div id='sui-player' style='display:none'>
-		<p><span class='sui-termPlay' id='sui-termPlay'>&#xe60a</span>
+		<p><div class='sui-termPlay' id='sui-termPlay'>&#xe60a</div>
 		<select class='sui-termSpeak' id='sui-termGroup'><option>AMDO GROUP</option></select></p></div>`;
 		str+="<div id='sui-termDetails'></div>";												// Add div for details
 
@@ -101,8 +101,8 @@ class Terms  {
 							str+="</div><br><hr style='border-top:1px solid #a2733f'>";			// End rule and div
 							}
 						else{																	// A primary definition
-							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES (0)","PASSAGES (0)"]);	// Add tab menu
-							t=["","<br>","<br>Waiting for data from Derik...<br><br><br><br>"] ;// New tab
+							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES (0)","PASSAGES (0)", "DETAILS"]);	// Add tab menu
+							t=["","<br>","<br>Waiting for data from Derik...<br><br><br><br>","<br>"] ;// New tab
 							t[0]+="<div class='termDefs'>";
 							t[0]+=data[i].related_definitions_content_s;						// Add text
 							t[0]+="</div><div class='sui-termData'>";
@@ -110,18 +110,18 @@ class Terms  {
 							t[0]+="LANGUAGE: "+data[i].related_definitions_language_s+"</div><br><br>"; // Add language
 							
 							if (data[i]["related_definitions_branch_subjects-185_header_s"]) {	// If a header
-								t[1]+=data[i]["related_definitions_branch_subjects-185_header_s"].toUpperCase();						// Add label
-								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-185_subjects_headers_t"]+"</i>";				// Add value
-								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br>";	// Add popover
+								t[3]+=data[i]["related_definitions_branch_subjects-185_header_s"].toUpperCase();						// Add label
+								t[3]+=": <i>"+data[i]["related_definitions_branch_subjects-185_subjects_headers_t"]+"</i>";				// Add value
+								t[3]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
-							t[1]+="LANGUAGE: <i>"+data[i].related_definitions_language_s+"</i>";	
-							t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-184_subjects_uids_t"][0])+"<br>";		// Add popover
+							t[3]+="LANGUAGE: <i>"+data[i].related_definitions_language_s+"</i>";	
+							t[3]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-184_subjects_uids_t"][0])+"<br>";		// Add popover
 							if (data[i]["related_definitions_branch_subjects-5855_header_s"]) {	// If a header
-								t[1]+=data[i]["related_definitions_branch_subjects-5855_header_s"].toUpperCase();						// Add label
-								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
-								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
+								t[3]+=data[i]["related_definitions_branch_subjects-5855_header_s"].toUpperCase();						// Add label
+								t[3]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
+								t[3]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
-							t[1]+="<br>";
+							t[3]+="<br>";
 							this.tabs.push(t);													// Add tab data for this def
 							}
 						}
@@ -227,7 +227,7 @@ class Terms  {
 	{
 		let i,str="";														
 		for (i=0;i<tabs.length;++i)	{															// For each tab	
-			str+=`<div class='sui-tabTab' id='sui-tabTab-${num}-${i}' style='display:inline-block;text-align:left;padding-left:24px;width:calc(33.333% - 26px)'>
+			str+=`<div class='sui-tabTab' id='sui-tabTab-${num}-${i}' style='display:inline-block;text-align:left;padding-left:24px;width:calc(25% - 26px)'>
 			${tabs[i]}&nbsp;&#xe609</div>`;														// Add it
 			}
 		str+=`<div class='sui-tabContent' id='sui-tabContent-${num}'>hhh</div>`;				// Tab contents
