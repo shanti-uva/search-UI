@@ -533,9 +533,8 @@ class Pages  {
 
 	FormatDate(date)																		// FRIENDLY FORMAT OF DATE
 	{
-		let m=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];		// Array of mos
 		let d=new Date(date);																	// Parse date
-		if (d)	date=d.getDate()+" "+m[d.getMonth()]+ " "+d.getFullYear();						// Remake it
+		if (d)	date=(d.getMonth()+1)+"/"+d.getDate()+"/"+d.getFullYear();						// Remake it
 		return date;
 	}		
 

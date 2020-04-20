@@ -32,12 +32,12 @@ class Images  {
 		if (o.url_thumb)	 o.url_thumb=o.url_thumb.replace(/images-test/i,"images");			// Force to prod
 		for (i=0;i<sui.curResults.length;++i) {	if (o.id == sui.curResults[i].id)	mid=i; }
 
-		var str=`<div class='sui-imagesBox' style='margin:${(sui.ss.mode == "related") ? "-12px 0 0 0" : "-12px -12px 0 -12px"}'>
-		<div id='sui-picEnlarge' style='cursor:pointer;font-size:16px' title='Click to enlarge and pan'>&#xe650</div></p>
+		var str=`<div class='sui-imagesBox' id='sui-imagesBox' style='margin:${(sui.ss.mode == "related") ? "-12px 0 0 0" : "-12px -12px 0 -12px"}'>
+		<div id='sui-picEnlarge' style='cursor:pointer;font-size:18px' title='Click to enlarge and pan'>&#xe650</div></p>
 		<div id='sui-imageDiv' class='sui-imageDiv' style='height:${h}px'>
 			<img id='sui-thisPic' src='${o.url_thumb.replace(/200,200/,"2000,2000")}' style='width:100%'> 
 		</div><br>
-		<div><span style='font-size:14px;vertical-align:-2px;color:#ccc'>&#xe62a</span>&nbsp;&nbsp;${o.title[0]}</div>
+		<div><span style='max-width:900px;font-size:20px;vertical-align:-2px;color:#ccc'>&#xe62a&nbsp;&nbsp;${o.title[0]}</span></div>
 		<div style='color:#ccc;margin-bottom:24px'>${o.creator}&nbsp;&nbsp;|&nbsp;&nbsp;${o.img_width_s} x ${o.img_height_s} px</div>
 		<div class='sui-imageGal'id='sui-imageGal'>`;
 		for (i=0;i<mid;++i) 																	// For each image up mid point
@@ -77,70 +77,71 @@ class Images  {
 				}
 		} catch(e) {}
 	
-		str=`<table class='sui-imageMid'>
+		str=`<br><table class='sui-imageMid'>
 			<tr class='sui-pageLab' style='font-size:16px;padding-bottom:4px'><td style='width:50%'>MANDALA COLLECTIONS</td><td>CLASSIFICATION</td></tr>
-			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;`;
+			<tr class='sui-pageLab' style='padding-bottom:8px'><td>&#xe633&nbsp;&nbsp;<i>`;
 			if (o.collection_title) 															// If a collection	
 				str+=`${o.collection_title}${sui.pages.AddPop(o.collection_uid_s)}`;			// Show name and popup
 			else str+="None";
-			str+="</td><td>";  																	// Close left side
+			str+="</td><td><i>";  																// Close left side
 			if (subjects.length) {																// If subjects	
 				str+="<span style='color:#cc4c39'>&#xe634</span>&nbsp;&nbsp";					// Add icon
 				for (i=0;i<subjects.length;++i) str+=subjects[i]+", ";							// Add item
 				str=str.slice(0,-2)+"<br>";														// Remove last comma
 				}	
 			if (places.length) {																// If places	
-				str+="<span style='color:#cc4c39'>&#xe62b</span>&nbsp;&nbsp";					// Add icon
+				str+="<span style='color:#6faaf1'>&#xe62b</span>&nbsp;&nbsp";					// Add icon
 				for (i=0;i<places.length;++i) str+=places[i]+", ";								// Add item
 				str=str.slice(0,-2)+"<br>";														// Remove last comma
 				}	
 			if (terms.length) {																	// If terms	
-				str+="<span style='color:#cc4c39'>&#xe635</span>&nbsp;&nbsp";					// Add icon
+				str+="<span style='color:#a2733f'>&#xe635</span>&nbsp;&nbsp";					// Add icon
 				for (i=0;i<terms.length;++i) str+=terms[i]+", ";								// Add item
 				str=str.slice(0,-2)+"<br>";														// Remove last comma
 				}	
-			str+="</td></tr></table>";
+			str+="</td></tr></i></table>";
 
-		var d=sui.pages.DrawItem;																	// Point at item drawer
+		var d=this.DrawItem;																	// Point at this item drawer
 		function drawDetails(j) {	
+			trace(j)
 			str+="<div class='sui-images'>";
-			str+="<div style='width:calc(49% - 24px);display:inline-block;margin-right:16px;vertical-align:top;height:100%;'>";
+			str+="<div style='width:calc(49% - 24px);display:inline-block;margin-right:16px;vertical-align:top;height:100%;'><table style='width:100%'>";
 				try{ str+=d(sui.assets[o.asset_type].g,"CAPTION",o.caption,"Untitled"); } catch(e){}
-				str+="<hr>";
+				str+="<tr><td colspan='2'><hr></td></tr>";
 				try{ str+=d("&#xe600","CREATOR",o.creator) } catch(e){}
 				try{ str+=d("&#xe66d","TYPE",j.field_image_type.und[0].value.charAt(0).toUpperCase()+j.field_image_type.und[0].value.slice(1)); } catch(e){}
 				try{ str+=d("&#xe665","SIZE", o.img_width_s+" x "+o.img_height_s+" px"); } catch(e){}
-				str+="<hr>";
+				str+="<tr><td colspan='2'><hr></td></tr>";
 				try{ str+="<p class='sui-pageLab'>";
 					for (i=0;i<j.field_image_descriptions.und.length;++i) 							// For each note
 						str+=j.field_image_descriptions.und[i].title+"<br>";						// Add it
 					str+="</p>";  
 					} catch(e){}
-					try{ str+=d("&#xe600",j.field_image_agents.und[0].field_agent_role.und[0].value.toUpperCase(),
-						 j.field_image_agents.und[0].title+" ("+sui.pages.FormatDate(j.field_image_agents.und[0].field_agent_dates.und[0].value)+")"
-						); } 	catch(e) {}
-					try{ str+="<p>";																// A sub description
-						str+=j.field_image_descriptions.und[0].field_description.und[0].value+"<br>"; // Add it
-					str+="</p>";  } catch(e){}
-				str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'>";
-				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>ONLY DIGITAL</span>:&nbsp;&nbsp;"+(j.field_image_digital.und[0].value ? "Yes" : "No");
-					 str+="&nbsp;&nbsp;<span class='sui-pageLab'>COLOR</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+(j.field_image_color.und[0].value ? "Yes" : "No")+"</p>"+"</span>"; } catch(e){}
-				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>QUALITY</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_quality.und[0].value+"</span>&nbsp;&nbsp;<span class='sui-pageLab'>ROTATION</span>:&nbsp;&nbsp;<span class='sui-pageVal'>"+j.field_image_rotation.und[0].value+"&deg;</span></p>"; } catch(e){}
-				try{ str+=d("&#xe665","PHYSICAL SIZE",j.field_physical_size.und[0].value); } 	catch(e){}
-				try{ str+=d("&#xe659","CAPURE DEVICE",j.field_image_capture_device.und[0].value); } 	catch(e){}
-				try{ str+=d("&#xe65f","MATERIALS",j.field_image_materials.und[0].value); } 				catch(e){}
-				try{ str+=d("&#xe66c","ENHANCEMENT",j.field_image_enhancement.und[0].value); } 			catch(e){}
-				try{ str+="<p>&#xe62B&nbsp;&nbsp;<span class='sui-pageLab'>LOCATION</span>:&nbsp;&nbsp;"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;";
-				  	 str+=j.field_latitude.und[0].value+"</p>"; } catch(e){}
-				try{ str+=d("&copy;","COPYRIGHT HOLDER",j.field_copyright_holder.und[0].value); } 		catch(e){}
-				try{ str+=d("&copy;","COPYRIGHT STATEMENT",j.field_copyright_statement.und[0].value); } catch(e){}
-				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } 	catch(e){}
-				try{ str+=d("&#xe678","TECHNICAL&nbsp;NOTES",j.field_technical_notes.und[0].value); } 	catch(e){}
-				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } catch(e){}
-				try{ str+="<p>&#xe67f&nbsp;&nbsp;<span class='sui-pageLab'>LICENSE</span>:&nbsp;&nbsp;<span class='sui-pageVal'><a style='font-weight:400' target='_blank' href='"+j.field_license_url.und[0].value+"'>"+j.field_license_url.und[0].value+"</a>" } catch(e){} 
+				try{ str+=d("&#xe600",j.field_image_agents.und[0].field_agent_role.und[0].value.toUpperCase(),
+						j.field_image_agents.und[0].title+" ("+sui.pages.FormatDate(j.field_image_agents.und[0].field_agent_dates.und[0].value)+")"
+					); } 	catch(e) {}
+				try{ str+="</table><p>";															// A sub description
+				str+=j.field_image_descriptions.und[0].field_description.und[0].value+"<br></p>";  } 		catch(e){}
+				str+="</div><div style='width:49%;display:inline-block;vertical-align:top;border-left:1px solid #ddd;padding-left:16px'><br><table style='width:100%'>";
+				try{ str+=d("&#xe67f","ONLY DIGITAL",j.field_image_digital.und[0].value ? "Yes" : "No"); } 	catch(e){}
+				try{ str+=d("&#xe67f","COLOR",j.field_image_color.und[0].value ? "Yes" : "No"); } 			catch(e){}
+				try{ str+=d("&#xe67f","QUALITY",j.field_image_quality.und[0].value); } 						catch(e){}
+				try{ str+=d("&#xe67f","ROTATION",j.field_image_rotation.und[0].value+"&deg;"); } 			catch(e){}
+				try{ str+=d("&#xe665","PHYSICAL&nbsp;SIZE",j.field_physical_size.und[0].value); } 			catch(e){}
+				try{ str+=d("&#xe659","CAPURE&nbsp;DEVICE",j.field_image_capture_device.und[0].value); } 	catch(e){}
+				try{ str+=d("&#xe65f","MATERIALS",j.field_image_materials.und[0].value); } 					catch(e){}
+				try{ str+=d("&#xe66c","ENHANCEMENT",j.field_image_enhancement.und[0].value); } 				catch(e){}
+				try{ str+="<tr><td>&#xe62B&nbsp;&nbsp;<span class='sui-pageLab'>LOCATION</span>:</td><td>"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;"+j.field_latitude.und[0].value+"</td></tr>"; } 									catch(e){}
+				trace(j.field_copyright_holder.und[0].value)
+				try{ str+=d("&copy;","COPYRIGHT&nbsp;HOLDER",j.field_copyright_holder.und[0].value); } 		catch(e){}
+				try{ str+=d("&copy;","COPYRIGHT&nbsp;STATEMENT",j.field_copyright_statement.und[0].value);} catch(e){}
+				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } 		catch(e){}
+				try{ str+=d("&#xe678","TECHNICAL&nbsp;NOTES",j.field_technical_notes.und[0].value); } 		catch(e){}
+				try{ str+=d("&#xe639","UPLOADED&nbsp;BY",o.node_user_full_s); } 							catch(e){}
+				try{ str+=d("&#xe67f","LICENSE","<a style='font-weight:400' target='_blank' href='"+j.field_license_url.und[0].value+"'>"+j.field_license_url.und[0].value+"</a>"); } catch(e){} 
 				
 				let asp=o.img_height_s/o.img_width_s;
-				str+=`<p class='sui-pageLab' style='cursor:pointer' onclick='$("#sui-dlOps").toggle()'>
+				str+=`</table><p class='sui-pageLab' style='cursor:pointer' onclick='$("#sui-dlOps").toggle()'>
 				&#xe616&nbsp;&nbsp;<a>DOWNLOAD IMAGE</a>
 					<div id='sui-dlOps' style='display:none;margin-left:24px;font-size:12px'>			
 					<a target='_blank' href='${o.url_thumb.replace(/200,200/,o.img_width_s+","+o.img_width_s)}'
@@ -163,19 +164,21 @@ class Images  {
 			}
 	
 		$("[id^=sui-pageThumb-]").on("click",(e)=> {												// ON THUMBNAIL CLICK
-			var id=e.currentTarget.id.split("-")[2];												// Get id
+			let id=e.currentTarget.id.split("-")[2];												// Get id
 			sui.pages.Draw(sui.curResults[id]);														// Show image
 			});
 
 		$("#sui-picEnlarge").on("click",()=> {														// ON RESIZE PIC
-			var sx,sy,px,py;
-			var pic=$("#sui-results")[0];															// Point at image
-			$("#sui-imageDiv").css("width","100%");													// Go full screen
+			let sx,sy,px,py;
+			let pic=$("#sui-results")[0];															// Point at image
+			let h=$(this.div).width()/2*asp;														// Make heighr
+			$("#sui-imagesBox").css({"padding-top":"12px"});										// Thinner top
+			$("#sui-imageDiv").css({width:"100%", height:$("#sui-results").height()+"px"});			// Full screen
 			if ($("#sui-picEnlarge").html().match(/Zoom/)) {										// If zoomed already
 				$("#sui-picEnlarge").html("&#xe650");												// Restore icon
-				$("#sui-thisPic").css("width","100%");												// Fit in window
 				$("#sui-thisPic").offset($("#sui-imageDiv").offset());								// Restore offset
-				$("#sui-imageDiv").css("width","50%");												// Back to half screen
+				$("#sui-imageDiv").css({width:"50%",height:h+"px"});								// Back to half screen
+				$("#sui-imagesBox").css({"padding-top":"60px"});									// Restore spacing
 				pic.onmousedown=pic.onwheel=null;													// Remove listeners
 				return;																				// Quit
 				}
@@ -202,5 +205,31 @@ class Images  {
 				};
 			});
 		}
+
+		DrawItem(icon, label, value, def, style, bold)											// DRAW ITEM
+		{
+			let i,str="<tr><td>";
+			if ((value == null) || (value == undefined) || (value == ""))	return "";				// Return nothing
+			if (icon)	str+=icon+"&nbsp;&nbsp;";													// Add icon
+			str+="<span class='sui-pageLab'";														// Label head
+			if (bold)	str+=" style='font-weight:600'";											// Bold?
+			str+=">"+label+":&nbsp;&nbsp;</span>";													// Add label
+			str+="</td><td><span class='";															// Add value span
+			str+=(style ? style : "sui-pageVal")+"'>";												// Default, or special style
+			if (typeof(value) == "object") {														// If an array
+				for (i=0;i<value.length;++i)	{													// For each item
+					if (value[i].header)		str+=value[i].header;								// Use .header
+					else if (value[i].value)	str+=value[i].value;								// .value
+					else if (value[i].val)		str+=value[i].val;									// .val
+					else if (value[i].title)	str+=value[i].title;								// .title
+					else 						str+=value[i];										// Plain	
+					if (i != value.length-1)	str+=", ";											// Add separator
+					}
+				}
+			else str+=(value && (!value.match(/undefined/))) ? value : def;							// Add def if bad value or show value
+			return str+"</span></td></tr>";															// Return item
+		}
+	
+
 
 } // Images class closure
