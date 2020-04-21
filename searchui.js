@@ -348,7 +348,8 @@ class SearchUI  {
 			relationships:[],																		// Relationships
 			users:[],																				// Users
 			assets:[{title:"All", id:"all",bool:"AND"}],											// Assets
-			perspectives:[]																			// Perspectives
+			termPerspective:"", subjectPerspective:"", placePerspective:"",							// Perspectives
+			view:""																					// View
 			};																
 	}
 
