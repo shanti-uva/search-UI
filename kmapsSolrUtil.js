@@ -14,7 +14,7 @@ const DEBUG = false;
 
 class KmapsSolrUtil {
 
-    constructor(jq) {
+    constructor(overrideDefaultState) {
         // check to make sure that jQuery is available
         if (typeof jQuery !== "function")
             $ = jQuery;
@@ -25,7 +25,7 @@ class KmapsSolrUtil {
 
         // this is the default state, state that is passed in overrides these values
         this.defaultState = {
-            "solrUrl": "https://ss251856-us-east-1-aws.measuredsearch.com/solr/kmassets_dev/select",
+            "solrUrl": "https://solrUrl.must.be.set.in.the.state.object",
             "mode": "input",
             "view": "Card",
             "sort": "Alpha",
@@ -48,6 +48,12 @@ class KmapsSolrUtil {
                 "project_filter": ""
             }
         };
+
+        // override the defaultState with state that was passed in the constructor
+        if (overrideDefaultState) {
+            this.defaultState = $.extend(true, {}, this.defaultState, overrideDefaultState);
+        }
+
 
         // facet configs.
 

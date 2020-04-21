@@ -65,7 +65,6 @@ class SearchUI  {
 		this.showSearch=false;																		// Click to search or add facet
 
 		this.noTop=(site == "CU") ? true : false;													// Has a top
-		this.solrUtil=new KmapsSolrUtil();															// Alloc Yuji's search class
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"searchui.css" }).appendTo("head"); 	// Load CSS
 
 		this.solrId=useProdIndex ? "_prod" : "_dev";												// Set solrId
@@ -77,7 +76,8 @@ class SearchUI  {
 		this.ss.page=0;																				// Current page being shown
 		this.ss.pageSize=100;																		// Results per page	
 		this.ss.site="Mandala";																		// Site
-		this.ss.numResults=0;																		// Number of resulrts found																							
+		this.ss.numResults=0;																		// Number of resulrts found
+		this.solrUtil=new KmapsSolrUtil( {solrUrl: this.ss.solrUrl });			// Alloc Yuji's search class and pass defaultState
 		this.ClearQuery();																			// Cleae our all search elements in query
 		this.AddFrame();																			// Add div framework
 		
@@ -384,7 +384,7 @@ class SearchUI  {
 			this.DrawAdvanced();																	// Draw advanced search if active
 			}).fail((msg)=> { console.log(msg); this.LoadingIcon(false);  this.Popup("Query error"); });	// Failure message
 		}
-	   
+
 	GetKmapFromID(id, callback)																	// GET KMAP FROM ID
 	{
 		var url=this.ss.solrUrl+"?q=uid:"+id.toLowerCase()+"&wt=json";								// Set query url
