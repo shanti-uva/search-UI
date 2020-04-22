@@ -154,14 +154,14 @@ class SearchUI  {
 			this.ss.query.text=$("#"+e.currentTarget.id).val(); 									// Get query
 			$("#sui-search").val(this.ss.query.text);												// Set top search
 			if ((this.ss.mode == "input") || (this.ss.mode == "related")) this.ss.mode="simple";	// Toggle simple mode
-			if (this.ActiveSearch(true)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
+			if (this.ActiveSearch(false)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
 
 		$("#sui-searchgo, #sui-searchgo2").on("click", (e)=> { 										// ON SEARCH BUTTON CLCK
 			if ((this.ss.mode == "input") || (this.ss.mode == "related") ) this.ss.mode="simple";	// Toggle simple mode
-			if (this.ActiveSearch(true)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
+			if (this.ActiveSearch(false)) this.ss.mode="advanced";									// Some advanced search items set, open advanced search							
 			this.ss.page=0;																			// Start at beginning
 			this.Query(); 																			// Load and redraw
 			});	
@@ -441,9 +441,9 @@ class SearchUI  {
 			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
 
-	GetTreeChildren(facet, path, callback)
+	GetTreeChildren(facet, path, callback)														// GET CHILDREN OF TREE LIMB
 	{
-		let base=`${this.solrBase}kmterms${this.solrId}`;														// Base url
+		let base=`${this.solrBase}kmterms${this.solrId}`;											// Base url
 		let lvla=Math.max(path.split("/").length+1,2);												// Set level
 		if ((facet == "features") ||  (facet == "languages")) facet="subjects";						// Features and languages are in subjects
 		var url=sui.solrUtil.buildQuery(base,facet,path,lvla,lvla);									// Build query using Yuji's builder

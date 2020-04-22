@@ -132,7 +132,6 @@ class Images  {
 				try{ str+=d("&#xe65f","MATERIALS",j.field_image_materials.und[0].value); } 					catch(e){}
 				try{ str+=d("&#xe66c","ENHANCEMENT",j.field_image_enhancement.und[0].value); } 				catch(e){}
 				try{ str+="<tr><td>&#xe62B&nbsp;&nbsp;<span class='sui-pageLab'>LOCATION</span>:</td><td>"+j.field_longitude.und[0].value+"&nbsp;&nbsp;&nbsp;"+j.field_latitude.und[0].value+"</td></tr>"; } 									catch(e){}
-				trace(j.field_copyright_holder.und[0].value)
 				try{ str+=d("&copy;","COPYRIGHT&nbsp;HOLDER",j.field_copyright_holder.und[0].value); } 		catch(e){}
 				try{ str+=d("&copy;","COPYRIGHT&nbsp;STATEMENT",j.field_copyright_statement.und[0].value);} catch(e){}
 				try{ str+=d("&#xe614","ORIGINAL&nbsp;FILE",j.field_original_filename.und[0].value); } 		catch(e){}

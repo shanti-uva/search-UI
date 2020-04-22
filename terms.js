@@ -101,7 +101,7 @@ class Terms  {
 							str+="</div><br><hr style='border-top:1px solid #a2733f'>";			// End rule and div
 							}
 						else{																	// A primary definition
-							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","RESOURCES (0)","PASSAGES (0)", "DETAILS"]);	// Add tab menu
+							str2+=this.DrawTabMenu(l++,[l+".&nbsp;&nbsp;DEFINITION","DETAILS","PASSAGES (0)","RESOURCES (0)"]);	// Add tab menu
 							t=["","<br>","<br>Waiting for data from Derik...<br><br><br><br>","<br>"] ;// New tab
 							t[0]+="<div class='termDefs'>";
 							t[0]+=data[i].related_definitions_content_s;						// Add text
@@ -110,18 +110,18 @@ class Terms  {
 							t[0]+="LANGUAGE: "+data[i].related_definitions_language_s+"</div><br><br>"; // Add language
 							
 							if (data[i]["related_definitions_branch_subjects-185_header_s"]) {	// If a header
-								t[3]+=data[i]["related_definitions_branch_subjects-185_header_s"].toUpperCase();						// Add label
-								t[3]+=": <i>"+data[i]["related_definitions_branch_subjects-185_subjects_headers_t"]+"</i>";				// Add value
-								t[3]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br>";	// Add popover
+								t[1]+=data[i]["related_definitions_branch_subjects-185_header_s"].toUpperCase();						// Add label
+								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-185_subjects_headers_t"]+"</i>";				// Add value
+								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-185_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
-							t[3]+="LANGUAGE: <i>"+data[i].related_definitions_language_s+"</i>";	
-							t[3]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-184_subjects_uids_t"][0])+"<br>";		// Add popover
+							t[1]+="LANGUAGE: <i>"+data[i].related_definitions_language_s+"</i>";	
+							t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-184_subjects_uids_t"][0])+"<br>";		// Add popover
 							if (data[i]["related_definitions_branch_subjects-5855_header_s"]) {	// If a header
-								t[3]+=data[i]["related_definitions_branch_subjects-5855_header_s"].toUpperCase();						// Add label
-								t[3]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
-								t[3]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
+								t[1]+=data[i]["related_definitions_branch_subjects-5855_header_s"].toUpperCase();						// Add label
+								t[1]+=": <i>"+data[i]["related_definitions_branch_subjects-5855_subjects_headers_t"]+"</i>";			// Add value
+								t[1]+=sui.pages.AddPop(data[i]["related_definitions_branch_subjects-5855_subjects_uids_t"][0])+"<br>";	// Add popover
 								}
-							t[3]+="<br>";
+							t[1]+="<br>";
 							this.tabs.push(t);													// Add tab data for this def
 							}
 						}
@@ -179,8 +179,8 @@ class Terms  {
 							s+=drawAssetButton(j,i,t[j]);										// Make button
 							}
 						}
-					$("#sui-tabTab-"+i+"-1").text("RESOURCES ("+t["all"]+")");					// Set number of resources
-					this.tabs[i][1]+=s;															// Add to definition tab
+					$("#sui-tabTab-"+i+"-3").text("RESOURCES ("+t["all"]+")");					// Set number of resources
+					this.tabs[i][3]+=s;															// Add to definition tab
 					}
 				});
 
