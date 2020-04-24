@@ -57,7 +57,7 @@ class Places  {
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
 			  center: [91.1721, 29.6524], zoom:12, tilt:80,
-			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
+			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/FeatureLayer", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
 	   		};
 	
@@ -86,7 +86,7 @@ class Places  {
 
 		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
-			var Map,WebMap,MapView,SceneView,KMLLayer,Extent;
+			var Map,WebMap,MapView,SceneView,FeatureLayer,KMLLayer,Extent;
 			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils;
 			for (i=0;i<app.reqs.length;++i)	{													// For each required module
 				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
@@ -94,6 +94,7 @@ class Places  {
 				else if (key == "WebMap")			WebMap=arguments[i];
 				else if (key == "MapView")			MapView=arguments[i];
 				else if (key == "SceneView")		SceneView=arguments[i];
+				else if (key == "FeatureLayer")		FeatureLayer=arguments[i];
 				else if (key == "KMLLayer")			KMLLayer=arguments[i];
 				else if (key == "watchUtils")		watchUtils=arguments[i];
 				else if (key == "Extent")			Extent=arguments[i];
@@ -160,6 +161,33 @@ class Places  {
 				});
 			}
 
+		function CreateFeatureLayer()  {															// CREATE LAYER TO HOLD FEATURES
+			app.featureLayer=new FeatureLayer({														// Create layer
+				source:[],
+			  	objectIdField:"OBJECTID",
+				geometryType:"point",
+				spatialReference: { wkid: 4326 },
+				fields:[ { name:"OBJECTID", type:"oid" }, { name:"title", type:"string" },  { name:"kmid", type:"string" } ],
+				renderer:{ type:"simple", symbol:{ type:"text", color: "#7A003C", text: "\ue661", font:{size: 20, family: "CalciteWebCoreIcons" }}
+				}});
+			trace(app.featureLayer)	
+			app.map.add(app.featureLayer);
+		}
+	 
+		function AddFeatures(data) {
+			let graphics=[]
+			let i=0,graphic;
+			for (i=0;i<data.length;i++) {
+				graphic=new Graphic({
+					geometry: { type: "point", latitude: data[i].LATITUDE, longitude: data[i].LONGITUDE  },
+					attributes: data[i]
+		  			});
+			 	graphics.push(graphic);
+				}
+			}
+		
+ 
+
 // ADD WIDGETS 
 
 		if (app.opt&1)  app.mapView.ui.add(new ScaleBar({ view:app.mapView }), "bottom-left");		// Add scale widget
@@ -190,6 +218,7 @@ class Places  {
 // POSITION
 
 		app.mapView.when(function() { 																// When 2D map loads
+			CreateFeatureLayer();
 			if (_this.extent)				app.GoToExtent(_this.extent);							// If an extent given			
 			else if (!app.map.portalItem) 	app.mapView.goTo({ center:app.center, zoom:app.zoom });	// Center	
 			sui.LoadingIcon(false);																	// Hide loading icon
@@ -405,8 +434,6 @@ class Places  {
 			$("#sui-togCatN").on("click", ()=> {												// ON COLLAPSE ALL
 				$("[id^=sui-spCatUL-]").slideUp();												// All down
 				});
-
-
 		});
 
 		function drawTabB(tabs)	{																// DRAW TAB MENU
