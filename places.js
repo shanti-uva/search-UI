@@ -56,8 +56,8 @@ class Places  {
 			map:null, baseMap:"hybrid", kml:null, 								
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
-			  center: [91.1721, 29.6524], zoom:12, tilt:80,
-			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/FeatureLayer", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
+			center: [91.1721, 29.6524], zoom:12, tilt:80,
+			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/FeatureLayer", "esri/Graphic", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
 	   		};
 	
@@ -86,7 +86,7 @@ class Places  {
 
 		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
-			var Map,WebMap,MapView,SceneView,FeatureLayer,KMLLayer,Extent;
+			var Map,WebMap,MapView,SceneView,FeatureLayer,Graphic,KMLLayer,Extent;
 			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils;
 			for (i=0;i<app.reqs.length;++i)	{													// For each required module
 				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
@@ -95,6 +95,7 @@ class Places  {
 				else if (key == "MapView")			MapView=arguments[i];
 				else if (key == "SceneView")		SceneView=arguments[i];
 				else if (key == "FeatureLayer")		FeatureLayer=arguments[i];
+				else if (key == "Graphic")			Graphic=arguments[i];
 				else if (key == "KMLLayer")			KMLLayer=arguments[i];
 				else if (key == "watchUtils")		watchUtils=arguments[i];
 				else if (key == "Extent")			Extent=arguments[i];
@@ -167,26 +168,29 @@ class Places  {
 			  	objectIdField:"OBJECTID",
 				geometryType:"point",
 				spatialReference: { wkid: 4326 },
-				fields:[ { name:"OBJECTID", type:"oid" }, { name:"title", type:"string" },  { name:"kmid", type:"string" } ],
-				renderer:{ type:"simple", symbol:{ type:"text", color: "#7A003C", text: "\ue661", font:{size: 20, family: "CalciteWebCoreIcons" }}
-				}});
+				fields:[ { name:"OBJECTID", type:"oid" }, { name:"name", type:"string" }, { name:"ktypemid", type:"string" }, { name:"kmid", type:"string" }],
+				renderer: {	type:"simple",	symbol:{ type: "web-style",  styleName: "Esri2DPointSymbolsStyle",  name: "landmark" } },
+				popupTemplate: { title: "{Name}"  }
+				});
 			trace(app.featureLayer)	
 			app.map.add(app.featureLayer);
+			const data=[{ LATITUDE: 37.6251, LONGITUDE: -119.085, TYPE: "Title",  NAME: "Name" }];
+			AddFeatures(data);
 		}
 	 
 		function AddFeatures(data) {
-			let graphics=[]
+			let graphics=[];
 			let i=0,graphic;
 			for (i=0;i<data.length;i++) {
 				graphic=new Graphic({
-					geometry: { type: "point", latitude: data[i].LATITUDE, longitude: data[i].LONGITUDE  },
+					geometry: { type: "point", latitude: data[i].LATITUDE, longitude: data[i].LONGITUDE },
 					attributes: data[i]
 		  			});
 			 	graphics.push(graphic);
 				}
+			app.featureLayer.applyEdits(graphics);
 			}
-		
- 
+	 
 
 // ADD WIDGETS 
 
