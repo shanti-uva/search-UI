@@ -82,7 +82,9 @@
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	$("#specialK").on("click",(e)=> { if (!e.altKey) return;
+	$("#sui-header").on("click",(e)=> { if (!e.altKey) return;
+		let d=[{ lat:37.6251, lon:-119.085, lab:"Lhasa",  ui:"subjects-6061" },{ lat:37.6251, lon:-119.085, lab:"Lhasa2",  ui:"subjects-6060" }];
+		sui.GetKmapFromID("places-637",(kmap)=>{ sui.plc.Draw(kmap,"",d); });									// Get kmap and show page
 	});
 
 	function trace(msg, p1, p2, p3, p4)														// CONSOLE 

@@ -102,7 +102,7 @@ class Pages  {
 	DisplayPopover(id, event)																// ACTUALLY DISPLAY KMAP DROP DOWN
 	{
 		var i;												
-		let pos={ top: event.y+140, left: event.x+200 };												// If coming from a map
+		let pos=$("#plc-main").offset();	pos.top+=event.y;	pos.left+=event.x;				// If coming from a map
 		if (event.target) pos=$(event.target).offset();											// Get position of icon
 		let x=Math.max(160,Math.min(pos.left,$("#sui-main").width()-200));						// Cap sides
 		let offset=pos.left-x+150;																// Offset for triangle

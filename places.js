@@ -42,17 +42,19 @@ class Places  {
 		this.div=sui.pages.div;	
 		this.content=["","...loading","...loading"];
 		this.content2=["<br>","<br>"];
-		this.popovers=[{ lat:37.6251, lon:-119.085, lab:"Lhasa",  ui:"subjects-6060" }];
+		this.popovers=null;
 	}
 
-	Draw(kmap, related)																		// DRAW MAP PAGE
+	Draw(kmap, related, popovers)															// DRAW MAP PAGE
 	{
 		var _this=this;																			// Save context
+		this.popovers=popovers;																	// Add data for any popovers
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
 		this.kmap=kmap;																			// Save kmap
 		this.DrawMetadata(related);																// Draw metadata
 		this.GeoLocate();																		// Get extent
 		sui.LoadingIcon(true,64);																// Show loading icon
+			
 		var app={ container:"plc-main",															// Holds startup parameters													
 			map:null, baseMap:"hybrid", kml:null, 								
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
@@ -162,7 +164,16 @@ class Places  {
 				});
 			}
 		
-		function AddPopovers(data) {																// ADD POPOVERS
+		function AddPopovers(data) 																	// ADD POPOVERS
+		{
+			$("#sui-headLeft").html("&#xe62b&nbsp;&nbspGeo-Mapping")								// Header text
+			$("#sui-footer").html("");																// Footer text
+			$("#sui-header").css("background-color","#6faaf1");										// Color header
+			$("#sui-footer").css("background-color","#6faaf1");										// Color footer
+			$("#sui-topCon").html("");																// No tabs													
+			$("#plc-main").css({ "margin":0, "width":"100%", "height":$("#sui-results").height()+"px"});	// Resize map area															
+			$("#plc-infoDiv").remove();		$(".sui-related").remove();								// Remove parts
+
 			let i=0,graphic;
 			for (i=0;i<data.length;i++) {															// For each element
 				graphic=new Graphic({																// Addloc new graphic
@@ -299,7 +310,7 @@ class Places  {
 
 	DrawContent()																		// DRAW TABS AND CAPTION INFO
 	{
-		let str="<div id='sui-topCon' style='margin-left:192px'>";							// Top content div
+		let str="<div id='sui-topCon' style='margin-left:192px'>";								// Top content div
 		if (this.kmap.caption) str+="<div style='margin:5px 0 13px 0' class='sui-sourceText'>"+this.kmap.caption+"</div>";	// Add caption
 		str+=sui.pages.DrawTabMenu(["MAP","NAMES","LOCATION"]);									// Add tab menu
 		str+="</div><div class='plc-main' id='plc-main' ></div>";								// Map holder
@@ -312,6 +323,7 @@ class Places  {
 
 	DrawMetadata(related)																	// SHOW PLACES METADATA
 	{
+		if (this.popovers)	return;
 		this.DrawContent();																		// Draw tabset and captions is not related subject/places
 		this.ShowTab(related ? related : 0);													// Show tab contents
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
