@@ -76,17 +76,11 @@ class Pages  {
 		else if (kmap.asset_type == "collections") 	sui.col.Draw(kmap);							// Collections
 	}
 
-
 	ShowPopover(id, event)																	// DISPLAY KMAP DROP DOWN FROM EVENT
 	{
-		if (this.PopoverTimer && (event.type == "mousemove") ) {								// Already in
-			return;																				// Quit
-			}
-		if (event.type == "mousemove") {														// Already in
-			clearTimeout(this.PopoverTimer);													// Kill timer
-			this.PopoverTimer=null;																// Kill flag
-			return;
-			}
+		if (id && id.match(/collections-/))								return;					// No maps for collections yet
+		if (this.PopoverTimer && (event.type == "mousemove")) 			return;					// Already timeing one
+		if ((event.type == "mousemove") && (id == this.lastPopover)) 	return;					// Already in this one
 		if (event.type == "mousedown") {														// Click on popover
 			if (sui.ss.mode == "related")  sui.ss.mode=this.lastMode;							// Get out of related and collections
 			this.relatedBase=null;																// No base and set to home
@@ -94,25 +88,28 @@ class Pages  {
 			this.ClearPopover();																// Clear popover	
 			return;																				// Quit
 			}
-		if (id && id.match(/collections-/))	return;												// No maps for collections yet
-		setTimeout(()=>{ this.DisplayPopover(id,event)},500);									// Draw it	
-		}
+		this.PopoverTimer=setTimeout(()=>{ this.DisplayPopover(id,event)},500);					// Draw it	
+	}
 
 	ClearPopover()																			// CLEAR KMAP DROP DOWN
 	{
 		clearTimeout(this.PopoverTimer);														// Kill timer
 		this.PopoverTimer=null;																	// Kill flag
 		$("[id^=sui-popover-]").remove();														// Remove old one
+		this.lastPopover="";																	// Clear last
 	}
 
 	DisplayPopover(id, event)																// ACTUALLY DISPLAY KMAP DROP DOWN
 	{
-		var i,pos=$(event.target).offset();														// Get position of icon
+		var i;												
+		let pos={ top: event.y+140, left: event.x+200 };												// If coming from a map
+		if (event.target) pos=$(event.target).offset();											// Get position of icon
 		let x=Math.max(160,Math.min(pos.left,$("#sui-main").width()-200));						// Cap sides
 		let offset=pos.left-x+150;																// Offset for triangle
 		clearTimeout(this.PopoverTimer);														// Kill timer
 		this.PopoverTimer=null;																	// Kill flag
 		if (!pos.top)	return;																	// Race condition 
+		this.lastPopover=id;
 		sui.GetKmapFromID(id,(o)=>{ 															// GET KMAP DATA
 			let v;
 			if (!o)  return; 																	// Quit if nothing

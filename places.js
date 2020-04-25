@@ -42,6 +42,7 @@ class Places  {
 		this.div=sui.pages.div;	
 		this.content=["","...loading","...loading"];
 		this.content2=["<br>","<br>"];
+		this.popovers=[{ lat:37.6251, lon:-119.085, lab:"Lhasa",  ui:"subjects-6060" }];
 	}
 
 	Draw(kmap, related)																		// DRAW MAP PAGE
@@ -57,7 +58,7 @@ class Places  {
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
 			center: [91.1721, 29.6524], zoom:12, tilt:80,
-			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/layers/FeatureLayer", "esri/Graphic", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
+			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/Graphic", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
 	   		};
 	
@@ -86,7 +87,7 @@ class Places  {
 
 		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
-			var Map,WebMap,MapView,SceneView,FeatureLayer,Graphic,KMLLayer,Extent;
+			var Map,WebMap,MapView,SceneView,Graphic,KMLLayer,Extent;
 			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils;
 			for (i=0;i<app.reqs.length;++i)	{													// For each required module
 				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
@@ -94,7 +95,6 @@ class Places  {
 				else if (key == "WebMap")			WebMap=arguments[i];
 				else if (key == "MapView")			MapView=arguments[i];
 				else if (key == "SceneView")		SceneView=arguments[i];
-				else if (key == "FeatureLayer")		FeatureLayer=arguments[i];
 				else if (key == "Graphic")			Graphic=arguments[i];
 				else if (key == "KMLLayer")			KMLLayer=arguments[i];
 				else if (key == "watchUtils")		watchUtils=arguments[i];
@@ -161,36 +161,30 @@ class Places  {
 					});
 				});
 			}
-
-		function CreateFeatureLayer()  {															// CREATE LAYER TO HOLD FEATURES
-			app.featureLayer=new FeatureLayer({														// Create layer
-				source:[],
-			  	objectIdField:"OBJECTID",
-				geometryType:"point",
-				spatialReference: { wkid: 4326 },
-				fields:[ { name:"OBJECTID", type:"oid" }, { name:"name", type:"string" }, { name:"ktypemid", type:"string" }, { name:"kmid", type:"string" }],
-				renderer: {	type:"simple",	symbol:{ type: "web-style",  styleName: "Esri2DPointSymbolsStyle",  name: "landmark" } },
-				popupTemplate: { title: "{Name}"  }
-				});
-			trace(app.featureLayer)	
-			app.map.add(app.featureLayer);
-			const data=[{ LATITUDE: 37.6251, LONGITUDE: -119.085, TYPE: "Title",  NAME: "Name" }];
-			AddFeatures(data);
-		}
-	 
-		function AddFeatures(data) {
-			let graphics=[];
+		
+		function AddPopovers(data) {																// ADD POPOVERS
 			let i=0,graphic;
-			for (i=0;i<data.length;i++) {
-				graphic=new Graphic({
-					geometry: { type: "point", latitude: data[i].LATITUDE, longitude: data[i].LONGITUDE },
-					attributes: data[i]
-		  			});
-			 	graphics.push(graphic);
-				}
-			app.featureLayer.applyEdits(graphics);
+			for (i=0;i<data.length;i++) {															// For each element
+				graphic=new Graphic({																// Addloc new graphic
+					geometry:{ type: "point", latitude:data[i].lat, longitude:data[i].lon },		// Position
+					symbol:{ type: "picture-marker", url:"popover.png", width:19, height:13 },		// Shape
+					attributes:data[i]																// Raw data
+				});
+				app.gl.add(graphic);																// Add to layer
+			}	
+		
+			app.mapView.on("pointer-move", function(event) {										// HANDLE HOVER
+				var screenPoint={ x: event.x, y: event.y };											// Format pos
+				app.mapView.hitTest(screenPoint).then(function(response) {							// Search for graphics at the clicked location
+					if (response.results.length) {													// Found at least one
+						let id=response.results[0].graphic.attributes.ui;							// Get id
+						event.type="mousemove";														// Make event compatible
+						sui.pages.ShowPopover(id, event)
+				 		}
+					});
+			   });		
 			}
-	 
+	
 
 // ADD WIDGETS 
 
@@ -210,8 +204,8 @@ class Places  {
 			document.getElementById("plc-legend-btn").addEventListener("click", function() { app.ToggleOption(app.legend); });	// Add button handler
 			}
 		if (app.opt&64) {																			// Sketch 
-			var gl=new GraphicsLayer();  app.map.add(gl);											// Add new graphics layer to map
-			app.sketch=new Sketch({ view:app.mapView, visible:false, layer:gl });					// Add widget
+			app.gl=new GraphicsLayer();  app.map.add(app.gl);										// Add new graphics layer to map
+			app.sketch=new Sketch({ view:app.mapView, visible:false, layer:app.gl });				// Add widget
 			document.getElementById("plc-sketch-btn").addEventListener("click", function() { app.ToggleOption(app.sketch); });	// Add button handler
 			}
 		if (app.opt&128) {  																		// Bookmarks
@@ -222,7 +216,7 @@ class Places  {
 // POSITION
 
 		app.mapView.when(function() { 																// When 2D map loads
-			CreateFeatureLayer();
+			if (_this.popovers)				AddPopovers(_this.popovers);							// Add popovers if any
 			if (_this.extent)				app.GoToExtent(_this.extent);							// If an extent given			
 			else if (!app.map.portalItem) 	app.mapView.goTo({ center:app.center, zoom:app.zoom });	// Center	
 			sui.LoadingIcon(false);																	// Hide loading icon
@@ -232,7 +226,6 @@ class Places  {
 
 		app.DrawFooter=function()																	// DRAW MAP FOOTER
 		{
-			var i;
 			str=`<div style='float:left;font-size:18px'>
 				<div id='plc-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div></div>				
 				<div style='float:right;font-size:14px;margin-right:16px'>PLACE ID: ${kmap.id}</div>`;
