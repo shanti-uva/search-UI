@@ -170,15 +170,27 @@ class Places  {
 			$("#plc-infoDiv").css("left","25px");	
 
 			let i=0,graphic;
+			let minLat,minLon,maxLat,maxLon;
+			minLat=minLon=999999;		maxLat=maxLon=-999999;										// Inits
 			for (i=0;i<data.length;i++) {															// For each element
+				if (data[i].lat < minLat)	minLat=data[i].lat;										// Get min lat
+				if (data[i].lat > maxLat)	maxLat=data[i].lat;										// Get max lat
+				if (data[i].lon < minLon)	minLon=data[i].lon;										// Get min lon
+				if (data[i].lon > maxLon)	maxLon=data[i].lon;										// Get max lom
 				graphic=new Graphic({																// Addloc new graphic
 					geometry:{ type: "point", latitude:data[i].lat, longitude:data[i].lon },		// Position
 					symbol:{ type: "picture-marker", url:"popover.png", width:19, height:13 },		// Shape
 					attributes:data[i]																// Raw data
 				});
 				app.gl.add(graphic);																// Add to layer
-			}	
-		
+				}	
+			
+			_this.extent={ 																			// Set extent based on minimax of popovers
+				spatialReference:4326, 																// In lat/lon coord space
+				xmax:maxLon, xmin:minLon,															// Longitude
+				ymax:maxLat, ymin:minLat															// Latitude
+				}	
+
 			app.mapView.on("pointer-move", function(event) {										// HANDLE HOVER
 				var screenPoint={ x: event.x, y: event.y };											// Format pos
 				app.mapView.hitTest(screenPoint).then(function(response) {							// Search for graphics at the clicked location
@@ -296,7 +308,7 @@ class Places  {
 				_this.extent=res.candidates[0].extent;											// Extract extent
 				_this.extent.spatialReference=res.spatialReference.wkid;						// Set ref
 				if (_this.showing) _this.app.GoToExtent(_this.extent);							// If already showing a map, go there
-				});	
+			});	
 		} catch(e) {};	
 	}
 
