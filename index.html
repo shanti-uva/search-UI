@@ -83,8 +83,7 @@
 
 
 	$("#sui-header").on("click",(e)=> { if (!e.altKey) return;
-		let d=[{ lat:37.6251, lon:-119.085, lab:"Lhasa",  ui:"subjects-6061" },{ lat:37.6251, lon:-119.085, lab:"Lhasa2",  ui:"subjects-6060" }];
-		sui.plc.Draw("","",d); 
+		sui.GeoLocate();
 	});
 
 	function trace(msg, p1, p2, p3, p4)														// CONSOLE 

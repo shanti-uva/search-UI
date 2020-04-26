@@ -134,7 +134,9 @@
 .sui-advViewListPage { 	display:inline-block; } 
 					.sui-advViewListPage:hover { color:#668eec;	}	
 .sui-advViewTreePage { 	display:inline-block; padding:0 4px; color:#777; } 
-					.sui-advViewTreePage:hover { color: #a4baec; }														
+					.sui-advViewTreePage:hover { color: #a4baec; }	
+.sui-geoLocate {	background-color:#6faaf1; border-radius:16px; margin-top:4px; padding:0 12px;
+					border:1px solid #999; cursor:pointer; text-align:center; float:right; color:#fff }
 /* TREE */
 .sui-tree {      	user-select: none; overflow-x:hidden; max-height:360px; padding-left:6px; font-size:12px; 	}
 .sui-tree ul { 		list-style:none outside none; padding:0; margin:0; }

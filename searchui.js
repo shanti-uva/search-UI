@@ -136,7 +136,10 @@ class SearchUI  {
 			<span id='sui-advPlus-recent' style='float:right'>&#xe669</span></div>
 			<div class='sui-advTerm'></div>
 			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div>
-			<div style='margin-top:4px;float:right;font-size:13px'>Show Boolean controls? &nbsp;<input type='checkbox' id='sui-showBool' ${this.showBool ? "checked" : ""}></div> 
+			<div style='margin-top:4px;float:right;font-size:13px'>
+				<div>Show Boolean controls? &nbsp;<input type='checkbox' id='sui-showBool' ${this.showBool ? "checked" : ""}></div>
+				<!-- div class='sui-geoLocate' id='sui-geoLocate'>Geo-Locate</div-->
+			</div>
 		</div>
 		<div id='sui-footer' class='sui-footer'></div></div>
 		<div class='sui-hamburger' id='sui-hamburger'></div>`;
@@ -175,7 +178,10 @@ class SearchUI  {
 			this.SetCookie("showBool", this.showBool);												// Set cookie
 			this.DrawAdvanced();																	// Draw search UI 
 			});	
-				
+		$("#sui-geoLocate").on("click",()=> { 														// ON GEO LOCATE
+			this.GeoLocate();																		// Show geolocation	
+			});	
+					
 		$("[id^=sui-advHeader-]").on("click",(e)=> {												// ON FACET HEADER CLICK
 			var id=e.currentTarget.id.substring(14);												// Get facet name		
 			$(".sui-advEdit").slideUp(400, ()=> {													// Close any open tree or lists
@@ -1327,6 +1333,13 @@ class SearchUI  {
 				}
 			}
 	}
+
+	GeoLocate()																						// SHOW GEOLOCATED ASSESTS
+	{
+		let d=[{ lat:37.6251, lon:-119.085, lab:"Lhasa",  ui:"subjects-6061" },{ lat:37.6251, lon:-119.085, lab:"Lhasa2",  ui:"subjects-6060" }];
+		sui.plc.Draw("","",d); 
+	}
+
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 // HELPERS

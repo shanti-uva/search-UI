@@ -101,9 +101,9 @@ class Pages  {
 
 	DisplayPopover(id, event)																// ACTUALLY DISPLAY KMAP DROP DOWN
 	{
-		var i;												
-		let pos=$("#plc-main").offset();	pos.top+=event.y;	pos.left+=event.x;				// If coming from a map
+		let i,pos;												
 		if (event.target) pos=$(event.target).offset();											// Get position of icon
+		else { pos=$("#plc-main").offset();	pos.top+=event.y;	pos.left+=event.x;	}			// If coming from a map
 		let x=Math.max(160,Math.min(pos.left,$("#sui-main").width()-200));						// Cap sides
 		let offset=pos.left-x+150;																// Offset for triangle
 		clearTimeout(this.PopoverTimer);														// Kill timer

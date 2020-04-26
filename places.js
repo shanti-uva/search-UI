@@ -163,7 +163,7 @@ class Places  {
 		
 		function AddPopovers(data) 																	// ADD POPOVERS
 		{
-			$("#sui-headLeft").html("&#xe62b&nbsp;&nbspGeo-Mapping")								// Header text
+			$("#sui-headLeft").html("&#xe61a&nbsp;&nbspGeo-Locate")								// Header text
 			$("#sui-footer").html("");																// Footer text
 			$("#sui-header").css("background-color","#6faaf1");										// Color header
 			$("#sui-footer").css("background-color","#6faaf1");										// Color footer
@@ -381,6 +381,7 @@ class Places  {
 
 	ShowTab(which)																			// OPEN TAB
 	{	
+		let _this=this;
 		$("[id^=sui-tabTab]").css({"background-color":"#999",color:"#fff" });					// Reset all tabs
 		$("#sui-tabContent").css({display:"block","background-color":"#eee"});					// Show content
 		$("#sui-tabTab"+which).css({"background-color":"#eee",color:"#000"});					// Active tab
@@ -394,6 +395,13 @@ class Places  {
 			$("#sui-tabTabB0").css({"background-color":"#eee",color:"#000"});					// Active tab
 			$("#sui-tabTabB0").css({"background-color":"#eee",color:"#000"});					// Active tab
 			$("#sui-tabContent").html(this.content2[0]);										// Set content
+			$("[id^=sui-spLab-]").on("click", function(e) {return false;	});					// ON CONTEXT LINE CLICK, INHIBIT
+			$("[id^=sui-spDot-]").on("click", function(e) {										// ON RELATIONSHIP TREE DOT CLICK
+				let path=e.currentTarget.id.substring(10);										// Get id
+				if (path != "null") sui.pages.AddRelBranch(_this.kmap.asset_type,path,$(this));	// Lazy load branch
+				$(this).html("&ndash;"); 														// Change label
+				$(this).parent().find('ul').slideToggle();            							// Slide into place
+				});
 			}
 		$("#sui-spLab-"+this.kmap.uid).css({ "font-weight":"bold", "text-decoration": "underline" });	// Highlight current one	
 	}
@@ -457,10 +465,11 @@ class Places  {
 
 	AddRelatedPlaces(o, d, content)																// ADD RELATED PLACES CONTENTS 
 	{	
-		let n=0;
+		let n=0,sups=0;
+		if (d[0].ancestors && d[0].ancestors.length > 2) sups=d[0].ancestors.length-2;
 		let str=`<br><div class='sui-spHead'>Places related to ${o.title}</div>
 		<div style='max-width:900px'>
-		<b>${o.title[0]}</b> has <b>${d[0].ancestors.length-2}</b> superordinate places and<b> TBD </b> immediately subordinate places. 
+		<b>${o.title[0]}</b> has <b>${sups}</b> superordinate places and<b> TBD </b> immediately subordinate places. 
 		You can browse these subordinate places as well as its superordinate categories with the tree below. 
 		See the RELATED PLACES tab if you instead prefer to view only its immediately subordinate places grouped together in useful ways, 
 		as well as places non-hierarchically related to it.</div><br>
