@@ -320,6 +320,7 @@ class Subjects  {
 		this.content[1]=str;																	// Set tab
 
 		function drawCat(f) {																	// DRAW CATEGORY
+			if (!s || !s[f]) return "</ul>";													// Bad data 
 			s[f]=s[f].sort((a,b)=>{ return a.title < b.title ? -1 : 1;});						// Sort
 			let str="<div id='sui-spCat-"+f.replace(/ /g,"_")+"' class='sui-spCat'>"+o.title+" "+f+"</div><ul id='sui-spCatUL-"+f.replace(/ /g,"_")+"' style='display:none'>";// Add category header
 			for (i=0;i<s[f].length;++i)	{														// For each item
@@ -338,7 +339,7 @@ class Subjects  {
 		for (i=0;i<d.length;++i) {																// For each child
 			subs+=d[i].child_count.numFound;													// Add children
 			}
-trace(d)
+
 subs="(TBD)"
 
 	let str=`<br><div class='sui-spHead'>Subjects related to ${o.title}</div>

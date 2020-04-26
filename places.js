@@ -52,7 +52,6 @@ class Places  {
 		$("#sui-results").css({ "padding-left":"12px", width:"calc(100% - 24px"});				// Reset to normal size
 		this.kmap=kmap;																			// Save kmap
 		this.DrawMetadata(related);																// Draw metadata
-		this.GeoLocate();																		// Get extent
 		sui.LoadingIcon(true,64);																// Show loading icon
 			
 		var app={ container:"plc-main",															// Holds startup parameters													
@@ -111,7 +110,6 @@ class Places  {
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
 				}
 
-			if (!$("#plc-switch-btn").length) {														// If not initted yet
 			var str=`<div id="plc-infoDiv">
 				<input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-switch-btn" value="3D"             title="Change view" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-base-btn"   src="basemapicon.gif"  title="Change base map"/>
@@ -120,8 +118,7 @@ class Places  {
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-sketch-btn" src="sketchicon.gif"   title="Show sketch" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-book-btn"   src="bookmarkicon.gif" title="Show bookmarks" />		
 				</div>`;
-				$("#plc-main").append(str);
-			}
+			$("#plc-main").append(str);
 
 		app.ShowOptions=function() {															// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
@@ -170,9 +167,7 @@ class Places  {
 			$("#sui-footer").html("");																// Footer text
 			$("#sui-header").css("background-color","#6faaf1");										// Color header
 			$("#sui-footer").css("background-color","#6faaf1");										// Color footer
-			$("#sui-topCon").html("");																// No tabs													
-			$("#plc-main").css({ "margin":0, "width":"100%", "height":$("#sui-results").height()+"px"});	// Resize map area															
-			$("#plc-infoDiv").remove();		$(".sui-related").remove();								// Remove parts
+			$("#plc-infoDiv").css("left","25px");	
 
 			let i=0,graphic;
 			for (i=0;i<data.length;i++) {															// For each element
@@ -234,7 +229,7 @@ class Places  {
 			_this.showing=true;																		// Been shown	
 			});
 		app.sceneView.when(function() { app.sceneView.goTo({ tilt:80 }); });						// When 3D loads, tilt
-
+/*
 		app.DrawFooter=function()																	// DRAW MAP FOOTER
 		{
 			str=`<div style='float:left;font-size:18px'>
@@ -253,7 +248,8 @@ class Places  {
 		}
 
 	app.DrawFooter();																				// Draw footer
-		
+*/
+
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		app.ToggleOption=function(option) {															// HIDE/SHOW WIDGET OPTION
@@ -323,7 +319,12 @@ class Places  {
 
 	DrawMetadata(related)																	// SHOW PLACES METADATA
 	{
-		if (this.popovers)	return;
+		if (this.popovers) {																	// Has popovers
+			$(this.div).html("<div class='plc-main' id='plc-main'></div>");						// Add to div
+			$("#plc-main").css({ "margin":0, "width":"100%", "height":$("#sui-results").height()+"px"});	// Resize map area															
+			return;																				// Don't need any metadata or tabs
+			}
+		this.GeoLocate();																		// Get extent
 		this.DrawContent();																		// Draw tabset and captions is not related subject/places
 		this.ShowTab(related ? related : 0);													// Show tab contents
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
