@@ -59,7 +59,7 @@ class Places  {
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
 			center: [91.1721, 29.6524], zoom:12, tilt:80,
-			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/Graphic", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
+			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/Graphic", "esri/layers/FeatureLayer", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
 	   		};
 	
@@ -88,7 +88,7 @@ class Places  {
 
 		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
-			var Map,WebMap,MapView,SceneView,Graphic,KMLLayer,Extent;
+			var Map,WebMap,MapView,SceneView,Graphic,FeatureLayer,KMLLayer,Extent;
 			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils;
 			for (i=0;i<app.reqs.length;++i)	{													// For each required module
 				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
@@ -97,6 +97,7 @@ class Places  {
 				else if (key == "MapView")			MapView=arguments[i];
 				else if (key == "SceneView")		SceneView=arguments[i];
 				else if (key == "Graphic")			Graphic=arguments[i];
+				else if (key == "FeatureLayer")		FeatureLayer=arguments[i];
 				else if (key == "KMLLayer")			KMLLayer=arguments[i];
 				else if (key == "watchUtils")		watchUtils=arguments[i];
 				else if (key == "Extent")			Extent=arguments[i];
@@ -165,13 +166,28 @@ class Places  {
 
 		function AddPopovers(data) 																	// ADD POPOVERS
 		{
+/*			app.fl=new FeatureLayer({
+				fields:[{ name:"ObjectID", alias:"ObjectID", type:"oid" },
+				  		{ name:"Name", alias:"Name", type:"string" },
+				  		{ name:"kmid",	alias:"kmid", type:"string" }],
+				objectIdField:"ObjectID", geometryType:"point",
+				spatialReference:{ wkid: 4326 }, source: [], 
+				renderer: { type: "simple", symbol: {
+							type: "web-style", // autocasts as new WebStyleSymbol()
+							styleName: "Esri2DPointSymbolsStyle",
+							name: "landmark" }
+					},
+			  popupTemplate: {  title: "{Name}"	}
+			  });
+			app.map.add(app.fl);
+*/
 			$("#sui-headLeft").html("<div style='margin-top:12px'>&#xe61a&nbsp;&nbspGeo-Locate</div>")	// Header text
 			$("#sui-footer").html("");																// Footer text
 			$("#sui-header").css("background-color","#6faaf1");										// Color header
 			$("#sui-footer").css("background-color","#6faaf1");										// Color footer
 			$("#plc-infoDiv").css("left","25px");	
 
-			let i,j,graphic;
+			let i,graphic;
 			let minLat=999999,minLon=999999,maxLat=-999999,maxLon=-999999;
 	
 			for (i=0;i<data.length;i++) {															// For each element
