@@ -160,18 +160,20 @@ class Places  {
 					});
 				});
 			}
-		
+
+// POPOVERS			
+
 		function AddPopovers(data) 																	// ADD POPOVERS
 		{
-			$("#sui-headLeft").html("&#xe61a&nbsp;&nbspGeo-Locate")								// Header text
+			$("#sui-headLeft").html("<div style='margin-top:12px'>&#xe61a&nbsp;&nbspGeo-Locate</div>")	// Header text
 			$("#sui-footer").html("");																// Footer text
 			$("#sui-header").css("background-color","#6faaf1");										// Color header
 			$("#sui-footer").css("background-color","#6faaf1");										// Color footer
 			$("#plc-infoDiv").css("left","25px");	
 
-			let i=0,graphic;
-			let minLat,minLon,maxLat,maxLon;
-			minLat=minLon=999999;		maxLat=maxLon=-999999;										// Inits
+			let i,j,graphic;
+			let minLat=999999,minLon=999999,maxLat=-999999,maxLon=-999999;
+	
 			for (i=0;i<data.length;i++) {															// For each element
 				if (data[i].lat < minLat)	minLat=data[i].lat;										// Get min lat
 				if (data[i].lat > maxLat)	maxLat=data[i].lat;										// Get max lat
@@ -203,7 +205,6 @@ class Places  {
 			   });		
 			}
 	
-
 // ADD WIDGETS 
 
 		if (app.opt&1)  app.mapView.ui.add(new ScaleBar({ view:app.mapView }), "bottom-left");		// Add scale widget

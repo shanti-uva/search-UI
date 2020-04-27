@@ -1336,7 +1336,8 @@ class SearchUI  {
 
 	GeoLocate()																						// SHOW GEOLOCATED ASSESTS
 	{
-		let d=[{ lat:37.6251, lon:-119.085, lab:"Lhasa",  ui:"subjects-6061" },{ lat:36.6251, lon:-120.085, lab:"Lhasa2",  ui:"subjects-6060" }];
+		let d=[{ lat:36.6251, lon:-118.085, lab:"Lhasa",  ui:"subjects-6061" },{ lat:37.6251, lon:-119.085, lab:"Lhasa2",  ui:"subjects-6060" }];
+		//move lat by .0001 to stack
 		sui.plc.Draw("","",d); 
 	}
 
