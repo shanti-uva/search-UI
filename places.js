@@ -173,7 +173,7 @@ class Places  {
 				objectIdField:"ObjectID", geometryType:"point",
 				spatialReference:{ wkid: 4326 }, source: [], 
 				renderer: { type: "simple", symbol: {
-							type: "web-style", // autocasts as new WebStyleSymbol()
+							type: "web-style", 
 							styleName: "Esri2DPointSymbolsStyle",
 							name: "landmark" }
 					},

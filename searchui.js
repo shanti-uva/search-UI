@@ -138,7 +138,7 @@ class SearchUI  {
 			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div>
 			<div style='margin-top:4px;float:right;font-size:13px'>
 				<div>Show Boolean controls? &nbsp;<input type='checkbox' id='sui-showBool' ${this.showBool ? "checked" : ""}></div>
-				<!-- div class='sui-geoLocate' id='sui-geoLocate'>Geo-Locate</div-->
+				<div class='sui-geoLocate' id='sui-geoLocate'>Geo-Locate</div>
 			</div>
 		</div>
 		<div id='sui-footer' class='sui-footer'></div></div>
