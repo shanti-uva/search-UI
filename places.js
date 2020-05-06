@@ -23,10 +23,10 @@
 				img/sketchicon.gif
 				img/bookmarkicon.gif
 
-	ESRI:		https://js.arcgis.com/4.12
-				https://js.arcgis.com/4.12/esri/themes/light/main.css (dynamically loaded)
+	ESRI:		https://js.arcgis.com/4.15
+				https://js.arcgis.com/4.15/esri/themes/light/main.css (dynamically loaded)
 	Dependents:	pages.js, searchui.js								// JS modules called
-	opt: 		Bitmapped: 1=Scale | 2=Search| 4=3D | 8=Base | 16=Layers | 32=Legend | 64=Sketch | 128=Bookmarks
+	opt: 		Bitmapped: 1=Scale | 2=Search| 4=3D | 8=Base | 16=Layers | 32=Legend | 64=Sketch | 128=Bookmarks | 256=Print | 512=Distance | 1024=Area
 
 *******************************************************************************************************************************************/
 
@@ -38,7 +38,7 @@ class Places  {
 		this.kmap=null;
 		this.extent=null;
 		this.showing=false;
-		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.12/esri/themes/light/main.css" }).appendTo("head");
+		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.15/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
 		this.content=["","...loading","...loading"];
 		this.content2=["<br>","<br>"];
@@ -56,8 +56,8 @@ class Places  {
 			
 		var app={ container:"plc-main",															// Holds startup parameters													
 			map:null, baseMap:"hybrid", kml:null, 								
-			mapView: null,  sceneView: null, activeView:null, opt:4|8|64,
-			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,				
+			mapView: null,  sceneView: null, activeView:null, opt:4|8|64|512|1024,
+			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,measurement:null,				
 			center: [91.1721, 29.6524], zoom:12, tilt:80,
 			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/Graphic", "esri/layers/FeatureLayer", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
@@ -78,18 +78,20 @@ class Places  {
 
 		this.app=app;	   
 		
-		if (app.opt&1)	 app.reqs.push("esri/widgets/ScaleBar");								// Scalebar if spec'd
-		if (app.opt&2)	 app.reqs.push("esri/widgets/Search");									// Search
-		if (app.opt&8)	 app.reqs.push("esri/widgets/BasemapGallery");							// Basepicker 
-		if (app.opt&16)	 app.reqs.push("esri/widgets/LayerList");								// Layerlist 
-		if (app.opt&32)  app.reqs.push("esri/widgets/Legend");									// Legend
-		if (app.opt&64)	 app.reqs.push("esri/widgets/Sketch"),app.reqs.push("esri/layers/GraphicsLayer");	// Sketch
-		if (app.opt&128) app.reqs.push("esri/widgets/Bookmarks");								// Bookmarks 
+		if (app.opt&1)	 		app.reqs.push("esri/widgets/ScaleBar");							// Scalebar if spec'd
+		if (app.opt&2)	 		app.reqs.push("esri/widgets/Search");							// Search
+		if (app.opt&8)	 		app.reqs.push("esri/widgets/BasemapGallery");					// Basepicker 
+		if (app.opt&16)	 		app.reqs.push("esri/widgets/LayerList");						// Layerlist 
+		if (app.opt&32)  		app.reqs.push("esri/widgets/Legend");							// Legend
+		if (app.opt&64)	 		app.reqs.push("esri/widgets/Sketch"),app.reqs.push("esri/layers/GraphicsLayer");	// Sketch
+		if (app.opt&128) 		app.reqs.push("esri/widgets/Bookmarks");						// Bookmarks 
+		if (app.opt&256) 		app.reqs.push("esri/widgets/Print");							// Print 
+		if (app.opt&(512|1024))	app.reqs.push("esri/widgets/Measurement");						// Measure 
 
 		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
 			var Map,WebMap,MapView,SceneView,Graphic,FeatureLayer,KMLLayer,Extent;
-			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils;
+			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils,Print,Measurement;
 			for (i=0;i<app.reqs.length;++i)	{													// For each required module
 				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
 				if (key == "Map") 					Map=arguments[i];							// Set variable
@@ -109,15 +111,20 @@ class Places  {
 				else if (key == "Sketch")			Sketch=arguments[i];
 				else if (key == "GraphicsLayer")	GraphicsLayer=arguments[i];
 				else if (key == "Bookmarks")		Bookmarks=arguments[i];
-				}
+				else if (key == "Print")			Print=arguments[i];
+				else if (key == "Measurement")		Measurement=arguments[i];
+			}
 
 			var str=`<div id="plc-infoDiv">
 				<input class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-switch-btn" value="3D"             title="Change view" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-base-btn"   src="basemapicon.gif"  title="Change base map"/>
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-layer-btn"  src="layericon.png"    title="Show list of layers" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-legend-btn" src="legendicon.gif"   title="Show legend" />
-				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-sketch-btn" src="sketchicon.gif"   title="Show sketch" />
 				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-book-btn"   src="bookmarkicon.gif" title="Show bookmarks" />		
+				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-print-btn"  src="printicon.gif" 	 title="Print menu" />		
+				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-sketch-btn" src="sketchicon.gif"   title="Show sketch" />
+				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-dist-btn"   src="disticon.png" 	 title="Measure distance" />
+				<img   class="esri-component esri-widget--button esri-widget esri-interactive" type="button" style="display:none" id="plc-area-btn"   src="areaicon.png" 	 title="Measure area" />
 				</div>`;
 			$("#plc-main").append(str);
 
@@ -128,16 +135,20 @@ class Places  {
 			document.getElementById("plc-legend-btn").style.display=(app.opt&32 && app.map.portalItem)  ? "block" : "none";						
 			document.getElementById("plc-sketch-btn").style.display=(app.opt&64) ? "block" : "none";						
 			document.getElementById("plc-book-btn").style.display=(app.opt&128 && app.map.bookmarks) ? "block" : "none";							
+			document.getElementById("plc-print-btn").style.display=(app.opt&256) ? "block" : "none";							
+			document.getElementById("plc-dist-btn").style.display=(app.opt&512) ? "block" : "none";							
+			document.getElementById("plc-area-btn").style.display=(app.opt&1024) ? "block" : "none";							
 			if (app.opt&16  && app.show&16) 	setOption(app.layers);								// Layers
 			if (app.opt&32  && app.show&32) 	setOption(app.legend);								// Legend
 			if (app.opt&64  && app.show&64) 	setOption(app.sketch);								// Sketch
 			if (app.opt&128 && app.show&128) 	setOption(app.bookmarks);							// Bookmarks
-			
+			if (app.opt&256 && app.show&256) 	setOption(app.printer);								// Bookmarks
 			function setOption(option) {															// SET OPTION ON
 				app.mapView.ui.add(option,"top-right");												// Show
 				option.visible=true;																// Show it's on
 				}
-			}
+
+		}
 		app.map=new Map({ basemap:app.baseMap, ground:"world-elevation" });							// Make new map
 		app.sceneView=new SceneView( { 	container:null,	map: app.map });							// 3D view (hidden)
 		app.activeView=app.mapView=new MapView({													// 2D view
@@ -166,21 +177,6 @@ class Places  {
 
 		function AddPopovers(data) 																	// ADD POPOVERS
 		{
-/*			app.fl=new FeatureLayer({
-				fields:[{ name:"ObjectID", alias:"ObjectID", type:"oid" },
-				  		{ name:"Name", alias:"Name", type:"string" },
-				  		{ name:"kmid",	alias:"kmid", type:"string" }],
-				objectIdField:"ObjectID", geometryType:"point",
-				spatialReference:{ wkid: 4326 }, source: [], 
-				renderer: { type: "simple", symbol: {
-							type: "web-style", 
-							styleName: "Esri2DPointSymbolsStyle",
-							name: "landmark" }
-					},
-			  popupTemplate: {  title: "{Name}"	}
-			  });
-			app.map.add(app.fl);
-*/
 			$("#sui-headLeft").html("<div style='margin-top:12px'>&#xe61a&nbsp;&nbspGeo-Locate</div>")	// Header text
 			$("#sui-footer").html("");																// Footer text
 			$("#sui-header").css("background-color","#6faaf1");										// Color header
@@ -247,8 +243,24 @@ class Places  {
 			app.bookmarks=new Bookmarks({ view:app.mapView, visible:false });						// Add widget
 			document.getElementById("plc-book-btn").addEventListener("click", function() { app.ToggleOption(app.bookmarks); });	 // Add button handler
 			}
-			
-// POSITION
+		if (app.opt&(512|1024)) {  																	// Measurement
+			app.measurement=new Measurement();														// Add widget
+			app.mapView.set({ container: "plc-main" });												// Holder for measuring dialog
+				app.mapView.ui.add(app.measurement, "bottom-right");								// Set bottom right
+				app.measurement.view=app.mapView;													// Tie to view
+			document.getElementById("plc-dist-btn").addEventListener("click", ()=>{ 				// HANDLE DISTANCE CLICK
+				if (app.measurement.activeTool == "distance") app.measurement.clear();				// Clear
+				else										  app.measurement.activeTool="distance"; // Start measurinng
+				});
+			document.getElementById("plc-area-btn").addEventListener("click", ()=>{ 				// HANDLE AREA CLICK
+				if (app.measurement.activeTool == "area")	app.measurement.clear();				// Clear
+				else										app.measurement.activeTool="area"; 		// Start measurinng
+				});
+			}
+	
+
+
+		// POSITION
 
 		app.mapView.when(function() { 																// When 2D map loads
 			if (_this.popovers)				AddPopovers(_this.popovers);							// Add popovers if any
@@ -258,26 +270,6 @@ class Places  {
 			_this.showing=true;																		// Been shown	
 			});
 		app.sceneView.when(function() { app.sceneView.goTo({ tilt:80 }); });						// When 3D loads, tilt
-/*
-		app.DrawFooter=function()																	// DRAW MAP FOOTER
-		{
-			str=`<div style='float:left;font-size:18px'>
-				<div id='plc-customMap' class='sui-resDisplay' title='Custom/normal map'>&#xe625</div></div>				
-				<div style='float:right;font-size:14px;margin-right:16px'>PLACE ID: ${kmap.id}</div>`;
-			$("#sui-footer").html(str);
-			$("#plc-customMap").on("click", ()=> {
-				if ($("#plc-infoDiv").length) {
-					$("#plc-infoDiv").remove();
-					var h=$(app.div).height()-4;
-					var link="https://www.thlib.org/places/maps/interactive_ajax/#fid:"+kmap.id;
-					$(app.div).html("<iframe frameborder='0' src='"+link+"' style='height:"+h+"px;width:100%'></iframe>");
-					}
-				else sui.plc.Draw(kmap);
-				});
-		}
-
-	app.DrawFooter();																				// Draw footer
-*/
 
 // HELPER FUNCTIONS //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

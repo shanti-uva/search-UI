@@ -138,7 +138,7 @@ class SearchUI  {
 			<div class='sui-advEdit' style='display:none' id='sui-advEdit-recent'></div></div>
 			<div style='margin-top:4px;float:right;font-size:13px'>
 				<div>Show Boolean controls? &nbsp;<input type='checkbox' id='sui-showBool' ${this.showBool ? "checked" : ""}></div>
-				<div class='sui-geoLocate' id='sui-geoLocate'>Geo-Locate</div>
+				<div class='sui-geoLocate' id='sui-geoLocate'>Show on map</div>
 			</div>
 		</div>
 		<div id='sui-footer' class='sui-footer'></div></div>
@@ -435,6 +435,7 @@ class SearchUI  {
 	{
 		let url=`${this.solrBase}kmterms${this.solrId}/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
+		trace(data)
 			callback(data.response.docs);															// Return data
 			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}
