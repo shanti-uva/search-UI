@@ -416,6 +416,7 @@ class SearchUI  {
 		url+="&child_count.rows=0&fl=child_count:[subquery],*&child_count.q={!child%20of='block_type:parent'}";
 		url+="{!term%20f=uid%20v=$row.related_subjects_id_s}&rows=2000&q=id:"+id+"%20OR%20{!child%20of=block_type:parent}id:"+id+"%20&sort=block_type%20DESC,%20related_subjects_header_s%20ASC";
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
+			trace(112222,data)
 			callback(data.response.docs);															// Return data
 		}).fail((msg)=> { console.log(msg); });														// Failure message
 	}
@@ -431,11 +432,11 @@ class SearchUI  {
 			}).fail((msg)=> { console.log(msg); this.LoadingIcon(false);  this.Popup("Related query error"); });	// Failure message
 	}
 
+	
 	GetChildNamesFromID(facet,id, callback) 													// GET NAMES/ETYMOLGY DATA FROM ID
 	{
 		let url=`${this.solrBase}kmterms${this.solrId}/select?fl=uid%2C%5Bchild%20childFilter%3Did%3A${facet}-${id}_names-*%20parentFilter%3Dblock_type%3Aparent%5D&q=uid%3A${facet}-${id}&wt=json&rows=300`;
 		$.ajax( { url:url, dataType:'jsonp', jsonp:'json.wrf' }).done((data)=> {					// Get kmap
-		trace(data)
 			callback(data.response.docs);															// Return data
 			}).fail((msg)=> { console.log(msg); });													// Failure message
 	}

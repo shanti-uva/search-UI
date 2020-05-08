@@ -55,29 +55,48 @@ class Places  {
 		sui.LoadingIcon(true,64);																// Show loading icon
 			
 		var app={ container:"plc-main",															// Holds startup parameters													
-			map:null, baseMap:"hybrid", kml:null, 								
+			map:null, baseMap:"hybrid", geoJSON:null, 								
 			mapView: null,  sceneView: null, activeView:null, opt:4|8|64|512|1024,
 			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,measurement:null,				
 			center: [91.1721, 29.6524], zoom:12, tilt:80,
-			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/Graphic", "esri/layers/FeatureLayer", "esri/layers/KMLLayer", "esri/core/watchUtils","esri/geometry/Extent"],
+			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/Graphic", "esri/layers/FeatureLayer", "esri/layers/GeoJSONLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
 	   		};
 	
-/*		app.kml=`http://www.thlib.org:8080/thdl-geoserver/wms
-			?LAYERS=thl:roman_popular_poly,thl:roman_popular_pt,thl:roman_popular_line
-			&TRANSPARENT=TRUE&SPHERICALMERCATOR=true&PROJECTION=EPSG:900913&UNITS=m
-			&GEOSERVERURL=http://www.thlib.org:8080/thdl-geoserver
-			&STYLES=thl_noscale,thl_noscale,thl_noscale
-			&CQL_FILTER=fid=${id};fid=${id};fid==${id}
-			&SERVICE=WMS&SRS=EPSG:900913&FORMAT=kml&VERSION=1.1.1
-			&BBOX=3159514.209965,-1447629.9642176,20066161.87184,9001617.5490246
-			&WIDTH=864&HEIGHT=53
-			&REQUEST=GetMap`.replace(/\t|\n|\r|/g,"")
-			app.kml="https://viseyes.org/visualeyes/projects/test.kml"
-*/
-
 		this.app=app;	   
 		
+/*		app.geoJSON=`{"type":"FeatureCollection", "features": [
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-116.51433,33.10683,9.01]},"properties":{"mag":0.85,"place":"9km ENE of Julian, CA","time":1560962164830,"title":"M 0.9 - 9km ENE of Julian, CA","depth":9.01}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-119.7572,39.6002,8.3]},"properties":{"mag":0.9,"place":"1km ENE of Sun Valley, Nevada","time":1560960042110,"title":"M 0.9 - 1km ENE of Sun Valley, Nevada","depth":8.3}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-149.7198,62.885,74.5]},"properties":{"mag":1.3,"place":"65km NNE of Talkeetna, Alaska","time":1560959595205,"title":"M 1.3 - 65km NNE of Talkeetna, Alaska","depth":74.5}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-149.3776,62.9519,66.2]},"properties":{"mag":1.1,"place":"53km SSW of Cantwell, Alaska","time":1560959262391,"title":"M 1.1 - 53km SSW of Cantwell, Alaska","depth":66.2}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-115.4425,36.6505,6.9]},"properties":{"mag":1.1,"place":"56km NW of Nellis Air Force Base, Nevada","time":1560959154530,"title":"M 1.1 - 56km NW of Nellis Air Force Base, Nevada","depth":6.9}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-149.4757,60.7773,14]},"properties":{"mag":1.4,"place":"43km W of Whittier, Alaska","time":1560958496752,"title":"M 1.4 - 43km W of Whittier, Alaska","depth":14}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-154.2321,57.7775,62.2]},"properties":{"mag":1.5,"place":"30km NNW of Larsen Bay, Alaska","time":1560957405745,"title":"M 1.5 - 30km NNW of Larsen Bay, Alaska","depth":62.2}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-119.7658,39.6,9.5]},"properties":{"mag":0.9,"place":"0km ENE of Sun Valley, Nevada","time":1560957112840,"title":"M 0.9 - 0km ENE of Sun Valley, Nevada","depth":9.5}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-140.7342,60.5606,18.9]},"properties":{"mag":1.3,"place":"108km ENE of Cape Yakataga, Alaska","time":1560956892229,"title":"M 1.3 - 108km ENE of Cape Yakataga, Alaska","depth":18.9}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-148.6673,60.8276,18.5]},"properties":{"mag":1.3,"place":"6km N of Whittier, Alaska","time":1560956487970,"title":"M 1.3 - 6km N of Whittier, Alaska","depth":18.5}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-122.85183,38.82817,2.03]},"properties":{"mag":0.9,"place":"10km NW of The Geysers, CA","time":1560955795230,"title":"M 0.9 - 10km NW of The Geysers, CA","depth":2.03}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-123.06333,39.03217,3.31]},"properties":{"mag":3.16,"place":"13km W of Lakeport, CA","time":1560954977080,"title":"M 3.2 - 13km W of Lakeport, CA","depth":3.31}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-119.7648,39.6023,9.3]},"properties":{"mag":1,"place":"1km NE of Sun Valley, Nevada","time":1560954850870,"title":"M 1.0 - 1km NE of Sun Valley, Nevada","depth":9.3}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-119.7567,39.5923,1.5]},"properties":{"mag":1.6,"place":"1km ESE of Sun Valley, Nevada","time":1560954720260,"title":"M 1.6 - 1km ESE of Sun Valley, Nevada","depth":1.5}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-147.3933,63.666,75.6]},"properties":{"mag":1.4,"place":"80km ESE of Healy, Alaska","time":1560953957416,"title":"M 1.4 - 80km ESE of Healy, Alaska","depth":75.6}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-120.56133,36.00517,3.28]},"properties":{"mag":1.12,"place":"17km NW of Parkfield, CA","time":1560953939420,"title":"M 1.1 - 17km NW of Parkfield, CA","depth":3.28}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-117.66883,36.11733,3.62]},"properties":{"mag":0.65,"place":"26km ENE of Coso Junction, CA","time":1560952795020,"title":"M 0.7 - 26km ENE of Coso Junction, CA","depth":3.62}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-119.7332,39.6033,0]},"properties":{"mag":1.8,"place":"3km ENE of Sun Valley, Nevada","time":1560952611730,"title":"M 1.8 - 3km ENE of Sun Valley, Nevada","depth":0}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-141.2967,60.1453,3.8]},"properties":{"mag":1.4,"place":"63km E of Cape Yakataga, Alaska","time":1560952497532,"title":"M 1.4 - 63km E of Cape Yakataga, Alaska","depth":3.8}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-155.2915,19.4175,-0.15]},"properties":{"mag":1.8,"place":"5km WSW of Volcano, Hawaii","time":1560951948410,"title":"M 1.8 - 5km WSW of Volcano, Hawaii","depth":-0.15}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-112.55833,46.912,12.49]},"properties":{"mag":2.23,"place":"10km ESE of Lincoln, Montana","time":1560951912930,"title":"M 2.2 - 10km ESE of Lincoln, Montana","depth":12.49}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-157.2126,66.3306,0]},"properties":{"mag":0.8,"place":"65km SSW of Kobuk, Alaska","time":1560951540390,"title":"M 0.8 - 65km SSW of Kobuk, Alaska","depth":0}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-116.52717,33.10483,7.68]},"properties":{"mag":2.76,"place":"8km ENE of Julian, CA","time":1560951254500,"title":"M 2.8 - 8km ENE of Julian, CA","depth":7.68}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-117.91533,36.111,3.8]},"properties":{"mag":0.8,"place":"8km NNE of Coso Junction, CA","time":1560951089350,"title":"M 0.8 - 8km NNE of Coso Junction, CA","depth":3.8}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-143.7007,69.7073,10.4]},"properties":{"mag":1.7,"place":"47km S of Kaktovik, Alaska","time":1560950971062,"title":"M 1.7 - 47km S of Kaktovik, Alaska","depth":10.4}},
+		{"type":"Feature","geometry":{"type":"Point","coordinates":[-120.47667,35.92283,2.94]},"properties":{"mag":1.07,"place":"5km NW of Parkfield, CA","time":1560950439360,"title":"M 1.1 - 5km NW of Parkfield, CA","depth":2.94}}
+		]}`;
+*/	
+
+
+
 		if (app.opt&1)	 		app.reqs.push("esri/widgets/ScaleBar");							// Scalebar if spec'd
 		if (app.opt&2)	 		app.reqs.push("esri/widgets/Search");							// Search
 		if (app.opt&8)	 		app.reqs.push("esri/widgets/BasemapGallery");					// Basepicker 
@@ -90,7 +109,7 @@ class Places  {
 
 		require(app.reqs, function() {														// LOAD ArcGIS MODULES
 			var i,key;
-			var Map,WebMap,MapView,SceneView,Graphic,FeatureLayer,KMLLayer,Extent;
+			var Map,WebMap,MapView,SceneView,Graphic,FeatureLayer,GeoJSONLayer,Extent;
 			var ScaleBar,Search,BasemapGallery,LayerList,Legend,Sketch,GraphicsLayer,Bookmarks,watchUtils,Print,Measurement;
 			for (i=0;i<app.reqs.length;++i)	{													// For each required module
 				key=app.reqs[i].match(/([^\/]+)$/i)[1];											// Extract variable name
@@ -100,7 +119,7 @@ class Places  {
 				else if (key == "SceneView")		SceneView=arguments[i];
 				else if (key == "Graphic")			Graphic=arguments[i];
 				else if (key == "FeatureLayer")		FeatureLayer=arguments[i];
-				else if (key == "KMLLayer")			KMLLayer=arguments[i];
+				else if (key == "GeoJSONLayer")		GeoJSONLayer=arguments[i];
 				else if (key == "watchUtils")		watchUtils=arguments[i];
 				else if (key == "Extent")			Extent=arguments[i];
 				else if (key == "ScaleBar")			ScaleBar=arguments[i];
@@ -131,7 +150,7 @@ class Places  {
 		app.ShowOptions=function() {															// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
 			document.getElementById("plc-base-btn").style.display=(app.opt&8) ? "block" : "none";							
-			document.getElementById("plc-layer-btn").style.display=(app.opt&16 && (app.map.portalItem || app.kml)) ? "block" : "none";							
+			document.getElementById("plc-layer-btn").style.display=(app.opt&16 && (app.map.portalItem || app.geoJSON)) ? "block" : "none";							
 			document.getElementById("plc-legend-btn").style.display=(app.opt&32 && app.map.portalItem)  ? "block" : "none";						
 			document.getElementById("plc-sketch-btn").style.display=(app.opt&64) ? "block" : "none";						
 			document.getElementById("plc-book-btn").style.display=(app.opt&128 && app.map.bookmarks) ? "block" : "none";							
@@ -156,19 +175,13 @@ class Places  {
 			});
 		app.ShowOptions();																			// Hide/show options		
 			
-		if (app.kml) {																				// Add KML/KMZ if spec'd	
-			app.kml=new KMLLayer({ url:app.kml });													// Make new layer
-			app.map.add(app.kml);																	// Add it to map
-			app.mapView.whenLayerView(app.kml).then(function(layerView) {
-				watchUtils.whenFalseOnce(layerView, "updating", function() {
-					var polygons=layerView.allVisiblePolygons;
-					var lines=layerView.allVisiblePolylines;
-					var points=layerView.allVisiblePoints;
-					var images=layerView.allVisibleMapImages;
-					var kmlFullExtent=polygons.concat(lines).concat(points).concat(images)
-					.map(graphic => (graphic.extent ? graphic.extent : graphic.geometry.extent))
-					.reduce((previous, current) => previous.union(current));
-					app.mapView.goTo({ extent: kmlFullExtent });
+		if (app.geoJSON) {																			// Add geoJSON if spec'd	
+			app.geoJSON=URL.createObjectURL(new Blob([app.geoJSON], {type: "text"}));				// Make into URL
+			app.geoJSON=new GeoJSONLayer({ url:app.geoJSON });										// Make new layer
+			app.map.add(app.geoJSON);																// Add it to map
+			app.mapView.whenLayerView(app.geoJSON).then(function() {								// When layer is ready
+				app.geoJSON.queryExtent().then(function(response) {									// Get extent
+					app.mapView.goTo(response.extent);												// Zoom to extent
 					});
 				});
 			}
