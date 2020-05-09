@@ -60,8 +60,8 @@ class Places  {
 			
 		var app={ container:"plc-main",															// Holds startup parameters													
 			map:null, baseMap:"hybrid", geoJSON:null, 								
-			mapView: null,  sceneView: null, activeView:null, opt:4|8|64|512|1024,
-			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null,measurement:null,				
+			mapView: null,  sceneView: null, activeView:null, opt:4|8|64|256|512|1024,
+			bookmarks:null, legend:null, layers:null, basePick:null, sketch:null, measurement:null, print:null,				
 			center: [91.1721, 29.6524], zoom:12, tilt:80,
 			reqs:["esri/Map","esri/WebMap", "esri/views/MapView", "esri/views/SceneView", "esri/Graphic", "esri/layers/FeatureLayer", "esri/layers/GeoJSONLayer", "esri/core/watchUtils","esri/geometry/Extent"],
 			div: this.div								
@@ -119,7 +119,7 @@ class Places  {
 				</div>`;
 			$("#plc-main").append(str);
 
-		app.ShowOptions=function() {															// SHOW ACTIVE OPTIONS
+		app.ShowOptions=function() {																// SHOW ACTIVE OPTIONS
 			document.getElementById("plc-switch-btn").style.display=(app.opt&4) ? "block" : "none";	// Hide/show icons
 			document.getElementById("plc-base-btn").style.display=(app.opt&8) ? "block" : "none";							
 			document.getElementById("plc-layer-btn").style.display=(app.opt&16 && (app.map.portalItem || app.geoJSON)) ? "block" : "none";							
@@ -217,6 +217,16 @@ class Places  {
 			app.bookmarks=new Bookmarks({ view:app.mapView, visible:false });						// Add widget
 			document.getElementById("plc-book-btn").addEventListener("click", function() { app.ToggleOption(app.bookmarks); });	 // Add button handler
 			}
+		if (app.opt&256) {  																		// Print
+			document.getElementById("plc-print-btn").addEventListener("click", ()=>{ 				// HANDLE PRINT CLICK
+				if (app.print) { app.print.destroy();	app.print=null; 	return;	}				// Close existing one if open
+				app.print=new Print({ view: app.mapView,											// Add print widget
+					printServiceUrl: "https://utility.arcgisonline.com/arcgis/rest/services/Utilities/PrintingTools/GPServer/Export%20Web%20Map%20Task"
+					});
+				app.mapView.ui.add(app.print, "top-right");											// Position dialog
+				});
+			}
+
 		if (app.opt&(512|1024)) {  																	// Measurement
 			app.measurement=new Measurement();														// Add widget
 			app.mapView.set({ container: "plc-main" });												// Holder for measuring dialog
@@ -232,7 +242,7 @@ class Places  {
 				});
 			}
 	
-
+	
 
 		// POSITION
 
@@ -418,8 +428,7 @@ class Places  {
 					if (data[i].block_child_type == "places_altitude")	trace(data[i].estimate_s+" "+data[i].unit_s)	
 //					if (data[i].block_child_type == "places_shape")		this.geoJSON='{"type":"FeatureCollection", "features": ['+data[i].geometry_grptgeom[0]+']}';	
 					}
-					
-//				this.geoJSON=null
+				this.geoJSON=null
 				});
 	}	
 
@@ -582,6 +591,7 @@ class Places  {
 
 			function drawCat(f) {																	// DRAW CATEGORY
 				let sub="xxx";
+				if (!s[f]) return "";																// Nothing there
 				s[f]=s[f].sort((a,b)=>{ return a.sub < b.sub ? -1 : 1;});							// Sort by sub category
 				let str=`<div id='sui-spCat-${f.replace(/ /g,"_")}' 
 				class='sui-spCat' style='background-color:${sui.assets[o.asset_type].c}'> ${o.title} ${f}</div>
