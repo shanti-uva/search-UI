@@ -386,7 +386,7 @@ class Places  {
 			});
 	
 		sui.GetRelatedFromID(this.kmap.uid,(data)=> { 											// Load data
-			let i;
+			let i,shapes=[];
 			if (data[0].illustration_external_url && data[0].illustration_external_url[0]) {	// If an image spec'd
 				$("#sui-relatedImg").addClass("sui-relatedImg");								// Set style
 				$("#sui-relatedImg").prop("src",data[0].illustration_external_url[0]);			// Show it
@@ -401,8 +401,9 @@ class Places  {
 
 			for (i=0;i<data.length;++i) {														// For each child
 				if (data[i].block_child_type == "places_altitude")	trace(data[i].estimate_s+" "+data[i].unit_s);	// Capture altitude
-				if (data[i].block_child_type == "places_shape")		this.geoJSON=data[i].geometry_grptgeom;			// Get places
+				if (data[i].block_child_type == "places_shape")		shapes.push(data[i].geometry_grptgeom[0]);		// Add shape
 				}
+			if (shapes.length)	this.geoJSON='{"type":"FeatureCollection", "features": ['+shapes.join(",")+"]}";	// Add header
 			if (!this.geoJSON)	this.GeoLocate();												// Get extent from arcGIS if not in kmap
 			});
  			}	
