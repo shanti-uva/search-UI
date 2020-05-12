@@ -41,7 +41,7 @@ class Places  {
 		this.showing=false;
 		$("<link/>", { rel:"stylesheet", type:"text/css", href:"https://js.arcgis.com/4.15/esri/themes/light/main.css" }).appendTo("head");
 		this.div=sui.pages.div;	
-		this.content=["","...loading","...loading"];
+		this.content=["","...loading",""];
 		this.content2=["<br>","<br>"];
 		this.popovers=null;
 	}
@@ -349,6 +349,11 @@ class Places  {
 		this.DrawContent();																		// Draw tabset and captions is not related subject/places
 		this.ShowTab(related ? related : 0);													// Show tab contents
 		sui.pages.DrawRelatedAssets(this.kmap);													// Draw related assets menu
+
+		if (this.kmap.shapes_centroid_grptgeom) {												// If has a centroid
+			let v=this.kmap.shapes_centroid_grptgeom.match(/\[(.*)\]/)[1].split(",");			// Get lat/lon
+			this.content[2]="<br>&#xe62B&nbsp;&nbsp;<span class='sui-pageLab'>LON/LAT:</span>&nbsp&nbsp;&nbsp&nbsp;&nbsp;<span class='sui-pageVal'>"+v[0]+",&nbsp;&nbsp;"+v[1]+"</span><br>"; 
+			}
 		sui.GetChildNamesFromID("places", this.kmap.id, (d)=> {									// Get name from children
 			let i,o,oo,l=[];
 			let str=`<div style='display:inline-block;width:50%'><br>
@@ -400,13 +405,14 @@ class Places  {
 			this.AddRelatedSubjects(this.kmap,data);											// Add related subjects html
 
 			for (i=0;i<data.length;++i) {														// For each child
-				if (data[i].block_child_type == "places_altitude")	trace(data[i].estimate_s+" "+data[i].unit_s);	// Capture altitude
-				if (data[i].block_child_type == "places_shape")		shapes.push(data[i].geometry_grptgeom[0]);		// Add shape
+				if (data[i].block_child_type == "places_altitude")	
+					this.content[2]+="<p>&nbsp;&uarr;&nbsp;&nbsp;&nbsp;<span class='sui-pageLab'>ALTITUDE:</span>&nbsp&nbsp;&nbsp;<span class='sui-pageVal'>"+data[i].estimate_s+" "+data[i].unit_s+"</span></p><br>"; 
+				if (data[i].block_child_type == "places_shape")	shapes.push(data[i].geometry_grptgeom[0]);		// Add shape
 				}
 			if (shapes.length)	this.geoJSON='{"type":"FeatureCollection", "features": ['+shapes.join(",")+"]}";	// Add header
 			if (!this.geoJSON)	this.GeoLocate();												// Get extent from arcGIS if not in kmap
 			});
- 			}	
+ 		}	
 
 	ShowTab(which)																			// OPEN TAB
 	{	
