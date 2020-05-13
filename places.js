@@ -409,7 +409,12 @@ class Places  {
 					this.content[2]+="<p>&nbsp;&uarr;&nbsp;&nbsp;&nbsp;<span class='sui-pageLab'>ALTITUDE:</span>&nbsp&nbsp;&nbsp;<span class='sui-pageVal'>"+data[i].estimate_s+" "+data[i].unit_s+"</span></p><br>"; 
 				if (data[i].block_child_type == "places_shape")	shapes.push(data[i].geometry_grptgeom[0]);		// Add shape
 				}
-			if (shapes.length)	this.geoJSON='{"type":"FeatureCollection", "features": ['+shapes.join(",")+"]}";	// Add header
+			if (shapes.length > 1) {															// If more than 1 shape
+				for (i=0;i<shapes.length;++i)													// For each one
+					if (shapes[i].match(/point/i))												// If it's a point
+						shapes.splice(i,1);														// Don't add it
+				}
+			this.geoJSON='{"type":"FeatureCollection", "features": ['+shapes.join(",")+"]}";	// Add header
 			if (!this.geoJSON)	this.GeoLocate();												// Get extent from arcGIS if not in kmap
 			});
  		}	
