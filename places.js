@@ -140,6 +140,7 @@ class Places  {
 				}
 
 		}
+		
 		app.map=new Map({ basemap:app.baseMap, ground:"world-elevation" });							// Make new map
 		app.sceneView=new SceneView( { 	container:null,	map: app.map });							// 3D view (hidden)
 		app.activeView=app.mapView=new MapView({													// 2D view
@@ -242,8 +243,6 @@ class Places  {
 				});
 			}
 	
-	
-
 		// POSITION
 
 		app.mapView.when(function() { 																// When 2D map loads
@@ -301,6 +300,7 @@ class Places  {
 					});
 				});
 			}
+		_this.app.geoJSON=null;																		// Don't reload it
 		});																							// Require closure
 	}																								// End Draw()
 
@@ -313,7 +313,7 @@ class Places  {
 			for (let i=this.kmap.ancestors_txt.length-1;i>0;--i)								// For each ancestor backwards
 			loc+=this.kmap.ancestors_txt[i]+"%20";												// Add name
 			if (this.kmap.ancestors_txt.length == 1) loc=this.kmap.ancestors_txt[0];			// Top level places
-			let url="//geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=pjson&SingleLine="+loc;
+			let url="//geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/findAddressCandidates?f=pjson&category=Country,Region&SingleLine="+loc;
 			$.ajax( { url: url, dataType: 'jsonp' } ).done(function(res) {						// Run query
 				_this.extent=res.candidates[0].extent;											// Extract extent
 				_this.extent.spatialReference=res.spatialReference.wkid;						// Set ref
@@ -333,7 +333,7 @@ class Places  {
 		str+=sui.pages.DrawTabMenu(["MAP","NAMES","LOCATION"]);									// Add tab menu
 		str+="</div><div class='plc-main' id='plc-main' ></div>";								// Map holder
 		$(this.div).html(str.replace(/\t|\n|\r|/g,""));											// Add to div
-		$("#plc-main").css("height",$("#sui-main").height()*.667+"px");							// Fill 2/3rds
+		$("#plc-main").css("height",$("#sui-main").height()-185+"px");							// Fill screen
 		$("[id^=sui-tabTab]").on("click", (e)=> {												// ON TAB CLICK
 			this.ShowTab(e.currentTarget.id.substring(10));										// Get index of tab	and draw it
 			});
@@ -414,9 +414,12 @@ class Places  {
 					if (shapes[i].match(/point/i))												// If it's a point
 						shapes.splice(i,1);														// Don't add it
 				}
-			this.geoJSON='{"type":"FeatureCollection", "features": ['+shapes.join(",")+"]}";	// Add header
-			if (!this.geoJSON)	this.GeoLocate();												// Get extent from arcGIS if not in kmap
-			});
+			if (shapes.length) {
+				this.geoJSON='{"type":"FeatureCollection", "features": ['+shapes.join(",")+"]}"; // Add header
+				if (this.showing) this.app.AddGeoJSON(this.geoJSON); 							// If already showing a map add it
+				}
+			else this.GeoLocate();																// Get extent from arcGIS if not in kmap
+		});
  		}	
 
 	ShowTab(which)																			// OPEN TAB
