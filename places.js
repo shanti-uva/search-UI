@@ -158,22 +158,44 @@ class Places  {
 			$("#sui-footer").css("background-color","#6faaf1");										// Color footer
 			$("#plc-infoDiv").css("left","25px");	
 
-			let i,graphic;
+			let i,graphic,gs=[];
 			let minLat=999999,minLon=999999,maxLat=-999999,maxLon=-999999;
-	
+
+			const labelClass={ 
+				symbol: { type: "text", color:"white", haloColor:"black", haloSize:"1px", font: { family:"sans-serif", size: 11 }},
+				labelPlacement: "above-center",
+				labelExpressionInfo: { expression: "$feature.NAME"	}
+				};
+		
+			app.fl=new FeatureLayer({																// Create feature layer to hold popovers
+				fields:[{ name:"ObjectID", alias:"ObjectID", type:"oid" },
+						{ name:"ui", alias:"ui", type:"string"  }, 
+						{ name:"Name", alias:"Name", type:"string"  } 
+						],
+				objectIdField: "ObjectID", geometryType:"point", source:[],  
+				labelingInfo:[labelClass],
+				renderer: { type: "simple", symbol:{ type: "picture-marker", url:"popover.png", width:19, height:13 } }
+				});
+			
+			app.map.add(app.fl);																	// Add new feature layer to map		  
+		
 			for (i=0;i<data.length;i++) {															// For each element
 				if (data[i].lat < minLat)	minLat=data[i].lat;										// Get min lat
 				if (data[i].lat > maxLat)	maxLat=data[i].lat;										// Get max lat
 				if (data[i].lon < minLon)	minLon=data[i].lon;										// Get min lon
 				if (data[i].lon > maxLon)	maxLon=data[i].lon;										// Get max lom
 				graphic=new Graphic({																// Addloc new graphic
-					geometry:{ type: "point", latitude:data[i].lat, longitude:data[i].lon },		// Position
-					symbol:{ type: "picture-marker", url:"popover.png", width:19, height:13 },		// Shape
+					geometry:{ type: "point", latitude:data[i].lat, longitude:data[i].lon, m:212 },	// Position
 					attributes:data[i]																// Raw data
-				});
-				app.gl.add(graphic);																// Add to layer
-				}	
-			
+					});
+				data[i].oid=graphic.uid;															// Ave graphics id
+				gs.push(graphic);																	// Add to array of graphics
+
+			}	
+			const addEdits={addFeatures: gs };
+			app.fl.applyEdits(addEdits)
+	
+
 			_this.extent={ 																			// Set extent based on minimax of popovers
 				spatialReference:4326, 																// In lat/lon coord space
 				xmax:maxLon, xmin:minLon,															// Longitude
@@ -181,10 +203,14 @@ class Places  {
 				}	
 
 			app.mapView.on("pointer-move", function(event) {										// HANDLE HOVER
-				var screenPoint={ x: event.x, y: event.y };											// Format pos
+				let i,id="",screenPoint={ x: event.x, y: event.y };									// Format pos
 				app.mapView.hitTest(screenPoint).then(function(response) {							// Search for graphics at the clicked location
 					if (response.results.length) {													// Found at least one
-						let id=response.results[0].graphic.attributes.ui;							// Get id
+						for (i=0;i<_this.popovers.length;++i)										// Look through popovers
+							if ( _this.popovers[i].oid == response.results[0].graphic.attributes.ObjectID) { // If oid matchs
+								id=_this.popovers[i].ui;											// Set kmap id
+								break;																// Stop looking
+								}
 						event.type="mousemove";														// Make event compatible
 						sui.pages.ShowPopover(id, event)
 				 		}
@@ -210,7 +236,12 @@ class Places  {
 			document.getElementById("plc-legend-btn").addEventListener("click", function() { app.ToggleOption(app.legend); });	// Add button handler
 			}
 		if (app.opt&64) {																			// Sketch 
-			app.gl=new GraphicsLayer();  app.map.add(app.gl);										// Add new graphics layer to map
+			const labelClass={ 
+				symbol: { type: "text", color: "green", font: { family: "Sans", size: 12, weight: "bold"  }},
+				labelPlacement: "above-center",
+				labelExpressionInfo: {  expression: "$feature.MARKER_ACTIVITY"	}
+				};
+			app.gl=new GraphicsLayer({ labelingInfo: [labelClass]});  app.map.add(app.gl);			// Add new graphics layer to map
 			app.sketch=new Sketch({ view:app.mapView, visible:false, layer:app.gl });				// Add widget
 			document.getElementById("plc-sketch-btn").addEventListener("click", function() { app.ToggleOption(app.sketch); });	// Add button handler
 			}
